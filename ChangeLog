@@ -1,0 +1,14 @@
+libDAI-0.2.1 (2008-05-26)
+-------------------------
+
+Bugfix release.
+* added missing cstdio header in util.h
+* fixed Properties in MR_CLAMPING_* and MR_EXACT_*
+* added description of the factor graph fileformat
+* improved Makefile
+
+
+libDAI-0.2.0 (2006-11-30)
+-------------------------
+
+First public release.

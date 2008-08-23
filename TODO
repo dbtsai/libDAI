@@ -1,0 +1,96 @@
+IMPORTANT
+
+- Find out which methods need connected factor graphs (at least TreeEP and JunctionTree).
+
+- Forwardport the Bart patch
+
+- Get rid of multiple inheritance
+
+- Introduce a namespace libDAI
+
+- Investigate the performance penalty from the use of Properties map
+
+- Another design question that needs to be answered: should a BP object own a
+  FactorGraph, or only store a reference to a FactorGraph (which can optimize
+  memory), or should it be a FactorGraph with additional variables and functions?
+  Probably, the first or second option would be the best. Since FactorGraphs are
+  assumed to be rather static, it would make sense to store *references* to
+  FactorGraphs inside AIAlgs. Or maybe some smart_ptr? It would make sense to 
+  prevent unnecessary copying of FactorGraphs. Also, general marginalization 
+  functions now copy a complete object. Instead, it would make more sense that
+  they construct a new object without copying the FactorGraph. Or they can be made
+  simply methods of the general InfAlg class.
+
+
+DIFFICULT
+
+- Bug: TreeEP sometimes returns NANs.
+
+- Bug: TreeEP::logZ() seems to be wrong (?).
+
+- Bug: strange things happen for at least JTree and TreeEP if the factor graph is not connected.
+  Should be fixed by finding out which methods demand connected factor graphs and these
+  methods should check whether the supplied factor graph is connected.
+
+- Kees' trick for preventing NANs in GBP updates:  if quantity smaller than epsilon, replace by epsilon.
+
+- Bug: MF_SEQRANDOM does not work on alarm2.fg (normalization error: Z = 0)
+
+
+OPTIONAL
+
+- Restore brute force EXACT method.
+
+- Alternative implementation of undo factor changes: the only things that have to be
+undone are setting a factor to all ones and setting a factor to a Kronecker delta. This
+could also be implemented in the factor itself, which could maintain its state 
+(one/delta/full) and act accordingly.
+
+- Regression test could be enhanced by 
+  * reporting number of iterations
+  * reporting all single node marginal errors
+
+- Think about the _fac2ind variable: a better implementation of this feature is
+probably possible.
+
+- Changed() methods?
+
+- It might be an idea to forbid modification of the structure of a factor graph
+  (except in constructors). Then we could do away with Regenerate and similar methods.
+
+- Think about whether using the L-1 norm as a distance measure between new and
+  old messages/beliefs would be better, since || P(x_A, x_B) - Q(x_A, xB) ||_1 < epsilon
+  implies that || P(x_A) - Q(x_A) ||_1 < epsilon. However, for a product of messages
+  we have the weaker || P1(x_A) P2(x_A) - Q1(x_A) Q2(x_A) ||_1 < 2 epsilon if
+  || P1(x_A) - Q1(x_A) ||_1 < epsilon AND || P2(x_A) - Q1(x_A) ||_1 < epsilon...
+
+- Implement damping.
+
+- Optimize GBP with precalculated indices.
+
+- Variable elimination should be implemented generically using a function
+  object that tells you which variable to delete.
+
+- Improve general support for graphs and trees.
+
+- What to do in case of divide-by-zero? For HUGIN, the correct way to handle
+  this is to define x/0 = 0. For other methods, this may not be the case...
+  Maybe a good solution would be to make different flavours of Prob which differ
+  in the way that they handle zeroes (two issues here: normalization of an all-zero
+  factor, which appears to be a sign that something is wrong, and division-by-zero
+  in operator/, operator/= and inverse(), which is probably harmless and can be fixed
+  by defining x/0 = 0. I think it is harmless because usually it occurs by calculating
+  some marginal _in the absence of some factor_ as an intermediate step. Afterwards,
+  this factor is always multiplied in again, which sets any value on these positions
+  to zero. Another difference would be how to deal with underflows: GBP often has 
+  numbers that converge to zero, but instead this gives an underflow. A solution is
+  to set everything smaller than some epsilon to zero. Finally, one could decide to
+  add support for sparse potentials. Oh, and whether it can handle negative entries.
+
+- Optimize BP_SEQMAX (it should use a better data structure than a vector for the residuals).
+  Also it does strange things in case of negative potentials.
+
+- Investigate the possibility to calculate logZ *during* the inference algorithm
+  by keeping track of all normalizations.
+
+- Write documentation.

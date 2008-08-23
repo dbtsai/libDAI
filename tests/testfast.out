@@ -1,0 +1,39 @@
+# testfast.fg
+# METHOD                                      CLOCKS     MAX ERROR   AVG ERROR  LOGZ ERROR     MAXDIFF
+JTREE_HUGIN                                        0    
+JTREE_SHSH                                         1     1.000e-09   1.000e-09   1.000e-09   1.000e-09
+BP_SEQFIX                                          1     9.483e-02   3.078e-02   1.737e-02   1.000e-09
+BP_SEQRND                                          0     9.483e-02   3.078e-02   1.737e-02   1.000e-09
+BP_SEQMAX                                          0     9.483e-02   3.078e-02   1.737e-02   1.000e-09
+BP_PARALL                                          0     9.483e-02   3.078e-02   1.737e-02   1.000e-09
+MF_SEQRND                                          4     3.607e-01   1.904e-01  -9.409e-02   1.000e-09
+TREEEP                                             7     3.268e-02   8.023e-03   6.340e-04   1.000e-09
+TREEEPWC                                           6     2.356e-02   1.026e-02   4.876e-03   1.000e-09
+GBP_MIN                                            2     9.483e-02   3.078e-02   1.737e-02   1.000e-09
+GBP_DELTA                                         13     6.291e-01   3.350e-01  -3.303e-01   1.000e-09
+GBP_LOOP3                                          2     9.483e-02   3.078e-02   1.737e-02   1.000e-09
+GBP_LOOP4                                          8     7.893e-01   3.569e-01  -3.781e-01   1.000e-09
+HAK_MIN                                           34     9.483e-02   3.078e-02   1.737e-02   1.000e-09
+HAK_DELTA                                        638     3.684e-01   1.892e-01   9.675e-01   1.000e-09
+HAK_LOOP3                                         39     9.483e-02   3.078e-02   1.737e-02   1.000e-09
+HAK_LOOP4                                       1051     4.970e-03   1.486e-03  -2.503e-04   1.000e-09
+MR_RESPPROP_FULL                                  35     1.676e-02   4.933e-03         nan   1.000e-09
+MR_CLAMPING_FULL                                  21     8.359e-03   2.508e-03         nan   1.000e-09
+MR_EXACT_FULL                                     22     3.527e-03   1.038e-03         nan   1.000e-09
+MR_RESPPROP_LINEAR                                35     1.932e-02   5.506e-03         nan   1.000e-09
+MR_CLAMPING_LINEAR                                20     1.089e-02   3.076e-03         nan   1.000e-09
+MR_EXACT_LINEAR                                   23     5.617e-03   1.742e-03         nan   1.000e-09
+LCBP_FULLCAV_SEQFIX                               34     1.225e-03   5.589e-04         nan   1.000e-09
+LCBP_FULLCAVin_SEQFIX                             36     1.225e-03   5.589e-04         nan   1.000e-09
+LCBP_FULLCAV_SEQRND                               34     1.225e-03   5.589e-04         nan   1.000e-09
+LCBP_FULLCAVin_SEQRND                             35     1.225e-03   5.589e-04         nan   1.000e-09
+LCBP_FULLCAV_NONE                                 26     1.318e-02   2.644e-03         nan   1.000e+00
+LCBP_FULLCAVin_NONE                               27     1.318e-02   2.644e-03         nan   1.000e+00
+LCBP_PAIRCAV_SEQFIX                               30     1.564e-02   5.284e-03         nan   1.000e-09
+LCBP_PAIRCAVin_SEQFIX                             31     1.564e-02   5.284e-03         nan   1.000e-09
+LCBP_PAIRCAV_SEQRND                               28     1.564e-02   5.284e-03         nan   1.000e-09
+LCBP_PAIRCAVin_SEQRND                             28     1.564e-02   5.284e-03         nan   1.000e-09
+LCBP_PAIRCAV_NONE                                 19     1.869e-01   6.816e-02         nan   1.000e+00
+LCBP_PAIRCAVin_NONE                               21     1.869e-01   6.816e-02         nan   1.000e+00
+LCBP_UNICAV_SEQFIX                                10     9.483e-02   3.078e-02         nan   1.000e-09
+LCBP_UNICAV_SEQRND                                10     9.483e-02   3.078e-02         nan   1.000e-09

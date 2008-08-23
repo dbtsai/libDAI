@@ -1,0 +1,16 @@
+#!/bin/bash
+TMPFILE1=`mktemp /var/tmp/testfast.XXXXXX`
+trap 'rm -f $TMP_FILE' 0 1 15
+TMPFILE2=`mktemp /var/tmp/testfast.XXXXXX`
+trap 'rm -f $TMP_FILE2' 0 1 15
+TMPFILE3=`mktemp /var/tmp/testfast.XXXXXX`
+trap 'rm -f $TMP_FILE3' 0 1 15
+
+./testall testfast.fg > $TMPFILE1
+awk '/^#/ {} NF == 2 && !/^#/ {} NF == 6 && !/^#/ { print $1, $3, $4, $5, $6; }' $TMPFILE1 > $TMPFILE2
+awk '/^#/ {} NF == 2 && !/^#/ {} NF == 6 && !/^#/ { print $1, $3, $4, $5, $6; }' testfast.out > $TMPFILE3
+diff -s $TMPFILE2 $TMPFILE3
+
+rm -f $TMPFILE1
+rm -f $TMPFILE2
+rm -f $TMPFILE3
