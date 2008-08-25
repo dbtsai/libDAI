@@ -25,9 +25,9 @@
 #include <numeric>
 #include <cmath>
 #include <cstdlib>
-#include "util.h"
-#include "alldai.h"
 #include <boost/program_options.hpp>
+#include <dai/util.h>
+#include <dai/alldai.h>
 
 
 using namespace std;

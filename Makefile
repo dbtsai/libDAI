@@ -18,6 +18,11 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+# Directories
+INC = include/dai
+SRC = src
+LIB = lib
+
 # We use the BOOST Program Options library
 BOOSTFLAGS = -lboost_program_options
 
@@ -25,7 +30,7 @@ BOOSTFLAGS = -lboost_program_options
 CC = g++
 
 # Flags for the C++ compiler
-CCFLAGS = -Wall -fpic -g -DDEBUG -I. -I$(HOME)/include -O3 #-static #-pg #-DVERBOSE
+CCFLAGS = -Wall -W -Wextra -fpic -g -DDEBUG -I./include -Llib -O3 #-static #-pg #-DVERBOSE
 
 # To enable the Matlab interface, define WITH_MATLAB = yes
 WITH_MATLAB = 
@@ -39,10 +44,10 @@ endif
 # Replace the following with the extension of compiled MEX files on this platform, e.g. .mexglx for x86
 MEXEXT = .mexglx
 
-HEADERS = bipgraph.h diffs.h index.h var.h factor.h varset.h prob.h daialg.h properties.h alldai.h enum.h x2x.h
+HEADERS = $(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/x2x.h
 
 # target matlabs is disabled by default since it only compiles with a very recent MatLab version
-TARGETS = tests utils libdai.a example testregression
+TARGETS = tests utils $(LIB)/libdai.a example testregression
 ifdef WITH_MATLAB
 TARGETS := $(TARGETS) matlabs
 endif
@@ -51,8 +56,8 @@ all : $(TARGETS)
 
 matlabs : matlab/dai.$(MEXEXT) matlab/dai_readfg.$(MEXEXT) matlab/dai_writefg.$(MEXEXT) matlab/dai_removeshortloops.$(MEXEXT) matlab/dai_potstrength.$(MEXEXT)
 
-libdai.a : daialg.o alldai.o bp.o clustergraph.o factorgraph.o hak.o jtree.o lc.o mf.o mr.o properties.o regiongraph.o util.o treeep.o weightedgraph.o x2x.o
-	ar rcs libdai.a daialg.o alldai.o bp.o clustergraph.o factorgraph.o hak.o jtree.o lc.o mf.o mr.o properties.o regiongraph.o util.o treeep.o weightedgraph.o x2x.o
+$(LIB)/libdai.a : daialg.o alldai.o bp.o clustergraph.o factorgraph.o hak.o jtree.o lc.o mf.o mr.o properties.o regiongraph.o util.o treeep.o weightedgraph.o x2x.o
+	ar rcs $(LIB)/libdai.a daialg.o alldai.o bp.o clustergraph.o factorgraph.o hak.o jtree.o lc.o mf.o mr.o properties.o regiongraph.o util.o treeep.o weightedgraph.o x2x.o
 
 tests : tests/test
 
@@ -62,73 +67,73 @@ testregression : tests/test
 	echo Testing...this can take a while...
 	cd tests; ./testregression; cd ..
 
-doc : *.h *.cpp doxygen.conf
+doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
 	doxygen doxygen.conf
 
 clean :
-	rm *.o *.$(MEXEXT) example matlab/*.$(MEXEXT) matlab/*.o tests/test utils/fg2dot utils/createfg utils/remove_short_loops utils/fginfo libdai.a; echo
+	rm *.o *.$(MEXEXT) example matlab/*.$(MEXEXT) matlab/*.o tests/test utils/fg2dot utils/createfg utils/remove_short_loops utils/fginfo $(LIB)/libdai.a; echo
 	rm -R doc; echo
 
 
-daialg.o : daialg.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c daialg.cpp
+daialg.o : $(SRC)/daialg.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/daialg.cpp
 
-bp.o : bp.cpp bp.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c bp.cpp
+bp.o : $(SRC)/bp.cpp $(INC)/bp.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/bp.cpp
 
-lc.o : lc.cpp lc.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c lc.cpp
+lc.o : $(SRC)/lc.cpp $(INC)/lc.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/lc.cpp
 
-mf.o : mf.cpp mf.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c mf.cpp
+mf.o : $(SRC)/mf.cpp $(INC)/mf.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/mf.cpp
 
-factorgraph.o : factorgraph.cpp factorgraph.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c factorgraph.cpp
+factorgraph.o : $(SRC)/factorgraph.cpp $(INC)/factorgraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/factorgraph.cpp
 
-util.o : util.cpp util.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c util.cpp
+util.o : $(SRC)/util.cpp $(INC)/util.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/util.cpp
 
-regiongraph.o : regiongraph.cpp regiongraph.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c regiongraph.cpp
+regiongraph.o : $(SRC)/regiongraph.cpp $(INC)/regiongraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/regiongraph.cpp
 
-hak.o : hak.cpp hak.h $(HEADERS) regiongraph.h
-	$(CC) $(CCFLAGS) -c hak.cpp
+hak.o : $(SRC)/hak.cpp $(INC)/hak.h $(HEADERS) $(INC)/regiongraph.h
+	$(CC) $(CCFLAGS) -c $(SRC)/hak.cpp
 
-clustergraph.o : clustergraph.cpp clustergraph.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c clustergraph.cpp
+clustergraph.o : $(SRC)/clustergraph.cpp $(INC)/clustergraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/clustergraph.cpp
 
-jtree.o : jtree.cpp jtree.h $(HEADERS) weightedgraph.h clustergraph.h regiongraph.h
-	$(CC) $(CCFLAGS) -c jtree.cpp
+jtree.o : $(SRC)/jtree.cpp $(INC)/jtree.h $(HEADERS) $(INC)/weightedgraph.h $(INC)/clustergraph.h $(INC)/regiongraph.h
+	$(CC) $(CCFLAGS) -c $(SRC)/jtree.cpp
 
-treeep.o : treeep.cpp treeep.h $(HEADERS) weightedgraph.h clustergraph.h regiongraph.h jtree.h
-	$(CC) $(CCFLAGS) -c treeep.cpp
+treeep.o : $(SRC)/treeep.cpp $(INC)/treeep.h $(HEADERS) $(INC)/weightedgraph.h $(INC)/clustergraph.h $(INC)/regiongraph.h $(INC)/jtree.h
+	$(CC) $(CCFLAGS) -c $(SRC)/treeep.cpp
 
-weightedgraph.o : weightedgraph.cpp weightedgraph.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c weightedgraph.cpp
+weightedgraph.o : $(SRC)/weightedgraph.cpp $(INC)/weightedgraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/weightedgraph.cpp
 
-mr.o : mr.cpp mr.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c mr.cpp
+mr.o : $(SRC)/mr.cpp $(INC)/mr.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/mr.cpp
 
-properties.o : properties.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c properties.cpp
+properties.o : $(SRC)/properties.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/properties.cpp
 
-alldai.o : alldai.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c alldai.cpp
+alldai.o : $(SRC)/alldai.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/alldai.cpp
 
-x2x.o : x2x.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c x2x.cpp
+x2x.o : $(SRC)/x2x.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/x2x.cpp
 
 # EXAMPLE
 ##########
 
-example : example.cpp $(HEADERS) libdai.a
-	$(CC) $(CCFLAGS) -o example example.cpp -L. libdai.a
+example : $(SRC)/example.cpp $(HEADERS) $(LIB)/libdai.a
+	$(CC) $(CCFLAGS) -o example $(SRC)/example.cpp -ldai
 
 # TESTS
 ########
 
-tests/test : tests/test.cpp $(HEADERS) libdai.a
-	$(CC) $(CCFLAGS) -o tests/test tests/test.cpp -L. -ldai $(BOOSTFLAGS)
+tests/test : tests/test.cpp $(HEADERS) lib/libdai.a
+	$(CC) $(CCFLAGS) -o tests/test tests/test.cpp -ldai $(BOOSTFLAGS)
 
 
 # MATLAB INTERFACE

@@ -19,9 +19,10 @@
 */
 
 
-#include "factorgraph.h"
 #include <iostream>
 #include <cstdlib>
+#include <dai/factorgraph.h>
+
 
 using namespace dai;
 using namespace std;

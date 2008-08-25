@@ -20,7 +20,7 @@
 
 
 #include <iostream>
-#include "alldai.h"
+#include <dai/alldai.h>
 
 
 using namespace dai;

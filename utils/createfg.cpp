@@ -21,10 +21,10 @@
 
 #include <iostream>
 #include <iterator>
-#include "factorgraph.h"
-#include "weightedgraph.h"
-#include "util.h"
 #include <boost/program_options.hpp>
+#include <dai/factorgraph.h>
+#include <dai/weightedgraph.h>
+#include <dai/util.h>
 
 
 using namespace std;
