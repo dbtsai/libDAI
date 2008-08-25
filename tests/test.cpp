@@ -31,6 +31,7 @@
 
 
 using namespace std;
+using namespace dai;
 namespace po = boost::program_options;
 
 

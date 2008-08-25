@@ -24,6 +24,9 @@
 #include "alldai.h"
 
 
+namespace dai {
+
+
 /// Sends a single Property object to an output stream
 std::ostream& operator<< (std::ostream & os, const Property & p) {
     os << p.first << "=";
@@ -120,4 +123,7 @@ std::istream& operator >> (std::istream& is, Properties & ps) {
     }
 
     return is;
+}
+
+
 }

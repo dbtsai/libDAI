@@ -22,6 +22,9 @@
 #include "daialg.h"
 
 
+namespace dai {
+
+
 /// Calculate the marginal of obj on ns by clamping 
 /// all variables in ns and calculating logZ for each joined state
 Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
@@ -221,4 +224,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
     assert( result.size() == (ns.size() * (ns.size() - 1) / 2) );
 
     return result;
+}
+
+
 }

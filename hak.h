@@ -28,6 +28,9 @@
 #include "enum.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -98,6 +101,9 @@ class HAK : public DAIAlgRG {
         void constructMessages();
         void findLoopClusters( const FactorGraph &fg, set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars );
 };
+
+
+}
 
 
 #endif

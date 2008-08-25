@@ -26,6 +26,10 @@
 #include "daialg.h"
 #include "factorgraph.h"
 
+
+namespace dai {
+
+
 using namespace std;
 
 
@@ -68,6 +72,9 @@ class MF : public DAIAlgFG {
         void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
         bool checkProperties();
 };
+
+
+}
 
 
 #endif

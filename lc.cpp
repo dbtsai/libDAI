@@ -30,6 +30,9 @@
 #include "x2x.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -138,7 +141,7 @@ double LC::CalcCavityDist (size_t i, const string &name, const Properties &opts)
             
             // Set interactions of order > 2 to zero
             size_t N = delta(var(i)).size();
-            double *p = &(*Bi.p().p().begin());
+            Real *p = &(*Bi.p().p().begin());
             x2x::p2logp (N, p);
             x2x::logp2w (N, p);
             x2x::fill (N, p, 2, 0.0);
@@ -150,7 +153,7 @@ double LC::CalcCavityDist (size_t i, const string &name, const Properties &opts)
             
             // Set cumulants of order > 2 to zero
             size_t N = delta(var(i)).size();
-            double *p = &(*Bi.p().p().begin());
+            Real *p = &(*Bi.p().p().begin());
             x2x::p2m (N, p);
             x2x::m2c (N, p, N);
             x2x::fill (N, p, 2, 0.0);
@@ -342,4 +345,7 @@ double LC::run() {
     }
 
     return diffs.max();
+}
+
+
 }

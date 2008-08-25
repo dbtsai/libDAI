@@ -19,8 +19,8 @@
 */
 
 
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 
 namespace x2x {

@@ -25,6 +25,9 @@
 #include "util.h"
 
 
+namespace dai {
+
+
 std::ostream & operator << (std::ostream & os, const DEdgeVec & rt) {
     os << "[";
     for( size_t n = 0; n < rt.size(); n++ )
@@ -144,4 +147,7 @@ UEdgeVec RandomDRegularGraph( size_t N, size_t d ) {
     }
 
     return G;
+}
+
+
 }

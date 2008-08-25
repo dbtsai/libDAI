@@ -34,6 +34,9 @@
 #include "enum.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -118,6 +121,9 @@ class TreeEP : public JTree {
         void undoProbs( const VarSet &ns ) { RegionGraph::undoProbs( ns ); init( ns ); }
         bool checkProperties();
 };
+
+
+}
 
 
 #endif

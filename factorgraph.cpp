@@ -27,62 +27,61 @@
 #include <string>
 #include <algorithm>
 #include <functional>
+#include <tr1/unordered_map>
 #include "factorgraph.h"
+
+
+namespace dai {
 
 
 using namespace std;
 
 
-FactorGraph::FactorGraph( const vector<Factor> &P ) : BipartiteGraph<Var,Factor>(), _undoProbs(), _hasNegatives(false), _normtype(Prob::NORMPROB) {
-    // add Factors
+FactorGraph::FactorGraph( const vector<Factor> &P ) : BipartiteGraph<Var,Factor>(), _undoProbs(), _normtype(Prob::NORMPROB) {
+    // add factors, obtain variables
     set<Var> _vars;
-    for(vector<Factor>::const_iterator p2 = P.begin(); p2 != P.end(); p2++ ) {
-        V2s().push_back(*p2);
-        if( !_hasNegatives && p2->hasNegatives() )
-            _hasNegatives = true;
-        for( set<Var>::const_iterator i = p2->vars().begin(); i != p2->vars().end(); i++ )
-            _vars.insert(*i);
+    V2s().reserve( P.size() );
+    size_t nrEdges = 0;
+    for( vector<Factor>::const_iterator p2 = P.begin(); p2 != P.end(); p2++ ) {
+        V2s().push_back( *p2 );
+	copy( p2->vars().begin(), p2->vars().end(), inserter( _vars, _vars.begin() ) );
+	nrEdges += p2->vars().size();
     }
 
-    // if negative factors are present, use LINF norm
-    if( _hasNegatives )
-        _normtype = Prob::NORMLINF;
-    
     // add _vars
-    for(VarSet::const_iterator p1 = _vars.begin(); p1 != _vars.end(); p1++ )
-        vars().push_back(*p1);
+    V1s().reserve( _vars.size() );
+    for( set<Var>::const_iterator p1 = _vars.begin(); p1 != _vars.end(); p1++ )
+        V1s().push_back( *p1 );
+    
+    // create graph structure
+    createGraph( nrEdges );
+}
 
+
+/// Part of constructors (creates edges, neighbours and adjacency matrix)
+void FactorGraph::createGraph( size_t nrEdges ) {
+    // create a mapping for indices
+    std::tr1::unordered_map<size_t, size_t> hashmap;
+    
+    for( size_t i = 0; i < vars().size(); i++ )    	
+    	hashmap[vars()[i].label()] = i;
+    
     // create edges
-    for(size_t i2 = 0; i2 < nrFactors(); i2++ ) {
-        VarSet ns = factor(i2).vars();
-        for(VarSet::const_iterator q = ns.begin(); q != ns.end(); q++ ) {
-            for(size_t i1=0; i1 < nrVars(); i1++ ) {
-                if (var(i1) == *q) {
-                    edges().push_back(_edge_t(i1,i2));
-                    break;
-                }
-            }
-        }
+    edges().reserve( nrEdges );
+    for( size_t i2 = 0; i2 < nrFactors(); i2++ ) {
+        const VarSet& ns = factor(i2).vars();
+        for( VarSet::const_iterator q = ns.begin(); q != ns.end(); q++ )
+            edges().push_back(_edge_t(hashmap[q->label()], i2));        	
     }
 
     // calc neighbours and adjacency matrix
     Regenerate();
-
-    // Check for short loops
-    if( hasShortLoops(P) )
-        cerr << "FactorGraph::FactorGraph():  WARNING: short loops are present" << endl;
 }
 
 
 /*FactorGraph& FactorGraph::addFactor( const Factor &I ) {
     // add Factor
     _V2.push_back( I );
-    if( !_hasNegatives && I.hasNegatives() )
-        _hasNegatives = true;
-
-    // if negative factors are present, use LINF norm
-    if( _hasNegatives )
-        _normtype = Prob::NORMLINF;
 
     // add new vars in Factor
     for( VarSet::const_iterator i = I.vars().begin(); i != I.vars().end(); i++ ) {
@@ -302,6 +301,15 @@ void FactorGraph::makeCavity(const Var & n) {
         factor(*I).fill(1.0);
 }
 
+
+bool FactorGraph::hasNegatives() const {
+    bool result = false;
+    for( size_t I = 0; I < nrFactors() && !result; I++ )
+        if( factor(I).hasNegatives() )
+	    result = true;
+    return result;
+}
+ 
 
 /*FactorGraph & FactorGraph::DeleteFactor(size_t I) {
     // Go through all edges
@@ -616,4 +624,7 @@ bool FactorGraph::isConnected() const {
         };
         return remaining.empty();
     }
+}
+
+
 }

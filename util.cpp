@@ -26,6 +26,9 @@
 #include <boost/random/variate_generator.hpp>
 
 
+namespace dai {
+
+
 clock_t toc() {
     tms tbuf;
     times(&tbuf);
@@ -37,7 +40,7 @@ clock_t toc() {
 // Try boost::mt19937 or boost::ecuyer1988 instead of boost::minstd_rand
 typedef boost::minstd_rand _rnd_gen_type;
 
-_rnd_gen_type _rnd_gen(42u);
+_rnd_gen_type _rnd_gen(42);
 
 // Define a uniform random number distribution which produces "double"
 // values between 0 and 1 (0 inclusive, 1 exclusive).
@@ -49,7 +52,7 @@ boost::normal_distribution<> _normal_dist;
 boost::variate_generator<_rnd_gen_type&, boost::normal_distribution<> > _normal_rnd(_rnd_gen, _normal_dist);
 
 
-void rnd_seed( size_t seed ) {
+void rnd_seed( int seed ) {
     _rnd_gen.seed(seed);
 }
 
@@ -59,4 +62,7 @@ double rnd_uniform() {
 
 double rnd_stdnormal() {
     return _normal_rnd();
+}
+
+
 }

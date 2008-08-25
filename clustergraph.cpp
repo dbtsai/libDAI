@@ -26,6 +26,9 @@
 #include "clustergraph.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -113,4 +116,7 @@ ClusterGraph ClusterGraph::VarElim_MinFill() const {
     }
 
     return result;
+}
+
+
 }

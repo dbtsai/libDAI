@@ -21,8 +21,10 @@
 
 #include "../factorgraph.h"
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
+#include <string>
 
+using namespace dai;
 using namespace std;
 
 
@@ -41,7 +43,7 @@ int main( int argc, char *argv[] ) {
             cerr << "Error reading file " << infile << endl;
             return 2;
         } else {
-            if( strcmp( argv[2], "-" ) ) 
+            if( string( argv[2] ) == "-" ) 
                 fg.WriteToDotFile( argv[2] );
             else {
                 cout << "graph G {" << endl;

@@ -27,10 +27,16 @@
 #include <cstdio>
 
 
+namespace dai {
+
+
 clock_t toc();
-void rnd_seed( size_t seed );
+void rnd_seed( int seed );
 double rnd_uniform();
 double rnd_stdnormal();
+
+
+}
 
 
 #endif

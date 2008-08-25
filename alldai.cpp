@@ -22,6 +22,9 @@
 #include "alldai.h"
 
 
+namespace dai {
+
+
 InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const Properties &opts ) {
     if( name == BP::Name ) 
         return new BP (fg, opts);
@@ -39,4 +42,7 @@ InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const Properties &
         return new JTree (fg, opts);
     else
         throw "Unknown inference algorithm";
+}
+
+
 }

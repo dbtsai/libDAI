@@ -30,6 +30,9 @@
 #include "diffs.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -579,7 +582,7 @@ Factor MR::belief( const Var &n ) const {
     if( supported ) {
         size_t i = findVar( n );
 
-        double x[2];
+        Real x[2];
         x[0] = 0.5 - Mag[i] / 2.0;
         x[1] = 0.5 + Mag[i] / 2.0;
 
@@ -654,4 +657,7 @@ MR::MR( const FactorGraph &fg, const Properties &opts ) : DAIAlgFG(fg, opts), su
 
     delete th;
     delete w;
+}
+
+
 }

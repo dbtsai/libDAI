@@ -28,6 +28,9 @@
 #include "varset.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -173,6 +176,9 @@ class ClusterGraph : public set<VarSet> {
         /// As Taylan does it
         ClusterGraph VarElim_MinFill() const;
 };
+
+
+}
 
 
 #endif

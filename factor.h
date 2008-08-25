@@ -30,6 +30,9 @@
 #include "index.h"
 
 
+namespace dai {
+
+
 template<typename T> class      TFactor;
 typedef TFactor<Real>           Factor;
 typedef TFactor<Complex>        CFactor;
@@ -353,6 +356,9 @@ template<typename T> TFactor<T> RemoveFirstOrderInteractions( const TFactor<T> &
     }
 
     return result;
+}
+
+
 }
 
 

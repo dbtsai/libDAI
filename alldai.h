@@ -33,6 +33,9 @@
 #include "mr.h"
 
 
+namespace dai {
+
+
 /// newInfAlg constructs a new approximate inference algorithm named name for the
 /// FactorGraph fg with optionts opts and returns a pointer to the new object.
 /// The caller needs to delete it (maybe some sort of smart_ptr might be useful here).
@@ -41,6 +44,8 @@ InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const Properties &
 
 /// AINames contains the names of all approximate inference algorithms
 static const char* DAINames[] = {BP::Name, MF::Name, HAK::Name, LC::Name, TreeEP::Name, MR::Name, JTree::Name};
+
+}
 
 
 #endif

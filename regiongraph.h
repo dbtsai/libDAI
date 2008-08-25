@@ -29,6 +29,9 @@
 #include "weightedgraph.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -223,6 +226,9 @@ class RegionGraph : public FactorGraph, BipRegGraph {
         /// Send RegionGraph to output stream
         friend ostream & operator << ( ostream & os, const RegionGraph & rg );
 };
+
+
+}
 
 
 #endif

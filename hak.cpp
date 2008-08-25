@@ -25,6 +25,9 @@
 #include "diffs.h"
 
 
+namespace dai {
+
+
 const char *HAK::Name = "HAK";
 
 
@@ -401,4 +404,7 @@ Complex HAK::logZ() const {
         sum += (OR(alpha).log0() * Qa(alpha)).totalSum();
     }
     return sum;
+}
+
+
 }

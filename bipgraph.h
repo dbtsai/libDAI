@@ -25,6 +25,10 @@
 
 #include <vector>
 #include <algorithm>
+#include <boost/numeric/ublas/vector_sparse.hpp>
+
+
+namespace dai {
 
 
 /// A BipartiteGraph represents a graph with two types of nodes
@@ -46,7 +50,7 @@ template <class T1, class T2> class BipartiteGraph {
         std::vector<_edge_t>                _E12;
 
         /// Conversion matrix that computes which index of _E12 corresponds to a vertex index pair (v1,v2)
-        std::vector<std::vector<size_t> >   _E12ind;
+        std::vector<boost::numeric::ublas::mapped_vector<size_t> > _E12ind;
 
         /// Neighbour indices of vertices of first type
         std::vector<_nb_t>                  _nb1;
@@ -115,7 +119,7 @@ template <class T1, class T2> class BipartiteGraph {
         _nb_t & nb2( size_t i2 ) { return _nb2[i2]; }
 
         /// Converts the pair of indices (i1,i2) to the corresponding edge index
-        size_t VV2E( const size_t i1, const size_t i2 ) const { return _E12ind[i1][i2]; }
+        size_t VV2E( const size_t i1, const size_t i2 ) const { return _E12ind[i1](i2); }
 
 
         /// Regenerates internal structures (_E12ind, _nb1 and _nb2) based upon _V1, _V2 and _E12
@@ -145,16 +149,15 @@ template <class T1, class T2> class BipartiteGraph {
             }
 
             // Calculate _E12ind
-            
-            // Allocate data structures
-            _E12ind.clear();
-            std::vector<size_t> col(_V2.size(),-1);
-            _E12ind.assign(_V1.size(), col);
-            // Assign elements
+            _E12ind = std::vector<boost::numeric::ublas::mapped_vector<size_t> >(_V1.size(), boost::numeric::ublas::mapped_vector<size_t>(_V2.size()) );            
             for( size_t k = 0; k < _E12.size(); k++ )
-                _E12ind[_E12[k].first][_E12[k].second] = k;
+                _E12ind[_E12[k].first](_E12[k].second) = k;
+                    
         }
 };
+
+
+}
 
 
 #endif

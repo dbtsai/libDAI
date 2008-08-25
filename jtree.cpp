@@ -23,6 +23,9 @@
 #include "jtree.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -503,4 +506,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
             return( Pns.normalized(Prob::NORMPROB) );
         }
     }
+}
+
+
 }

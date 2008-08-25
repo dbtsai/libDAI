@@ -31,6 +31,9 @@
 #include <typeinfo>
 
 
+namespace dai {
+
+
 typedef std::string PropertyKey;
 typedef boost::any  PropertyValue;
 typedef std::pair<PropertyKey, PropertyValue> Property;
@@ -97,6 +100,9 @@ class Properties : public std::map<PropertyKey, PropertyValue> {
         /// Reads a Properties object from an input stream
         friend std::istream& operator >> (std::istream& is, Properties & ps);
 };
+
+
+}
 
 
 #endif

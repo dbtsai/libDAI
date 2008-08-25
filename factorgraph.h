@@ -28,29 +28,39 @@
 #include "bipgraph.h"
 #include "factor.h"
 
+#include <tr1/unordered_map>
+
+
+namespace dai {
+
 
 using namespace std;
 
 
+bool hasShortLoops(const vector<Factor> &P);
+void RemoveShortLoops(vector<Factor> &P);
+
 class FactorGraph : public BipartiteGraph<Var,Factor> {
     protected:
         map<size_t,Prob>    _undoProbs;
-        bool                _hasNegatives;
         Prob::NormType      _normtype;
 
     public:
         /// Default constructor
-        FactorGraph() : BipartiteGraph<Var,Factor>(), _undoProbs(), _hasNegatives(false), _normtype(Prob::NORMPROB) {};
+        FactorGraph() : BipartiteGraph<Var,Factor>(), _undoProbs(), _normtype(Prob::NORMPROB) {};
         /// Copy constructor
-        FactorGraph(const FactorGraph & x) : BipartiteGraph<Var,Factor>(x), _undoProbs(), _hasNegatives(x._hasNegatives), _normtype(x._normtype) {};
+        FactorGraph(const FactorGraph & x) : BipartiteGraph<Var,Factor>(x), _undoProbs(), _normtype(x._normtype) {};
         /// Construct FactorGraph from vector of Factors
         FactorGraph(const vector<Factor> &P);
+        // Construct a FactorGraph from given factor and variable iterators
+        template<typename FactorInputIterator, typename VarInputIterator>
+        FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint = 0, size_t nr_var_hint = 0 );
+        
         /// Assignment operator
         FactorGraph & operator=(const FactorGraph & x) {
             if(this!=&x) {
                 BipartiteGraph<Var,Factor>::operator=(x);
                 _undoProbs      = x._undoProbs;
-                _hasNegatives   = x._hasNegatives;
                 _normtype       = x._normtype;
             }
             return *this;
@@ -109,7 +119,7 @@ class FactorGraph : public BipartiteGraph<Var,Factor> {
 
         virtual void clamp( const Var & n, size_t i );
         
-        bool hasNegatives() const { return _hasNegatives; }
+        bool hasNegatives() const;
         Prob::NormType NormType() const { return _normtype; }
         
         vector<VarSet> Cliques() const;
@@ -122,11 +132,35 @@ class FactorGraph : public BipartiteGraph<Var,Factor> {
         bool isConnected() const;
 
         virtual void updatedFactor( size_t I ) {};
+
+    private:
+        /// Part of constructors (creates edges, neighbours and adjacency matrix)
+        void createGraph( size_t nrEdges );
 };
 
 
-bool hasShortLoops(const vector<Factor> &P);
-void RemoveShortLoops(vector<Factor> &P);
+// assumes that the set of variables in [var_begin,var_end) is the union of the variables in the factors in [fact_begin, fact_end)
+template<typename FactorInputIterator, typename VarInputIterator>
+FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : BipartiteGraph<Var,Factor>(), _undoProbs(), _normtype(Prob::NORMPROB) {
+    // add factors
+    size_t nrEdges = 0;
+    V2s().reserve( nr_fact_hint );
+    for( FactorInputIterator p2 = fact_begin; p2 != fact_end; ++p2 ) {
+        V2s().push_back( *p2 );
+	nrEdges += p2->vars().size();
+    }
+ 
+    // add variables
+    V1s().reserve( nr_var_hint );
+    for( VarInputIterator p1 = var_begin; p1 != var_end; ++p1 )
+	V1s().push_back( *p1 );
+
+    // create graph structure
+    createGraph( nrEdges );
+}
+
+
+}
 
 
 #endif

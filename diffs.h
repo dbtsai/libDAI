@@ -25,6 +25,10 @@
 
 #include <vector>
 
+
+namespace dai {
+
+
 using namespace std;
 
 
@@ -66,5 +70,9 @@ class Diffs : public vector<double> {
             }
         }
 };
+
+
+}
+
 
 #endif

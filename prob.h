@@ -31,6 +31,9 @@
 #include "util.h"
 
 
+namespace dai {
+
+
 typedef double                  Real;
 typedef std::complex<double>    Complex;
 
@@ -470,6 +473,9 @@ template <typename T> class TProb {
             return os;
         }
 };
+
+
+}
 
 
 #endif

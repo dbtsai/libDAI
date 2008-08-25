@@ -28,6 +28,9 @@
 #include "enum.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -36,7 +39,7 @@ class BP : public DAIAlgFG {
         typedef vector<size_t>  _ind_t;
 
         vector<_ind_t>          _indices;
-        vector<Prob>            _messages, _newmessages;    
+        vector<Prob>            _messages, _newmessages;
 
     public:
         ENUM4(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
@@ -88,5 +91,9 @@ class BP : public DAIAlgFG {
         void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
         bool checkProperties();
 };
+
+
+}
+
 
 #endif

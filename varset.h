@@ -30,6 +30,9 @@
 #include "var.h"
 
 
+namespace dai {
+
+
 /// VarSet represents a set of variables and is a descendant of set<Var>. 
 /// In addition, it provides an easy interface for set-theoretic operations
 /// by operator overloading.
@@ -236,6 +239,9 @@ class VarSet : private std::set<Var> {
 /// For two Vars n1 and n2, the expression n1 | n2 gives the Varset containing n1 and n2
 inline VarSet operator| (const Var& n1, const Var& n2) {
     return( VarSet(n1, n2) );
+}
+
+
 }
 
 

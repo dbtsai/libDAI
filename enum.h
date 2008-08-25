@@ -27,6 +27,9 @@
 #include <iostream>
 
 
+namespace dai {
+
+
 // C++ enums are too limited for my purposes. This defines wrapper classes
 // that provide much more functionality than a simple enum. The only
 // disadvantage is that one wrapper class needs to be written for each
@@ -261,6 +264,9 @@
     private:\
         value v;\
 };
+
+
+}
 
 
 #endif

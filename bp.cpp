@@ -30,6 +30,9 @@
 #include "properties.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -343,4 +346,7 @@ void BP::init( const VarSet &ns ) {
         for( _nb_cit I = nb1(ni).begin(); I != nb1(ni).end(); I++ )
             message(ni,*I).fill( 1.0 );
     }
+}
+
+
 }

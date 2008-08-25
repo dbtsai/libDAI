@@ -33,6 +33,9 @@
 #include "enum.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -90,6 +93,9 @@ class JTree : public DAIAlgRG {
         Factor calcMarginal( const VarSet& ns );
         bool checkProperties();
 };
+
+
+}
 
 
 #endif

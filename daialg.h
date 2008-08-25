@@ -31,6 +31,9 @@
 #include "properties.h"
 
 
+namespace dai {
+
+
 /// The InfAlg class is the common denominator of the various approximate inference algorithms.
 /// A InfAlg object represents a discrete factorized probability distribution over multiple variables 
 /// together with an inference algorithm.
@@ -280,6 +283,8 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
 /// Calculate 2nd order interactions of the marginal of obj on ns
 Factor calcMarginal2ndO( const InfAlg & obj, const VarSet& ns, bool reInit );
 
+
+}
 
 
 #endif

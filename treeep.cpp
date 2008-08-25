@@ -28,6 +28,9 @@
 #include "diffs.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -471,4 +474,7 @@ Complex TreeEP::logZ() const {
             sum += (_Q.find(I))->second.logZ( _Qa, _Qb );
     
     return sum;
+}
+
+
 }

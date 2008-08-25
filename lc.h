@@ -28,6 +28,9 @@
 #include "factorgraph.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -102,6 +105,9 @@ class LC : public DAIAlgFG {
         virtual void makeCavity(const Var & n) { assert( 0 == 1 ); }
         bool checkProperties();
 };
+
+
+}
 
 
 #endif

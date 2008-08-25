@@ -26,6 +26,9 @@
 #include "clustergraph.h"
 
 
+namespace dai {
+
+
 RegionGraph::RegionGraph(const FactorGraph & fg, const vector<Region> & ors, const vector<Region> & irs, const vector<R_edge_t> & edges) : FactorGraph(fg), BipRegGraph(), _fac2OR() {
     // Copy outer regions (giving them counting number 1.0)
     ORs().reserve( ors.size() );
@@ -273,4 +276,7 @@ ostream & operator << (ostream & os, const RegionGraph & rg) {
         os << (VarSet)rg.IR(beta) << ": c = " << rg.IR(beta).c() << endl;
 
     return(os);
+}
+
+
 }

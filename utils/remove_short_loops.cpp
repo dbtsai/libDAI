@@ -21,8 +21,9 @@
 
 #include "factorgraph.h"
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
+using namespace dai;
 using namespace std;
 
 

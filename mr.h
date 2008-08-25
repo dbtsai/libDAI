@@ -29,6 +29,9 @@
 #include "enum.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -145,11 +148,12 @@ class sub_nb {
         size_t operator[](size_t i) { 
             size_t bit;
             for(bit = 0; bit < bits; bit++ )
-                if( s & (1U << bit) )
+                if( s & (1U << bit) ) {
                     if( i == 0 )
                         break;
                     else
                         i--;
+                }
 #ifdef DEBUG
             assert( bit < bits );
 #endif
@@ -207,6 +211,9 @@ class sub_nb {
             return os;
         }
 };
+
+
+}
 
 
 #endif

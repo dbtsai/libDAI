@@ -29,6 +29,9 @@
 #include <set>
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -165,6 +168,9 @@ DEdgeVec GrowRootedTree( const Graph & T, size_t Root );
 
 
 UEdgeVec RandomDRegularGraph( size_t N, size_t d );
+
+
+}
 
 
 #endif

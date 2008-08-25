@@ -28,6 +28,9 @@
 #include "util.h"
 
 
+namespace dai {
+
+
 using namespace std;
 
 
@@ -193,4 +196,7 @@ void MF::init( const VarSet &ns ) {
         if( ns && var(i) )
             _beliefs[i].fill( 1.0 );
     }
+}
+
+
 }

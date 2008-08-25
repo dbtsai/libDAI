@@ -22,8 +22,13 @@
 #ifndef __INDEX_H__
 #define __INDEX_H__
 
+
 #include <vector>
 #include "varset.h"
+
+
+namespace dai {
+
 
 /* Example:
  *
@@ -33,6 +38,7 @@
  *      // i is linear index of corresponding state of (s_j_1, ..., s_j_m)
  * }
  */
+
 
 class Index
 {
@@ -97,6 +103,7 @@ public:
     };
 };
 
+
 class multind {
     private:
         std::vector<size_t> _dims;  // dimensions
@@ -125,7 +132,7 @@ class multind {
         }
         std::vector<size_t> vi(size_t li) const {   // linear index to vector index
             std::vector<size_t> v(_dims.size(),0);
-            assert(li >= 0 && li < _pdims.back());
+            assert(li < _pdims.back());
             for( long j = v.size()-1; j >= 0; j-- ) {
                 size_t q = li / _pdims[j];
                 v[j] = q;
@@ -144,5 +151,9 @@ class multind {
 
         // FIXME add an iterator, which increases a vector index just using addition
 };
+
+
+}
+
 
 #endif

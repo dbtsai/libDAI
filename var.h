@@ -25,6 +25,9 @@
 #include <iostream>
 
 
+namespace dai {
+
+
 /// Represents a discrete variable
 class Var {
     private:
@@ -68,6 +71,9 @@ class Var {
             return( os << "[" << n.label() << "]" );
         };
 };
+
+
+}
 
 
 #endif
