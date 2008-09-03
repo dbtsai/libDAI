@@ -59,10 +59,10 @@ bool MR::checkProperties() {
 
 
 // init N, con, nb, tJ, theta
-void MR::init(size_t _N, double *_w, double *_th) {
+void MR::init(size_t Nin, double *_w, double *_th) {
     size_t i,j;
     
-    N = _N;
+    N = Nin;
 
     con.resize(N);
     nb.resize(N);
@@ -624,15 +624,15 @@ MR::MR( const FactorGraph &fg, const Properties &opts ) : DAIAlgFG(fg, opts), su
         return;
 
     // create w and th
-    size_t _N = fg.nrVars();
+    size_t Nin = fg.nrVars();
 
-    double *w = new double[_N*_N];
-    double *th = new double[_N];
+    double *w = new double[Nin*Nin];
+    double *th = new double[Nin];
     
-    for( size_t i = 0; i < _N; i++ ) {
+    for( size_t i = 0; i < Nin; i++ ) {
         th[i] = 0.0;
-        for( size_t j = 0; j < _N; j++ )
-            w[i*_N+j] = 0.0;
+        for( size_t j = 0; j < Nin; j++ )
+            w[i*Nin+j] = 0.0;
     }
 
     for( size_t I = 0; I < fg.nrFactors(); I++ ) {
@@ -645,15 +645,15 @@ MR::MR( const FactorGraph &fg, const Properties &opts ) : DAIAlgFG(fg, opts), su
             VarSet::const_iterator jit = psi.vars().begin();
             size_t j = fg.findVar( *(++jit) );
 
-            w[i*_N+j] += 0.25 * log(psi[3] * psi[0] / (psi[2] * psi[1])); 
-            w[j*_N+i] += 0.25 * log(psi[3] * psi[0] / (psi[2] * psi[1])); 
+            w[i*Nin+j] += 0.25 * log(psi[3] * psi[0] / (psi[2] * psi[1])); 
+            w[j*Nin+i] += 0.25 * log(psi[3] * psi[0] / (psi[2] * psi[1])); 
 
             th[i] += 0.25 * log(psi[3] / psi[2] * psi[1] / psi[0]);
             th[j] += 0.25 * log(psi[3] / psi[1] * psi[2] / psi[0]);
         }
     }
     
-    init(_N, w, th);
+    init(Nin, w, th);
 
     delete th;
     delete w;

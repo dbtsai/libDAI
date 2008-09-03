@@ -145,7 +145,7 @@ template <typename T> class TProb {
 
         /// Division by T x
         TProb<T>& operator/= (T x) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( x != 0.0 );
 #endif
             for( size_t i = 0; i < size(); i++ )
@@ -162,7 +162,7 @@ template <typename T> class TProb {
 
         /// Pointwise multiplication with q
         TProb<T>& operator*= (const TProb<T> & q) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             for( size_t i = 0; i < size(); i++ )
@@ -172,7 +172,7 @@ template <typename T> class TProb {
         
         /// Return product of *this with q
         TProb<T> operator* (const TProb<T> & q) const {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             TProb<T> prod( *this );
@@ -182,7 +182,7 @@ template <typename T> class TProb {
 
         /// Pointwise addition with q
         TProb<T>& operator+= (const TProb<T> & q) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             for( size_t i = 0; i < size(); i++ )
@@ -192,7 +192,7 @@ template <typename T> class TProb {
         
         /// Pointwise subtraction of q
         TProb<T>& operator-= (const TProb<T> & q) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             for( size_t i = 0; i < size(); i++ )
@@ -202,7 +202,7 @@ template <typename T> class TProb {
         
         /// Return sum of *this and q
         TProb<T> operator+ (const TProb<T> & q) const {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             TProb<T> sum( *this );
@@ -212,7 +212,7 @@ template <typename T> class TProb {
         
         /// Return *this minus q
         TProb<T> operator- (const TProb<T> & q) const {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             TProb<T> sum( *this );
@@ -222,11 +222,11 @@ template <typename T> class TProb {
 
         /// Pointwise division by q
         TProb<T>& operator/= (const TProb<T> & q) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             for( size_t i = 0; i < size(); i++ ) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
 //              assert( q[i] != 0.0 );
 #endif
                 if( q[i] == 0.0 )       // FIXME
@@ -239,7 +239,7 @@ template <typename T> class TProb {
         
         /// Pointwise division by q, division by zero yields infinity
         TProb<T>& divide (const TProb<T> & q) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             for( size_t i = 0; i < size(); i++ )
@@ -249,7 +249,7 @@ template <typename T> class TProb {
         
         /// Return quotient of *this with q
         TProb<T> operator/ (const TProb<T> & q) const {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( size() == q.size() );
 #endif
             TProb<T> quot( *this );
@@ -266,7 +266,7 @@ template <typename T> class TProb {
                     inv._p.push_back( _p[i] == 0.0 ? 0.0 : 1.0 / _p[i] );
             else
                 for( size_t i = 0; i < size(); i++ ) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
                     assert( _p[i] != 0.0 );
 #endif
                     inv._p.push_back( 1.0 / _p[i] );
@@ -333,7 +333,7 @@ template <typename T> class TProb {
 
         /// Return distance of p and q
         friend Real dist( const TProb<T> & p, const TProb<T> & q, DistType dt ) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( p.size() == q.size() );
 #endif
             Real result = 0.0;
@@ -362,7 +362,7 @@ template <typename T> class TProb {
 
         /// Return (complex) Kullback-Leibler distance with q
         friend Complex KL_dist( const TProb<T> & p, const TProb<T> & q ) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( p.size() == q.size() );
 #endif
             Complex result = 0.0;
@@ -412,7 +412,7 @@ template <typename T> class TProb {
                 Z = totalSum();
             else if( norm == NORMLINF )
                 Z = maxAbs();
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( Z != 0.0 );
 #endif
             T Zi = 1.0 / Z;
@@ -428,7 +428,7 @@ template <typename T> class TProb {
                 Z = totalSum();
             else if( norm == NORMLINF )
                 Z = maxAbs();
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( Z != 0.0 );
 #endif
             Z = 1.0 / Z;

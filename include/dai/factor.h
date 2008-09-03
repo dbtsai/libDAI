@@ -65,7 +65,7 @@ template <typename T> class TFactor {
 
         // Construct Factor from VarSet and TProb<T>
         TFactor( const VarSet& ns, const TProb<T> p ) : _vs(ns), _p(p) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( _vs.stateSpace() == _p.size() );
 #endif
         }
@@ -89,7 +89,7 @@ template <typename T> class TFactor {
         TProb<T> & p() { return _p; }
         const VarSet & vars() const { return _vs; }
         size_t stateSpace() const { 
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( _vs.stateSpace() == _p.size() );
 #endif
             return _p.size();
@@ -122,7 +122,7 @@ template <typename T> class TFactor {
         TFactor<T> operator* (const TFactor<T>& Q) const;
         TFactor<T>& operator*= (const TFactor<T>& Q) { return( *this = (*this * Q) ); }
         TFactor<T> operator+ (const TFactor<T>& Q) const {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( Q._vs == _vs );
 #endif
             TFactor<T> sum(*this); 
@@ -130,7 +130,7 @@ template <typename T> class TFactor {
             return sum; 
         }
         TFactor<T> operator- (const TFactor<T>& Q) const {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( Q._vs == _vs );
 #endif
             TFactor<T> sum(*this); 
@@ -138,14 +138,14 @@ template <typename T> class TFactor {
             return sum; 
         }
         TFactor<T>& operator+= (const TFactor<T>& Q) { 
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( Q._vs == _vs );
 #endif
             _p += Q._p;
             return *this;
         }
         TFactor<T>& operator-= (const TFactor<T>& Q) { 
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( Q._vs == _vs );
 #endif
             _p -= Q._p;
@@ -168,7 +168,7 @@ template <typename T> class TFactor {
         }
 
         TFactor<T> divided_by( const TFactor<T>& denom ) const { 
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( denom._vs == _vs );
 #endif
             TFactor<T> quot(*this); 
@@ -177,7 +177,7 @@ template <typename T> class TFactor {
         }
 
         TFactor<T>& divide( const TFactor<T>& denom ) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( denom._vs == _vs );
 #endif
             _p /= denom._p;
@@ -253,7 +253,7 @@ template <typename T> class TFactor {
             if( x._vs.empty() || y._vs.empty() )
                 return -1;
             else {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
                 assert( x._vs == y._vs );
 #endif
                 return dist( x._p, y._p, dt );
@@ -265,7 +265,7 @@ template <typename T> class TFactor {
 
 
 template<typename T> TFactor<T> TFactor<T>::part_sum(const VarSet & ns) const {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
     assert( ns << _vs );
 #endif
 
@@ -305,7 +305,7 @@ template<typename T> Complex KL_dist(const TFactor<T> & P, const TFactor<T> & Q)
     if( P._vs.empty() || Q._vs.empty() )
         return -1;
     else {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
         assert( P._vs == Q._vs );
 #endif
         return KL_dist( P._p, Q._p );
@@ -315,7 +315,7 @@ template<typename T> Complex KL_dist(const TFactor<T> & P, const TFactor<T> & Q)
 
 // calculate N(psi, i, j)
 template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
     assert( _vs && i );
     assert( _vs && j );
     assert( i != j );

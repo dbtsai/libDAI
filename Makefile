@@ -30,7 +30,7 @@ BOOSTFLAGS = -lboost_program_options
 CC = g++
 
 # Flags for the C++ compiler
-CCFLAGS = -Wall -W -Wextra -fpic -g -DDEBUG -I./include -Llib -O3 #-static #-pg #-DVERBOSE
+CCFLAGS = -Wall -W -Wextra -fpic -g -DDAI_DEBUG -I./include -Llib -O3 #-static #-pg #-DVERBOSE
 
 # To enable the Matlab interface, define WITH_MATLAB = yes
 WITH_MATLAB = 
@@ -38,7 +38,7 @@ ifdef WITH_MATLAB
 # Replace the following by the directory where Matlab has been installed
 MATLABDIR = /opt/matlab/bin
 MEX = $(MATLABDIR)/mex
-MEXFLAGS = -g -I. -DDEBUG -largeArrayDims #-g means debugging
+MEXFLAGS = -g -I. -DDAI_DEBUG -largeArrayDims #-g means debugging
 endif
 
 # Replace the following with the extension of compiled MEX files on this platform, e.g. .mexglx for x86

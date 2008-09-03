@@ -49,7 +49,7 @@ class Properties : public std::map<PropertyKey, PropertyValue> {
         /// Gets a property
         const PropertyValue & Get(const PropertyKey &key) const { 
             Properties::const_iterator x = find(key); 
-#ifdef DEBUG            
+#ifdef DAI_DEBUG            
             if( x == this->end() )
                 std::cerr << "Get cannot find property " << key << std::endl;
 #endif

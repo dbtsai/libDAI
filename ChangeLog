@@ -1,7 +1,15 @@
 libDAI-0.2.2 (2008-??-??)
 -------------------------
-
-* Contributions by Christian, resulting in vast speed and memory improvements
+ 
+- Renamed DEBUG to DAI_DEBUG to avoid conflicts
+* Contributions by ???:
+  - Renamed variable _N in mr.* for compatibility with g++ under cygwin
+* Contributions by Giuseppe Passino:
+  - removed "using namespace std;" from header files - bad practice
+  - moved header files in include/dai and sources in src
+  - changed #ifndefs to GNU style
+  - added extra warning checks (-W -Wextra) and fixed resulting warnings
+* Contributions by Christian Wojek, resulting in vast speed and memory improvements
   for large factor graphs:
   - Sparse implementation of nodes->edge conversion table _E12ind in bipgraph.h
   - New FactorGraph constructor that constructs from given ranges of factors

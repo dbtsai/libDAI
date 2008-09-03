@@ -62,7 +62,7 @@ class MR : public DAIAlgFG {
         InitType Inits() const { return GetPropertyAs<InitType>("inits"); }
 
         MR( const FactorGraph & fg, const Properties &opts );
-        void init(size_t _N, double *_w, double *_th);
+        void init(size_t Nin, double *_w, double *_th);
         void makekindex();
         void read_files();
         void init_cor();
@@ -106,7 +106,7 @@ class sub_nb {
     public:
         // construct full subset containing nr_elmt elements
         sub_nb(size_t nr_elmt) {
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( nr_elmt < sizeof(size_t) / sizeof(char) * 8 );
 #endif
             bits = nr_elmt;
@@ -152,7 +152,7 @@ class sub_nb {
                     else
                         i--;
                 }
-#ifdef DEBUG
+#ifdef DAI_DEBUG
             assert( bit < bits );
 #endif
             return bit;
