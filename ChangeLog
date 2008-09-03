@@ -1,7 +1,8 @@
 libDAI-0.2.2 (2008-??-??)
 -------------------------
  
-- Renamed DEBUG to DAI_DEBUG to avoid conflicts
+* Moved everything into namespace "dai"
+* Renamed DEBUG to DAI_DEBUG to avoid conflicts
 * Contributions by ???:
   - Renamed variable _N in mr.* for compatibility with g++ under cygwin
 * Contributions by Giuseppe Passino:
@@ -9,6 +10,12 @@ libDAI-0.2.2 (2008-??-??)
   - moved header files in include/dai and sources in src
   - changed #ifndefs to GNU style
   - added extra warning checks (-W -Wextra) and fixed resulting warnings
+  - dai::TProb: 
+    o  removed copy constructor and assignment operators (redundant)
+    o  implementation of some methods via STL algorithms
+    o  added methods takeExp, takeLog, takeLog0 for transformation in-place
+    o  explicit constructor (prevents implicit conversion from size_t to TProb)
+    o  added operator+,+=,-,-=, with argument T (for calculations in log-scale)
 * Contributions by Christian Wojek, resulting in vast speed and memory improvements
   for large factor graphs:
   - Sparse implementation of nodes->edge conversion table _E12ind in bipgraph.h
@@ -17,7 +24,6 @@ libDAI-0.2.2 (2008-??-??)
   - Optimization of FactorGraph constructors
 * FactorGraph constructors no longer check for short loops and for
   negative entries. Also, the normtype is now Prob::NORMPROB by default.
-* Moved everything into namespace "dai"
 
 
 libDAI-0.2.1 (2008-05-26)

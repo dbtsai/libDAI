@@ -30,7 +30,7 @@ BOOSTFLAGS = -lboost_program_options
 CC = g++
 
 # Flags for the C++ compiler
-CCFLAGS = -Wall -W -Wextra -fpic -g -DDAI_DEBUG -I./include -Llib -O3 #-static #-pg #-DVERBOSE
+CCFLAGS = -Wall -W -Wextra -fpic -I./include -Llib -O3 -g -DDAI_DEBUG #-static #-pg #-DVERBOSE
 
 # To enable the Matlab interface, define WITH_MATLAB = yes
 WITH_MATLAB = 
