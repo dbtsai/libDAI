@@ -95,11 +95,11 @@ ostream& operator << (ostream& os, const FactorGraph& fg) {
             os << i->states() << " ";
         os << endl;
         size_t nr_nonzeros = 0;
-        for( size_t k = 0; k < fg.factor(I).stateSpace(); k++ )
+        for( size_t k = 0; k < fg.factor(I).states(); k++ )
             if( fg.factor(I)[k] != 0.0 )
                 nr_nonzeros++;
         os << nr_nonzeros << endl;
-        for( size_t k = 0; k < fg.factor(I).stateSpace(); k++ )
+        for( size_t k = 0; k < fg.factor(I).states(); k++ )
             if( fg.factor(I)[k] != 0.0 ) {
                 char buf[20];
                 sprintf(buf,"%18.14g", fg.factor(I)[k]);
@@ -413,45 +413,7 @@ vector<VarSet> FactorGraph::Cliques() const {
 void FactorGraph::clamp( const Var & n, size_t i ) {
     assert( i <= n.states() );
 
-/*  if( do_surgery ) {
-        size_t ni = find( vars().begin(), vars().end(), n) - vars().begin();
-
-        if( ni != nrVars() ) {
-            for( _nb_cit I = nb1(ni).begin(); I != nb1(ni).end(); I++ ) {
-                if( factor(*I).size() == 1 )
-                    // Remove this single-variable factor
-    //              I = (_V2.erase(I))--;
-                    _E12.erase( _E12.begin() + VV2E(ni, *I) );
-                else {
-                    // Replace it by the slice
-                    Index ind_I_min_n( factor(*I), factor(*I) / n );
-                    Index ind_n( factor(*I), n );
-                    Factor slice_I( factor(*I) / n );
-                    for( size_t ind_I = 0; ind_I < factor(*I).stateSpace(); ++ind_I, ++ind_I_min_n, ++ind_n )
-                        if( ind_n == i )
-                            slice_I[ind_I_min_n] = factor(*I)[ind_I];
-                    factor(*I) = slice_I;
-
-                    // Remove the edge between n and I
-                    _E12.erase( _E12.begin() + VV2E(ni, *I) );
-                }
-            }
-
-            Regenerate();
-            
-            // remove all unconnected factors
-            for( size_t I = 0; I < nrFactors(); I++ )
-                if( nb2(I).size() == 0 )
-                    DeleteFactor(I--);
-
-            DeleteVar( ni );
-
-            // FIXME
-        }
-    } */
-
-    // The cheap solution (at least in terms of coding time) is to multiply every factor
-    // that contains the variable with a delta function
+    // Multiply each factor that contains the variable with a delta function
 
     Factor delta_n_i(n,0.0);
     delta_n_i[i] = 1.0;

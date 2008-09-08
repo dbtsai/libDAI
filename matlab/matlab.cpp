@@ -49,10 +49,10 @@ mxArray *Factors2mx(const vector<Factor> &Ps) {
             dims.push_back( j->states() );
         }
 
-        //      mxArray *BiP = mxCreateDoubleMatrix(I->stateSpace(),1,mxREAL);
+        //      mxArray *BiP = mxCreateDoubleMatrix(I->states(),1,mxREAL);
         mxArray *BiP = mxCreateNumericArray(I->vars().size(), &(*(dims.begin())), mxDOUBLE_CLASS, mxREAL);
         double *BiP_data = mxGetPr(BiP);
-        for( size_t j = 0; j < I->stateSpace(); j++ )
+        for( size_t j = 0; j < I->states(); j++ )
             BiP_data[j] = (*I)[j];
 
         mxSetField(Bi,0,"Member",BiMember);

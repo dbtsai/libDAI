@@ -56,7 +56,7 @@ class BP : public DAIAlgFG {
         // construct BP object from FactorGraph
         BP(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts) {
             assert( checkProperties() );
-            Regenerate();
+            create();
         }
         // assignment operator
         BP & operator=(const BP & x) {
@@ -80,7 +80,7 @@ class BP : public DAIAlgFG {
         void findMaxResidual( size_t &i, size_t &_I );
 
         std::string identify() const;
-        void Regenerate();
+        void create();
         void init();
         void calcNewMessage( size_t i, size_t _I );
         double run();

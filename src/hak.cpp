@@ -157,15 +157,15 @@ string HAK::identify() const {
 void HAK::init( const VarSet &ns ) {
     for( vector<Factor>::iterator alpha = _Qa.begin(); alpha != _Qa.end(); alpha++ )
         if( alpha->vars() && ns )
-            alpha->fill( 1.0 / alpha->stateSpace() );
+            alpha->fill( 1.0 / alpha->states() );
 
     for( size_t beta = 0; beta < nrIRs(); beta++ )
         if( IR(beta) && ns ) {
-            _Qb[beta].fill( 1.0 / IR(beta).stateSpace() );
+            _Qb[beta].fill( 1.0 );
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
-                muab( alpha, _beta ).fill( 1.0 / IR(beta).stateSpace() );
-                muba( alpha, _beta ).fill( 1.0 / IR(beta).stateSpace() );
+                muab( alpha, _beta ).fill( 1.0 / IR(beta).states() );
+                muba( alpha, _beta ).fill( 1.0 / IR(beta).states() );
             }
         }
 }
@@ -175,16 +175,16 @@ void HAK::init() {
     assert( checkProperties() );
 
     for( vector<Factor>::iterator alpha = _Qa.begin(); alpha != _Qa.end(); alpha++ )
-        alpha->fill( 1.0 / alpha->stateSpace() );
+        alpha->fill( 1.0 / alpha->states() );
 
     for( vector<Factor>::iterator beta = _Qb.begin(); beta != _Qb.end(); beta++ )
-        beta->fill( 1.0 / beta->stateSpace() );
+        beta->fill( 1.0 / beta->states() );
 
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         foreach( const Neighbor &beta, nbOR(alpha) ) {
             size_t _beta = beta.iter;
-            muab( alpha, _beta ).fill( 1.0 / muab( alpha, _beta ).stateSpace() );
-            muba( alpha, _beta ).fill( 1.0 / muab( alpha, _beta ).stateSpace() );
+            muab( alpha, _beta ).fill( 1.0 / muab( alpha, _beta ).states() );
+            muba( alpha, _beta ).fill( 1.0 / muab( alpha, _beta ).states() );
         }
 }
 

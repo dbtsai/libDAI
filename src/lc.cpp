@@ -110,7 +110,7 @@ double LC::CalcCavityDist (size_t i, const string &name, const Properties &opts)
     double maxdiff = 0;
 
     if( Verbose() >= 2 )
-        cout << "Initing cavity " << var(i) << "(" << delta(i).size() << " vars, " << delta(i).stateSpace() << " states)" << endl;
+        cout << "Initing cavity " << var(i) << "(" << delta(i).size() << " vars, " << delta(i).states() << " states)" << endl;
 
     if( Cavity() == CavityType::UNIFORM )
         Bi = Factor(delta(i));

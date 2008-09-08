@@ -58,7 +58,7 @@ bool BP::checkProperties() {
 }
 
 
-void BP::Regenerate() {
+void BP::create() {
     // create edge properties
     edges.clear();
     edges.reserve( nrVars() );
@@ -70,7 +70,7 @@ void BP::Regenerate() {
             newEP.message = Prob( var(i).states() );
             newEP.newMessage = Prob( var(i).states() );
 
-            newEP.index.reserve( factor(I).stateSpace() );
+            newEP.index.reserve( factor(I).states() );
             for( Index k( var(i), factor(I).vars() ); k >= 0; ++k )
                 newEP.index.push_back( k );
 

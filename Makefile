@@ -176,8 +176,8 @@ x2x.o : $(SRC)/x2x.cpp $(HEADERS)
 # EXAMPLE
 ##########
 
-example : $(SRC)/example.cpp $(HEADERS) $(LIB)/libdai.a
-	$(CC) $(CCFLAGS) -o example $(SRC)/example.cpp -ldai
+example : example.cpp $(HEADERS) $(LIB)/libdai.a
+	$(CC) $(CCFLAGS) -o example example.cpp -ldai
 
 # TESTS
 ########

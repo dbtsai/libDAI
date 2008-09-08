@@ -44,7 +44,7 @@ class MF : public DAIAlgFG {
         // construct MF object from FactorGraph
         MF(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts) {
             assert( checkProperties() );
-            Regenerate();
+            create();
         }
         // assignment operator
         MF & operator=(const MF & x) {
@@ -57,7 +57,7 @@ class MF : public DAIAlgFG {
 
         static const char *Name;
         std::string identify() const;
-        void Regenerate();
+        void create();
         void init();
         double run();
         Factor beliefV (size_t i) const;

@@ -55,18 +55,18 @@ template <typename T> class TFactor {
         TFactor () : _vs(), _p(1,1.0) {}
         
         // Construct Factor from VarSet
-        TFactor( const VarSet& ns ) : _vs(ns), _p(_vs.stateSpace()) {}
+        TFactor( const VarSet& ns ) : _vs(ns), _p(_vs.states()) {}
         
         // Construct Factor from VarSet and initial value
-        TFactor( const VarSet& ns, Real p ) : _vs(ns), _p(_vs.stateSpace(),p) {}
+        TFactor( const VarSet& ns, Real p ) : _vs(ns), _p(_vs.states(),p) {}
         
         // Construct Factor from VarSet and initial array
-        TFactor( const VarSet& ns, const Real* p ) : _vs(ns), _p(_vs.stateSpace(),p) {}
+        TFactor( const VarSet& ns, const Real* p ) : _vs(ns), _p(_vs.states(),p) {}
 
         // Construct Factor from VarSet and TProb<T>
         TFactor( const VarSet& ns, const TProb<T> p ) : _vs(ns), _p(p) {
 #ifdef DAI_DEBUG
-            assert( _vs.stateSpace() == _p.size() );
+            assert( _vs.states() == _p.size() );
 #endif
         }
         
@@ -88,9 +88,9 @@ template <typename T> class TFactor {
         const TProb<T> & p() const { return _p; }
         TProb<T> & p() { return _p; }
         const VarSet & vars() const { return _vs; }
-        size_t stateSpace() const { 
+        size_t states() const { 
 #ifdef DAI_DEBUG
-            assert( _vs.stateSpace() == _p.size() );
+            assert( _vs.states() == _p.size() );
 #endif
             return _p.size();
         }
@@ -229,7 +229,7 @@ template <typename T> class TFactor {
             // OPTIMIZE ME
             Index i_ns (ns, _vs);
             Index i_nsrem (nsrem, _vs);
-            for( size_t i = 0; i < stateSpace(); i++, ++i_ns, ++i_nsrem )
+            for( size_t i = 0; i < states(); i++, ++i_ns, ++i_nsrem )
                 if( (size_t)i_ns == ns_state )
                     result._p[i_nsrem] = _p[i];
 

@@ -52,7 +52,7 @@ void MakeHOIFG( size_t N, size_t M, size_t k, double sigma, FactorGraph &fg ) {
 			} while( 1 );
 		}
 		Factor newfac(vars);
-		for( size_t t = 0; t < newfac.stateSpace(); t++ )
+		for( size_t t = 0; t < newfac.states(); t++ )
 			newfac[t] = exp(rnd_stdnormal() * sigma);
 		factors.push_back(newfac);
 	}

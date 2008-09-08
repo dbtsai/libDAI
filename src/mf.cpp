@@ -53,9 +53,7 @@ bool MF::checkProperties() {
 }
 
 
-void MF::Regenerate() {
-//    DAIAlgFG::Regenerate();
-
+void MF::create() {
     // clear beliefs
     _beliefs.clear();
     _beliefs.reserve( nrVars() );

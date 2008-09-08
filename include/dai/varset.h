@@ -91,7 +91,7 @@ class VarSet : private std::set<Var> {
         
 
         /// Return statespace, i.e. the product of the number of states of each variable
-        size_t stateSpace() const { 
+        size_t states() const { 
 #ifdef DAI_DEBUG
             size_t x = 1;
             for( const_iterator i = begin(); i != end(); ++i )

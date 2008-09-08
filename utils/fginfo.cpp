@@ -52,10 +52,10 @@ int main( int argc, char *argv[] ) {
             size_t max_Delta_size = 0;
             for( size_t i = 0; i < fg.nrVars(); i++ ) {
                 VarSet di = fg.delta(i);
-                size_t Ds = fg.Delta(i).stateSpace();
+                size_t Ds = fg.Delta(i).states();
                 if( Ds > max_Delta_size )
                     max_Delta_size = Ds;
-                cavsum_lcbp += di.stateSpace();
+                cavsum_lcbp += di.states();
                 for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
                     cavsum_lcbp2 += j->states();
             }

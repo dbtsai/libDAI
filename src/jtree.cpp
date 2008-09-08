@@ -315,7 +315,7 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
     // find new root clique (the one with maximal statespace overlap with ns)
     size_t maxval = 0, maxalpha = 0;
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
-        size_t val = (ns & OR(alpha).vars()).stateSpace();
+        size_t val = (ns & OR(alpha).vars()).states();
         if( val > maxval ) {
             maxval = val;
             maxalpha = alpha;
