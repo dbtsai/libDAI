@@ -1,4 +1,5 @@
 /*  Copyright (C) 2006-2008  Joris Mooij  [j dot mooij at science dot ru dot nl]
+    Copyright (C) 2002  Martijn Leisink  [martijn@mbfys.kun.nl]
     Radboud University Nijmegen, The Netherlands
     
     This file is part of libDAI.
@@ -227,8 +228,8 @@ template <typename T> class TFactor {
             Factor result( nsrem, 0.0 );
             
             // OPTIMIZE ME
-            Index i_ns (ns, _vs);
-            Index i_nsrem (nsrem, _vs);
+            IndexFor i_ns (ns, _vs);
+            IndexFor i_nsrem (nsrem, _vs);
             for( size_t i = 0; i < states(); i++, ++i_ns, ++i_nsrem )
                 if( (size_t)i_ns == ns_state )
                     result._p[i_nsrem] = _p[i];
@@ -271,7 +272,7 @@ template<typename T> TFactor<T> TFactor<T>::part_sum(const VarSet & ns) const {
 
     TFactor<T> res( ns, 0.0 );
 
-    Index i_res( ns, _vs );
+    IndexFor i_res( ns, _vs );
     for( size_t i = 0; i < _p.size(); i++, ++i_res )
         res._p[i_res] += _p[i];
 
@@ -291,8 +292,8 @@ template<typename T> std::ostream& operator<< (std::ostream& os, const TFactor<T
 template<typename T> TFactor<T> TFactor<T>::operator* (const TFactor<T>& Q) const {
     TFactor<T> prod( _vs | Q._vs, 0.0 );
 
-    Index i1(_vs, prod._vs);
-    Index i2(Q._vs, prod._vs);
+    IndexFor i1(_vs, prod._vs);
+    IndexFor i2(Q._vs, prod._vs);
 
     for( size_t i = 0; i < prod._p.size(); i++, ++i1, ++i2 )
         prod._p[i] += _p[i1] * Q._p[i2];

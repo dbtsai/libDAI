@@ -451,8 +451,6 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
             VarSet nsrem = ns / OR(T.front().n1).vars();
             Factor Pns (ns, 0.0);
             
-            multind mi( nsrem );
-
             // Save _Qa and _Qb on the subtree
             map<size_t,Factor> _Qa_old;
             map<size_t,Factor> _Qb_old;
@@ -476,20 +474,18 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
             }
                 
             // For all states of nsrem
-            for( size_t j = 0; j < mi.max(); j++ ) {
-                vector<size_t> vi = mi.vi( j );
+            for( State s(nsrem); s.valid(); s++ ) {
                 
                 // CollectEvidence
                 double logZ = 0.0;
                 for( size_t i = Tsize; (i--) != 0; ) {
-            //      Make outer region T[i].n1 consistent with outer region T[i].n2
-            //      IR(i) = seperator OR(T[i].n1) && OR(T[i].n2)
+                // Make outer region T[i].n1 consistent with outer region T[i].n2
+                // IR(i) = seperator OR(T[i].n1) && OR(T[i].n2)
 
-                    size_t k = 0;
-                    for( VarSet::const_iterator n = nsrem.begin(); n != nsrem.end(); n++, k++ )
+                    for( VarSet::const_iterator n = nsrem.begin(); n != nsrem.end(); n++ )
                         if( _Qa[T[i].n2].vars() >> *n ) {
                             Factor piet( *n, 0.0 );
-                            piet[vi[k]] = 1.0;
+                            piet[s(*n)] = 1.0;
                             _Qa[T[i].n2] *= piet; 
                         }
 
@@ -501,7 +497,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                 logZ += log(_Qa[T[0].n1].normalize( Prob::NORMPROB ));
 
                 Factor piet( nsrem, 0.0 );
-                piet[j] = exp(logZ);
+                piet[s] = exp(logZ);
                 Pns += piet * _Qa[T[0].n1].part_sum( ns / nsrem );      // OPTIMIZE ME
 
                 // Restore clamped beliefs

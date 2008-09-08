@@ -120,40 +120,14 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
 
         // read Factor
         vector<size_t> di(nr_mem,0);
-        vector<size_t> pdi(nr_mem,0);
+        size_t prod = 1;
         for( size_t k = 0; k < nr_mem; k++ ) {
             di[k] = dims[k];
-            pdi[k] = dims[perm[k]];
+            prod *= dims[k];
         }
-        multind mi(di);
-        multind pmi(pdi);
-        if( verbose >= 3 ) {
-            cout << "  mi.max(): " << mi.max() << endl;
-            cout << "       ";
-            for( size_t k = 0; k < nr_mem; k++ ) 
-                cout << labels[k] << " ";
-            cout << "   ";
-            for( size_t k = 0; k < nr_mem; k++ ) 
-                cout << labels[perm[k]] << " ";
-            cout << endl;
-        }
-        for( size_t li = 0; li < mi.max(); li++ ) {
-            vector<size_t> vi = mi.vi(li);
-            vector<size_t> pvi(vi.size(),0);
-            for( size_t k = 0; k < vi.size(); k++ )
-                pvi[k] = vi[perm[k]];
-            size_t pli = pmi.li(pvi);
-            if( verbose >= 3 ) {
-                cout << "    " << li << ": ";
-                for( vector<size_t>::iterator r=vi.begin(); r!=vi.end(); r++)
-                    cout << *r << " ";
-                cout << "-> ";
-                for( vector<size_t>::iterator r=pvi.begin(); r!=pvi.end(); r++)
-                    cout << *r << " ";
-                cout << ": " << pli << endl;
-            }
-            factors.back()[pli] = factordata[li];
-        }
+        Permute permindex( di, perm );
+        for( size_t li = 0; li < prod; li++ )
+            factors.back()[permindex.convert_linear_index(li)] = factordata[li];
     }
 
     if( verbose >= 3 ) {
@@ -193,21 +167,14 @@ Factor mx2Factor(const mxArray *psi) {
 
     // read Factor
     vector<size_t> di(nr_mem,0);
-    vector<size_t> pdi(nr_mem,0);
+    size_t prod = 1;
     for( size_t k = 0; k < nr_mem; k++ ) {
         di[k] = dims[k];
-        pdi[k] = dims[perm[k]];
+        prod *= dims[k];
     }
-    multind mi(di);
-    multind pmi(pdi);
-    for( size_t li = 0; li < mi.max(); li++ ) {
-        vector<size_t> vi = mi.vi(li);
-        vector<size_t> pvi(vi.size(),0);
-        for( size_t k = 0; k < vi.size(); k++ )
-            pvi[k] = vi[perm[k]];
-        size_t pli = pmi.li(pvi);
-        factor[pli] = factordata[li];
-    }
+    Permute permindex( di, perm );
+    for( size_t li = 0; li < prod; li++ )
+        factor[permindex.convert_linear_index(li)] = factordata[li];
 
     return( factor );
 }

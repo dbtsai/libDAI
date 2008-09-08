@@ -112,8 +112,6 @@ void TreeEPSubTree::InvertAndMultiply( const vector<Factor> &Qa, const vector<Fa
 
 
 void TreeEPSubTree::HUGIN_with_I( vector<Factor> &Qa, vector<Factor> &Qb ) {
-    multind mi( _nsrem );
-
     // Backup _Qa and _Qb
     vector<Factor> _Qa_old(_Qa);
     vector<Factor> _Qb_old(_Qb);
@@ -125,20 +123,17 @@ void TreeEPSubTree::HUGIN_with_I( vector<Factor> &Qa, vector<Factor> &Qb ) {
         Qb[_b[beta]].fill( 0.0 );
     
     // For all states of _nsrem
-    for( size_t j = 0; j < mi.max(); j++ ) {
-        vector<size_t> vi = mi.vi( j );
-        
+    for( State s(_nsrem); s.valid(); s++ ) {
         // Multiply root with slice of I
-        _Qa[0] *= _I->slice( _nsrem, j );
+        _Qa[0] *= _I->slice( _nsrem, s );
 
         // CollectEvidence
         for( size_t i = _RTree.size(); (i--) != 0; ) {
             // clamp variables in nsrem
-            size_t k = 0;
-            for( VarSet::const_iterator n = _nsrem.begin(); n != _nsrem.end(); n++, k++ )
+            for( VarSet::const_iterator n = _nsrem.begin(); n != _nsrem.end(); n++ )
                 if( _Qa[_RTree[i].n2].vars() >> *n ) {
                     Factor delta( *n, 0.0 );
-                    delta[vi[k]] = 1.0;
+                    delta[s(*n)] = 1.0;
                     _Qa[_RTree[i].n2] *= delta;
                 }
             Factor new_Qb = _Qa[_RTree[i].n2].part_sum( _Qb[i].vars() );

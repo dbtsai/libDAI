@@ -176,7 +176,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             factors.push_back(Factor(I_vars,0.0));
             
             // calculate permutation sigma (internally, members are sorted)
-            vector<long> sigma(nr_members,0);
+            vector<size_t> sigma(nr_members,0);
             VarSet::iterator j = I_vars.begin();
             for( size_t mi = 0; mi < nr_members; mi++,j++ ) {
                 long search_for = j->label();
@@ -190,22 +190,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             }
 
             // calculate multindices
-            vector<size_t> sdims(nr_members,0);
-            for( size_t k = 0; k < nr_members; k++ ) {
-                sdims[k] = dims[sigma[k]];
-            }
-            multind mi(dims);
-            multind smi(sdims);
-            if( verbose >= 3 ) {
-                cout << "  mi.max(): " << mi.max() << endl;
-                cout << "       ";
-                for( size_t k=0; k < nr_members; k++ ) 
-                    cout << labels[k] << " ";
-                cout << "   ";
-                for( size_t k=0; k < nr_members; k++ ) 
-                    cout << labels[sigma[k]] << " ";
-                cout << endl;
-            }
+            Permute permindex( dims, sigma );
             
             // read values
             size_t nr_nonzeros;
@@ -224,19 +209,9 @@ istream& operator >> (istream& is, FactorGraph& fg) {
                     getline(is,line);
                 is >> val;
 
-                vector<size_t> vi = mi.vi(li);
-                vector<size_t> svi(vi.size(),0);
-                for( size_t k = 0; k < vi.size(); k++ )
-                    svi[k] = vi[sigma[k]];
-                size_t sli = smi.li(svi);
-                if( verbose >= 3 ) {
-                    cout << "    " << li << ": ";
-                    copy( vi.begin(), vi.end(), ostream_iterator<size_t>(cout," "));
-                    cout << "-> ";
-                    copy( svi.begin(), svi.end(), ostream_iterator<size_t>(cout," "));
-                    cout << ": " << sli << endl;
-                }
-                factors.back()[sli] = val;
+                // store value, but permute indices first according
+                // to internal representation
+                factors.back()[permindex.convert_linear_index( li  )] = val;
             }
         }
 

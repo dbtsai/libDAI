@@ -34,32 +34,28 @@ using namespace std;
 Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
     Factor Pns (ns);
     
-    multind mi( ns );
-
     InfAlg *clamped = obj.clone();
     if( !reInit )
         clamped->init();
 
     Complex logZ0;
-    for( size_t j = 0; j < mi.max(); j++ ) {
+    for( State s(ns); s.valid(); s++ ) {
         // save unclamped factors connected to ns
         clamped->saveProbs( ns );
 
         // set clamping Factors to delta functions
-        vector<size_t> vi = mi.vi( j );
-        size_t k = 0;
-        for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++, k++ )
-            clamped->clamp( *n, vi[k] );
+        for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
+            clamped->clamp( *n, s(*n) );
         
         // run DAIAlg, calc logZ, store in Pns
         if( clamped->Verbose() >= 2 )
-            cout << j << ": ";
+            cout << s << ": ";
         if( reInit )
             clamped->init();
         clamped->run();
 
         Complex Z;
-        if( j == 0 ) {
+        if( s == 0 ) {
             logZ0 = clamped->logZ();
             Z = 1.0;
         } else {
@@ -69,7 +65,7 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
                 cout << "Marginal:: WARNING: complex Z (" << Z << ")" << endl;
         }
 
-        Pns[j] = real(Z);
+        Pns[s] = real(Z);
         
         // restore clamped factors
         clamped->undoProbs( ns );

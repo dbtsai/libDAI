@@ -71,7 +71,7 @@ void BP::create() {
             newEP.newMessage = Prob( var(i).states() );
 
             newEP.index.reserve( factor(I).states() );
-            for( Index k( var(i), factor(I).vars() ); k >= 0; ++k )
+            for( IndexFor k( var(i), factor(I).vars() ); k >= 0; ++k )
                 newEP.index.push_back( k );
 
             newEP.residual = 0.0;
@@ -127,7 +127,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
     foreach( const Neighbor &j, nbF(I) ) {
         if( j != i ) {     // for all j in I \ i
             size_t _I = j.dual;
-            // ind is the precalculated Index(j,I) i.e. to x_I == k corresponds x_j == ind[k]
+            // ind is the precalculated IndexFor(j,I) i.e. to x_I == k corresponds x_j == ind[k]
             const ind_t & ind = index(j, _I);
 
             // prod_j will be the product of messages coming into j
@@ -145,7 +145,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
 
     // Marginalize onto i
     Prob marg( var(i).states(), 0.0 );
-    // ind is the precalculated Index(i,I) i.e. to x_I == k corresponds x_i == ind[k]
+    // ind is the precalculated IndexFor(i,I) i.e. to x_I == k corresponds x_i == ind[k]
     const ind_t ind = index(i,_I);
     for( size_t r = 0; r < prod.size(); ++r )
         marg[ind[r]] += prod[r];
@@ -313,7 +313,7 @@ Factor BP::beliefF (size_t I) const {
 
     foreach( const Neighbor &j, nbF(I) ) {
         size_t _I = j.dual;
-        // ind is the precalculated Index(j,I) i.e. to x_I == k corresponds x_j == ind[k]
+        // ind is the precalculated IndexFor(j,I) i.e. to x_I == k corresponds x_j == ind[k]
         const ind_t & ind = index(j, _I);
 
         // prod_j will be the product of messages coming into j
