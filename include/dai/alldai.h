@@ -25,13 +25,27 @@
 
 #include <string>
 #include <dai/daialg.h>
-#include <dai/bp.h>
-#include <dai/lc.h>
-#include <dai/hak.h>
-#include <dai/mf.h>
-#include <dai/jtree.h>
-#include <dai/treeep.h>
-#include <dai/mr.h>
+#ifdef WITH_BP
+    #include <dai/bp.h>
+#endif
+#ifdef WITH_MF
+    #include <dai/mf.h>
+#endif
+#ifdef WITH_HAK
+    #include <dai/hak.h>
+#endif
+#ifdef WITH_LC
+    #include <dai/lc.h>
+#endif
+#ifdef WITH_TREEEP
+    #include <dai/treeep.h>
+#endif
+#ifdef WITH_JTREE
+    #include <dai/jtree.h>
+#endif
+#ifdef WITH_MR
+    #include <dai/mr.h>
+#endif
 
 
 namespace dai {
@@ -43,8 +57,32 @@ namespace dai {
 InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Properties &opts );
 
 
-/// AINames contains the names of all approximate inference algorithms
-static const char* DAINames[] = {BP::Name, MF::Name, HAK::Name, LC::Name, TreeEP::Name, MR::Name, JTree::Name};
+/// DAINames contains the names of all approximate inference algorithms
+
+static const char* DAINames[] = {
+#ifdef WITH_BP
+    BP::Name, 
+#endif
+#ifdef WITH_MF
+    MF::Name,
+#endif
+#ifdef WITH_HAK
+    HAK::Name,
+#endif
+#ifdef WITH_LC
+    LC::Name,
+#endif
+#ifdef WITH_TREEEP
+    TreeEP::Name,
+#endif
+#ifdef WITH_JTREE
+    JTree::Name,
+#endif
+#ifdef WITH_MR
+    MR::Name,
+#endif
+    ""
+};
 
 
 } // end of namespace dai

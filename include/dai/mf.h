@@ -60,7 +60,7 @@ class MF : public DAIAlgFG {
         void Regenerate();
         void init();
         double run();
-        Factor belief1 (size_t i) const;
+        Factor beliefV (size_t i) const;
         Factor belief (const Var &n) const;
         Factor belief (const VarSet &ns) const;
         std::vector<Factor> beliefs() const;

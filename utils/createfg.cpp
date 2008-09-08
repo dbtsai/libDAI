@@ -284,7 +284,7 @@ int main( int argc, char *argv[] ) {
                 throw "Please specify all required arguments";
             do {
                 MakeHOIFG( N, M, k, beta, fg );
-            } while( !fg.isConnected() );
+            } while( !fg.G.isConnected() );
 
             cout << "# N = " << N << endl;
             cout << "# M = " << M << endl;

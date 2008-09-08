@@ -71,30 +71,20 @@ bool LC::checkProperties() {
 LC::LC(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts) {
     assert( checkProperties() );
 
-    // calc iI
-    for( size_t i=0; i < nrVars(); i++ ) {
-        for( _nb_cit I = nb1(i).begin(); I != nb1(i).end(); I++ ) {
-                _iI_type _iI_entry;
-                _iI_entry.i = i;
-                _iI_entry.I = *I;
-
-                _iI.push_back(_iI_entry);
-            }
-    }
-
     // create pancakes
     _pancakes.resize(nrVars());
    
     // create cavitydists
     for( size_t i=0; i < nrVars(); i++ )
-        _cavitydists.push_back(Factor(delta(var(i))));
+        _cavitydists.push_back(Factor(delta(i)));
 
     // create phis
-    _phis.reserve(nr_edges());
-    for( size_t iI = 0; iI < nr_edges(); iI++ ) {
-        size_t i = edge(iI).first;
-        size_t I = edge(iI).second;
-        _phis.push_back( Factor( factor(I).vars() / var(i) ) );
+    _phis.reserve( nrVars() );
+    for( size_t i = 0; i < nrVars(); i++ ) {
+        _phis.push_back( vector<Factor>() );
+        _phis[i].reserve( nbV(i).size() );
+        foreach( const Neighbor &I, nbV(i) )
+            _phis[i].push_back( Factor( factor(I).vars() / var(i) ) );
     }
 
     // create beliefs
@@ -120,27 +110,27 @@ double LC::CalcCavityDist (size_t i, const string &name, const Properties &opts)
     double maxdiff = 0;
 
     if( Verbose() >= 2 )
-        cout << "Initing cavity " << var(i) << "(" << delta(var(i)).size() << " vars, " << delta(var(i)).stateSpace() << " states)" << endl;
+        cout << "Initing cavity " << var(i) << "(" << delta(i).size() << " vars, " << delta(i).stateSpace() << " states)" << endl;
 
     if( Cavity() == CavityType::UNIFORM )
-        Bi = Factor(delta(var(i)));
+        Bi = Factor(delta(i));
     else {
         InfAlg *cav = newInfAlg( name, *this, opts );
-        cav->makeCavity( var(i) );
+        cav->makeCavity( i );
 
         if( Cavity() == CavityType::FULL )
-            Bi = calcMarginal( *cav, cav->delta(var(i)), reInit() );
+            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
         else if( Cavity() == CavityType::PAIR )
-            Bi = calcMarginal2ndO( *cav, cav->delta(var(i)), reInit() );
+            Bi = calcMarginal2ndO( *cav, cav->delta(i), reInit() );
         else if( Cavity() == CavityType::PAIR2 ) {
-            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->delta(var(i)), reInit() );
+            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->delta(i), reInit() );
             for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
                 Bi *= pairbeliefs[ij];
         } else if( Cavity() == CavityType::PAIRINT ) {
-            Bi = calcMarginal( *cav, cav->delta(var(i)), reInit() );
+            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
             
             // Set interactions of order > 2 to zero
-            size_t N = delta(var(i)).size();
+            size_t N = delta(i).size();
             Real *p = &(*Bi.p().p().begin());
             x2x::p2logp (N, p);
             x2x::logp2w (N, p);
@@ -149,10 +139,10 @@ double LC::CalcCavityDist (size_t i, const string &name, const Properties &opts)
 //            x2x::logpnorm (N, p);
             x2x::logp2p (N, p);
         } else if( Cavity() == CavityType::PAIRCUM ) {
-            Bi = calcMarginal( *cav, cav->delta(var(i)), reInit() );
+            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
             
             // Set cumulants of order > 2 to zero
-            size_t N = delta(var(i)).size();
+            size_t N = delta(i).size();
             Real *p = &(*Bi.p().p().begin());
             x2x::p2m (N, p);
             x2x::m2c (N, p, N);
@@ -218,19 +208,19 @@ long LC::SetCavityDists (vector<Factor> &Q) {
 
 
 void LC::init() {
-    for( size_t iI = 0; iI < nr_edges(); iI++ ) {
-        if( Updates() == UpdateType::SEQRND )
-            _phis[iI].randomize();
-        else
-            _phis[iI].fill(1.0);
-    }
+    for( size_t i = 0; i < nrVars(); ++i )
+        foreach( const Neighbor &I, nbV(i) )
+            if( Updates() == UpdateType::SEQRND )
+                _phis[i][I.iter].randomize();
+            else
+                _phis[i][I.iter].fill(1.0);
     for( size_t i = 0; i < nrVars(); i++ ) {
         _pancakes[i] = _cavitydists[i];
         
-        for( _nb_cit I = nb1(i).begin(); I != nb1(i).end(); I++ ) {
-            _pancakes[i] *= factor(*I);
+        foreach( const Neighbor &I, nbV(i) ) {
+            _pancakes[i] *= factor(I);
             if( Updates() == UpdateType::SEQRND )
-              _pancakes[i] *= _phis[VV2E(i,*I)];
+              _pancakes[i] *= _phis[i][I.iter];
         }
         
         _pancakes[i].normalize( _normtype );
@@ -240,11 +230,8 @@ void LC::init() {
 }
 
 
-Factor LC::NewPancake (size_t iI, bool & hasNaNs) {
-    size_t i = _iI[iI].i;
-    size_t I = _iI[iI].I;
-    iI = VV2E(i, I);
-
+Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
+    size_t I = nbV(i)[_I];
     Factor piet = _pancakes[i];
 
     // recalculate _pancake[i]
@@ -255,16 +242,16 @@ Factor LC::NewPancake (size_t iI, bool & hasNaNs) {
             A_I *= (_pancakes[findVar(*k)] * factor(I).inverse()).part_sum( Ivars / var(i) );
     if( Ivars.size() > 1 )
         A_I ^= (1.0 / (Ivars.size() - 1));
-    Factor A_Ii = (_pancakes[i] * factor(I).inverse() * _phis[iI].inverse()).part_sum( Ivars / var(i) );
+    Factor A_Ii = (_pancakes[i] * factor(I).inverse() * _phis[i][_I].inverse()).part_sum( Ivars / var(i) );
     Factor quot = A_I.divided_by(A_Ii);
 
-    piet *= quot.divided_by( _phis[iI] ).normalized( _normtype );
-    _phis[iI] = quot.normalized( _normtype );
+    piet *= quot.divided_by( _phis[i][_I] ).normalized( _normtype );
+    _phis[i][_I] = quot.normalized( _normtype );
 
     piet.normalize( _normtype );
 
     if( piet.hasNaNs() ) {
-        cout << "LC::NewPancake(" << iI << "):  has NaNs!" << endl;
+        cout << "LC::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;
         hasNaNs = true;
     }
 
@@ -298,11 +285,15 @@ double LC::run() {
         return NAN;
     }
 
-    vector<long> update_seq(nr_iI(),0);
-    for( size_t k=0; k < nr_iI(); k++ )
-        update_seq[k] = k;
+    size_t nredges = nrEdges();
+    typedef pair<size_t,size_t> Edge;
+    vector<Edge> update_seq;
+    update_seq.reserve( nredges );
+    for( size_t i = 0; i < nrVars(); ++i )
+        foreach( const Neighbor &I, nbV(i) )
+            update_seq.push_back( Edge( i, I.iter ) );
 
-    size_t iter=0;
+    size_t iter = 0;
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
@@ -311,13 +302,13 @@ double LC::run() {
         if( Updates() == UpdateType::SEQRND )
             random_shuffle( update_seq.begin(), update_seq.end() );
         
-        for( size_t t=0; t < nr_iI(); t++ ) {
-            long iI = update_seq[t];
-            long i = _iI[iI].i;
-            _pancakes[i] = NewPancake(iI, hasNaNs);
+        for( size_t t=0; t < nredges; t++ ) {
+            size_t i = update_seq[t].first;
+            size_t _I = update_seq[t].second;
+            _pancakes[i] = NewPancake( i, _I, hasNaNs);
             if( hasNaNs )
                 return NAN;
-            CalcBelief(i);
+            CalcBelief( i );
         }
 
         // compare new beliefs with old ones

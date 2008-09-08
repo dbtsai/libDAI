@@ -190,7 +190,7 @@ double TreeEPSubTree::logZ( const vector<Factor> &Qa, const vector<Factor> &Qb )
 TreeEP::TreeEP( const FactorGraph &fg, const Properties &opts ) : JTree(fg, opts("updates",string("HUGIN")), false) {
     assert( checkProperties() );
 
-    assert( fg.isConnected() );
+    assert( fg.G.isConnected() );
 
     if( opts.hasKey("tree") ) {
         ConstructRG( opts.GetAs<DEdgeVec>("tree") );
@@ -199,24 +199,25 @@ TreeEP::TreeEP( const FactorGraph &fg, const Properties &opts ) : JTree(fg, opts
             // construct weighted graph with as weights a crude estimate of the
             // mutual information between the nodes
             WeightedGraph<double> wg;
-            for( vector<Var>::const_iterator i = vars().begin(); i != vars().end(); i++ ) {
-                VarSet di = delta(*i);
+            for( size_t i = 0; i < nrVars(); ++i ) {
+                Var v_i = var(i);
+                VarSet di = delta(i);
                 for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
-                    if( *i < *j ) {
+                    if( v_i < *j ) {
                         Factor piet;
                         for( size_t I = 0; I < nrFactors(); I++ ) {
                             VarSet Ivars = factor(I).vars();
-                            if( (Ivars == *i) || (Ivars == *j) )
+                            if( (Ivars == v_i) || (Ivars == *j) )
                                 piet *= factor(I);
-                            else if( Ivars >> (*i | *j) )
-                                piet *= factor(I).marginal( *i | *j );
+                            else if( Ivars >> (v_i | *j) )
+                                piet *= factor(I).marginal( v_i | *j );
                         }
-                        if( piet.vars() >> (*i | *j) ) {
-                            piet = piet.marginal( *i | *j );
-                            Factor pietf = piet.marginal(*i) * piet.marginal(*j);
-                            wg[UEdge(findVar(*i),findVar(*j))] = real( KL_dist( piet, pietf ) );
+                        if( piet.vars() >> (v_i | *j) ) {
+                            piet = piet.marginal( v_i | *j );
+                            Factor pietf = piet.marginal(v_i) * piet.marginal(*j);
+                            wg[UEdge(i,findVar(*j))] = real( KL_dist( piet, pietf ) );
                         } else
-                            wg[UEdge(findVar(*i),findVar(*j))] = 0;
+                            wg[UEdge(i,findVar(*j))] = 0;
                     }
             }
 
@@ -233,17 +234,18 @@ TreeEP::TreeEP( const FactorGraph &fg, const Properties &opts ) : JTree(fg, opts
             // construct weighted graph with as weights an upper bound on the
             // effective interaction strength between pairs of nodes
             WeightedGraph<double> wg;
-            for( vector<Var>::const_iterator i = vars().begin(); i != vars().end(); i++ ) {
-                VarSet di = delta(*i);
+            for( size_t i = 0; i < nrVars(); ++i ) {
+                Var v_i = var(i);
+                VarSet di = delta(i);
                 for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
-                    if( *i < *j ) {
+                    if( v_i < *j ) {
                         Factor piet;
                         for( size_t I = 0; I < nrFactors(); I++ ) {
                             VarSet Ivars = factor(I).vars();
-                            if( Ivars >> (*i | *j) )
+                            if( Ivars >> (v_i | *j) )
                                 piet *= factor(I);
                         }
-                        wg[UEdge(findVar(*i),findVar(*j))] = piet.strength(*i, *j);
+                        wg[UEdge(i,findVar(*j))] = piet.strength(v_i, *j);
                     }
             }
 
@@ -277,19 +279,21 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     // Construct corresponding region graph
 
     // Create outer regions
-    ORs().reserve( Cliques.size() );
+    ORs.reserve( Cliques.size() );
     for( size_t i = 0; i < Cliques.size(); i++ )
-        ORs().push_back( FRegion( Factor(Cliques[i], 1.0), 1.0 ) );
+        ORs.push_back( FRegion( Factor(Cliques[i], 1.0), 1.0 ) );
 
     // For each factor, find an outer region that subsumes that factor.
     // Then, multiply the outer region with that factor.
     // If no outer region can be found subsuming that factor, label the
     // factor as off-tree.
+    fac2OR.clear();
+    fac2OR.resize( nrFactors(), -1U );
     for( size_t I = 0; I < nrFactors(); I++ ) {
         size_t alpha;
-        for( alpha = 0; alpha < nr_ORs(); alpha++ )
+        for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
-                _fac2OR[I] = alpha;
+                fac2OR[I] = alpha;
                 break;
             }
     // DIFF WITH JTree::GenerateJT:      assert
@@ -297,30 +301,32 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     RecomputeORs();
 
     // Create inner regions and edges
-    IRs().reserve( _RTree.size() );
-    Redges().reserve( 2 * _RTree.size() );
+    IRs.reserve( _RTree.size() );
+    typedef pair<size_t,size_t> Edge;
+    vector<Edge> edges;
+    edges.reserve( 2 * _RTree.size() );
     for( size_t i = 0; i < _RTree.size(); i++ ) {
-        Redges().push_back( R_edge_t( _RTree[i].n1, IRs().size() ) );
-        Redges().push_back( R_edge_t( _RTree[i].n2, IRs().size() ) );
+        edges.push_back( Edge( _RTree[i].n1, IRs.size() ) );
+        edges.push_back( Edge( _RTree[i].n2, IRs.size() ) );
         // inner clusters have counting number -1
-        IRs().push_back( Region( Cliques[_RTree[i].n1] & Cliques[_RTree[i].n2], -1.0 ) );
+        IRs.push_back( Region( Cliques[_RTree[i].n1] & Cliques[_RTree[i].n2], -1.0 ) );
     }
 
-    // Regenerate BipartiteGraph internals
-    Regenerate();
+    // create bipartite graph
+    G.create( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Check counting numbers
     Check_Counting_Numbers();
     
     // Create messages and beliefs
     _Qa.clear();
-    _Qa.reserve( nr_ORs() );
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    _Qa.reserve( nrORs() );
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         _Qa.push_back( OR(alpha) );
 
     _Qb.clear();
-    _Qb.reserve( nr_IRs() );
-    for( size_t beta = 0; beta < nr_IRs(); beta++ ) 
+    _Qb.reserve( nrIRs() );
+    for( size_t beta = 0; beta < nrIRs(); beta++ ) 
         _Qb.push_back( Factor( IR(beta), 1.0 ) );
 
     // DIFF with JTree::GenerateJT:  no messages
@@ -459,13 +465,13 @@ Complex TreeEP::logZ() const {
     double sum = 0.0;
 
     // entropy of the tree
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         sum -= real(_Qb[beta].entropy());
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         sum += real(_Qa[alpha].entropy());
 
     // energy of the on-tree factors
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         sum += (OR(alpha).log0() * _Qa[alpha]).totalSum();
 
     // energy of the off-tree factors

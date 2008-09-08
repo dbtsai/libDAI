@@ -37,16 +37,23 @@ bool hasShortLoops( const std::vector<Factor> &P );
 void RemoveShortLoops( std::vector<Factor> &P );
 
 
-class FactorGraph : public BipartiteGraph<Var,Factor> {
+class FactorGraph {
+    public:
+        BipartiteGraph         G;
+        std::vector<Var>       vars;
+        std::vector<Factor>    factors;
+        typedef BipartiteGraph::Neighbor  Neighbor;
+        typedef BipartiteGraph::Neighbors Neighbors;
+
     protected:
-        std::map<size_t,Prob>    _undoProbs;
-        Prob::NormType           _normtype;
+        std::map<size_t,Prob>  _undoProbs;
+        Prob::NormType         _normtype;
 
     public:
         /// Default constructor
-        FactorGraph() : BipartiteGraph<Var,Factor>(), _undoProbs(), _normtype(Prob::NORMPROB) {};
+        FactorGraph() : G(), vars(), factors(), _undoProbs(), _normtype(Prob::NORMPROB) {};
         /// Copy constructor
-        FactorGraph(const FactorGraph & x) : BipartiteGraph<Var,Factor>(x), _undoProbs(), _normtype(x._normtype) {};
+        FactorGraph(const FactorGraph & x) : G(x.G), vars(x.vars), factors(x.factors), _undoProbs(x._undoProbs), _normtype(x._normtype) {};
         /// Construct FactorGraph from vector of Factors
         FactorGraph(const std::vector<Factor> &P);
         // Construct a FactorGraph from given factor and variable iterators
@@ -55,38 +62,46 @@ class FactorGraph : public BipartiteGraph<Var,Factor> {
         
         /// Assignment operator
         FactorGraph & operator=(const FactorGraph & x) {
-            if(this!=&x) {
-                BipartiteGraph<Var,Factor>::operator=(x);
-                _undoProbs      = x._undoProbs;
-                _normtype       = x._normtype;
+            if( this != &x ) {
+                G          = x.G;
+                vars       = x.vars;
+                factors    = x.factors;
+                _undoProbs = x._undoProbs;
+                _normtype  = x._normtype;
             }
             return *this;
         }
         virtual ~FactorGraph() {}
 
         // aliases
-        Var & var(size_t i) { return V1(i); }
-        const Var & var(size_t i) const { return V1(i); }
-        const std::vector<Var> & vars() const { return V1s(); }
-        std::vector<Var> & vars() { return V1s(); }
-        size_t nrVars() const { return V1s().size(); }
-        Factor & factor(size_t I) { return V2(I); }
-        const Factor & factor(size_t I) const { return V2(I); }
-        const std::vector<Factor> & factors() const { return V2s(); }
-        std::vector<Factor> & factors() { return V2s(); }
-        size_t nrFactors() const { return V2s().size(); }
+        Var & var(size_t i) { return vars[i]; }
+        const Var & var(size_t i) const { return vars[i]; }
+        Factor & factor(size_t I) { return factors[I]; }
+        const Factor & factor(size_t I) const { return factors[I]; }
 
-        /// Provides read access to neighbours of variable
-        const _nb_t & nbV( size_t i1 ) const { return nb1(i1); }
-        /// Provides full access to neighbours of variable
-        _nb_t & nbV( size_t i1 ) { return nb1(i1); }
-        /// Provides read access to neighbours of factor
-        const _nb_t & nbF( size_t i2 ) const { return nb2(i2); }
-        /// Provides full access to neighbours of factor
-        _nb_t & nbF( size_t i2 ) { return nb2(i2); }
+        size_t nrVars() const { return vars.size(); }
+        size_t nrFactors() const { return factors.size(); }
+        size_t nrEdges() const { return G.nrEdges(); }
+
+        /// Provides read access to neighbors of variable
+        const Neighbors & nbV( size_t i ) const { return G.nb1(i); }
+        /// Provides full access to neighbors of variable
+        Neighbors & nbV( size_t i ) { return G.nb1(i); }
+        /// Provides read access to neighbors of factor
+        const Neighbors & nbF( size_t I ) const { return G.nb2(I); }
+        /// Provides full access to neighbors of factor
+        Neighbors & nbF( size_t I ) { return G.nb2(I); }
+        /// Provides read access to neighbor of variable
+        const Neighbor & nbV( size_t i, size_t _I ) const { return G.nb1(i)[_I]; }
+        /// Provides full access to neighbor of variable
+        Neighbor & nbV( size_t i, size_t _I ) { return G.nb1(i)[_I]; }
+        /// Provides read access to neighbor of factor
+        const Neighbor & nbF( size_t I, size_t _i ) const { return G.nb2(I)[_i]; }
+        /// Provides full access to neighbor of factor
+        Neighbor & nbF( size_t I, size_t _i ) { return G.nb2(I)[_i]; }
 
         size_t findVar(const Var & n) const {
-            size_t i = find( vars().begin(), vars().end(), n ) - vars().begin();
+            size_t i = find( vars.begin(), vars.end(), n ) - vars.begin();
             assert( i != nrVars() );
             return i;
         }
@@ -102,17 +117,13 @@ class FactorGraph : public BipartiteGraph<Var,Factor> {
         friend std::ostream& operator << (std::ostream& os, const FactorGraph& fg);
         friend std::istream& operator >> (std::istream& is, FactorGraph& fg);
 
-        VarSet delta(const Var & n) const;
-        VarSet Delta(const Var & n) const;
-        virtual void makeFactorCavity(size_t I);
-        virtual void makeCavity(const Var & n);
+        VarSet delta( unsigned i ) const;
+        VarSet Delta( unsigned i ) const;
+        virtual void makeCavity( unsigned i );
 
         long ReadFromFile(const char *filename);
         long WriteToFile(const char *filename) const;
         long WriteToDotFile(const char *filename) const;
-
-        Factor ExactMarginal(const VarSet & x) const;
-        Real ExactlogZ() const;
 
         virtual void clamp( const Var & n, size_t i );
         
@@ -126,31 +137,29 @@ class FactorGraph : public BipartiteGraph<Var,Factor> {
         virtual void undoProb( size_t I );
         void saveProb( size_t I );
 
-        bool isConnected() const;
-
         virtual void updatedFactor( size_t /*I*/ ) {};
 
     private:
-        /// Part of constructors (creates edges, neighbours and adjacency matrix)
+        /// Part of constructors (creates edges, neighbors and adjacency matrix)
         void createGraph( size_t nrEdges );
 };
 
 
 // assumes that the set of variables in [var_begin,var_end) is the union of the variables in the factors in [fact_begin, fact_end)
 template<typename FactorInputIterator, typename VarInputIterator>
-FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : BipartiteGraph<Var,Factor>(), _undoProbs(), _normtype(Prob::NORMPROB) {
+FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : G(), _undoProbs(), _normtype(Prob::NORMPROB) {
     // add factors
     size_t nrEdges = 0;
-    V2s().reserve( nr_fact_hint );
+    factors.reserve( nr_fact_hint );
     for( FactorInputIterator p2 = fact_begin; p2 != fact_end; ++p2 ) {
-        V2s().push_back( *p2 );
-	nrEdges += p2->vars().size();
+        factors.push_back( *p2 );
+        nrEdges += p2->vars().size();
     }
  
     // add variables
-    V1s().reserve( nr_var_hint );
+    vars.reserve( nr_var_hint );
     for( VarInputIterator p1 = var_begin; p1 != var_end; ++p1 )
-	V1s().push_back( *p1 );
+        vars.push_back( *p1 );
 
     // create graph structure
     createGraph( nrEdges );

@@ -40,22 +40,34 @@ std::ostream& operator<< (std::ostream & os, const Property & p) {
         os << boost::any_cast<bool>(p.second);
     else if( p.second.type() == typeid(Properties) )
         os << boost::any_cast<Properties>(p.second);
+#ifdef WITH_BP
     else if( p.second.type() == typeid(BP::UpdateType) )
         os << boost::any_cast<BP::UpdateType>(p.second);
+#endif
+#ifdef WITH_HAK
     else if( p.second.type() == typeid(HAK::ClustersType) )
         os << boost::any_cast<HAK::ClustersType>(p.second);
+#endif
+#ifdef WITH_JTREE
     else if( p.second.type() == typeid(JTree::UpdateType) )
         os << boost::any_cast<JTree::UpdateType>(p.second);
+#endif
+#ifdef WITH_MR
     else if( p.second.type() == typeid(MR::UpdateType) )
         os << boost::any_cast<MR::UpdateType>(p.second);
     else if( p.second.type() == typeid(MR::InitType) )
         os << boost::any_cast<MR::InitType>(p.second);
+#endif
+#ifdef WITH_TREEEP
     else if( p.second.type() == typeid(TreeEP::TypeType) )
         os << boost::any_cast<TreeEP::TypeType>(p.second);
+#endif
+#ifdef WITH_LC
     else if( p.second.type() == typeid(LC::CavityType) )
         os << boost::any_cast<LC::CavityType>(p.second);
     else if( p.second.type() == typeid(LC::UpdateType) )
         os << boost::any_cast<LC::UpdateType>(p.second);
+#endif
     else
         throw "Unknown property type";
     return( os );

@@ -42,7 +42,7 @@ class JTree : public DAIAlgRG {
         DEdgeVec             _RTree;     // rooted tree
         std::vector<Factor>  _Qa;
         std::vector<Factor>  _Qb;
-        std::vector<Factor>  _mes;
+        std::vector<std::vector<Factor> >  _mes;
         double               _logZ;
 
 
@@ -67,15 +67,12 @@ class JTree : public DAIAlgRG {
         JTree( const FactorGraph &fg, const Properties &opts, bool automatic=true );
         void GenerateJT( const std::vector<VarSet> &Cliques );
 
-        Factor & message(size_t i1, size_t i2) { return( _mes[ORIR2E(i1,i2)] ); }   
-        const Factor & message(size_t i1, size_t i2) const { return( _mes[ORIR2E(i1,i2)] ); }   
+        Factor & message( size_t alpha, size_t _beta ) { return _mes[alpha][_beta]; }   
+        const Factor & message( size_t alpha, size_t _beta ) const { return _mes[alpha][_beta]; }   
 
         static const char *Name;
         std::string identify() const;
-//      void Regenerate();
-        void init() {
-            assert( checkProperties() );
-        }
+        void init() { assert( checkProperties() ); }
         void runHUGIN();
         void runShaferShenoy();
         double run();

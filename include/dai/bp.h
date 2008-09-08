@@ -34,10 +34,15 @@ namespace dai {
 
 class BP : public DAIAlgFG {
     protected:
-        typedef std::vector<size_t>  _ind_t;
+        typedef std::vector<size_t> ind_t;
+        struct EdgeProp {
+            ind_t  index;
+            Prob   message;
+            Prob   newMessage;
+            double residual;
+        };
 
-        std::vector<_ind_t>          _indices;
-        std::vector<Prob>            _messages, _newmessages;
+        std::vector<std::vector<EdgeProp> > edges;
 
     public:
         ENUM4(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
@@ -46,7 +51,7 @@ class BP : public DAIAlgFG {
         // default constructor
         BP() : DAIAlgFG() {};
         // copy constructor
-        BP(const BP & x) : DAIAlgFG(x), _indices(x._indices), _messages(x._messages), _newmessages(x._newmessages) {};
+        BP(const BP & x) : DAIAlgFG(x), edges(x.edges) {};
         BP* clone() const { return new BP(*this); }
         // construct BP object from FactorGraph
         BP(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts) {
@@ -57,29 +62,30 @@ class BP : public DAIAlgFG {
         BP & operator=(const BP & x) {
             if(this!=&x) {
                 DAIAlgFG::operator=(x);
-                _messages = x._messages;
-                _newmessages = x._newmessages;
-                _indices = x._indices;
+                edges = x.edges;
             }
             return *this;
         }
 
         static const char *Name;
 
-        Prob & message(size_t i1, size_t i2) { return( _messages[VV2E(i1,i2)] ); }  
-        const Prob & message(size_t i1, size_t i2) const { return( _messages[VV2E(i1,i2)] ); }  
-        Prob & newMessage(size_t i1, size_t i2) { return( _newmessages[VV2E(i1,i2)] ); }    
-        const Prob & newMessage(size_t i1, size_t i2) const { return( _newmessages[VV2E(i1,i2)] ); }    
-        _ind_t & index(size_t i1, size_t i2) { return( _indices[VV2E(i1,i2)] ); }
-        const _ind_t & index(size_t i1, size_t i2) const { return( _indices[VV2E(i1,i2)] ); }
+        Prob & message(size_t i, size_t _I) { return edges[i][_I].message; }
+        const Prob & message(size_t i, size_t _I) const { return edges[i][_I].message; }
+        Prob & newMessage(size_t i, size_t _I) { return edges[i][_I].newMessage; }
+        const Prob & newMessage(size_t i, size_t _I) const { return edges[i][_I].newMessage; }
+        ind_t & index(size_t i, size_t _I) { return edges[i][_I].index; }
+        const ind_t & index(size_t i, size_t _I) const { return edges[i][_I].index; }
+        double & residual(size_t i, size_t _I) { return edges[i][_I].residual; }
+        const double & residual(size_t i, size_t _I) const { return edges[i][_I].residual; }
+        void findMaxResidual( size_t &i, size_t &_I );
 
         std::string identify() const;
         void Regenerate();
         void init();
-        void calcNewMessage(size_t iI);
+        void calcNewMessage( size_t i, size_t _I );
         double run();
-        Factor belief1 (size_t i) const;
-        Factor belief2 (size_t I) const;
+        Factor beliefV (size_t i) const;
+        Factor beliefF (size_t I) const;
         Factor belief (const Var &n) const;
         Factor belief (const VarSet &n) const;
         std::vector<Factor> beliefs() const;

@@ -44,15 +44,15 @@ int main( int argc, char *argv[] ) {
         } else {
             cout << "Number of variables: " << fg.nrVars() << endl;
             cout << "Number of factors:   " << fg.nrFactors() << endl;
-            cout << "Connected:           " << fg.isConnected() << endl;
+            cout << "Connected:           " << fg.G.isConnected() << endl;
 //          cout << "Treewidth:           " << endl;
 
             double cavsum_lcbp = 0.0;
             double cavsum_lcbp2 = 0.0;
             size_t max_Delta_size = 0;
             for( size_t i = 0; i < fg.nrVars(); i++ ) {
-                VarSet di = fg.delta(fg.var(i));
-                size_t Ds = fg.Delta(fg.var(i)).stateSpace();
+                VarSet di = fg.delta(i);
+                size_t Ds = fg.Delta(i).stateSpace();
                 if( Ds > max_Delta_size )
                     max_Delta_size = Ds;
                 cavsum_lcbp += di.stateSpace();

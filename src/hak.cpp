@@ -64,24 +64,30 @@ bool HAK::checkProperties() {
 void HAK::constructMessages() {
     // Create outer beliefs
     _Qa.clear();
-    _Qa.reserve(nr_ORs());
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    _Qa.reserve(nrORs());
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         _Qa.push_back( Factor( OR(alpha).vars() ) );
 
     // Create inner beliefs
     _Qb.clear();
-    _Qb.reserve(nr_IRs());
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    _Qb.reserve(nrIRs());
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         _Qb.push_back( Factor( IR(beta) ) );
     
     // Create messages
     _muab.clear();
-    _muab.reserve(nr_Redges());
+    _muab.reserve( nrORs() );
     _muba.clear();
-    _muba.reserve(nr_Redges());
-    for( vector<R_edge_t>::const_iterator ab = Redges().begin(); ab != Redges().end(); ab++ ) {
-        _muab.push_back( Factor( IR(ab->second) ) );
-        _muba.push_back( Factor( IR(ab->second) ) );
+    _muba.reserve( nrORs() );
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
+        _muab.push_back( vector<Factor>() );
+        _muba.push_back( vector<Factor>() );
+        _muab[alpha].reserve( nbOR(alpha).size() );
+        _muba[alpha].reserve( nbOR(alpha).size() );
+        foreach( const Neighbor &beta, nbOR(alpha) ) {
+            _muab[alpha].push_back( Factor( IR(beta) ) );
+            _muba[alpha].push_back( Factor( IR(beta) ) );
+        }
     }
 }
 
@@ -95,7 +101,7 @@ HAK::HAK(const RegionGraph & rg, const Properties &opts) : DAIAlgRG(rg, opts) {
 
 void HAK::findLoopClusters( const FactorGraph & fg, set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars ) {
     for( VarSet::const_iterator in = vars.begin(); in != vars.end(); in++ ) {
-        VarSet ind = fg.delta( *in );
+        VarSet ind = fg.delta( fg.findVar( *in ) );
         if( (newcl.size()) >= 2 && (ind >> root) ) {
             allcl.insert( newcl | *in );
         }
@@ -113,14 +119,14 @@ HAK::HAK(const FactorGraph & fg, const Properties &opts) : DAIAlgRG(opts) {
         cl = fg.Cliques();
     } else if( Clusters() == ClustersType::DELTA ) {
         for( size_t i = 0; i < fg.nrVars(); i++ )
-            cl.push_back(fg.Delta(fg.var(i))); 
+            cl.push_back(fg.Delta(i)); 
     } else if( Clusters() == ClustersType::LOOP ) {
         cl = fg.Cliques();
         set<VarSet> scl;
-        for( vector<Var>::const_iterator i0 = fg.vars().begin(); i0 != fg.vars().end(); i0++ ) {
-            VarSet i0d = fg.delta(*i0);
+        for( size_t i0 = 0; i0 < fg.nrVars(); i0++ ) {
+            VarSet i0d = fg.delta(i0);
             if( LoopDepth() > 1 )
-                findLoopClusters( fg, scl, *i0, *i0, LoopDepth() - 1, fg.delta(*i0) );
+                findLoopClusters( fg, scl, fg.var(i0), fg.var(i0), LoopDepth() - 1, fg.delta(i0) );
         }
         for( set<VarSet>::const_iterator c = scl.begin(); c != scl.end(); c++ )
             cl.push_back(*c);
@@ -153,12 +159,13 @@ void HAK::init( const VarSet &ns ) {
         if( alpha->vars() && ns )
             alpha->fill( 1.0 / alpha->stateSpace() );
 
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         if( IR(beta) && ns ) {
             _Qb[beta].fill( 1.0 / IR(beta).stateSpace() );
-            for( R_nb_cit alpha = nbIR(beta).begin(); alpha != nbIR(beta).end(); alpha++ ) {
-                muab(*alpha,beta).fill( 1.0 / IR(beta).stateSpace() );
-                muba(beta,*alpha).fill( 1.0 / IR(beta).stateSpace() );
+            foreach( const Neighbor &alpha, nbIR(beta) ) {
+                size_t _beta = alpha.dual;
+                muab( alpha, _beta ).fill( 1.0 / IR(beta).stateSpace() );
+                muba( alpha, _beta ).fill( 1.0 / IR(beta).stateSpace() );
             }
         }
 }
@@ -173,10 +180,12 @@ void HAK::init() {
     for( vector<Factor>::iterator beta = _Qb.begin(); beta != _Qb.end(); beta++ )
         beta->fill( 1.0 / beta->stateSpace() );
 
-    for( size_t ab = 0; ab < nr_Redges(); ab++ ) {
-        _muab[ab].fill( 1.0 / _muab[ab].stateSpace() );
-        _muba[ab].fill( 1.0 / _muba[ab].stateSpace() );
-    }
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
+        foreach( const Neighbor &beta, nbOR(alpha) ) {
+            size_t _beta = beta.iter;
+            muab( alpha, _beta ).fill( 1.0 / muab( alpha, _beta ).stateSpace() );
+            muba( alpha, _beta ).fill( 1.0 / muab( alpha, _beta ).stateSpace() );
+        }
 }
 
 
@@ -189,7 +198,7 @@ double HAK::doGBP() {
     clock_t tic = toc();
 
     // Check whether counting numbers won't lead to problems
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         assert( nbIR(beta).size() + IR(beta).c() != 0.0 );
 
     // Keep old beliefs to check convergence
@@ -205,13 +214,18 @@ double HAK::doGBP() {
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
     for( iter = 0; iter < MaxIter() && diffs.max() > Tol(); iter++ ) {
-        for( size_t beta = 0; beta < nr_IRs(); beta++ ) {
-            for( R_nb_cit alpha = nbIR(beta).begin(); alpha != nbIR(beta).end(); alpha++ )
-                muab(*alpha,beta) = _Qa[*alpha].marginal(IR(beta)).divided_by( muba(beta,*alpha) );
+        for( size_t beta = 0; beta < nrIRs(); beta++ ) {
+            foreach( const Neighbor &alpha, nbIR(beta) ) {
+                size_t _beta = alpha.dual;
+                muab( alpha, _beta ) = _Qa[alpha].marginal(IR(beta)).divided_by( muba(alpha,_beta) );
+            }
 
             Factor Qb_new;
-            for( R_nb_cit alpha = nbIR(beta).begin(); alpha != nbIR(beta).end(); alpha++ )
-                Qb_new *= muab(*alpha,beta) ^ (1 / (nbIR(beta).size() + IR(beta).c()));
+            foreach( const Neighbor &alpha, nbIR(beta) ) {
+                size_t _beta = alpha.dual;
+                Qb_new *= muab(alpha,_beta) ^ (1 / (nbIR(beta).size() + IR(beta).c()));
+            }
+
             Qb_new.normalize( _normtype );
             if( Qb_new.hasNaNs() ) {
                 cout << "HAK::doGBP:  Qb_new has NaNs!" << endl;
@@ -220,20 +234,22 @@ double HAK::doGBP() {
 //          _Qb[beta] = Qb_new.makeZero(1e-100);    // damping?
             _Qb[beta] = Qb_new;
 
-            for( R_nb_cit alpha = nbIR(beta).begin(); alpha != nbIR(beta).end(); alpha++ ) {
-                muba(beta,*alpha) = _Qb[beta].divided_by( muab(*alpha,beta) );
+            foreach( const Neighbor &alpha, nbIR(beta) ) {
+                size_t _beta = alpha.dual;
 
-                Factor Qa_new = OR(*alpha);
-                for( R_nb_cit gamma = nbOR(*alpha).begin(); gamma != nbOR(*alpha).end(); gamma++ )
-                    Qa_new *= muba(*gamma,*alpha);
-                Qa_new ^= (1.0 / OR(*alpha).c());
+                muba(alpha,_beta) = _Qb[beta].divided_by( muab(alpha,_beta) );
+
+                Factor Qa_new = OR(alpha);
+                foreach( const Neighbor &gamma, nbOR(alpha) )
+                    Qa_new *= muba(alpha,gamma.iter);
+                Qa_new ^= (1.0 / OR(alpha).c());
                 Qa_new.normalize( _normtype );
                 if( Qa_new.hasNaNs() ) {
                     cout << "HAK::doGBP:  Qa_new has NaNs!" << endl;
                     return NAN;
                 }
-//              _Qa[*alpha] = Qa_new.makeZero(1e-100); // damping?
-                _Qa[*alpha] = Qa_new;
+//              _Qa[alpha] = Qa_new.makeZero(1e-100); // damping?
+                _Qa[alpha] = Qa_new;
             }
         }
 
@@ -275,11 +291,11 @@ double HAK::doDoubleLoop() {
     clock_t tic = toc();
 
     // Save original outer regions
-    vector<FRegion> org_ORs = ORs();
+    vector<FRegion> org_ORs = ORs;
 
     // Save original inner counting numbers and set negative counting numbers to zero
-    vector<double> org_IR_cs( nr_IRs(), 0.0 );
-    for( size_t beta = 0; beta < nr_IRs(); beta++ ) {
+    vector<double> org_IR_cs( nrIRs(), 0.0 );
+    for( size_t beta = 0; beta < nrIRs(); beta++ ) {
         org_IR_cs[beta] = IR(beta).c();
         if( IR(beta).c() < 0.0 )
             IR(beta).c() = 0.0;
@@ -294,9 +310,9 @@ double HAK::doDoubleLoop() {
     // Differences in single node beliefs
     Diffs diffs(nrVars(), 1.0);
 
-    size_t   outer_maxiter   = MaxIter();
+    size_t  outer_maxiter   = MaxIter();
     double  outer_tol       = Tol();
-    size_t   outer_verbose   = Verbose();
+    size_t  outer_verbose   = Verbose();
     double  org_maxdiff     = MaxDiff();
 
     // Set parameters for inner loop
@@ -306,10 +322,10 @@ double HAK::doDoubleLoop() {
     size_t outer_iter = 0;
     for( outer_iter = 0; outer_iter < outer_maxiter && diffs.max() > outer_tol; outer_iter++ ) {
         // Calculate new outer regions
-        for( size_t alpha = 0; alpha < nr_ORs(); alpha++ ) {
+        for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
             OR(alpha) = org_ORs[alpha];
-            for( R_nb_cit beta = nbOR(alpha).begin(); beta != nbOR(alpha).end(); beta++ )
-                OR(alpha) *= _Qb[*beta] ^ ((IR(*beta).c() - org_IR_cs[*beta]) / nbIR(*beta).size());
+            foreach( const Neighbor &beta, nbOR(alpha) )
+                OR(alpha) *= _Qb[beta] ^ ((IR(beta).c() - org_IR_cs[beta]) / nbIR(beta).size());
         }
 
         // Inner loop
@@ -335,10 +351,10 @@ double HAK::doDoubleLoop() {
     updateMaxDiff( diffs.max() );
 
     // Restore original outer regions
-    ORs() = org_ORs;
+    ORs = org_ORs;
 
     // Restore original inner counting numbers
-    for( size_t beta = 0; beta < nr_IRs(); ++beta )
+    for( size_t beta = 0; beta < nrIRs(); ++beta )
         IR(beta).c() = org_IR_cs[beta];
 
     if( Verbose() >= 1 ) {
@@ -390,9 +406,9 @@ Factor HAK::belief( const Var &n ) const {
 
 vector<Factor> HAK::beliefs() const {
     vector<Factor> result;
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         result.push_back( Qb(beta) );
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         result.push_back( Qa(alpha) );
     return result;
 }
@@ -400,9 +416,9 @@ vector<Factor> HAK::beliefs() const {
 
 Complex HAK::logZ() const {
     Complex sum = 0.0;
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         sum += Complex(IR(beta).c()) * Qb(beta).entropy();
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ ) {
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
         sum += Complex(OR(alpha).c()) * Qa(alpha).entropy();
         sum += (OR(alpha).log0() * Qa(alpha)).totalSum();
     }

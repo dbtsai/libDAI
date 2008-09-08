@@ -492,12 +492,12 @@ void MR::init_cor() {
         vector<Factor> pairq;
         if( Inits() == InitType::CLAMPING ) {
             BP bpcav(*this, Properties()("updates",string("SEQMAX"))("tol", string("1e-9"))("maxiter", string("1000UL"))("verbose", string("0UL")));
-            bpcav.makeCavity( var(i) );
-            pairq = calcPairBeliefs( bpcav, delta(var(i)), false );
+            bpcav.makeCavity( i );
+            pairq = calcPairBeliefs( bpcav, delta(i), false );
         } else if( Inits() == InitType::EXACT ) {
             JTree jtcav(*this, Properties()("updates",string("HUGIN"))("verbose", string("0UL")) );
-            jtcav.makeCavity( var(i) );
-            pairq = calcPairBeliefs( jtcav, delta(var(i)), false );
+            jtcav.makeCavity( i );
+            pairq = calcPairBeliefs( jtcav, delta(i), false );
         }
         for( size_t jk = 0; jk < pairq.size(); jk++ ) {
             VarSet::const_iterator kit = pairq[jk].vars().begin();
@@ -605,7 +605,7 @@ MR::MR( const FactorGraph &fg, const Properties &opts ) : DAIAlgFG(fg, opts), su
     // check whether all vars in fg are binary
     // check whether connectivity is <= kmax
     for( size_t i = 0; i < fg.nrVars(); i++ )
-        if( (fg.var(i).states() > 2) || (fg.delta(fg.var(i)).size() > kmax) ) {
+        if( (fg.var(i).states() > 2) || (fg.delta(i).size() > kmax) ) {
             supported = false;
             break;
         }

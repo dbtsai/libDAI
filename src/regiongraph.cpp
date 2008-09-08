@@ -32,110 +32,62 @@ namespace dai {
 using namespace std;
 
 
-RegionGraph::RegionGraph(const FactorGraph & fg, const vector<Region> & ors, const vector<Region> & irs, const vector<R_edge_t> & edges) : FactorGraph(fg), BipRegGraph(), _fac2OR() {
+RegionGraph::RegionGraph( const FactorGraph &fg, const vector<Region> &ors, const vector<Region> &irs, const vector<pair<size_t,size_t> > &edges) : FactorGraph(fg), G(), ORs(), IRs(irs), fac2OR() {
     // Copy outer regions (giving them counting number 1.0)
-    ORs().reserve( ors.size() );
+    ORs.reserve( ors.size() );
     for( vector<Region>::const_iterator alpha = ors.begin(); alpha != ors.end(); alpha++ )
-        ORs().push_back( FRegion(Factor(*alpha, 1.0), 1.0) );
+        ORs.push_back( FRegion(Factor(*alpha, 1.0), 1.0) );
 
-    // Incorporate factors into outer regions
-/*  if( !_hasNegatives ) {
-        // For each factor, find the outer regions that subsume that factor.
-        // Then, "divide" the factor over its subsuming outer regions.
-        for( size_t I = 0; I < nrFactors(); I++ ) {
-            vector<size_t> subsuming_alphas;
-
-            for( size_t alpha = 0; alpha < nr_ORs(); alpha++ ) {
-                if( OR(alpha).vars() >> factor(I).vars() )
-                    subsuming_alphas.push_back( alpha );
-            }
-
-            assert( subsuming_alphas.size() >= 1 );
-
-            for( vector<size_t>::const_iterator alpha = subsuming_alphas.begin(); alpha != subsuming_alphas.end(); alpha++ )
-                OR(*alpha) *= (factor(I) ^ (1.0 / subsuming_alphas.size()));
-        }
-    } else {
-        cout << "Careful composition of outer regions" << endl;
-*/
     // For each factor, find an outer regions that subsumes that factor.
     // Then, multiply the outer region with that factor.
+    fac2OR.reserve( nrFactors() );
     for( size_t I = 0; I < nrFactors(); I++ ) {
         size_t alpha;
-        for( alpha = 0; alpha < nr_ORs(); alpha++ )
+        for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
-                _fac2OR[I] = alpha;
+                fac2OR.push_back( alpha );
 //              OR(alpha) *= factor(I);
                 break;
             }
-        assert( alpha != nr_ORs() );
+        assert( alpha != nrORs() );
     }
     RecomputeORs();
-//  }
     
-    // Copy inner regions
-    IRs().reserve( irs.size() );
-    for( vector<Region>::const_iterator beta = irs.begin(); beta != irs.end(); beta++ )
-        IRs().push_back( *beta );
-    
-    // Copy edges
-    Redges().reserve( edges.size() );
-    for( vector<R_edge_t>::const_iterator e = edges.begin(); e != edges.end(); e++ )
-        Redges().push_back( *e );
-    
-    // Regenerate BipartiteGraph internals
-    BipRegGraph::Regenerate();
+    // create bipartite graph
+    G.create( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Check counting numbers
+#ifdef DAI_DEBUG
     Check_Counting_Numbers();
+#endif
 }
 
 
 // CVM style
-RegionGraph::RegionGraph(const FactorGraph & fg, const vector<VarSet> & cl) : FactorGraph(fg), BipRegGraph() {
+RegionGraph::RegionGraph( const FactorGraph &fg, const vector<VarSet> &cl ) : FactorGraph(fg), G(), ORs(), IRs(), fac2OR() {
     // Retain only maximal clusters
     ClusterGraph cg( cl );
     cg.eraseNonMaximal();
     
     // Create outer regions, giving them counting number 1.0
-    ORs().reserve( cg.size() );
+    ORs.reserve( cg.size() );
     for( ClusterGraph::const_iterator alpha = cg.begin(); alpha != cg.end(); alpha++ )
-        ORs().push_back( FRegion(Factor(*alpha, 1.0), 1.0) );
+        ORs.push_back( FRegion(Factor(*alpha, 1.0), 1.0) );
 
-    // Incorporate factors into outer regions
-/*  if( !_hasNegatives ) {
-        // For each factor, find the outer regions that subsume that factor.
-        // Then, "divide" the factor over its subsuming outer regions.
-        for( size_t I = 0; I < nrFactors(); I++ ) {
-            vector<size_t> subsuming_alphas;
-
-            for( size_t alpha = 0; alpha < nr_ORs(); alpha++ ) {
-                if( OR(alpha).vars() >> factor(I).vars() )
-                    subsuming_alphas.push_back( alpha );
-            }
-
-            assert( subsuming_alphas.size() >= 1 );
-
-            for( vector<size_t>::const_iterator alpha = subsuming_alphas.begin(); alpha != subsuming_alphas.end(); alpha++ )
-                OR(*alpha) *= factor(I) ^ (1.0 / subsuming_alphas.size());
-        }
-    } else {
-        cout << "Careful composition of outer regions" << endl;
-*/
     // For each factor, find an outer regions that subsumes that factor.
     // Then, multiply the outer region with that factor.
+    fac2OR.reserve( nrFactors() );
     for( size_t I = 0; I < nrFactors(); I++ ) {
         size_t alpha;
-        for( alpha = 0; alpha < nr_ORs(); alpha++ )
+        for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
-                _fac2OR[I] = alpha;
+                fac2OR.push_back( alpha );
 //              OR(alpha) *= factor(I);
                 break;
             }
-        assert( alpha != nr_ORs() );
+        assert( alpha != nrORs() );
     }
     RecomputeORs();
-//  }
     
     // Create inner regions - first pass
     set<VarSet> betas;
@@ -160,36 +112,39 @@ RegionGraph::RegionGraph(const FactorGraph & fg, const vector<VarSet> & cl) : Fa
     } while( new_betas.size() );
 
     // Create inner regions - store them in the bipartite graph
-    IRs().reserve( betas.size() );
+    IRs.reserve( betas.size() );
     for( set<VarSet>::const_iterator beta = betas.begin(); beta != betas.end(); beta++ )
-        IRs().push_back( Region(*beta,NAN) );
+        IRs.push_back( Region(*beta,NAN) );
     
     // Create edges
-    for( size_t beta = 0; beta < nr_IRs(); beta++ ) {
-        for( size_t alpha = 0; alpha < nr_ORs(); alpha++ ) {
+    vector<pair<size_t,size_t> > edges;
+    for( size_t beta = 0; beta < nrIRs(); beta++ ) {
+        for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
             if( OR(alpha).vars() >> IR(beta) )
-                Redges().push_back(R_edge_t(alpha,beta));
+                edges.push_back( pair<size_t,size_t>(alpha,beta) );
         }
     }
     
-    // Regenerate BipartiteGraph internals
-    BipRegGraph::Regenerate();
+    // create bipartite graph
+    G.create( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Calculate counting numbers
     Calc_Counting_Numbers();
 
     // Check counting numbers
+#ifdef DAI_DEBUG
     Check_Counting_Numbers();
+#endif
 }
 
 
 void RegionGraph::Calc_Counting_Numbers() {
     // Calculates counting numbers of inner regions based upon counting numbers of outer regions
     
-    vector<vector<size_t> > ancestors(nr_IRs());
-    for( size_t beta = 0; beta < nr_IRs(); beta++ ) {
+    vector<vector<size_t> > ancestors(nrIRs());
+    for( size_t beta = 0; beta < nrIRs(); beta++ ) {
         IR(beta).c() = NAN;
-        for( size_t beta2 = 0; beta2 < nr_IRs(); beta2++ )
+        for( size_t beta2 = 0; beta2 < nrIRs(); beta2++ )
             if( (beta2 != beta) && IR(beta2) >> IR(beta) )
                 ancestors[beta].push_back(beta2);
     }
@@ -197,7 +152,7 @@ void RegionGraph::Calc_Counting_Numbers() {
     bool new_counting;
     do {
         new_counting = false;
-        for( size_t beta = 0; beta < nr_IRs(); beta++ ) {
+        for( size_t beta = 0; beta < nrIRs(); beta++ ) {
             if( isnan( IR(beta).c() ) ) {
                 bool has_nan_ancestor = false;
                 for( vector<size_t>::const_iterator beta2 = ancestors[beta].begin(); (beta2 != ancestors[beta].end()) && !has_nan_ancestor; beta2++ )
@@ -205,8 +160,8 @@ void RegionGraph::Calc_Counting_Numbers() {
                         has_nan_ancestor = true;
                 if( !has_nan_ancestor ) {
                     double c = 1.0;
-                    for( R_nb_cit alpha = nbIR(beta).begin(); alpha != nbIR(beta).end(); alpha++ )
-                        c -= OR(*alpha).c();
+                    foreach( const Neighbor &alpha, nbIR(beta) )
+                        c -= OR(alpha).c();
                     for( vector<size_t>::const_iterator beta2 = ancestors[beta].begin(); beta2 != ancestors[beta].end(); beta2++ )
                         c -= IR(*beta2).c();
                     IR(beta).c() = c;
@@ -222,12 +177,12 @@ bool RegionGraph::Check_Counting_Numbers() {
     // Checks whether the counting numbers satisfy the fundamental relation
     
     bool all_valid = true;
-    for( vector<Var>::const_iterator n = vars().begin(); n != vars().end(); n++ ) {
+    for( vector<Var>::const_iterator n = vars.begin(); n != vars.end(); n++ ) {
         double c_n = 0.0;
-        for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+        for( size_t alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() && *n )
                 c_n += OR(alpha).c();
-        for( size_t beta = 0; beta < nr_IRs(); beta++ )
+        for( size_t beta = 0; beta < nrIRs(); beta++ )
             if( IR(beta) && *n )
                 c_n += IR(beta).c();
         if( fabs(c_n - 1.0) > 1e-15 ) {
@@ -241,41 +196,44 @@ bool RegionGraph::Check_Counting_Numbers() {
 
 
 void RegionGraph::RecomputeORs() {
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         OR(alpha).fill( 1.0 );
-    for( fac2OR_cit I = _fac2OR.begin(); I != _fac2OR.end(); I++ )
-        OR( I->second ) *= factor( I->first );
+    for( size_t I = 0; I < nrFactors(); I++ )
+        if( fac2OR[I] != -1U )
+            OR( fac2OR[I] ) *= factor( I );
 }
 
 
 void RegionGraph::RecomputeORs( const VarSet &ns ) {
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         if( OR(alpha).vars() && ns )
             OR(alpha).fill( 1.0 );
-    for( fac2OR_cit I = _fac2OR.begin(); I != _fac2OR.end(); I++ )
-        if( OR( I->second ).vars() && ns )
-            OR( I->second ) *= factor( I->first );
+    for( size_t I = 0; I < nrFactors(); I++ )
+        if( fac2OR[I] != -1U )
+            if( OR( fac2OR[I] ).vars() && ns )
+                OR( fac2OR[I] ) *= factor( I );
 }
 
 
 void RegionGraph::RecomputeOR( size_t I ) {
-    if( _fac2OR.count(I) ) {
-        size_t alpha = _fac2OR[I];
+    assert( I < nrFactors() );
+    if( fac2OR[I] != -1U ) {
+        size_t alpha = fac2OR[I];
         OR(alpha).fill( 1.0 );
-        for( fac2OR_cit I = _fac2OR.begin(); I != _fac2OR.end(); I++ )
-            if( I->second == alpha )
-                OR(alpha) *= factor( I->first );
+        for( size_t J = 0; J < nrFactors(); J++ )
+            if( fac2OR[J] == alpha )
+                OR(alpha) *= factor( J );
     }
 }
 
 
 ostream & operator << (ostream & os, const RegionGraph & rg) {
     os << "Outer regions" << endl;
-    for( size_t alpha = 0; alpha < rg.nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < rg.nrORs(); alpha++ )
         os << rg.OR(alpha).vars() << ": c = " << rg.OR(alpha).c() << endl;
 
     os << "Inner regions" << endl;
-    for( size_t beta = 0; beta < rg.nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < rg.nrIRs(); beta++ )
         os << (VarSet)rg.IR(beta) << ": c = " << rg.IR(beta).c() << endl;
 
     return(os);
