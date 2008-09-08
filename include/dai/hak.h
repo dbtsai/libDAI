@@ -35,10 +35,10 @@ namespace dai {
 /// HAK provides an implementation of the single and double-loop algorithms by Heskes, Albers and Kappen
 class HAK : public DAIAlgRG {
     protected:
-        std::vector<Factor>          _Qa;
-        std::vector<Factor>          _Qb;
-        std::vector<Factor>          _muab;
-        std::vector<Factor>          _muba;
+        std::vector<Factor>                _Qa;
+        std::vector<Factor>                _Qb;
+        std::vector<std::vector<Factor> >  _muab;
+        std::vector<std::vector<Factor> >  _muba;
         
     public:
         /// Default constructor
@@ -75,12 +75,11 @@ class HAK : public DAIAlgRG {
         bool DoubleLoop() { return GetPropertyAs<bool>("doubleloop"); }
         size_t LoopDepth() { return GetPropertyAs<size_t>("loopdepth"); }
 
-        Factor & muab( size_t alpha, size_t beta ) { return _muab[ORIR2E(alpha,beta)]; }
-        Factor & muba( size_t beta, size_t alpha ) { return _muba[ORIR2E(alpha,beta)]; }
+        Factor & muab( size_t alpha, size_t _beta ) { return _muab[alpha][_beta]; }
+        Factor & muba( size_t alpha, size_t _beta ) { return _muba[alpha][_beta]; }
         const Factor& Qa( size_t alpha ) const { return _Qa[alpha]; };
         const Factor& Qb( size_t beta ) const { return _Qb[beta]; };
 
-//      void Regenerate();
         double doGBP();
         double doDoubleLoop();
         double run();

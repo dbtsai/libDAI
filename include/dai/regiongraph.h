@@ -96,98 +96,73 @@ class FRegion : public Factor {
 };
 
 
-typedef BipartiteGraph<FRegion,Region> BipRegGraph;
-
-
 /// A RegionGraph is a bipartite graph consisting of outer regions (type FRegion) and inner regions (type Region)
-class RegionGraph : public FactorGraph, BipRegGraph {
+class RegionGraph : public FactorGraph {
     public:
-        typedef BipRegGraph::_nb_t      R_nb_t;
-        typedef R_nb_t::const_iterator  R_nb_cit;
-        typedef BipRegGraph::_edge_t    R_edge_t;
+        BipartiteGraph          G;
+        std::vector<FRegion>    ORs;
+        std::vector<Region>     IRs;
 
-        
     protected:
         /// Give back the OR index that corresponds to a factor index
-        typedef std::map<size_t,size_t>::const_iterator fac2OR_cit;
-        std::map<size_t,size_t>         _fac2OR;
+        std::vector<size_t>     fac2OR;
 
 
     public:
         /// Default constructor
-        RegionGraph() : FactorGraph(), BipRegGraph(), _fac2OR() {}
+        RegionGraph() : FactorGraph(), G(), ORs(), IRs(), fac2OR() {}
 
         /// Constructs a RegionGraph from a FactorGraph
-        RegionGraph(const FactorGraph & fg) : FactorGraph(fg), BipRegGraph(), _fac2OR() {}
+        RegionGraph( const FactorGraph &fg ) : FactorGraph(fg), G(), ORs(), IRs(), fac2OR() {}
 
         /// Constructs a RegionGraph from a FactorGraph, a vector of outer regions, a vector of inner regions and a vector of edges
-        RegionGraph(const FactorGraph & fg, const std::vector<Region> & ors, const std::vector<Region> & irs, const std::vector<R_edge_t> & edges);
+        RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors, const std::vector<Region> &irs, const std::vector<std::pair<size_t,size_t> > &edges );
         
         /// Constructs a RegionGraph from a FactorGraph and a vector of outer VarSets (CVM style)
-        RegionGraph(const FactorGraph & fg, const std::vector<VarSet> & cl);
+        RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl );
 
         /// Copy constructor
-        RegionGraph(const RegionGraph & x) : FactorGraph(x), BipRegGraph(x), _fac2OR(x._fac2OR) {}
+        RegionGraph( const RegionGraph &x ) : FactorGraph(x), G(x.G), ORs(x.ORs), IRs(x.IRs), fac2OR(x.fac2OR) {}
 
         /// Assignment operator
-        RegionGraph & operator=(const RegionGraph & x) {
+        RegionGraph & operator=( const RegionGraph &x ) {
             if( this != &x ) {
-                FactorGraph::operator=(x);
-                BipRegGraph::operator=(x);
-                _fac2OR = x._fac2OR;
+                FactorGraph::operator=( x );
+                G = x.G;
+                ORs = x.ORs;
+                IRs = x.IRs;
+                fac2OR = x.fac2OR;
             }
             return *this;
         }
 
         /// Provides read access to outer region
-        const FRegion & OR(long alpha) const { return BipRegGraph::V1(alpha); }
+        const FRegion & OR(size_t alpha) const { return ORs[alpha]; }
         /// Provides access to outer region
-        FRegion & OR(long alpha) { return BipRegGraph::V1(alpha); }
-        /// Provides read access to all outer regions
-        const std::vector<FRegion> & ORs() const { return BipRegGraph::V1s(); }
-        /// Provides access to all outer regions
-        std::vector<FRegion> &ORs() { return BipRegGraph::V1s(); }
-        /// Returns number of outer regions
-        size_t nr_ORs() const { return BipRegGraph::V1s().size(); }
+        FRegion & OR(size_t alpha) { return ORs[alpha]; }
 
         /// Provides read access to inner region
-        const Region & IR(long beta) const { return BipRegGraph::V2(beta); }
+        const Region & IR(size_t beta) const { return IRs[beta]; }
         /// Provides access to inner region
-        Region & IR(long beta) { return BipRegGraph::V2(beta); }
-        /// Provides read access to all inner regions
-        const std::vector<Region> & IRs() const { return BipRegGraph::V2s(); }
-        /// Provides access to all inner regions
-        std::vector<Region> & IRs() { return BipRegGraph::V2s(); }
+        Region & IR(size_t beta) { return IRs[beta]; }
+
+        /// Returns number of outer regions
+        size_t nrORs() const { return ORs.size(); }
         /// Returns number of inner regions
-        size_t nr_IRs() const { return BipRegGraph::V2s().size(); }
+        size_t nrIRs() const { return IRs.size(); }
 
-        /// Provides read access to edge
-        const R_edge_t & Redge(size_t ind) const { return BipRegGraph::edge(ind); }
-        /// Provides full access to edge
-        R_edge_t & Redge(size_t ind) { return BipRegGraph::edge(ind); }
-        /// Provides read access to all edges
-        const std::vector<R_edge_t> & Redges() const { return BipRegGraph::edges(); }
-        /// Provides full access to all edges
-        std::vector<R_edge_t> & Redges() { return BipRegGraph::edges(); }
-        /// Returns number of edges
-        size_t nr_Redges() const { return BipRegGraph::edges().size(); }
 
-        /// Provides read access to neighbours of outer region
-        const R_nb_t & nbOR( size_t i1 ) const { return BipRegGraph::nb1(i1); }
-        /// Provides full access to neighbours of outer region
-        R_nb_t & nbOR( size_t i1 ) { return BipRegGraph::nb1(i1); }
+        /// Provides read access to neighbors of outer region
+        const Neighbors & nbOR( size_t alpha ) const { return G.nb1(alpha); }
+        /// Provides full access to neighbors of outer region
+        Neighbors & nbOR( size_t alpha ) { return G.nb1(alpha); }
 
-        /// Provides read access to neighbours of inner region
-        const R_nb_t & nbIR( size_t i2 ) const { return BipRegGraph::nb2(i2); }
-        /// Provides full access to neighbours of inner region
-        R_nb_t & nbIR( size_t i2 ) { return BipRegGraph::nb2(i2); }
+        /// Provides read access to neighbors of inner region
+        const Neighbors & nbIR( size_t beta ) const { return G.nb2(beta); }
+        /// Provides full access to neighbors of inner region
+        Neighbors & nbIR( size_t beta ) { return G.nb2(beta); }
 
-        /// Converts the pair of outer/inner region indices (i1,i2) to the corresponding edge index
-        size_t ORIR2E( const size_t i1, const size_t i2 ) const { return BipRegGraph::VV2E(i1, i2); }
 
-        void Regenerate() { BipRegGraph::Regenerate(); }
-        
-        
         /// Calculates counting numbers of inner regions based upon counting numbers of outer regions
         void Calc_Counting_Numbers();
         /// Check whether the counting numbers are valid
@@ -206,10 +181,7 @@ class RegionGraph : public FactorGraph, BipRegGraph {
         void clamp( const Var &n, size_t i ) { FactorGraph::clamp( n, i ); RecomputeORs( n ); }
 
         /// We have to overload FactorGraph::makeCavity because the corresponding outer regions have to be recomputed
-        void makeCavity( const Var &n ) { FactorGraph::makeCavity( n ); RecomputeORs( n ); }
-
-        /// We have to overload FactorGraph::makeFactorCavity because the corresponding outer regions have to be recomputed
-        void makeFactorCavity( size_t I ) { FactorGraph::makeFactorCavity( I ); RecomputeOR( I ); }
+        void makeCavity( size_t i ) { FactorGraph::makeCavity( i ); RecomputeORs( var(i) ); }
 
         /// We have to overload FactorGraph::undoProbs because the corresponding outer regions have to be recomputed
         void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs( ns ); RecomputeORs( ns ); }

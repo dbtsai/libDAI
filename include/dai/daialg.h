@@ -153,14 +153,11 @@ class InfAlg {
         /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$)
         virtual void clamp( const Var & n, size_t i ) = 0;
 
-        /// Return all variables that interact with n
-        virtual VarSet delta( const Var & n ) const = 0;
+        /// Return all variables that interact with var(i)
+        virtual VarSet delta( size_t i ) const = 0;
 
-        /// Set all factors interacting with n to 1
-        virtual void makeCavity( const Var & n ) = 0;
-
-        /// Set factor I to 1
-        virtual void makeFactorCavity( size_t I ) = 0;
+        /// Set all factors interacting with var(i) to 1
+        virtual void makeCavity( size_t i ) = 0;
 
         /// Get index of variable n
         virtual size_t findVar( const Var & n ) const = 0;
@@ -223,14 +220,11 @@ class DAIAlg : public InfAlg, public T {
         /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$) (using T::clamp)
         void clamp( const Var & n, size_t i ) { T::clamp( n, i ); }
 
-        /// Return all variables that interact with n (using T::delta)
-        VarSet delta( const Var & n ) const { return T::delta(n); }
+        /// Return all variables that interact with var(i) (using T::delta)
+        VarSet delta( size_t i ) const { return T::delta( i ); }
 
-        /// Set all factors interacting with n to 1 (using T::makeCavity)
-        void makeCavity( const Var & n ) { T::makeCavity(n); }
-
-        /// Set factor I to 1 (using T::makeFactorCavity)
-        void makeFactorCavity( size_t I ) { T::makeFactorCavity(I); }
+        /// Set all factors interacting with var(i) to 1 (using T::makeCavity)
+        void makeCavity( size_t i ) { T::makeCavity( i ); }
 
         /// Get index of variable n (using T::findVar)
         size_t findVar( const Var & n ) const { return T::findVar(n); }

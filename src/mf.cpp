@@ -54,15 +54,15 @@ bool MF::checkProperties() {
 
 
 void MF::Regenerate() {
-    DAIAlgFG::Regenerate();
+//    DAIAlgFG::Regenerate();
 
     // clear beliefs
     _beliefs.clear();
     _beliefs.reserve( nrVars() );
 
     // create beliefs
-    for( vector<Var>::const_iterator i = vars().begin(); i != vars().end(); i++ ) 
-        _beliefs.push_back(Factor(*i));
+    for( size_t i = 0; i < nrVars(); ++i )
+        _beliefs.push_back(Factor(var(i)));
 }
 
 
@@ -97,19 +97,18 @@ double MF::run() {
 
         Factor jan;
         Factor piet;
-        for( _nb_cit I = nb1(i).begin(); I != nb1(i).end(); I++ ) {
-
+        foreach( const Neighbor &I, nbV(i) ) {
             Factor henk;
-            for( _nb_cit j = nb2(*I).begin(); j != nb2(*I).end(); j++ ) // for all j in I \ i
-                if( *j != i )
-                    henk *= _beliefs[*j];
-            piet = factor(*I).log0();
+            foreach( const Neighbor &j, nbF(I) ) // for all j in I \ i
+                if( j != i )
+                    henk *= _beliefs[j];
+            piet = factor(I).log0();
             piet *= henk;
             piet = piet.part_sum(var(i));
             piet = piet.exp();
             jan *= piet; 
         }
-            
+
         jan.normalize( _normtype );
 
         if( jan.hasNaNs() ) {
@@ -140,7 +139,7 @@ double MF::run() {
 }
 
 
-Factor MF::belief1 (size_t i) const {
+Factor MF::beliefV (size_t i) const {
     Factor piet;
     piet = _beliefs[i];
     piet.normalize( Prob::NORMPROB );
@@ -159,14 +158,14 @@ Factor MF::belief (const VarSet &ns) const {
 
 
 Factor MF::belief (const Var &n) const {
-    return( belief1( findVar( n) ) );
+    return( beliefV( findVar( n ) ) );
 }
 
 
 vector<Factor> MF::beliefs() const {
     vector<Factor> result;
     for( size_t i = 0; i < nrVars(); i++ )
-        result.push_back( belief1(i) );
+        result.push_back( beliefV(i) );
     return result;
 }
 
@@ -175,11 +174,11 @@ Complex MF::logZ() const {
     Complex sum = 0.0;
     
     for(size_t i=0; i < nrVars(); i++ )
-        sum -= belief1(i).entropy();
+        sum -= beliefV(i).entropy();
     for(size_t I=0; I < nrFactors(); I++ ) {
         Factor henk;
-        for( _nb_cit j = nb2(I).begin(); j != nb2(I).end(); j++ )   // for all j in I
-            henk *= _beliefs[*j];
+        foreach( const Neighbor &j, nbF(I) )  // for all j in I
+            henk *= _beliefs[j];
         henk.normalize( Prob::NORMPROB );
         Factor piet;
         piet = factor(I).log0();

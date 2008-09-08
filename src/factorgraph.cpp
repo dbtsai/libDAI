@@ -29,6 +29,7 @@
 #include <functional>
 #include <tr1/unordered_map>
 #include <dai/factorgraph.h>
+#include <dai/util.h>
 
 
 namespace dai {
@@ -37,21 +38,21 @@ namespace dai {
 using namespace std;
 
 
-FactorGraph::FactorGraph( const vector<Factor> &P ) : BipartiteGraph<Var,Factor>(), _undoProbs(), _normtype(Prob::NORMPROB) {
+FactorGraph::FactorGraph( const vector<Factor> &P ) : G(), _undoProbs(), _normtype(Prob::NORMPROB) {
     // add factors, obtain variables
     set<Var> _vars;
-    V2s().reserve( P.size() );
+    factors.reserve( P.size() );
     size_t nrEdges = 0;
     for( vector<Factor>::const_iterator p2 = P.begin(); p2 != P.end(); p2++ ) {
-        V2s().push_back( *p2 );
-	copy( p2->vars().begin(), p2->vars().end(), inserter( _vars, _vars.begin() ) );
-	nrEdges += p2->vars().size();
+        factors.push_back( *p2 );
+        copy( p2->vars().begin(), p2->vars().end(), inserter( _vars, _vars.begin() ) );
+        nrEdges += p2->vars().size();
     }
 
     // add _vars
-    V1s().reserve( _vars.size() );
+    vars.reserve( _vars.size() );
     for( set<Var>::const_iterator p1 = _vars.begin(); p1 != _vars.end(); p1++ )
-        V1s().push_back( *p1 );
+        vars.push_back( *p1 );
     
     // create graph structure
     createGraph( nrEdges );
@@ -63,37 +64,22 @@ void FactorGraph::createGraph( size_t nrEdges ) {
     // create a mapping for indices
     std::tr1::unordered_map<size_t, size_t> hashmap;
     
-    for( size_t i = 0; i < vars().size(); i++ )    	
-    	hashmap[vars()[i].label()] = i;
+    for( size_t i = 0; i < vars.size(); i++ )
+        hashmap[var(i).label()] = i;
     
-    // create edges
-    edges().reserve( nrEdges );
+    // create edge list
+    typedef pair<unsigned,unsigned> Edge;
+    vector<Edge> edges;
+    edges.reserve( nrEdges );
     for( size_t i2 = 0; i2 < nrFactors(); i2++ ) {
         const VarSet& ns = factor(i2).vars();
         for( VarSet::const_iterator q = ns.begin(); q != ns.end(); q++ )
-            edges().push_back(_edge_t(hashmap[q->label()], i2));        	
+            edges.push_back( Edge(hashmap[q->label()], i2) );
     }
 
-    // calc neighbours and adjacency matrix
-    Regenerate();
+    // create bipartite graph
+    G.create( nrVars(), nrFactors(), edges.begin(), edges.end() );
 }
-
-
-/*FactorGraph& FactorGraph::addFactor( const Factor &I ) {
-    // add Factor
-    _V2.push_back( I );
-
-    // add new vars in Factor
-    for( VarSet::const_iterator i = I.vars().begin(); i != I.vars().end(); i++ ) {
-        size_t i_ind = find(vars().begin(), vars().end(), *i) - vars().begin();
-        if( i_ind == vars().size() )
-            _V1.push_back( *i );
-        _E12.push_back( _edge_t( i_ind, nrFactors() - 1 ) );
-    }
-
-    Regenerate();
-    return(*this);
-}*/
 
 
 ostream& operator << (ostream& os, const FactorGraph& fg) {
@@ -268,37 +254,27 @@ istream& operator >> (istream& is, FactorGraph& fg) {
 }
 
 
-VarSet FactorGraph::delta(const Var & n) const {
+VarSet FactorGraph::delta( unsigned i ) const {
     // calculate Markov Blanket
-    size_t i = findVar( n );
-
     VarSet del;
-    for( _nb_cit I = nb1(i).begin(); I != nb1(i).end(); ++I )
-        for( _nb_cit j = nb2(*I).begin(); j != nb2(*I).end(); ++j )
-            if( *j != i )
-                del |= var(*j);
+    foreach( const Neighbor &I, nbV(i) ) // for all neighboring factors I of i
+        foreach( const Neighbor &j, nbF(I) ) // for all neighboring variables j of I
+            if( j != i )
+                del |= var(j);
 
     return del;
 }
 
 
-VarSet FactorGraph::Delta(const Var & n) const {
-    return( delta(n) | n );
+VarSet FactorGraph::Delta( unsigned i ) const {
+    return( delta(i) | var(i) );
 }
 
 
-void FactorGraph::makeFactorCavity(size_t I) {
-    // fill Factor I with ones
-    factor(I).fill(1.0);
-}
-
-
-void FactorGraph::makeCavity(const Var & n) {
-    // fills all Factors that include Var n with ones
-    size_t i = findVar( n );
-
-    for( _nb_cit I = nb1(i).begin(); I != nb1(i).end(); ++I )
-        factor(*I).fill(1.0);
+void FactorGraph::makeCavity( unsigned i ) {
+    // fills all Factors that include var(i) with ones
+    foreach( const Neighbor &I, nbV(i) ) // for all neighboring factors I of i
+        factor(I).fill( 1.0 );
 }
 
 
@@ -306,61 +282,10 @@ bool FactorGraph::hasNegatives() const {
     bool result = false;
     for( size_t I = 0; I < nrFactors() && !result; I++ )
         if( factor(I).hasNegatives() )
-	    result = true;
+            result = true;
     return result;
 }
  
-
-/*FactorGraph & FactorGraph::DeleteFactor(size_t I) {
-    // Go through all edges
-    for( vector<_edge_t>::iterator edge = _E12.begin(); edge != _E12.end(); edge++ )
-        if( edge->second >= I ) {
-            if( edge->second == I )
-                edge->second = -1UL;
-            else 
-                (edge->second)--;
-        }
-    // Remove all edges containing I
-    for( vector<_edge_t>::iterator edge = _E12.begin(); edge != _E12.end(); edge++ )
-        if( edge->second == -1UL )
-            edge = _E12.erase( edge );
-//  vector<_edge_t>::iterator new_end = _E12.remove_if( _E12.begin(), _E12.end(), compose1( bind2nd(equal_to<size_t>(), -1), select2nd<_edge_t>() ) );
-//  _E12.erase( new_end, _E12.end() );
-
-    // Erase the factor
-    _V2.erase( _V2.begin() + I );
-    
-    Regenerate();
-
-    return *this;
-}
-
-
-FactorGraph & FactorGraph::DeleteVar(size_t i) {
-    // Go through all edges
-    for( vector<_edge_t>::iterator edge = _E12.begin(); edge != _E12.end(); edge++ )
-        if( edge->first >= i ) {
-            if( edge->first == i )
-                edge->first = -1UL;
-            else 
-                (edge->first)--;
-        }
-    // Remove all edges containing i
-    for( vector<_edge_t>::iterator edge = _E12.begin(); edge != _E12.end(); edge++ )
-        if( edge->first == -1UL )
-            edge = _E12.erase( edge );
-                
-//  vector<_edge_t>::iterator new_end = _E12.remove_if( _E12.begin(), _E12.end(), compose1( bind2nd(equal_to<size_t>(), -1), select1st<_edge_t>() ) );
-//  _E12.erase( new_end, _E12.end() );
-
-    // Erase the variable
-    _V1.erase( _V1.begin() + i );
-    
-    Regenerate();
-
-    return *this;
-}*/
-
 
 long FactorGraph::ReadFromFile(const char *filename) {
     ifstream infile;
@@ -408,8 +333,9 @@ long FactorGraph::WriteToDotFile(const char *filename) const {
             outfile << "node[shape=box,style=filled,color=lightgrey,width=0.3,height=0.3,fixedsize=true];" << endl;
             for( size_t I = 0; I < nrFactors(); I++ )
                 outfile << "\tp" << I << ";" << endl;
-            for( size_t iI = 0; iI < nr_edges(); iI++ )
-                outfile << "\tx" << var(edge(iI).first).label() << " -- p" << edge(iI).second << ";" << endl;
+            for( size_t i = 0; i < nrVars(); i++ )
+                foreach( const Neighbor &I, nbV(i) )  // for all neighboring factors I of i
+                    outfile << "\tx" << var(i).label() << " -- p" << I << ";" << endl;
             outfile << "}" << endl;
         } catch (char *e) {
             cout << e << endl;
@@ -464,22 +390,6 @@ void RemoveShortLoops(vector<Factor> &P) {
             P.erase(J);
         }
     }
-}
-
-
-Factor FactorGraph::ExactMarginal(const VarSet & x) const {
-    Factor P;
-    for( size_t I = 0; I < nrFactors(); I++ )
-        P *= factor(I);
-    return P.marginal(x);
-}
-
-
-Real FactorGraph::ExactlogZ() const {
-    Factor P;
-    for( size_t I = 0; I < nrFactors(); I++ )
-        P *= factor(I);
-    return std::log(P.totalSum());
 }
 
 
@@ -591,38 +501,6 @@ void FactorGraph::undoProbs( const VarSet &ns ) {
             _undoProbs.erase(uI++);
         } else
             uI++;
-    }
-}
-
-
-bool FactorGraph::isConnected() const {
-    if( nrVars() == 0 )
-        return false;
-    else {
-        Var n = var( 0 );
-
-        VarSet component = n;
-
-        VarSet remaining;
-        for( size_t i = 1; i < nrVars(); i++ )
-            remaining |= var(i);
-
-        bool found_new_vars = true;
-        while( found_new_vars ) {
-            VarSet new_vars;
-            for( VarSet::const_iterator m = remaining.begin(); m != remaining.end(); m++ )
-                if( delta(*m) && component )
-                    new_vars |= *m;
-
-            if( new_vars.empty() )
-                found_new_vars = false;
-            else 
-                found_new_vars = true;
-
-            component |= new_vars;
-            remaining /= new_vars;
-        };
-        return remaining.empty();
     }
 }
 

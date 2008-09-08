@@ -45,7 +45,7 @@ bool JTree::checkProperties() {
 }
 
 
-JTree::JTree( const FactorGraph &fg, const Properties &opts, bool automatic) : DAIAlgRG(fg, opts), _RTree(), _Qa(), _Qb(), _mes(), _logZ() {
+JTree::JTree( const FactorGraph &fg, const Properties &opts, bool automatic ) : DAIAlgRG(fg, opts), _RTree(), _Qa(), _Qb(), _mes(), _logZ() {
     assert( checkProperties() );
 
     if( automatic ) {
@@ -95,52 +95,58 @@ void JTree::GenerateJT( const vector<VarSet> &Cliques ) {
     // Construct corresponding region graph
 
     // Create outer regions
-    ORs().reserve( Cliques.size() );
+    ORs.reserve( Cliques.size() );
     for( size_t i = 0; i < Cliques.size(); i++ )
-        ORs().push_back( FRegion( Factor(Cliques[i], 1.0), 1.0 ) );
+        ORs.push_back( FRegion( Factor(Cliques[i], 1.0), 1.0 ) );
 
     // For each factor, find an outer region that subsumes that factor.
     // Then, multiply the outer region with that factor.
     for( size_t I = 0; I < nrFactors(); I++ ) {
         size_t alpha;
-        for( alpha = 0; alpha < nr_ORs(); alpha++ )
+        for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
 //              OR(alpha) *= factor(I);
-                _fac2OR[I] = alpha;
+                fac2OR.push_back( alpha );
                 break;
             }
-        assert( alpha != nr_ORs() );
+        assert( alpha != nrORs() );
     }
     RecomputeORs();
 
     // Create inner regions and edges
-    IRs().reserve( _RTree.size() );
-    Redges().reserve( 2 * _RTree.size() );
+    IRs.reserve( _RTree.size() );
+    typedef pair<size_t,size_t> Edge;
+    vector<Edge> edges;
+    edges.reserve( 2 * _RTree.size() );
     for( size_t i = 0; i < _RTree.size(); i++ ) {
-        Redges().push_back( R_edge_t( _RTree[i].n1, IRs().size() ) );
-        Redges().push_back( R_edge_t( _RTree[i].n2, IRs().size() ) );
+        edges.push_back( Edge( _RTree[i].n1, nrIRs() ) );
+        edges.push_back( Edge( _RTree[i].n2, nrIRs() ) );
         // inner clusters have counting number -1
-        IRs().push_back( Region( Cliques[_RTree[i].n1] & Cliques[_RTree[i].n2], -1.0 ) );
+        IRs.push_back( Region( Cliques[_RTree[i].n1] & Cliques[_RTree[i].n2], -1.0 ) );
     }
 
-    // Regenerate BipartiteGraph internals
-    Regenerate();
+    // create bipartite graph
+    G.create( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Create messages and beliefs
     _Qa.clear();
-    _Qa.reserve( nr_ORs() );
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    _Qa.reserve( nrORs() );
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         _Qa.push_back( OR(alpha) );
 
     _Qb.clear();
-    _Qb.reserve( nr_IRs() );
-    for( size_t beta = 0; beta < nr_IRs(); beta++ ) 
+    _Qb.reserve( nrIRs() );
+    for( size_t beta = 0; beta < nrIRs(); beta++ ) 
         _Qb.push_back( Factor( IR(beta), 1.0 ) );
 
     _mes.clear();
-    _mes.reserve( nr_Redges() );
-    for( size_t e = 0; e < nr_Redges(); e++ )
-        _mes.push_back( Factor( IR(Redge(e).second), 1.0 ) );
+    _mes.reserve( nrORs() );
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
+        _mes.push_back( vector<Factor>() );
+        _mes[alpha].reserve( nbOR(alpha).size() );
+        foreach( const Neighbor &beta, nbOR(alpha) )
+            _mes[alpha].push_back( Factor( IR(beta), 1.0 ) );
+    }
 
     // Check counting numbers
     Check_Counting_Numbers();
@@ -178,9 +184,9 @@ Factor JTree::belief( const VarSet &ns ) const {
 
 vector<Factor> JTree::beliefs() const {
     vector<Factor> result;
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         result.push_back( _Qb[beta] );
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         result.push_back( _Qa[alpha] );
     return result;
 }
@@ -193,10 +199,10 @@ Factor JTree::belief( const Var &n ) const {
 
 // Needs no init
 void JTree::runHUGIN() {
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         _Qa[alpha] = OR(alpha);
 
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         _Qb[beta].fill( 1.0 );
 
     // CollectEvidence
@@ -224,7 +230,7 @@ void JTree::runHUGIN() {
     }
 
     // Normalize
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         _Qa[alpha].normalize( Prob::NORMPROB );
 }
 
@@ -233,42 +239,44 @@ void JTree::runHUGIN() {
 void JTree::runShaferShenoy() {
     // First pass
     _logZ = 0.0;
-    for( size_t e = _RTree.size(); (e--) != 0; ) {
+    for( size_t e = nrIRs(); (e--) != 0; ) {
         // send a message from _RTree[e].n2 to _RTree[e].n1
         // or, actually, from the seperator IR(e) to _RTree[e].n1
 
-        size_t i = _RTree[e].n2;
-        size_t j = _RTree[e].n1;
+        size_t i = nbIR(e)[1].node; // = _RTree[e].n2
+        size_t j = nbIR(e)[0].node; // = _RTree[e].n1
+        size_t _e = nbIR(e)[0].dual;
         
         Factor piet = OR(i);
-        for( R_nb_cit k = nbOR(i).begin(); k != nbOR(i).end(); k++ )
-            if( *k != e )
-                piet *= message( i, *k );
-        message( j, e ) = piet.part_sum( IR(e) );
-        _logZ += log( message(j,e).normalize( Prob::NORMPROB ) );
+        foreach( const Neighbor &k, nbOR(i) )
+            if( k != e ) 
+                piet *= message( i, k.iter );
+        message( j, _e ) = piet.part_sum( IR(e) );
+        _logZ += log( message(j,_e).normalize( Prob::NORMPROB ) );
     }
 
     // Second pass
-    for( size_t e = 0; e < _RTree.size(); e++ ) {
-        size_t i = _RTree[e].n1;
-        size_t j = _RTree[e].n2;
+    for( size_t e = 0; e < nrIRs(); e++ ) {
+        size_t i = nbIR(e)[0].node; // = _RTree[e].n1
+        size_t j = nbIR(e)[1].node; // = _RTree[e].n2
+        size_t _e = nbIR(e)[1].dual;
         
         Factor piet = OR(i);
-        for( R_nb_cit k = nbOR(i).begin(); k != nbOR(i).end(); k++ )
-            if( *k != e )
-                piet *= message( i, *k );
-        message( j, e ) = piet.marginal( IR(e) );
+        foreach( const Neighbor &k, nbOR(i) )
+            if(  k != e )
+                piet *= message( i, k.iter );
+        message( j, _e ) = piet.marginal( IR(e) );
     }
 
     // Calculate beliefs
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ ) {
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
         Factor piet = OR(alpha);
-        for( R_nb_cit k = nbOR(alpha).begin(); k != nbOR(alpha).end(); k++ )
-            piet *= message( alpha, *k );
-        if( _RTree.empty() ) {
+        foreach( const Neighbor &k, nbOR(alpha) )
+            piet *= message( alpha, k.iter );
+        if( nrIRs() == 0 ) {
             _logZ += log( piet.normalize( Prob::NORMPROB ) );
             _Qa[alpha] = piet;
-        } else if( alpha == _RTree[0].n1 ) {
+        } else if( alpha == nbIR(0)[0].node /*_RTree[0].n1*/ ) {
             _logZ += log( piet.normalize( Prob::NORMPROB ) );
             _Qa[alpha] = piet;
         } else
@@ -276,8 +284,8 @@ void JTree::runShaferShenoy() {
     }
 
     // Only for logZ (and for belief)...
-    for( size_t beta = 0; beta < nr_IRs(); beta++ ) 
-        _Qb[beta] = _Qa[nbIR(beta)[0]].marginal( IR(beta) );
+    for( size_t beta = 0; beta < nrIRs(); beta++ ) 
+        _Qb[beta] = _Qa[nbIR(beta)[0].node].marginal( IR(beta) );
 }
 
 
@@ -292,9 +300,9 @@ double JTree::run() {
 
 Complex JTree::logZ() const {
     Complex sum = 0.0;
-    for( size_t beta = 0; beta < nr_IRs(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         sum += Complex(IR(beta).c()) * _Qb[beta].entropy();
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ ) {
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
         sum += Complex(OR(alpha).c()) * _Qa[alpha].entropy();
         sum += (OR(alpha).log0() * _Qa[alpha]).totalSum();
     }
@@ -306,7 +314,7 @@ Complex JTree::logZ() const {
 size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t PreviousRoot ) const {
     // find new root clique (the one with maximal statespace overlap with ns)
     size_t maxval = 0, maxalpha = 0;
-    for( size_t alpha = 0; alpha < nr_ORs(); alpha++ ) {
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
         size_t val = (ns & OR(alpha).vars()).stateSpace();
         if( val > maxval ) {
             maxval = val;
@@ -453,10 +461,10 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                 size_t alpha1 = T[i].n1;
                 size_t alpha2 = T[i].n2;
                 size_t beta;
-                for( beta = 0; beta < nr_IRs(); beta++ )
+                for( beta = 0; beta < nrIRs(); beta++ )
                     if( UEdge( _RTree[beta].n1, _RTree[beta].n2 ) == UEdge( alpha1, alpha2 ) )
                         break;
-                assert( beta != nr_IRs() );
+                assert( beta != nrIRs() );
                 b[i] = beta;
 
                 if( !_Qa_old.count( alpha1 ) )

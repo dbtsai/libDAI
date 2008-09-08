@@ -18,6 +18,18 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+# Enable/disable various approximate inference methods
+WITH_BP = true
+WITH_MF = true
+WITH_HAK = true
+WITH_LC = true
+WITH_TREEEP = true
+WITH_JTREE = true
+WITH_MR = true
+DEBUG = true
+NEW_MATLAB = true
+WITH_MATLAB =
+
 # Directories
 INC = include/dai
 SRC = src
@@ -30,24 +42,62 @@ BOOSTFLAGS = -lboost_program_options
 CC = g++
 
 # Flags for the C++ compiler
-CCFLAGS = -Wall -W -Wextra -fpic -I./include -Llib -O3 -g -DDAI_DEBUG #-static #-pg #-DVERBOSE
+CCFLAGS = -Wall -W -Wextra -fpic -I./include -Llib -O3 #-pg #-static -DVERBOSE
+ifdef DEBUG
+CCFLAGS := $(CCFLAGS) -g -DDAI_DEBUG
+else
+CCFLAGS := $(CCFLAGS)
+endif
 
-# To enable the Matlab interface, define WITH_MATLAB = yes
-WITH_MATLAB = 
+ifdef WITH_BP
+CCFLAGS := $(CCFLAGS) -DWITH_BP
+OBJECTS := $(OBJECTS) bp.o
+endif
+ifdef WITH_MF
+CCFLAGS := $(CCFLAGS) -DWITH_MF
+OBJECTS := $(OBJECTS) mf.o
+endif
+ifdef WITH_HAK
+CCFLAGS := $(CCFLAGS) -DWITH_HAK
+OBJECTS := $(OBJECTS) hak.o
+endif
+ifdef WITH_LC
+CCFLAGS := $(CCFLAGS) -DWITH_LC
+OBJECTS := $(OBJECTS) lc.o
+endif
+ifdef WITH_TREEEP
+CCFLAGS := $(CCFLAGS) -DWITH_TREEEP
+OBJECTS := $(OBJECTS) treeep.o
+endif
+ifdef WITH_JTREE
+CCFLAGS := $(CCFLAGS) -DWITH_JTREE
+OBJECTS := $(OBJECTS) jtree.o
+endif
+ifdef WITH_MR
+CCFLAGS := $(CCFLAGS) -DWITH_MR
+OBJECTS := $(OBJECTS) mr.o
+endif
+
 ifdef WITH_MATLAB
 # Replace the following by the directory where Matlab has been installed
 MATLABDIR = /opt/matlab/bin
-MEX = $(MATLABDIR)/mex
-MEXFLAGS = -g -I. -DDAI_DEBUG -largeArrayDims #-g means debugging
-endif
-
 # Replace the following with the extension of compiled MEX files on this platform, e.g. .mexglx for x86
 MEXEXT = .mexglx
+MEX = $(MATLABDIR)/mex
+MEXFLAGS = -I.
+ifdef DEBUG
+MEXFLAGS := $(MEXFLAGS) -g -DDAI_DEBUG
+endif
+ifdef NEW_MATLAB
+MEXFLAGS := $(MEXFLAGS) -largeArrayDims
+else
+MEXFLAGS := $(MEXFLAGS) -DSMALLMEM
+endif
+endif
 
 HEADERS = $(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/x2x.h
 
-# target matlabs is disabled by default since it only compiles with a very recent MatLab version
-TARGETS = tests utils $(LIB)/libdai.a example testregression
+TARGETS = tests utils $(LIB)/libdai.a example testregression doc
 ifdef WITH_MATLAB
 TARGETS := $(TARGETS) matlabs
 endif
@@ -56,8 +106,8 @@ all : $(TARGETS)
 
 matlabs : matlab/dai.$(MEXEXT) matlab/dai_readfg.$(MEXEXT) matlab/dai_writefg.$(MEXEXT) matlab/dai_removeshortloops.$(MEXEXT) matlab/dai_potstrength.$(MEXEXT)
 
-$(LIB)/libdai.a : daialg.o alldai.o bp.o clustergraph.o factorgraph.o hak.o jtree.o lc.o mf.o mr.o properties.o regiongraph.o util.o treeep.o weightedgraph.o x2x.o
-	ar rcs $(LIB)/libdai.a daialg.o alldai.o bp.o clustergraph.o factorgraph.o hak.o jtree.o lc.o mf.o mr.o properties.o regiongraph.o util.o treeep.o weightedgraph.o x2x.o
+$(LIB)/libdai.a : daialg.o alldai.o clustergraph.o factorgraph.o properties.o regiongraph.o util.o weightedgraph.o x2x.o $(OBJECTS)
+	ar rcs $(LIB)/libdai.a daialg.o alldai.o clustergraph.o factorgraph.o properties.o regiongraph.o util.o weightedgraph.o x2x.o $(OBJECTS)
 
 tests : tests/test
 
@@ -65,13 +115,13 @@ utils : utils/createfg utils/fg2dot utils/remove_short_loops utils/fginfo
 
 testregression : tests/test
 	echo Testing...this can take a while...
-	cd tests; ./testregression; cd ..
+	cd tests; time ./testregression; cd ..
 
 doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
 	doxygen doxygen.conf
 
 clean :
-	rm *.o *.$(MEXEXT) example matlab/*.$(MEXEXT) matlab/*.o tests/test utils/fg2dot utils/createfg utils/remove_short_loops utils/fginfo $(LIB)/libdai.a; echo
+	rm *.o example matlab/*.$(MEXEXT) matlab/*.o tests/test utils/fg2dot utils/createfg utils/remove_short_loops utils/fginfo $(LIB)/libdai.a; echo
 	rm -R doc; echo
 
 
@@ -132,15 +182,15 @@ example : $(SRC)/example.cpp $(HEADERS) $(LIB)/libdai.a
 # TESTS
 ########
 
-tests/test : tests/test.cpp $(HEADERS) lib/libdai.a
+tests/test : tests/test.cpp $(HEADERS) $(LIB)/libdai.a
 	$(CC) $(CCFLAGS) -o tests/test tests/test.cpp -ldai $(BOOSTFLAGS)
 
 
 # MATLAB INTERFACE
 ###################
 
-matlab/dai.$(MEXEXT) : matlab/dai.cpp $(HEADERS) matlab/matlab.o daialg.o alldai.o bp.o clustergraph.o factorgraph.o hak.o jtree.o lc.o mf.o mr.o properties.o regiongraph.o util.o treeep.o weightedgraph.o x2x.o
-	$(MEX) $(MEXFLAGS) -o matlab/dai matlab/dai.cpp matlab/matlab.o daialg.o alldai.o bp.o clustergraph.o factorgraph.o hak.o jtree.o lc.o mf.o mr.o properties.o regiongraph.o util.o treeep.o weightedgraph.o x2x.o
+matlab/dai.$(MEXEXT) : matlab/dai.cpp $(HEADERS) matlab/matlab.o $(LIB)/libdai.a
+	$(MEX) $(MEXFLAGS) -o matlab/dai matlab/dai.cpp matlab/matlab.o $(LIB)/libdai.a
 
 matlab/dai_readfg.$(MEXEXT) : matlab/dai_readfg.cpp $(HEADERS) factorgraph.o matlab/matlab.o
 	$(MEX) $(MEXFLAGS) -o matlab/dai_readfg matlab/dai_readfg.cpp factorgraph.o matlab/matlab.o

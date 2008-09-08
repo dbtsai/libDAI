@@ -25,6 +25,10 @@
 
 #include <sys/times.h>
 #include <cstdio>
+#include <boost/foreach.hpp>
+
+
+#define foreach BOOST_FOREACH
 
 
 namespace dai {

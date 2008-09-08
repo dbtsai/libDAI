@@ -34,18 +34,13 @@ namespace dai {
 
 class LC : public DAIAlgFG {
     protected:
-        typedef struct { size_t i; size_t I; } _iI_type;
-
         std::vector<Factor>      _pancakes;      // used by all LC types (psi_I is stored in the pancake)
         std::vector<Factor>      _cavitydists;   // used by all LC types to store the approximate cavity distribution
-        /// _phis[VV2E(i,I)] corresponds to \f$ \phi^{\setminus i}_I(x_{I \setminus i}) \f$
-        std::vector<Factor>      _phis;
+        /// _phis[i][_I] corresponds to \f$ \phi^{\setminus i}_I(x_{I \setminus i}) \f$
+        std::vector<std::vector<Factor> >      _phis;
 
         /// Single variable beliefs
         std::vector<Factor>      _beliefs;
-
-        /// For each pair (i,j) with j in delta(i), store i and the common factor I
-        std::vector<_iI_type>    _iI;
 
     public:
         ENUM6(CavityType,FULL,PAIR,PAIR2,PAIRINT,PAIRCUM,UNIFORM)
@@ -58,7 +53,7 @@ class LC : public DAIAlgFG {
         /// Default constructor
         LC() : DAIAlgFG() {};
         /// Copy constructor
-        LC(const LC & x) : DAIAlgFG(x), _pancakes(x._pancakes), _cavitydists(x._cavitydists), _phis(x._phis), _beliefs(x._beliefs), _iI(x._iI) {};
+        LC(const LC & x) : DAIAlgFG(x), _pancakes(x._pancakes), _cavitydists(x._cavitydists), _phis(x._phis), _beliefs(x._beliefs) {};
         /// Clone function
         LC* clone() const { return new LC(*this); }
         /// Construct LC object from a FactorGraph and parameters
@@ -71,7 +66,6 @@ class LC : public DAIAlgFG {
                 _cavitydists    = x._cavitydists;
                 _phis           = x._phis;
                 _beliefs        = x._beliefs;
-                _iI             = x._iI;
             }
             return *this;
         }
@@ -82,7 +76,7 @@ class LC : public DAIAlgFG {
         long SetCavityDists( std::vector<Factor> &Q );
 
         void init();
-        Factor NewPancake (size_t iI, bool & hasNaNs);
+        Factor NewPancake (size_t i, size_t _I, bool & hasNaNs);
         double run();
 
         std::string identify() const;
@@ -94,12 +88,10 @@ class LC : public DAIAlgFG {
         const Factor & belief (size_t i) const { return _beliefs[i]; };
         const Factor & pancake (size_t i) const { return _pancakes[i]; };
         const Factor & cavitydist (size_t i) const { return _cavitydists[i]; };
-        size_t nr_iI() const { return _iI.size(); };
 
         void clamp( const Var &/*n*/, size_t /*i*/ ) { assert( 0 == 1 ); }
         void undoProbs( const VarSet &/*ns*/ ) { assert( 0 == 1 ); }
         void saveProbs( const VarSet &/*ns*/ ) { assert( 0 == 1 ); }
-        void makeFactorCavity(size_t /*I*/) { assert( 0 == 1 ); }
         virtual void makeCavity(const Var & /*n*/) { assert( 0 == 1 ); }
         bool checkProperties();
 };

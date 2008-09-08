@@ -43,8 +43,8 @@ class TreeEPSubTree {
         std::vector<Factor>  _Qa;
         std::vector<Factor>  _Qb;
         DEdgeVec             _RTree;
-        std::vector<size_t>  _a;             // _Qa[alpha]  <->  superTree._Qa[_a[alpha]]
-        std::vector<size_t>  _b;             // _Qb[beta]   <->  superTree._Qb[_b[beta]]
+        std::vector<size_t>  _a;        // _Qa[alpha]  <->  superTree._Qa[_a[alpha]]
+        std::vector<size_t>  _b;        // _Qb[beta]   <->  superTree._Qb[_b[beta]]
                                         // _Qb[beta]   <->  _RTree[beta]    
         const Factor *       _I;
         VarSet               _ns;
@@ -113,7 +113,7 @@ class TreeEP : public JTree {
         double run();
         Complex logZ() const;
 
-        bool offtree(size_t I) const { return !_fac2OR.count(I); }
+        bool offtree( size_t I ) const { return (fac2OR[I] == -1U); }
 
         void init( const VarSet &/*ns*/ ) { init(); }
         void undoProbs( const VarSet &ns ) { RegionGraph::undoProbs( ns ); init( ns ); }

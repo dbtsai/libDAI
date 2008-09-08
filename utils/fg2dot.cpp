@@ -44,7 +44,7 @@ int main( int argc, char *argv[] ) {
             cerr << "Error reading file " << infile << endl;
             return 2;
         } else {
-            if( string( argv[2] ) == "-" ) 
+            if( string( argv[2] ) != "-" ) 
                 fg.WriteToDotFile( argv[2] );
             else {
                 cout << "graph G {" << endl;
@@ -55,8 +55,9 @@ int main( int argc, char *argv[] ) {
                 cout << "node[shape=box,style=filled,color=lightgrey,width=0.3,height=0.3,fixedsize=true];" << endl;
                 for( size_t I = 0; I < fg.nrFactors(); I++ )
                     cout << "\tp" << I << ";" << endl;
-                for( size_t iI = 0; iI < fg.nr_edges(); iI++ )
-                    cout << "\tx" << fg.var(fg.edge(iI).first).label() << " -- p" << fg.edge(iI).second << ";" << endl;
+                for( size_t i = 0; i < fg.nrVars(); i++ )
+                    foreach( const FactorGraph::Neighbor &I, fg.nbV(i) )
+                        cout << "\tx" << fg.var(i).label() << " -- p" << I << ";" << endl;
                 cout << "}" << endl;
             }
 
