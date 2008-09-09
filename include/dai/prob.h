@@ -406,7 +406,7 @@ template <typename T> class TProb {
         }
 
         /// Returns maximum value
-        T max() const {
+        T maxVal() const {
             T Z = *std::max_element( _p.begin(), _p.end() );
             return Z;
         }

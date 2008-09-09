@@ -26,11 +26,11 @@ libDAI-0.2.2 (2008-??-??)
   - changed #ifndefs to GNU style
   - added extra warning checks (-W -Wextra) and fixed resulting warnings
   - dai::TProb: 
-    o  removed copy constructor and assignment operators (redundant)
-    o  implementation of some methods via STL algorithms
-    o  added methods takeExp, takeLog, takeLog0 for transformation in-place
-    o  explicit constructor (prevents implicit conversion from size_t to TProb)
-    o  added operator+,+=,-,-=, with argument T (for calculations in log-scale)
+    o removed copy constructor and assignment operators (redundant)
+    o implementation of some methods via STL algorithms
+    o added methods takeExp, takeLog, takeLog0 for transformation in-place
+    o explicit constructor (prevents implicit conversion from size_t to TProb)
+    o added operator+,+=,-,-=, with argument T (for calculations in log-scale)
   - Added "logdomain" property to BP, a boolean that controls whether 
     calculations are done in the log-domain or in the linear domain;
     doing calculations in the log-domain may help if the numerical range
@@ -44,25 +44,31 @@ libDAI-0.2.2 (2008-??-??)
   normtype is now Prob::NORMPROB by default.
 * Small optimization in Diffs
 * Interface changes:
-  - VarSet::
-    stateSpace() -> VarSet::states()
+  - VarSet::stateSpace() -> VarSet::states()
   - FactorGraph::
-    delta(const Var &) -> delta(size_t)
-    Delta(const Var &) -> Delta(size_t)
-    makeCavity(const Var &) -> makeCavity(size_t)
-    removed MakeFactorCavity(size_t)
-    removed ExactMarginal(const VarSet &)
-    removed ExactlogZ()
-    moved isConnected() to BipartiteGraph
-    vars() -> vars
-    factors() -> factors
+      delta(const Var &) -> delta(size_t)
+      Delta(const Var &) -> Delta(size_t)
+      makeCavity(const Var &) -> makeCavity(size_t)
+      vars() -> vars
+      factors() -> factors
+      removed MakeFactorCavity(size_t)
+      removed ExactMarginal(const VarSet &)
+      removed ExactlogZ()
+      moved isConnected() to BipartiteGraph
   - RegionGraph::
-    nr_ORs() -> nrORs()
-    nr_IRs() -> nrIRs()
-    ORs() -> ORs
-    IRs() -> IRs
+      nr_ORs() -> nrORs()
+      nr_IRs() -> nrIRs()
+      ORs() -> ORs
+      IRs() -> IRs
   - *::Regenerate() -> *::create()
   - Renamed Index -> IndexFor
+  - Diffs:
+      max() -> maxDiff()
+      max_size() -> maxSize()
+  - Prob::max() -> Prob::maxVal()
+  - Factor::max() -> Factor::maxVal()
+  - toc() in util.h now returns seconds as a double
+* Added possibility to build for Windows in Makefile
 
 
 libDAI-0.2.1 (2008-05-26)

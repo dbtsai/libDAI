@@ -160,7 +160,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
         }
     }
     if( logDomain ) {
-        prod -= prod.max();
+        prod -= prod.maxVal();
         prod.takeExp();
     }
 
@@ -188,7 +188,7 @@ double BP::run() {
     if( Verbose() >= 3)
        cout << endl; 
 
-    clock_t tic = toc();
+    double tic = toc();
     Diffs diffs(nrVars(), 1.0);
     
     typedef pair<size_t,size_t> Edge;
@@ -219,7 +219,7 @@ double BP::run() {
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter=0; iter < MaxIter() && diffs.max() > Tol(); ++iter ) {
+    for( iter=0; iter < MaxIter() && diffs.maxDiff() > Tol(); ++iter ) {
         if( Updates() == UpdateType::SEQMAX ) {
             // Residuals-BP by Koller et al.
             for( size_t t = 0; t < nredges; ++t ) {
@@ -272,16 +272,16 @@ double BP::run() {
         }
 
         if( Verbose() >= 3 )
-            cout << "BP::run:  maxdiff " << diffs.max() << " after " << iter+1 << " passes" << endl;
+            cout << "BP::run:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
     }
 
-    updateMaxDiff( diffs.max() );
+    updateMaxDiff( diffs.maxDiff() );
 
     if( Verbose() >= 1 ) {
-        if( diffs.max() > Tol() ) {
+        if( diffs.maxDiff() > Tol() ) {
             if( Verbose() == 1 )
                 cout << endl;
-                cout << "BP::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.max() << endl;
+                cout << "BP::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( Verbose() >= 3 )
                 cout << "BP::run:  ";
@@ -289,7 +289,7 @@ double BP::run() {
         }
     }
 
-    return diffs.max();
+    return diffs.maxDiff();
 }
 
 
@@ -301,7 +301,7 @@ Factor BP::beliefV( size_t i ) const {
         else
             prod *= newMessage( i, I.iter );
     if( logDomain ) {
-        prod -= prod.max();
+        prod -= prod.maxVal();
         prod.takeExp();
     }
 
@@ -370,7 +370,7 @@ Factor BP::beliefF (size_t I) const {
     }
 
     if( logDomain ) {
-        prod -= prod.max();
+        prod -= prod.maxVal();
         prod.takeExp();
     }
 

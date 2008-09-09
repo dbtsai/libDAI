@@ -45,10 +45,10 @@ class TestAI {
         vector<Factor>  q;
         double          logZ;
         double          maxdiff;
-        clock_t         time;
+        double          time;
 
         TestAI( const FactorGraph &fg, const string &_name, const Properties &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0) {
-            clock_t tic = toc();
+            double tic = toc();
             obj = newInfAlg( name, fg, opts );
             time += toc() - tic;
 /*
@@ -96,7 +96,7 @@ class TestAI {
         }
 
         void doAI() {
-            clock_t tic = toc();
+            double tic = toc();
 //            if( name == "EXACT" ) {
 //                // calculation has already been done
 //            } 
@@ -251,7 +251,7 @@ int main( int argc, char *argv[] ) {
             cout.width( 40 );
             cout << left << "# METHOD" << "  ";
             cout.width( 10 );
-            cout << right << "CLOCKS" << "    ";
+            cout << right << "SECONDS" << "   ";
             cout.width( 10 );
             cout << "MAX ERROR" << "  ";
             cout.width( 10 );

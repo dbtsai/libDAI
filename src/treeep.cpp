@@ -56,7 +56,7 @@ bool TreeEP::checkProperties() {
 }
 
 
-TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &jt_RTree, const vector<Factor> &jt_Qa, const vector<Factor> &jt_Qb, const Factor *I ) : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(I), _ns(), _nsrem(), _logZ(0.0) {
+TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I ) : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(I), _ns(), _nsrem(), _logZ(0.0) {
     _ns = _I->vars();
 
     // Make _Qa, _Qb, _a and _b corresponding to the subtree
@@ -102,7 +102,7 @@ void TreeEPSubTree::init() {
 }
 
 
-void TreeEPSubTree::InvertAndMultiply( const vector<Factor> &Qa, const vector<Factor> &Qb ) {
+void TreeEPSubTree::InvertAndMultiply( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) {
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
         _Qa[alpha] = Qa[_a[alpha]].divided_by( _Qa[alpha] );
 
@@ -111,7 +111,7 @@ void TreeEPSubTree::InvertAndMultiply( const vector<Factor> &Qa, const vector<Fa
 }
 
 
-void TreeEPSubTree::HUGIN_with_I( vector<Factor> &Qa, vector<Factor> &Qb ) {
+void TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &Qb ) {
     // Backup _Qa and _Qb
     vector<Factor> _Qa_old(_Qa);
     vector<Factor> _Qb_old(_Qb);
@@ -172,7 +172,7 @@ void TreeEPSubTree::HUGIN_with_I( vector<Factor> &Qa, vector<Factor> &Qb ) {
 }
 
 
-double TreeEPSubTree::logZ( const vector<Factor> &Qa, const vector<Factor> &Qb ) const {
+double TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const {
     double sum = 0.0;
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
         sum += (Qa[_a[alpha]] * _Qa[alpha].log0()).totalSum();
@@ -407,7 +407,7 @@ double TreeEP::run() {
     if( Verbose() >= 3)
         cout << endl;
 
-    clock_t tic = toc();
+    double tic = toc();
     Diffs diffs(nrVars(), 1.0);
 
     vector<Factor> old_beliefs;
@@ -419,7 +419,7 @@ double TreeEP::run() {
     
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter=0; iter < MaxIter() && diffs.max() > Tol(); iter++ ) {
+    for( iter=0; iter < MaxIter() && diffs.maxDiff() > Tol(); iter++ ) {
         for( size_t I = 0; I < nrFactors(); I++ )
             if( offtree(I) ) {  
                 _Q[I].InvertAndMultiply( _Qa, _Qb );
@@ -435,16 +435,16 @@ double TreeEP::run() {
         }
 
         if( Verbose() >= 3 )
-            cout << "TreeEP::run:  maxdiff " << diffs.max() << " after " << iter+1 << " passes" << endl;
+            cout << "TreeEP::run:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
     }
 
-    updateMaxDiff( diffs.max() );
+    updateMaxDiff( diffs.maxDiff() );
 
     if( Verbose() >= 1 ) {
-        if( diffs.max() > Tol() ) {
+        if( diffs.maxDiff() > Tol() ) {
             if( Verbose() == 1 )
                 cout << endl;
-            cout << "TreeEP::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.max() << endl;
+            cout << "TreeEP::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( Verbose() >= 3 )
                 cout << "TreeEP::run:  ";
@@ -452,7 +452,7 @@ double TreeEP::run() {
         }
     }
 
-    return diffs.max();
+    return diffs.maxDiff();
 }
 
 

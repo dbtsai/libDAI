@@ -23,9 +23,19 @@
 #define __defined_libdai_util_h
 
 
-#include <sys/times.h>
+#include <vector>
+#include <set>
+#include <map>
+#include <iostream>
 #include <cstdio>
 #include <boost/foreach.hpp>
+
+#ifdef WINDOWS
+    #include <float.h>  // for _isnan (?)
+    #include <boost/math/special_functions/atanh.hpp>  // for atanh
+    #include <boost/math/special_functions/log1p.hpp>  // for log1p
+//    #include <xmath.h>
+#endif
 
 
 #define foreach BOOST_FOREACH
@@ -34,10 +44,59 @@
 namespace dai {
 
 
-clock_t toc();
-void rnd_seed( int seed );
+#ifdef WINDOWS
+    bool isnan( double x ) inline { return _isnan( x ); }
+    using boost::math:atanh;
+    using boost::math::log1p;
+#endif
+
+
+double toc();
+void rnd_seed( size_t seed );
 double rnd_uniform();
 double rnd_stdnormal();
+int rnd_int( int min, int max );
+
+
+// Output a std::vector
+template<class T> 
+std::ostream& operator << (std::ostream& os, const std::vector<T> & x) {
+    os << "(";
+    for( typename std::vector<T>::const_iterator it = x.begin(); it != x.end(); it++ )
+        os << (it != x.begin() ? ", " : "") << *it;
+    os << ")";
+    return os;
+}
+
+
+// Output a std::set
+template<class T> 
+std::ostream& operator << (std::ostream& os, const std::set<T> & x) {
+    os << "{";
+   for( typename std::set<T>::const_iterator it = x.begin(); it != x.end(); it++ )
+        os << (it != x.begin() ? ", " : "") << *it;
+    os << "}";
+    return os;
+}
+
+
+/// Output a std::map
+template<class T1, class T2>
+std::ostream& operator << (std::ostream& os, const std::map<T1,T2> & x) {
+    os << "{";
+    for( typename std::map<T1,T2>::const_iterator it = x.begin(); it != x.end(); it++ )
+        os << (it != x.begin() ? ", " : "") << it->first << "->" << it->second;
+    os << "}";
+    return os;
+}
+
+
+/// Output a std::pair
+template<class T1, class T2>
+std::ostream& operator << (std::ostream& os, const std::pair<T1,T2> & x) {
+    os << "(" << x.first << ", " << x.second << ")";
+    return os;
+}
 
 
 } // end of namespace dai

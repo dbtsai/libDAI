@@ -80,7 +80,7 @@ std::ostream& operator<< (std::ostream & os, const Properties & ps) {
     for( Properties::const_iterator p = ps.begin(); p != ps.end(); p++ ) {
         if( p != ps.begin() )
             os << ",";
-        os << *p;
+        os << (Property)*p;
     }
     os << "]";
     return os;

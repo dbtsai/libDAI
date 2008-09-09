@@ -99,7 +99,7 @@ HAK::HAK(const RegionGraph & rg, const Properties &opts) : DAIAlgRG(rg, opts) {
 }
 
 
-void HAK::findLoopClusters( const FactorGraph & fg, set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars ) {
+void HAK::findLoopClusters( const FactorGraph & fg, std::set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars ) {
     for( VarSet::const_iterator in = vars.begin(); in != vars.end(); in++ ) {
         VarSet ind = fg.delta( fg.findVar( *in ) );
         if( (newcl.size()) >= 2 && (ind >> root) ) {
@@ -195,7 +195,7 @@ double HAK::doGBP() {
     if( Verbose() >= 3)
         cout << endl;
 
-    clock_t tic = toc();
+    double tic = toc();
 
     // Check whether counting numbers won't lead to problems
     for( size_t beta = 0; beta < nrIRs(); beta++ )
@@ -213,7 +213,7 @@ double HAK::doGBP() {
     size_t iter = 0;
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter = 0; iter < MaxIter() && diffs.max() > Tol(); iter++ ) {
+    for( iter = 0; iter < MaxIter() && diffs.maxDiff() > Tol(); iter++ ) {
         for( size_t beta = 0; beta < nrIRs(); beta++ ) {
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
@@ -261,16 +261,16 @@ double HAK::doGBP() {
         }
 
         if( Verbose() >= 3 )
-            cout << "HAK::doGBP:  maxdiff " << diffs.max() << " after " << iter+1 << " passes" << endl;
+            cout << "HAK::doGBP:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
     }
 
-    updateMaxDiff( diffs.max() );
+    updateMaxDiff( diffs.maxDiff() );
 
     if( Verbose() >= 1 ) {
-        if( diffs.max() > Tol() ) {
+        if( diffs.maxDiff() > Tol() ) {
             if( Verbose() == 1 )
                 cout << endl;
-            cout << "HAK::doGBP:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.max() << endl;
+            cout << "HAK::doGBP:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( Verbose() >= 2 )
                 cout << "HAK::doGBP:  ";
@@ -278,7 +278,7 @@ double HAK::doGBP() {
         }
     }
 
-    return diffs.max();
+    return diffs.maxDiff();
 }
 
 
@@ -288,7 +288,7 @@ double HAK::doDoubleLoop() {
     if( Verbose() >= 3)
         cout << endl;
 
-    clock_t tic = toc();
+    double tic = toc();
 
     // Save original outer regions
     vector<FRegion> org_ORs = ORs;
@@ -320,7 +320,7 @@ double HAK::doDoubleLoop() {
     Verbose( outer_verbose ? outer_verbose - 1 : 0 );
 
     size_t outer_iter = 0;
-    for( outer_iter = 0; outer_iter < outer_maxiter && diffs.max() > outer_tol; outer_iter++ ) {
+    for( outer_iter = 0; outer_iter < outer_maxiter && diffs.maxDiff() > outer_tol; outer_iter++ ) {
         // Calculate new outer regions
         for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
             OR(alpha) = org_ORs[alpha];
@@ -340,7 +340,7 @@ double HAK::doDoubleLoop() {
         }
 
         if( Verbose() >= 3 )
-            cout << "HAK::doDoubleLoop:  maxdiff " << diffs.max() << " after " << outer_iter+1 << " passes" << endl;
+            cout << "HAK::doDoubleLoop:  maxdiff " << diffs.maxDiff() << " after " << outer_iter+1 << " passes" << endl;
     }
 
     // restore _maxiter, _verbose and _maxdiff
@@ -348,7 +348,7 @@ double HAK::doDoubleLoop() {
     Verbose( outer_verbose );
     MaxDiff( org_maxdiff );
 
-    updateMaxDiff( diffs.max() );
+    updateMaxDiff( diffs.maxDiff() );
 
     // Restore original outer regions
     ORs = org_ORs;
@@ -358,10 +358,10 @@ double HAK::doDoubleLoop() {
         IR(beta).c() = org_IR_cs[beta];
 
     if( Verbose() >= 1 ) {
-        if( diffs.max() > Tol() ) {
+        if( diffs.maxDiff() > Tol() ) {
             if( Verbose() == 1 )
                 cout << endl;
-                cout << "HAK::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.max() << endl;
+                cout << "HAK::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
             } else {
                 if( Verbose() >= 3 )
                     cout << "HAK::doDoubleLoop:  ";
@@ -369,7 +369,7 @@ double HAK::doDoubleLoop() {
             }
         }
 
-    return diffs.max();
+    return diffs.maxDiff();
 }
 
 

@@ -32,7 +32,7 @@ namespace dai {
 using namespace std;
 
 
-RegionGraph::RegionGraph( const FactorGraph &fg, const vector<Region> &ors, const vector<Region> &irs, const vector<pair<size_t,size_t> > &edges) : FactorGraph(fg), G(), ORs(), IRs(irs), fac2OR() {
+RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors, const std::vector<Region> &irs, const std::vector<std::pair<size_t,size_t> > &edges) : FactorGraph(fg), G(), ORs(), IRs(irs), fac2OR() {
     // Copy outer regions (giving them counting number 1.0)
     ORs.reserve( ors.size() );
     for( vector<Region>::const_iterator alpha = ors.begin(); alpha != ors.end(); alpha++ )
@@ -64,7 +64,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const vector<Region> &ors, cons
 
 
 // CVM style
-RegionGraph::RegionGraph( const FactorGraph &fg, const vector<VarSet> &cl ) : FactorGraph(fg), G(), ORs(), IRs(), fac2OR() {
+RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl ) : FactorGraph(fg), G(), ORs(), IRs(), fac2OR() {
     // Retain only maximal clusters
     ClusterGraph cg( cl );
     cg.eraseNonMaximal();

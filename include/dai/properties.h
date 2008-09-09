@@ -39,7 +39,7 @@ typedef boost::any  PropertyValue;
 typedef std::pair<PropertyKey, PropertyValue> Property;
 
 
-/// Sends a Properties object to an output stream
+/// Sends a Property object to an output stream
 std::ostream& operator<< (std::ostream & os, const Property & p);
 
 

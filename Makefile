@@ -26,9 +26,14 @@ WITH_LC = true
 WITH_TREEEP = true
 WITH_JTREE = true
 WITH_MR = true
+# Build with debug info?
 DEBUG = true
-NEW_MATLAB = true
+# Build matlab interface?
 WITH_MATLAB =
+# New/old matlab version?
+NEW_MATLAB = true
+# Windows or linux (default)?
+WINDOWS =
 
 # Directories
 INC = include/dai

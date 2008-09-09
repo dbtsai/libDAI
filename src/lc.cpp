@@ -105,7 +105,7 @@ void LC::CalcBelief (size_t i) {
 }
 
 
-double LC::CalcCavityDist (size_t i, const string &name, const Properties &opts) {
+double LC::CalcCavityDist (size_t i, const std::string &name, const Properties &opts) {
     Factor Bi;
     double maxdiff = 0;
 
@@ -160,8 +160,8 @@ double LC::CalcCavityDist (size_t i, const string &name, const Properties &opts)
 }
 
 
-double LC::InitCavityDists (const string &name, const Properties &opts) {
-    clock_t tic = toc();
+double LC::InitCavityDists (const std::string &name, const Properties &opts) {
+    double tic = toc();
 
     if( Verbose() >= 1 ) {
         cout << "LC::InitCavityDists:  ";
@@ -191,7 +191,7 @@ double LC::InitCavityDists (const string &name, const Properties &opts) {
 }
 
 
-long LC::SetCavityDists (vector<Factor> &Q) {
+long LC::SetCavityDists( std::vector<Factor> &Q ) {
     if( Verbose() >= 1 ) 
         cout << "LC::SetCavityDists:  Setting initial cavity distributions" << endl;
     if( Q.size() != nrVars() )
@@ -265,7 +265,7 @@ double LC::run() {
     if( Verbose() >= 2 )
         cout << endl;
 
-    clock_t tic = toc();
+    double tic = toc();
     Diffs diffs(nrVars(), 1.0);
 
     updateMaxDiff( InitCavityDists(GetPropertyAs<string>("cavainame"), GetPropertyAs<Properties>("cavaiopts")) );
@@ -297,7 +297,7 @@ double LC::run() {
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter=0; iter < MaxIter() && diffs.max() > Tol(); iter++ ) {
+    for( iter=0; iter < MaxIter() && diffs.maxDiff() > Tol(); iter++ ) {
         // Sequential updates
         if( Updates() == UpdateType::SEQRND )
             random_shuffle( update_seq.begin(), update_seq.end() );
@@ -318,16 +318,16 @@ double LC::run() {
         }
 
         if( Verbose() >= 3 )
-            cout << "LC::run:  maxdiff " << diffs.max() << " after " << iter+1 << " passes" << endl;
+            cout << "LC::run:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
     }
 
-    updateMaxDiff( diffs.max() );
+    updateMaxDiff( diffs.maxDiff() );
 
     if( Verbose() >= 1 ) {
-        if( diffs.max() > Tol() ) {
+        if( diffs.maxDiff() > Tol() ) {
             if( Verbose() == 1 )
                 cout << endl;
-                cout << "LC::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.max() << endl;
+                cout << "LC::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( Verbose() >= 2 )
                 cout << "LC::run:  ";
@@ -335,7 +335,7 @@ double LC::run() {
         }
     }
 
-    return diffs.max();
+    return diffs.maxDiff();
 }
 
 

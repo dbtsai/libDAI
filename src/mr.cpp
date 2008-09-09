@@ -527,7 +527,7 @@ double MR::run() {
         if( Verbose() >= 1 )
             cout << "Starting " << identify() << "...";
 
-        clock_t tic = toc();
+        double tic = toc();
 //        Diffs diffs(nrVars(), 1.0);
 
         M.resize(N);

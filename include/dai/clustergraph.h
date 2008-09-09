@@ -84,7 +84,7 @@ class ClusterGraph : public std::set<VarSet> {
         /// Return union of all members
         VarSet vars() const {
             VarSet result;
-            for( iterator x = begin(); x != end(); x++ )
+            for( const_iterator x = begin(); x != end(); x++ )
                 result |= *x;
             return result;
         }
@@ -102,7 +102,7 @@ class ClusterGraph : public std::set<VarSet> {
         /// Returns union of clusters that contain n, minus n
         VarSet Delta( const Var& n ) const {
             VarSet result;
-            for( iterator x = begin(); x != end(); x++ )
+            for( const_iterator x = begin(); x != end(); x++ )
                 if( (*x && n) )
                     result |= *x;
             return result;

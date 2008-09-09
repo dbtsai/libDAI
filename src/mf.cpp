@@ -80,7 +80,7 @@ void MF::init() {
 
 
 double MF::run() {
-    clock_t tic = toc();
+    double tic = toc();
 
     if( Verbose() >= 1 )
         cout << "Starting " << identify() << "...";
@@ -89,7 +89,7 @@ double MF::run() {
     Diffs diffs(pass_size * 3, 1.0);
 
     size_t t=0;
-    for( t=0; t < (MaxIter()*pass_size) && diffs.max() > Tol(); t++ ) {
+    for( t=0; t < (MaxIter()*pass_size) && diffs.maxDiff() > Tol(); t++ ) {
         // choose random Var i
         size_t i = (size_t) (nrVars() * rnd_uniform());
 
@@ -119,13 +119,13 @@ double MF::run() {
         _beliefs[i] = jan;
     }
 
-    updateMaxDiff( diffs.max() );
+    updateMaxDiff( diffs.maxDiff() );
 
     if( Verbose() >= 1 ) {
-        if( diffs.max() > Tol() ) {
+        if( diffs.maxDiff() > Tol() ) {
             if( Verbose() == 1 )
                 cout << endl;
-            cout << "MF::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.max() << endl;
+            cout << "MF::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( Verbose() >= 2 )
                 cout << "MF::run:  ";
@@ -133,7 +133,7 @@ double MF::run() {
         }
     }
 
-    return diffs.max();
+    return diffs.maxDiff();
 }
 
 

@@ -32,7 +32,7 @@ namespace dai {
 using namespace std;
 
 
-ClusterGraph ClusterGraph::VarElim( const vector<Var> & ElimSeq ) const {
+ClusterGraph ClusterGraph::VarElim( const std::vector<Var> & ElimSeq ) const {
     const long verbose = 0;
 
     // Make a copy
@@ -90,7 +90,7 @@ ClusterGraph ClusterGraph::VarElim_MinFill() const {
     while( !_vars.empty() ) {
         if( verbose >= 1 )
             cout << "Var  Eliminiation cost" << endl;
-        VarSet::iterator lowest = _vars.end();
+        VarSet::const_iterator lowest = _vars.end();
         size_t lowest_cost = -1UL;
         for( VarSet::const_iterator n = _vars.begin(); n != _vars.end(); n++ ) {
             size_t cost = _Cl.eliminationCost( *n );

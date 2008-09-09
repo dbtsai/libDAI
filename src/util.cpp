@@ -25,14 +25,29 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
+#ifdef WINDOWS
+    #include <windows.h>
+#else
+    // Assume POSIX compliant system. We need the following for querying the CPU time for this process
+    #include <sys/times.h>
+    #include <sys/param.h>
+#endif
+
 
 namespace dai {
 
 
-clock_t toc() {
+// Returns user+system time in seconds
+double toc() {
+#ifdef WINDOWS
+    SYSTEMTIME  tbuf;
+    GetSystemTime(&tbuf);
+    return( (double)(tbuf.wSecond + (double)tbuf.wMilliseconds / 1000.0) );
+#else
     tms tbuf;
     times(&tbuf);
-    return( tbuf.tms_utime );
+    return( (double)(tbuf.tms_utime + tbuf.tms_stime) / HZ );
+#endif
 }
 
 
@@ -40,9 +55,9 @@ clock_t toc() {
 // Try boost::mt19937 or boost::ecuyer1988 instead of boost::minstd_rand
 typedef boost::minstd_rand _rnd_gen_type;
 
-_rnd_gen_type _rnd_gen(42);
+_rnd_gen_type _rnd_gen(42U);
 
-// Define a uniform random number distribution which produces "double"
+// Define a uniform random number distribution which produces
 // values between 0 and 1 (0 inclusive, 1 exclusive).
 boost::uniform_real<> _uni_dist(0,1);
 boost::variate_generator<_rnd_gen_type&, boost::uniform_real<> > _uni_rnd(_rnd_gen, _uni_dist);
@@ -52,7 +67,7 @@ boost::normal_distribution<> _normal_dist;
 boost::variate_generator<_rnd_gen_type&, boost::normal_distribution<> > _normal_rnd(_rnd_gen, _normal_dist);
 
 
-void rnd_seed( int seed ) {
+void rnd_seed( size_t seed ) {
     _rnd_gen.seed(seed);
 }
 
@@ -62,6 +77,11 @@ double rnd_uniform() {
 
 double rnd_stdnormal() {
     return _normal_rnd();
+}
+
+// Returns integer in interval [min, max]
+int rnd_int( int min, int max ) {
+    return (int)floor(_uni_rnd() * (max + 1 - min) + min);
 }
 
 

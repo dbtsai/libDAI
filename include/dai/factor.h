@@ -246,7 +246,7 @@ template <typename T> class TFactor {
         bool hasNegatives() const { return _p.hasNegatives(); }
         T totalSum() const { return _p.totalSum(); }
         T maxAbs() const { return _p.maxAbs(); }
-        T max() const { return _p.max(); }
+        T maxVal() const { return _p.maxVal(); }
         Complex entropy() const { return _p.entropy(); }
         T strength( const Var &i, const Var &j ) const;
 
@@ -335,8 +335,8 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
                                 bs = i.states();
                             else
                                 as = j.states();
-                            T f1 = slice( ij, alpha1 * as + beta1 * bs ).p().divide( slice( ij, alpha2 * as + beta1 * bs ).p() ).max();
-                            T f2 = slice( ij, alpha2 * as + beta2 * bs ).p().divide( slice( ij, alpha1 * as + beta2 * bs ).p() ).max();
+                            T f1 = slice( ij, alpha1 * as + beta1 * bs ).p().divide( slice( ij, alpha2 * as + beta1 * bs ).p() ).maxVal();
+                            T f2 = slice( ij, alpha2 * as + beta2 * bs ).p().divide( slice( ij, alpha1 * as + beta2 * bs ).p() ).maxVal();
                             T f = f1 * f2;
                             if( f > max )
                                 max = f;

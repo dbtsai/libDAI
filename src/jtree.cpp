@@ -78,7 +78,7 @@ JTree::JTree( const FactorGraph &fg, const Properties &opts, bool automatic ) : 
 }
 
 
-void JTree::GenerateJT( const vector<VarSet> &Cliques ) {
+void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
     // Construct a weighted graph (each edge is weighted with the cardinality 
     // of the intersection of the nodes, where the nodes are the elements of
     // Cliques).

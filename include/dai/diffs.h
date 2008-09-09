@@ -41,7 +41,7 @@ class Diffs : public std::vector<double> {
             _pos = begin(); 
             _maxpos = begin(); 
         };
-        double max() { 
+        double maxDiff() { 
             if( size() < _maxsize )
                 return _def;
             else
@@ -73,7 +73,7 @@ class Diffs : public std::vector<double> {
                 }
             }
         }
-        size_t max_size() { return _maxsize; }
+        size_t maxSize() { return _maxsize; }
 };
 
 
