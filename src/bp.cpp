@@ -48,11 +48,15 @@ bool BP::checkProperties() {
         return false;
     if (!HasProperty("verbose") )
         return false;
+    if (!HasProperty("logdomain") )
+        return false;
     
     ConvertPropertyTo<double>("tol");
     ConvertPropertyTo<size_t>("maxiter");
     ConvertPropertyTo<size_t>("verbose");
     ConvertPropertyTo<UpdateType>("updates");
+    ConvertPropertyTo<bool>("logdomain");
+    logDomain = GetPropertyAs<bool>("logdomain");
 
     return true;
 }
@@ -85,8 +89,13 @@ void BP::init() {
     assert( checkProperties() );
     for( size_t i = 0; i < nrVars(); ++i ) {
         foreach( const Neighbor &I, nbV(i) ) {
-            message( i, I.iter ).fill( 1.0 );
-            newMessage( i, I.iter ).fill( 1.0 );
+            if( logDomain ) {
+                message( i, I.iter ).fill( 0.0 );
+                newMessage( i, I.iter ).fill( 0.0 );
+            } else {
+                message( i, I.iter ).fill( 1.0 );
+                newMessage( i, I.iter ).fill( 1.0 );
+            }
         }
     }
 }
@@ -122,6 +131,8 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
 */
     
     Prob prod( factor(I).p() );
+    if( logDomain ) 
+        prod.takeLog();
 
     // Calculate product of incoming messages and factor I
     foreach( const Neighbor &j, nbF(I) ) {
@@ -131,16 +142,26 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
             const ind_t & ind = index(j, _I);
 
             // prod_j will be the product of messages coming into j
-            Prob prod_j( var(j).states() ); 
-            foreach( const Neighbor &J, nbV(j) ) {
-                if( J != I )   // for all J in nb(j) \ I 
-                    prod_j *= message( j, J.iter );
-            }
+            Prob prod_j( var(j).states(), logDomain ? 0.0 : 1.0 ); 
+            foreach( const Neighbor &J, nbV(j) )
+                if( J != I ) { // for all J in nb(j) \ I 
+                    if( logDomain )
+                        prod_j += message( j, J.iter );
+                    else
+                        prod_j *= message( j, J.iter );
+                }
 
             // multiply prod with prod_j
             for( size_t r = 0; r < prod.size(); ++r )
-                prod[r] *= prod_j[ind[r]];
+                if( logDomain )
+                    prod[r] += prod_j[ind[r]];
+                else
+                    prod[r] *= prod_j[ind[r]];
         }
+    }
+    if( logDomain ) {
+        prod -= prod.max();
+        prod.takeExp();
     }
 
     // Marginalize onto i
@@ -152,7 +173,10 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
     marg.normalize( _normtype );
     
     // Store result
-    newMessage(i,_I) = marg;
+    if( logDomain )
+        newMessage(i,_I) = marg.log();
+    else
+        newMessage(i,_I) = marg;
 }
 
 
@@ -270,9 +294,16 @@ double BP::run() {
 
 
 Factor BP::beliefV( size_t i ) const {
-    Prob prod( var(i).states() ); 
+    Prob prod( var(i).states(), logDomain ? 0.0 : 1.0 ); 
     foreach( const Neighbor &I, nbV(i) )
-        prod *= newMessage( i, I.iter );
+        if( logDomain )
+            prod += newMessage( i, I.iter );
+        else
+            prod *= newMessage( i, I.iter );
+    if( logDomain ) {
+        prod -= prod.max();
+        prod.takeExp();
+    }
 
     prod.normalize( Prob::NORMPROB );
     return( Factor( var(i), prod ) );
@@ -310,6 +341,8 @@ Factor BP::belief( const VarSet &ns ) const {
 
 Factor BP::beliefF (size_t I) const {
     Prob prod( factor(I).p() );
+    if( logDomain )
+        prod.takeLog();
 
     foreach( const Neighbor &j, nbF(I) ) {
         size_t _I = j.dual;
@@ -317,15 +350,28 @@ Factor BP::beliefF (size_t I) const {
         const ind_t & ind = index(j, _I);
 
         // prod_j will be the product of messages coming into j
-        Prob prod_j( var(j).states() ); 
+        Prob prod_j( var(j).states(), logDomain ? 0.0 : 1.0 ); 
         foreach( const Neighbor &J, nbV(j) ) {
-            if( J != I )   // for all J in nb(j) \ I 
-                prod_j *= newMessage( j, J.iter );
+            if( J != I ) { // for all J in nb(j) \ I 
+                if( logDomain )
+                    prod_j += newMessage( j, J.iter );
+                else
+                    prod_j *= newMessage( j, J.iter );
+            }
         }
 
         // multiply prod with prod_j
-        for( size_t r = 0; r < prod.size(); ++r )
-            prod[r] *= prod_j[ind[r]];
+        for( size_t r = 0; r < prod.size(); ++r ) {
+            if( logDomain )
+                prod[r] += prod_j[ind[r]];
+            else
+                prod[r] *= prod_j[ind[r]];
+        }
+    }
+
+    if( logDomain ) {
+        prod -= prod.max();
+        prod.takeExp();
     }
 
     Factor result( factor(I).vars(), prod );
@@ -366,7 +412,7 @@ void BP::init( const VarSet &ns ) {
     for( VarSet::const_iterator n = ns.begin(); n != ns.end(); ++n ) {
         size_t ni = findVar( *n );
         foreach( const Neighbor &I, nbV( ni ) )
-            message( ni, I.iter ).fill( 1.0 );
+            message( ni, I.iter ).fill( logDomain ? 0.0 : 1.0 );
     }
 }
 

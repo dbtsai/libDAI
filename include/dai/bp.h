@@ -43,18 +43,19 @@ class BP : public DAIAlgFG {
         };
 
         std::vector<std::vector<EdgeProp> > edges;
+        bool logDomain;
 
     public:
         ENUM4(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
         UpdateType Updates() const { return GetPropertyAs<UpdateType>("updates"); }
 
         // default constructor
-        BP() : DAIAlgFG() {};
+        BP() : DAIAlgFG(), edges(), logDomain(false) {};
         // copy constructor
-        BP(const BP & x) : DAIAlgFG(x), edges(x.edges) {};
+        BP(const BP & x) : DAIAlgFG(x), edges(x.edges), logDomain(x.logDomain) {};
         BP* clone() const { return new BP(*this); }
         // construct BP object from FactorGraph
-        BP(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts) {
+        BP(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts), edges(), logDomain(false) {
             assert( checkProperties() );
             create();
         }
@@ -63,6 +64,7 @@ class BP : public DAIAlgFG {
             if(this!=&x) {
                 DAIAlgFG::operator=(x);
                 edges = x.edges;
+                logDomain = x.logDomain;
             }
             return *this;
         }

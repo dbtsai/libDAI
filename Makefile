@@ -42,7 +42,7 @@ BOOSTFLAGS = -lboost_program_options
 CC = g++
 
 # Flags for the C++ compiler
-CCFLAGS = -Wall -W -Wextra -fpic -I./include -Llib -O3 #-pg #-static -DVERBOSE
+CCFLAGS = -Wall -W -Wextra -fpic -I./include -Llib -O3 #-pg #-static #-DVERBOSE
 ifdef DEBUG
 CCFLAGS := $(CCFLAGS) -g -DDAI_DEBUG
 else

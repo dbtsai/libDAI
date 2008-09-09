@@ -1,9 +1,24 @@
 libDAI-0.2.2 (2008-??-??)
 -------------------------
- 
+
+* Pervasive change of BipartiteGraph implementation (based on an idea by
+  Giuseppe Passino). BipartiteGraph no longer stores the node properties (former
+  _V1 and _V2), nor does it store a dense adjacency matrix anymore, nor an edge
+  list. Instead, it stores the graph structure as lists of neighboring nodes.
+  This yields a significant memory/speed improvement for large factor graphs, and
+  is more elegant as well. Iterating over neighbors is made easy by using
+  boost::foreach.
+* Improved index.h (merged from SVN head):
+  - Renamed Index -> IndexFor
+  - Added some .reserve()'s to IndexFor methods which yields a 
+    25% speedup of testregression
+  - Replaced multind by Permute
+  - Added MultiFor
+  - Added State
 * Moved everything into namespace "dai"
 * Renamed DEBUG to DAI_DEBUG to avoid conflicts
-* Contributions by ???:
+* Added conditional compilation of inference methods
+* Contributions by Peter Gober:
   - Renamed variable _N in mr.* for compatibility with g++ under cygwin
 * Contributions by Giuseppe Passino:
   - removed "using namespace std;" from header files - bad practice
@@ -16,14 +31,38 @@ libDAI-0.2.2 (2008-??-??)
     o  added methods takeExp, takeLog, takeLog0 for transformation in-place
     o  explicit constructor (prevents implicit conversion from size_t to TProb)
     o  added operator+,+=,-,-=, with argument T (for calculations in log-scale)
-* Contributions by Christian Wojek, resulting in vast speed and memory improvements
-  for large factor graphs:
-  - Sparse implementation of nodes->edge conversion table _E12ind in bipgraph.h
+  - Added "logdomain" property to BP, a boolean that controls whether 
+    calculations are done in the log-domain or in the linear domain;
+    doing calculations in the log-domain may help if the numerical range
+    of a double is too small.
+* Contributions by Christian Wojek:
   - New FactorGraph constructor that constructs from given ranges of factors
     and variables
-  - Optimization of FactorGraph constructors
-* FactorGraph constructors no longer check for short loops and for
-  negative entries. Also, the normtype is now Prob::NORMPROB by default.
+  - Optimization of FactorGraph constructors using tr1::unordered_map.
+* FactorGraph constructors no longer check for short loops (huge speed
+  increase for large factor graphs), nor for negative entries. Also, the 
+  normtype is now Prob::NORMPROB by default.
+* Small optimization in Diffs
+* Interface changes:
+  - VarSet::
+    stateSpace() -> VarSet::states()
+  - FactorGraph::
+    delta(const Var &) -> delta(size_t)
+    Delta(const Var &) -> Delta(size_t)
+    makeCavity(const Var &) -> makeCavity(size_t)
+    removed MakeFactorCavity(size_t)
+    removed ExactMarginal(const VarSet &)
+    removed ExactlogZ()
+    moved isConnected() to BipartiteGraph
+    vars() -> vars
+    factors() -> factors
+  - RegionGraph::
+    nr_ORs() -> nrORs()
+    nr_IRs() -> nrIRs()
+    ORs() -> ORs
+    IRs() -> IRs
+  - *::Regenerate() -> *::create()
+  - Renamed Index -> IndexFor
 
 
 libDAI-0.2.1 (2008-05-26)
