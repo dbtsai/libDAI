@@ -32,44 +32,51 @@
 namespace dai {
 
 
-/// A BipartiteGraph represents a bipartite graph, with two types of nodes (both are numbered
-/// as 0,1,2,...), with edges only between nodes of different type. The edges are stored as 
-/// lists of adjacent nodes for each node.
+/// A BipartiteGraph represents the neighborhood structure of nodes in a bipartite graph.
+/** A bipartite graph has two types of nodes: type 1 and type 2. Edges can occur only between
+ *  nodes of different type. Nodes are indexed by an unsigned integer, edges are indexed as
+ *  a pair of unsigned integers (where the pair (a,b) means the b'th neighbor of the a'th node).
+ *  The BipartiteGraph stores neighborhood structures as vectors of vectors of Neighbor entries.
+ */
 class BipartiteGraph {
     public:
         /// A Neighbor describes a neighboring node of some other node.
-        /** Iterating over all neighbors of some node i can be done in the following way:
+        /** Iterating over all neighbors of node n1 of type 1 can be done in the following way:
          *  \code
-         *      foreach( const BipartiteGraph::Neighbor &I, nb1(i) ) {
-         *          size_t _I = I.iter;
-         *          size_t _i = I.dual;
-         *          // I == I.node;
-         *          // The _I'th neighbor of i is I, and the _i'th neighbor of I is i:
-         *          // nb1(i)[_I] == I, nb2(I)[_i] == i
+         *      foreach( const BipartiteGraph::Neighbor &n2, nb1(n1) ) {
+         *          size_t _n2 = n2.iter;
+         *          size_t _n1 = n2.dual;
+         *          // n2 == n2.node;
+         *          // The _n2'th neighbor of n1 is n2, and the _n1'th neighbor of n2 is n1:
+         *          // nb1(n1)[_n2] == n2, nb2(n2)[_n1] == n1 
          *      }
          *  \endcode
          */
         struct Neighbor {
-            /// iter corresponds to the index of this Neighbor entry in the list of neighbors
+            /// Corresponds to the index of this Neighbor entry in the vector of neighbors
             unsigned iter;
-            /// node contains the number of the neighboring node
+            /// Contains the number of the neighboring node
             unsigned node;
-            /// dual contains the "dual" iter
+            /// Contains the "dual" iter
             unsigned dual;
-            /// cast to unsigned returns node
-            operator unsigned () const { return node; };
+            /// Cast to unsigned returns node
+            operator unsigned () const { return node; }
+            /// Default constructor
+            Neighbor() {}
+            /// Constructor
+            Neighbor( size_t iter, size_t node, size_t dual ) : iter(iter), node(node), dual(dual) {}
         };
 
-        /// Neighbors is a vector of Neigbor entries
+        /// Neighbors is a vector of Neighbor entries; each node has an associated Neighbors variable, which describes its neighbors.
         typedef std::vector<Neighbor> Neighbors;
 
-        /// Edge is used as index of an edge
+        /// Edge is used as index of an edge: an Edge(a,b) corresponds to the edge between the a'th node and its b'th neighbor.
         typedef std::pair<size_t,size_t> Edge;
 
     private:
-        /// _nb1 contains for each node of the first kind a list of its neighbors
+        /// _nb1 contains for each node of type 1 a vector of its neighbors
         std::vector<Neighbors> _nb1;
-        /// _nb2 contains for each node of the second kind a list of its neighbors
+        /// _nb2 contains for each node of type 2 a vector of its neighbors
         std::vector<Neighbors> _nb2;
 
         /// Used internally by isTree()
@@ -94,47 +101,45 @@ class BipartiteGraph {
             return *this;
         }
 
-        /// Create bipartite graph from a range of edges, encoded as pairs of node numbers
-        /// (more precisely, a std::pair<unsigned, unsigned> where the first integer corresponds
-        /// to the node of the first type, and the second integer corresponds to the node of the
-        /// second type). nr1 is the number of nodes of the first type, nr2 the number of nodes
-        /// of the second type. The values between the iterators begin and end should be of type Edge.
+        /// Create bipartite graph from a range of edges. 
+        /** nr1 is the number of nodes of type 1, nr2 the number of nodes of type 2. 
+         *  The value_type of an EdgeInputIterator should be Edge.
+         */
         template<typename EdgeInputIterator>
         void create( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end );
 
-        /// Construct bipartite graph from a range of edges, encoded as pairs of node numbers
-        /// (more precisely, a std::pair<unsigned, unsigned> where the first integer corresponds
-        /// to the node of the first type, and the second integer corresponds to the node of the
-        /// second type). nr1 is the number of nodes of the first type, nr2 the number of nodes
-        /// of the second type. The values between the iterators begin and end should be of type Edge.
+        /// Construct bipartite graph from a range of edges. 
+        /** nr1 is the number of nodes of type 1, nr2 the number of nodes of type 2. 
+         *  The value_type of an EdgeInputIterator should be Edge.
+         */
         template<typename EdgeInputIterator>
         BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ) {
             create( nr1, nr2, begin, end );
         }
 
-        /// Returns constant reference to the _i2'th neighbor of node i1 of first type
+        /// Returns constant reference to the _i2'th neighbor of node i1 of type 1
         const Neighbor & nb1( size_t i1, size_t _i2 ) const { return _nb1[i1][_i2]; }
-        /// Returns reference to the _i2'th neighbor of node i1 of first type
+        /// Returns reference to the _i2'th neighbor of node i1 of type 1
         Neighbor & nb1( size_t i1, size_t _i2 ) { return _nb1[i1][_i2]; }
 
-        /// Returns constant reference to the _i1'th neighbor of node i2 of second type
+        /// Returns constant reference to the _i1'th neighbor of node i2 of type 2
         const Neighbor & nb2( size_t i2, size_t _i1 ) const { return _nb2[i2][_i1]; }
-        /// Returns reference to the _i1'th neighbor of node i2 of second type
+        /// Returns reference to the _i1'th neighbor of node i2 of type 2
         Neighbor & nb2( size_t i2, size_t _i1 ) { return _nb2[i2][_i1]; }
 
-        /// Returns constant reference to all neighbors of node of first type
+        /// Returns constant reference to all neighbors of node i1 of type 1
         const Neighbors & nb1( size_t i1 ) const { return _nb1[i1]; }
-        /// Returns reference to all neighbors of node of first type
+        /// Returns reference to all neighbors of node of i1 type 1
         Neighbors & nb1( size_t i1 ) { return _nb1[i1]; }
 
-        /// Returns constant reference to all neighbors of node of second type
+        /// Returns constant reference to all neighbors of node i2 of type 2
         const Neighbors & nb2( size_t i2 ) const { return _nb2[i2]; }
-        /// Returns reference to all neighbors of node of second type
+        /// Returns reference to all neighbors of node i2 of type 2
         Neighbors & nb2( size_t i2 ) { return _nb2[i2]; }
 
-        /// Returns number of nodes of first type
+        /// Returns number of nodes of type 1
         size_t nr1() const { return _nb1.size(); }
-        /// Returns number of nodes of second type
+        /// Returns number of nodes of type 2
         size_t nr2() const { return _nb2.size(); }
         
         /// Calculates the number of edges
@@ -145,19 +150,21 @@ class BipartiteGraph {
             return sum;
         }
         
-        /// Add node of first type without neighbors.
+        /// Add node of type 1 without neighbors.
         void add1() {
             _nb1.push_back( Neighbors() );
         }
         
-        /// Add node of first type without neighbors.
+        /// Add node of type 2 without neighbors.
         void add2() {
             _nb2.push_back( Neighbors() );
         }
 
-        /// Add node of first type with neighbors specified by a range.
-        /// For improved efficiency, the size of the range may be specified by sizeHint.
-        /// *NodeInputIterator should be a size_t.
+        /// Add node of type 1 with neighbors specified by a range.
+        /** The value_type of an NodeInputIterator should be a size_t, corresponding to
+         *  the indices of nodes of type 2 that should become neighbors of the added node.
+         *  For improved efficiency, the size of the range may be specified by sizeHint.
+         */
         template <typename NodeInputIterator>
         void add1( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
             Neighbors nbs1new;
@@ -165,26 +172,19 @@ class BipartiteGraph {
             size_t iter = 0;
             for( NodeInputIterator it = begin; it != end; ++it ) {
                 assert( *it < nr2() );
-
-                Neighbor nb1new;
-                nb1new.node = *it;
-                nb1new.iter = iter;
-                nb1new.dual = nb2(*it).size();
-
-                Neighbor nb2new;
-                nb2new.node = nr1();
-                nb2new.iter = nb2(*it).size();
-                nb2new.dual = iter++;
-
+                Neighbor nb1new( iter, *it, nb2(*it).size() );
+                Neighbor nb2new( nb2(*it).size(), nr1(), iter++ );
                 nbs1new.push_back( nb1new );
                 nb2( *it ).push_back( nb2new );
             }
             _nb1.push_back( nbs1new );
         }
 
-        /// Add node of second type with neighbors specified by a range.
-        /// For improved efficiency, the size of the range may be specified by sizeHint.
-        /// *NodeInputIterator should be a size_t.
+        /// Add node of type 2 with neighbors specified by a range.
+        /** The value_type of an NodeInputIterator should be a size_t, corresponding to
+         *  the indices of nodes of type 1 that should become neighbors of the added node.
+         *  For improved efficiency, the size of the range may be specified by sizeHint.
+         */
         template <typename NodeInputIterator>
         void add2( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
             Neighbors nbs2new;
@@ -192,36 +192,27 @@ class BipartiteGraph {
             size_t iter = 0;
             for( NodeInputIterator it = begin; it != end; ++it ) {
                 assert( *it < nr1() );
-
-                Neighbor nb2new;
-                nb2new.node = *it;
-                nb2new.iter = iter;
-                nb2new.dual = nb1(*it).size();
-
-                Neighbor nb1new;
-                nb1new.node = nr2();
-                nb1new.iter = nb1(*it).size();
-                nb1new.dual = iter++;
-
+                Neighbor nb2new( iter, *it, nb1(*it).size() );
+                Neighbor nb1new( nb1(*it).size(), nr2(), iter++ );
                 nbs2new.push_back( nb2new );
                 nb1( *it ).push_back( nb1new );
             }
             _nb2.push_back( nbs2new );
         }
 
-        /// Remove node of first type
+        /// Remove node of type 1 and all incident edges.
         void erase1( size_t n1 ) {
             assert( n1 < nr1() );
             // Erase neighbor entry of node n1
             _nb1.erase( _nb1.begin() + n1 );
-            // Adjust neighbor entries of nodes of second type
+            // Adjust neighbor entries of nodes of type 2
             for( size_t n2 = 0; n2 < nr2(); n2++ )
                 for( size_t iter = 0; iter < nb2(n2).size(); ) {
                     if( nb2(n2, iter).node == n1 ) {
                         // delete this entry, because it points to the deleted node
                         nb2(n2).erase( nb2(n2).begin() + iter );
                         // adjust all subsequent entries:
-                        // update their iter and the corresponding dual of the neighboring node of the first kind
+                        // update their iter and the corresponding dual of the neighboring node of type 1
                         for( size_t newiter = iter; newiter < nb2(n2).size(); newiter++ ) {
                             nb2( n2, newiter ).iter = newiter;
                             nb1( nb2(n2, newiter).node, nb2(n2, newiter).dual ).dual = newiter;
@@ -234,19 +225,19 @@ class BipartiteGraph {
                 }
         }
 
-        /// Remove node of second type
+        /// Remove node of type 2 and all incident edges.
         void erase2( size_t n2 ) {
             assert( n2 < nr2() );
             // Erase neighbor entry of node n2
             _nb2.erase( _nb2.begin() + n2 );
-            // Adjust neighbor entries of nodes of first type
+            // Adjust neighbor entries of nodes of type 1
             for( size_t n1 = 0; n1 < nr1(); n1++ )
                 for( size_t iter = 0; iter < nb1(n1).size(); ) {
                     if( nb1(n1, iter).node == n2 ) {
                         // delete this entry, because it points to the deleted node
                         nb1(n1).erase( nb1(n1).begin() + iter );
                         // adjust all subsequent entries:
-                        // update their iter and the corresponding dual of the neighboring node of the first kind
+                        // update their iter and the corresponding dual of the neighboring node of type 2
                         for( size_t newiter = iter; newiter < nb1(n1).size(); newiter++ ) {
                             nb1( n1, newiter ).iter = newiter;
                             nb2( nb1(n1, newiter).node, nb1(n1, newiter).dual ).dual = newiter;
@@ -259,8 +250,9 @@ class BipartiteGraph {
                 }
         }
 
-        /// Calculate neighbors of neighbors of node n1 of first type.
-        /// If include == true, include n1 itself, otherwise exclude n1.
+        /// Calculate second-order neighbors (i.e., neighbors of neighbors) of node n1 of type 1.
+        /** If include == true, include n1 itself, otherwise exclude n1.
+         */
         std::vector<size_t> delta1( size_t n1, bool include = false ) const {
             std::vector<size_t> result;
             foreach( const Neighbor &n2, nb1(n1) )
@@ -273,8 +265,9 @@ class BipartiteGraph {
             return result;
         }
 
-        /// Calculate neighbors of neighbors of node n2 of second type
-        /// If include == true, include n2 itself, otherwise exclude n2.
+        /// Calculate second-order neighbors (i.e., neighbors of neighbors) of node n2 of type 2.
+        /** If include == true, include n2 itself, otherwise exclude n2.
+         */
         std::vector<size_t> delta2( size_t n2, bool include = false ) const {
             std::vector<size_t> result;
             foreach( const Neighbor &n1, nb2(n2) )
@@ -300,7 +293,7 @@ class BipartiteGraph {
                 do {
                     found_new_nodes = false;
 
-                    // For all nodes of second type, check if they are connected with the (growing) component
+                    // For all nodes of type 2, check if they are connected with the (growing) component
                     for( size_t n2 = 0; n2 < nr2(); n2++ )
                         if( !incomponent2[n2] ) {
                             foreach( const Neighbor &n1, nb2(n2) ) {
@@ -312,7 +305,7 @@ class BipartiteGraph {
                             }
                         }
 
-                    // For all nodes of first type, check if they are connected with the (growing) component
+                    // For all nodes of type 1, check if they are connected with the (growing) component
                     for( size_t n1 = 0; n1 < nr1(); n1++ )
                         if( !incomponent1[n1] ) {
                             foreach( const Neighbor &n2, nb1(n1) ) {
@@ -339,8 +332,9 @@ class BipartiteGraph {
         }
 
         /// Returns true if the graph is a tree, i.e., if it is singly connected and connected.
-        /// This is equivalent to whether for each pair of vertices in the graph, there exists
-        /// a unique path in the graph that starts at the first and ends at the second vertex.
+        /** This is equivalent to whether for each pair of vertices in the graph, there exists
+         *  a unique path in the graph that starts at the first and ends at the second vertex.
+         */
         bool isTree() const {
             using namespace std;
             vector<levelType> levels;
@@ -395,7 +389,7 @@ class BipartiteGraph {
                             }
                             if( foundCycle )
                                 break;
-                        }
+                        } 
                     }
                     levels.push_back( newLevel );
                     nr_1 += newLevel.ind1.size();
@@ -435,16 +429,8 @@ void BipartiteGraph::create( size_t nr1, size_t nr2, EdgeInputIterator begin, Ed
 
     for( EdgeInputIterator e = begin; e != end; e++ ) {
         // Each edge yields a neighbor pair
-        Neighbor nb_1;
-        nb_1.iter = _nb1[e->first].size();
-        nb_1.node = e->second;
-        nb_1.dual = _nb2[e->second].size();
-
-        Neighbor nb_2;
-        nb_2.iter = nb_1.dual;
-        nb_2.node = e->first;
-        nb_2.dual = nb_1.iter;
-
+        Neighbor nb_1( _nb1[e->first].size(), e->second, _nb2[e->second].size() );
+        Neighbor nb_2( nb_1.dual, e->first, nb_1.iter );
         _nb1[e->first].push_back( nb_1 );
         _nb2[e->second].push_back( nb_2 );
     }
