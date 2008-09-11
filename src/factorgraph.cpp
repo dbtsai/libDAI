@@ -68,7 +68,6 @@ void FactorGraph::createGraph( size_t nrEdges ) {
         hashmap[var(i).label()] = i;
     
     // create edge list
-    typedef pair<unsigned,unsigned> Edge;
     vector<Edge> edges;
     edges.reserve( nrEdges );
     for( size_t i2 = 0; i2 < nrFactors(); i2++ ) {

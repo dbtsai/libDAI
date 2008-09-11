@@ -78,6 +78,13 @@ class VarSet : private std::set<Var> {
             calcStateSpace();
         }
 
+        /// Construct from a vector<Var>
+        VarSet( const std::vector<Var> &ns ) {
+            for( std::vector<Var>::const_iterator n = ns.begin(); n != ns.end(); n++ )
+                insert( *n );
+            calcStateSpace();
+        }
+
         /// Copy constructor
         VarSet( const VarSet &x ) : std::set<Var>( x ), _statespace( x._statespace ) {}
 

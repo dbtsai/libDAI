@@ -27,6 +27,12 @@
 #include <map>
 #include <iostream>
 #include <set>
+#include <cassert>
+#include <limits>
+
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/prim_minimum_spanning_tree.hpp>
+
 
 
 namespace dai {
@@ -92,71 +98,87 @@ template<class T> class WeightedGraph : public std::map<UEdge, T> {};
 typedef std::set<UEdge>     Graph;
 
 
-/// Use Prim's algorithm to construct a maximal spanning tree from the weighted graph Graph
-template<typename T> DEdgeVec MaxSpanningTreePrim( const WeightedGraph<T> & Graph ) {
-    const long verbose = 0;
-
+/// Use Prim's algorithm to construct a minimal spanning tree from the weighted graph Graph
+/// The weights should be positive. Use implementation in Boost Graph Library.
+template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> & Graph ) {
     DEdgeVec result;
-    if( Graph.size() == 0 )
-        return result;
-    else {
-        // Make a copy
-        WeightedGraph<T> Gr = Graph;
+    if( Graph.size() > 0 ) {
+        using namespace boost;
+        using namespace std;
+        typedef adjacency_list< vecS, vecS, undirectedS, property<vertex_distance_t, int>, property<edge_weight_t, double> > boostGraph;
+        typedef pair<size_t, size_t> E;
 
-        // Nodes in the tree
-        std::set<size_t> treeV;
-
-        // Start with one node
-        treeV.insert( Gr.begin()->first.n1 );
-        
-        // Perform Prim's algorithm
-        while( Gr.size() ) {
-            typename WeightedGraph<T>::iterator largest = Gr.end();
-            
-            for( typename WeightedGraph<T>::iterator e = Gr.begin(); e != Gr.end(); ) {
-                if( verbose >= 1 )
-                    std::cout << "considering edge " << e->first << "...";
-                bool e1_in_treeV = treeV.count( e->first.n1 );
-                bool e2_in_treeV = treeV.count( e->first.n2 );
-                if( e1_in_treeV && e2_in_treeV ) {
-                    if( verbose >= 1 )
-                        std::cout << "red";
-                    Gr.erase( e++ );    // Nice trick! 
-                } else if( e1_in_treeV || e2_in_treeV ) {
-                    if( verbose >= 1 )
-                        std::cout << e->second;
-                    if( (largest == Gr.end()) || (e->second > largest->second) ) {
-                        largest = e;    // largest edge connected to the tree (until now)
-                        if( verbose >= 1 )
-                            std::cout << " and largest!";
-                    } 
-                    e++;
-                } else {
-                    if( verbose >= 1 )
-                        std::cout << "out of reach";
-                    e++;
-                }
-                if( verbose >= 1 )
-                    std::cout << std::endl;
-            }
-
-            if( largest != Gr.end() ) {
-                if( verbose >= 1 )
-                    std::cout << "largest = " << largest->first << std::endl;
-                // Add directed edge, pointing away from the root
-                if( treeV.count( largest->first.n1 ) ) {
-                    result.push_back( DEdge( largest->first.n1, largest->first.n2 ) );
-                    treeV.insert( largest->first.n2 );
-                } else {
-                    result.push_back( DEdge( largest->first.n2, largest->first.n1 ) );
-                    treeV.insert( largest->first.n1 );
-                }
-                Gr.erase( largest );
-            }
+        set<size_t> nodes;
+        vector<E> edges;
+        vector<double> weights;
+        edges.reserve( Graph.size() );
+        weights.reserve( Graph.size() );
+        for( typename WeightedGraph<T>::const_iterator e = Graph.begin(); e != Graph.end(); e++ ) {
+            weights.push_back( e->second );
+            edges.push_back( E( e->first.n1, e->first.n2 ) );
+            nodes.insert( e->first.n1 );
+            nodes.insert( e->first.n2 );
         }
 
-        return result;
+        boostGraph g( edges.begin(), edges.end(), weights.begin(), nodes.size() );
+        vector< graph_traits< boostGraph >::vertex_descriptor > p( num_vertices(g) );
+        prim_minimum_spanning_tree( g, &(p[0]) );
+
+        // Store tree edges in result
+        result.reserve( nodes.size() - 1 );
+        size_t root = 0;
+        for( size_t i = 0; i != p.size(); i++ )
+            if( p[i] != i )
+                result.push_back( DEdge( p[i], i ) );
+            else
+                root = i;
+
+        // We have to store the minimum spanning tree in the right
+        // order, such that for all (i1, j1), (i2, j2) in result,
+        // if j1 == i2 then (i1, j1) comes before (i2, j2) in result.
+        // We do this by reordering the contents of result, effectively
+        // growing the tree starting at the root. At each step, 
+        // result[0..N-1] are the edges already added to the tree,
+        // whereas the other elements of result still have to be added.
+        // The elements of nodes are the vertices that still have to
+        // be added to the tree.
+
+        // Start with the root
+        nodes.erase( root );
+        size_t N = 0;
+
+        // Iteratively add edges and nodes to the growing tree
+        while( N != result.size() ) {
+            for( size_t e = N; e != result.size(); e++ ) {
+                bool e1_in_tree = !nodes.count( result[e].n1 );
+                if( e1_in_tree ) {
+                    nodes.erase( result[e].n2 );
+                    swap( result[N], result[e] );
+                    N++;
+                    break;
+                }
+            }
+        }
     }
+
+    return result;
+}
+
+
+/// Use Prim's algorithm to construct a maximal spanning tree from the weighted graph Graph
+/// The weights should be positive. Use implementation in Boost Graph Library.
+template<typename T> DEdgeVec MaxSpanningTreePrims( const WeightedGraph<T> & Graph ) {
+    T maxweight = Graph.begin()->second;
+    for( typename WeightedGraph<T>::const_iterator it = Graph.begin(); it != Graph.end(); it++ )
+        if( it->second > maxweight )
+            maxweight = it->second;
+    // make a copy of the graph
+    WeightedGraph<T> gr( Graph );
+    // invoke MinSpanningTreePrims with negative weights
+    // (which have to be shifted to satisfy positivity criterion)
+    for( typename WeightedGraph<T>::iterator it = gr.begin(); it != gr.end(); it++ )
+        it->second = maxweight - it->second;
+    return MinSpanningTreePrims( gr );
 }
 
 
@@ -165,6 +187,87 @@ DEdgeVec GrowRootedTree( const Graph & T, size_t Root );
 
 
 UEdgeVec RandomDRegularGraph( size_t N, size_t d );
+
+
+/// Use Dijkstra's algorithm to solve the shortest path problem for the weighted graph Graph and source vertex index s
+template<typename T>
+std::map<size_t,size_t> DijkstraShortestPaths( const WeightedGraph<T> & Graph, size_t s ) {
+/*
+ * from wikipedia 
+ *
+In the following algorithm, u := Extract_Min(Q) searches for the vertex u in the vertex set Q that has the least d[u] value. That vertex is removed from the set Q and returned to the user.
+
+  function Dijkstra(G, w, s)
+     for each vertex v in V[G]                        // Initializations
+           d[v] := infinity                                 // Unknown distance function from s to v
+           previous[v] := undefined
+     d[s] := 0                                        // Distance from s to s
+     S := empty set                                   // Set of all visited vertices
+     Q := V[G]                                        // Set of all unvisited vertices
+     while Q is not an empty set                      // The algorithm itself
+           u := Extract_Min(Q)                        // Remove best vertex from priority queue
+           S := S union {u}                           // Mark it 'visited'
+           for each edge (u,v) outgoing from u
+                  if d[u] + w(u,v) < d[v]             // Relax (u,v)
+                        d[v] := d[u] + w(u,v) 
+                        previous[v] := u
+
+To find the shortest path from s to t:
+
+u := t
+while defined previous[u]
+      insert u to the beginning of S
+      u := previous[u]
+	
+*/
+
+    // Calculate set of nodes in G
+    std::set<size_t> nodes;
+    for( typename WeightedGraph<T>::const_iterator e = Graph.begin(); e != Graph.end(); e++ ) {
+        nodes.insert( e->n1.n1 );
+        nodes.insert( e->n1.n2 );
+    }
+    if( !nodes.count( s ) )
+        return std::map<size_t, size_t>();
+
+    std::map<size_t, double> d;
+    std::map<size_t, size_t> previous;
+    for( std::set<size_t>::const_iterator n = nodes.begin(); n != nodes.end(); n++ )
+        d[*n] = std::numeric_limits<double>::infinity();
+
+    d[s] = 0;
+    std::set<size_t> S;
+    std::set<size_t> Q = nodes;
+
+    while( Q.size() ) {
+        double least = d[*Q.begin()];
+        std::set<size_t>::iterator u_least = Q.begin();
+        for( std::set<size_t>::iterator _u = Q.begin(); _u != Q.end(); _u++ )
+            if( d[*_u] < least ) {
+                u_least = _u;
+                least = d[*_u];
+            }
+        size_t u = *u_least;
+        Q.erase( u_least );
+            
+        S.insert( u );
+        for( typename WeightedGraph<T>::const_iterator e = Graph.begin(); e != Graph.end(); e++ ) {
+            size_t v;
+            if( e->n1.n1 == u )
+                v = e->n1.n2;
+            else if( e->n1.n2 == u )
+                v = e->n1.n1;
+            else
+                continue;
+            if( d[u] + e->n2 < d[v] ) {
+                d[v] = d[u] + e->n2;
+                previous[v] = u;
+            }
+        }
+    }
+
+    return previous;
+}
 
 
 } // end of namespace dai

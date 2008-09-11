@@ -49,11 +49,13 @@ JTree::JTree( const FactorGraph &fg, const Properties &opts, bool automatic ) : 
     assert( checkProperties() );
 
     if( automatic ) {
-        ClusterGraph _cg;
-
-        // Copy factors
+        // Copy VarSets of factors
+        vector<VarSet> cl;
+        cl.reserve( fg.nrFactors() );
         for( size_t I = 0; I < nrFactors(); I++ )
-            _cg.insert( factor(I).vars() );
+            cl.push_back( factor(I).vars() );
+        ClusterGraph _cg( cl );
+
         if( Verbose() >= 3 )
             cout << "Initial clusters: " << _cg << endl;
 
@@ -63,15 +65,8 @@ JTree::JTree( const FactorGraph &fg, const Properties &opts, bool automatic ) : 
             cout << "Maximal clusters: " << _cg << endl;
 
         vector<VarSet> ElimVec = _cg.VarElim_MinFill().eraseNonMaximal().toVector();
-        if( Verbose() >= 3 ) {
-            cout << "VarElim_MinFill result: {" << endl;
-            for( size_t i = 0; i < ElimVec.size(); i++ ) {
-                if( i != 0 )
-                    cout << ", ";
-                cout << ElimVec[i];
-            }
-            cout << "}" << endl;
-        }
+        if( Verbose() >= 3 )
+            cout << "VarElim_MinFill result: " << ElimVec << endl;
 
         GenerateJT( ElimVec );
     }
@@ -90,7 +85,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
         }
     
     // Construct maximal spanning tree using Prim's algorithm
-    _RTree = MaxSpanningTreePrim( JuncGraph );
+    _RTree = MaxSpanningTreePrims( JuncGraph );
 
     // Construct corresponding region graph
 
@@ -115,7 +110,6 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
 
     // Create inner regions and edges
     IRs.reserve( _RTree.size() );
-    typedef pair<size_t,size_t> Edge;
     vector<Edge> edges;
     edges.reserve( 2 * _RTree.size() );
     for( size_t i = 0; i < _RTree.size(); i++ ) {

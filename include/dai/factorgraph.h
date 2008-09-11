@@ -44,6 +44,7 @@ class FactorGraph {
         std::vector<Factor>    factors;
         typedef BipartiteGraph::Neighbor  Neighbor;
         typedef BipartiteGraph::Neighbors Neighbors;
+        typedef BipartiteGraph::Edge      Edge;
 
     protected:
         std::map<size_t,Prob>  _undoProbs;

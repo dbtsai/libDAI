@@ -217,10 +217,10 @@ TreeEP::TreeEP( const FactorGraph &fg, const Properties &opts ) : JTree(fg, opts
             }
 
             // find maximal spanning tree
-            ConstructRG( MaxSpanningTreePrim( wg ) );
+            ConstructRG( MaxSpanningTreePrims( wg ) );
 
 //            cout << "Constructing maximum spanning tree..." << endl;
-//            DEdgeVec MST = MaxSpanningTreePrim( wg );
+//            DEdgeVec MST = MaxSpanningTreePrims( wg );
 //            cout << "Maximum spanning tree:" << endl;
 //            for( DEdgeVec::const_iterator e = MST.begin(); e != MST.end(); e++ )
 //                cout << *e << endl; 
@@ -245,7 +245,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const Properties &opts ) : JTree(fg, opts
             }
 
             // find maximal spanning tree
-            ConstructRG( MaxSpanningTreePrim( wg ) );
+            ConstructRG( MaxSpanningTreePrims( wg ) );
         } else {
             assert( 0 == 1 );
         }
@@ -269,7 +269,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
         }
     
     // Construct maximal spanning tree using Prim's algorithm
-    _RTree = MaxSpanningTreePrim( JuncGraph );
+    _RTree = MaxSpanningTreePrims( JuncGraph );
 
     // Construct corresponding region graph
 
@@ -297,7 +297,6 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
 
     // Create inner regions and edges
     IRs.reserve( _RTree.size() );
-    typedef pair<size_t,size_t> Edge;
     vector<Edge> edges;
     edges.reserve( 2 * _RTree.size() );
     for( size_t i = 0; i < _RTree.size(); i++ ) {

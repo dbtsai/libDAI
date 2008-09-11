@@ -286,7 +286,6 @@ double LC::run() {
     }
 
     size_t nredges = nrEdges();
-    typedef pair<size_t,size_t> Edge;
     vector<Edge> update_seq;
     update_seq.reserve( nredges );
     for( size_t i = 0; i < nrVars(); ++i )

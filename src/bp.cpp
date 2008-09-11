@@ -191,7 +191,6 @@ double BP::run() {
     double tic = toc();
     Diffs diffs(nrVars(), 1.0);
     
-    typedef pair<size_t,size_t> Edge;
     vector<Edge> update_seq;
 
     vector<Factor> old_beliefs;

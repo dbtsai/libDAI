@@ -71,8 +71,8 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
     
     // Create outer regions, giving them counting number 1.0
     ORs.reserve( cg.size() );
-    for( ClusterGraph::const_iterator alpha = cg.begin(); alpha != cg.end(); alpha++ )
-        ORs.push_back( FRegion(Factor(*alpha, 1.0), 1.0) );
+    foreach( const VarSet &ns, cg.clusters )
+        ORs.push_back( FRegion(Factor(ns, 1.0), 1.0) );
 
     // For each factor, find an outer regions that subsumes that factor.
     // Then, multiply the outer region with that factor.
@@ -91,9 +91,9 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
     
     // Create inner regions - first pass
     set<VarSet> betas;
-    for( ClusterGraph::const_iterator alpha = cg.begin(); alpha != cg.end(); alpha++ )
-        for( ClusterGraph::const_iterator alpha2 = alpha; (++alpha2) != cg.end(); ) {
-            VarSet intersect = (*alpha) & (*alpha2);
+    for( size_t alpha = 0; alpha < cg.clusters.size(); alpha++ )
+        for( size_t alpha2 = alpha; (++alpha2) != cg.clusters.size(); ) {
+            VarSet intersect = cg.clusters[alpha] & cg.clusters[alpha2];
             if( intersect.size() > 0 )
                 betas.insert( intersect );
         }
