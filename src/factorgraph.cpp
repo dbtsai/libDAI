@@ -171,7 +171,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             // add the Factor
             VarSet I_vars;
             for( size_t mi = 0; mi < nr_members; mi++ )
-                I_vars.insert( Var(labels[mi], dims[mi]) );
+                I_vars |= Var(labels[mi], dims[mi]);
             factors.push_back(Factor(I_vars,0.0));
             
             // calculate permutation sigma (internally, members are sorted)
@@ -394,7 +394,7 @@ void FactorGraph::clamp( const Var & n, size_t i ) {
 
     // For all factors that contain n
     for( size_t I = 0; I < nrFactors(); I++ ) 
-        if( factor(I).vars() && n )
+        if( factor(I).vars().contains( n ) )
             // Multiply it with a delta function
             factor(I) *= delta_n_i;
 
@@ -423,14 +423,14 @@ void FactorGraph::saveProbs( const VarSet &ns ) {
     if( !_undoProbs.empty() )
         cout << "FactorGraph::saveProbs:  WARNING: _undoProbs not empy!" << endl;
     for( size_t I = 0; I < nrFactors(); I++ )
-        if( factor(I).vars() && ns )
+        if( factor(I).vars().intersects( ns ) )
             _undoProbs[I] = factor(I).p();
 }
 
 
 void FactorGraph::undoProbs( const VarSet &ns ) {
     for( map<size_t,Prob>::iterator uI = _undoProbs.begin(); uI != _undoProbs.end(); ) {
-        if( factor((*uI).first).vars() && ns ) {
+        if( factor((*uI).first).vars().intersects( ns ) ) {
 //          cout << "undoing " << factor((*uI).first).vars() << endl;
 //          cout << "from " << factor((*uI).first).p() << " to " << (*uI).second << endl;
             factor((*uI).first).p() = (*uI).second;

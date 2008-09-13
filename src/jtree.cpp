@@ -338,7 +338,7 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
         // find first occurence of *n in the tree, which is closest to the root
         size_t e = 0;
         for( ; e != newTree.size(); e++ ) {
-            if( OR(newTree[e].n2).vars() && *n )
+            if( OR(newTree[e].n2).vars().contains( *n ) )
                 break;
         }
         assert( e != newTree.size() );

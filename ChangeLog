@@ -2,12 +2,12 @@ libDAI-0.2.2 (2008-??-??)
 -------------------------
 
 * Pervasive change of BipartiteGraph implementation (based on an idea by
-  Giuseppe Passino). BipartiteGraph no longer stores the node properties (former
-  _V1 and _V2), nor does it store a dense adjacency matrix anymore, nor an edge
-  list. Instead, it stores the graph structure as lists of neighboring nodes.
-  This yields a significant memory/speed improvement for large factor graphs, and
-  is more elegant as well. Iterating over neighbors is made easy by using
-  boost::foreach.
+  Giuseppe Passino). BipartiteGraph no longer stores the node properties 
+  (former _V1 and _V2), nor does it store a dense adjacency matrix anymore, 
+  nor an edge list. Instead, it stores the graph structure as lists of 
+  neighboring nodes. This yields a significant memory/speed improvement for 
+  large factor graphs, and is more elegant as well. Iterating over neighbors is
+  made easy by using boost::foreach.
 * Improved index.h (merged from SVN head):
   - Renamed Index -> IndexFor
   - Added some .reserve()'s to IndexFor methods which yields a 
@@ -42,9 +42,17 @@ libDAI-0.2.2 (2008-??-??)
 * FactorGraph constructors no longer check for short loops (huge speed
   increase for large factor graphs), nor for negative entries. Also, the 
   normtype is now Prob::NORMPROB by default.
+* VarSet is now implemented using a std::vector<Var> instead of a
+  std::set<Var>, which yields a significant speed improvement.
 * Small optimization in Diffs
 * Interface changes:
-  - VarSet::stateSpace() -> VarSet::states()
+  - VarSet::
+      stateSpace() -> states()
+      VarSet( const std::set<Var> ) -> VarSet( begin, end, sizeHint=0 )
+      VarSet( const std::vector<Var> ) -> VarSet( begin, end, sizeHint=0 )
+      removed bool operator||
+      operator&&(const VarSet&) -> intersects(const VarSet&)
+      operator&&(const Var&) -> contains(const Var&)
   - FactorGraph::
       delta(const Var &) -> delta(size_t)
       Delta(const Var &) -> Delta(size_t)
@@ -68,6 +76,7 @@ libDAI-0.2.2 (2008-??-??)
   - Prob::max() -> Prob::maxVal()
   - Factor::max() -> Factor::maxVal()
   - toc() in util.h now returns seconds as a double
+  - VarSet::operator&&
 * Added possibility to build for Windows in Makefile
 
 

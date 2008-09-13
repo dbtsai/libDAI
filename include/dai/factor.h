@@ -317,8 +317,8 @@ template<typename T> Complex KL_dist(const TFactor<T> & P, const TFactor<T> & Q)
 // calculate N(psi, i, j)
 template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const {
 #ifdef DAI_DEBUG
-    assert( _vs && i );
-    assert( _vs && j );
+    assert( _vs.contains( i ) );
+    assert( _vs.contains( j ) );
     assert( i != j );
 #endif
     VarSet ij = i | j;

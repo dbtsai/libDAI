@@ -156,11 +156,11 @@ string HAK::identify() const {
 
 void HAK::init( const VarSet &ns ) {
     for( vector<Factor>::iterator alpha = _Qa.begin(); alpha != _Qa.end(); alpha++ )
-        if( alpha->vars() && ns )
+        if( alpha->vars().intersects( ns ) )
             alpha->fill( 1.0 / alpha->states() );
 
     for( size_t beta = 0; beta < nrIRs(); beta++ )
-        if( IR(beta) && ns ) {
+        if( IR(beta).intersects( ns ) ) {
             _Qb[beta].fill( 1.0 );
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;

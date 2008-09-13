@@ -180,10 +180,10 @@ bool RegionGraph::Check_Counting_Numbers() {
     for( vector<Var>::const_iterator n = vars.begin(); n != vars.end(); n++ ) {
         double c_n = 0.0;
         for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-            if( OR(alpha).vars() && *n )
+            if( OR(alpha).vars().contains( *n ) )
                 c_n += OR(alpha).c();
         for( size_t beta = 0; beta < nrIRs(); beta++ )
-            if( IR(beta) && *n )
+            if( IR(beta).contains( *n ) )
                 c_n += IR(beta).c();
         if( fabs(c_n - 1.0) > 1e-15 ) {
             all_valid = false;
@@ -206,11 +206,11 @@ void RegionGraph::RecomputeORs() {
 
 void RegionGraph::RecomputeORs( const VarSet &ns ) {
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        if( OR(alpha).vars() && ns )
+        if( OR(alpha).vars().intersects( ns ) )
             OR(alpha).fill( 1.0 );
     for( size_t I = 0; I < nrFactors(); I++ )
         if( fac2OR[I] != -1U )
-            if( OR( fac2OR[I] ).vars() && ns )
+            if( OR( fac2OR[I] ).vars().intersects( ns ) )
                 OR( fac2OR[I] ) *= factor( I );
 }
 

@@ -190,7 +190,7 @@ Complex MF::logZ() const {
 
 void MF::init( const VarSet &ns ) {
     for( size_t i = 0; i < nrVars(); i++ ) {
-        if( ns && var(i) )
+        if( ns.contains(var(i) ) )
             _beliefs[i].fill( 1.0 );
     }
 }

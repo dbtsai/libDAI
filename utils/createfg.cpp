@@ -45,7 +45,7 @@ void MakeHOIFG( size_t N, size_t M, size_t k, double sigma, FactorGraph &fg ) {
 			do {
 				size_t newind = (size_t)(N * rnd_uniform());
 				Var newvar = Var(newind, 2);
-				if( !(vars && newvar) ) {
+				if( !(vars.contains( newvar )) ) {
 					vars |= newvar;
 					break;
 				}

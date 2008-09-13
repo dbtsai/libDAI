@@ -30,7 +30,11 @@
 namespace dai {
 
 
-/// Represents a discrete variable
+/// Represents a discrete variable.
+/*  It contains the label of the variable, an integer-valued
+ *  unique ID for that variable, and the number of possible 
+ *  values ("states") of the variable.
+ */
 class Var {
     private:
         /// Internal label of the variable
@@ -41,37 +45,37 @@ class Var {
         
     public:
         /// Default constructor
-        Var() : _label(-1), _states(0) {};
+        Var() : _label(-1), _states(0) {}
         /// Constructor
-        Var(long label, size_t states) : _label(label), _states(states) {};
+        Var( long label, size_t states ) : _label(label), _states(states) {}
 
-        /// Read access to label
-        long label() const { return _label; };
-        /// Access to label
-        long & label() { return _label; };
+        /// Gets the label
+        long label() const { return _label; }
+        /// Returns reference to label
+        long & label() { return _label; }
 
-        /// Read access to states
-        size_t states () const { return _states; };
-        /// Access to states
-        size_t& states () { return _states; };
+        /// Gets the number of states
+        size_t states () const { return _states; }
+        /// Returns reference to number of states
+        size_t& states () { return _states; }
 
         /// Smaller-than operator (compares labels)
-        bool operator <  (const Var& n) const { return( _label <  n._label ); };
+        bool operator < ( const Var& n ) const { return( _label <  n._label ); }
         /// Larger-than operator (compares labels)
-        bool operator >  (const Var& n) const { return( _label >  n._label ); };
+        bool operator > ( const Var& n ) const { return( _label >  n._label ); }
         /// Smaller-than-or-equal-to operator (compares labels)
-        bool operator <= (const Var& n) const { return( _label <= n._label ); };
+        bool operator <= ( const Var& n ) const { return( _label <= n._label ); }
         /// Larger-than-or-equal-to operator (compares labels)
-        bool operator >= (const Var& n) const { return( _label >= n._label ); };
+        bool operator >= ( const Var& n ) const { return( _label >= n._label ); }
         /// Not-equal-to operator (compares labels)
-        bool operator != (const Var& n) const { return( _label != n._label ); };
+        bool operator != ( const Var& n ) const { return( _label != n._label ); }
         /// Equal-to operator (compares labels)
-        bool operator == (const Var& n) const { return( _label == n._label ); };
+        bool operator == ( const Var& n ) const { return( _label == n._label ); }
 
-        /// Stream output operator
-        friend std::ostream& operator << (std::ostream& os, const Var& n) {
+        /// Write this Var to stream
+        friend std::ostream& operator << ( std::ostream& os, const Var& n ) {
             return( os << "[" << n.label() << "]" );
-        };
+        }
 };
 
 
