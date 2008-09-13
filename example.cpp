@@ -61,7 +61,7 @@ int main( int argc, char *argv[] ) {
             bp.init();
             bp.run();
 
-            cout << "Exact single node marginals:" << endl;
+            cout << "Approximate (loopy belief propagation) single node marginals:" << endl;
             for( size_t i = 0; i < fg.nrVars(); i++ )
                 cout << bp.belief(fg.var(i)) << endl;
         }

@@ -26,6 +26,7 @@
 #include <ostream>
 #include <vector>
 #include <cassert>
+#include <algorithm>
 #include <dai/util.h>
 
 
@@ -260,7 +261,7 @@ class BipartiteGraph {
                     if( include || (m1 != n1) )
                         result.push_back( m1 );
             // remove duplicates
-            std::vector<size_t>::iterator it = unique( result.begin(), result.end() );
+            std::vector<size_t>::iterator it = std::unique( result.begin(), result.end() );
             result.erase( it, result.end() );
             return result;
         }
@@ -275,7 +276,7 @@ class BipartiteGraph {
                     if( include || (m2 != n2) )
                         result.push_back( m2 );
             // remove duplicates
-            std::vector<size_t>::iterator it = unique( result.begin(), result.end() );
+            std::vector<size_t>::iterator it = std::unique( result.begin(), result.end() );
             result.erase( it, result.end() );
             return result;
         }
