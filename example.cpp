@@ -57,7 +57,7 @@ int main( int argc, char *argv[] ) {
             for( size_t i = 0; i < fg.nrVars(); i++ )
                 cout << jt.belief(fg.var(i)) << endl;
 
-            BP bp(fg, opts("updates",string("SEQMAX")));
+            BP bp(fg, opts("updates",string("SEQMAX"))("logdomain",false));
             bp.init();
             bp.run();
 

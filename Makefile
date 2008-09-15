@@ -111,8 +111,8 @@ all : $(TARGETS)
 
 matlabs : matlab/dai.$(MEXEXT) matlab/dai_readfg.$(MEXEXT) matlab/dai_writefg.$(MEXEXT) matlab/dai_removeshortloops.$(MEXEXT) matlab/dai_potstrength.$(MEXEXT)
 
-$(LIB)/libdai.a : daialg.o alldai.o clustergraph.o factorgraph.o properties.o regiongraph.o util.o weightedgraph.o x2x.o $(OBJECTS)
-	ar rcs $(LIB)/libdai.a daialg.o alldai.o clustergraph.o factorgraph.o properties.o regiongraph.o util.o weightedgraph.o x2x.o $(OBJECTS)
+$(LIB)/libdai.a : bipgraph.o daialg.o alldai.o clustergraph.o factorgraph.o properties.o regiongraph.o util.o weightedgraph.o x2x.o $(OBJECTS)
+	ar rcs $(LIB)/libdai.a bipgraph.o daialg.o alldai.o clustergraph.o factorgraph.o properties.o regiongraph.o util.o weightedgraph.o x2x.o $(OBJECTS)
 
 tests : tests/test
 
@@ -129,6 +129,8 @@ clean :
 	rm *.o example matlab/*.$(MEXEXT) matlab/*.o tests/test utils/fg2dot utils/createfg utils/remove_short_loops utils/fginfo $(LIB)/libdai.a; echo
 	rm -R doc; echo
 
+bipgraph.o : $(SRC)/bipgraph.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/bipgraph.cpp
 
 daialg.o : $(SRC)/daialg.cpp $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/daialg.cpp
@@ -216,8 +218,8 @@ matlab/matlab.o : matlab/matlab.cpp matlab/matlab.h $(HEADERS)
 # UTILS
 ########
 
-utils/createfg : utils/createfg.cpp $(HEADERS) factorgraph.o weightedgraph.o util.o
-	$(CC) $(CCFLAGS) -o utils/createfg utils/createfg.cpp factorgraph.o weightedgraph.o util.o $(BOOSTFLAGS)
+utils/createfg : utils/createfg.cpp $(HEADERS) factorgraph.o weightedgraph.o util.o bipgraph.o
+	$(CC) $(CCFLAGS) -o utils/createfg utils/createfg.cpp factorgraph.o weightedgraph.o util.o bipgraph.o $(BOOSTFLAGS)
 
 utils/fg2dot : utils/fg2dot.cpp $(HEADERS) factorgraph.o
 	$(CC) $(CCFLAGS) -o utils/fg2dot utils/fg2dot.cpp factorgraph.o
@@ -225,5 +227,5 @@ utils/fg2dot : utils/fg2dot.cpp $(HEADERS) factorgraph.o
 utils/remove_short_loops : utils/remove_short_loops.cpp $(HEADERS) factorgraph.o
 	$(CC) $(CCFLAGS) -o utils/remove_short_loops utils/remove_short_loops.cpp factorgraph.o
 
-utils/fginfo : utils/fginfo.cpp $(HEADERS) factorgraph.o
-	$(CC) $(CCFLAGS) -o utils/fginfo utils/fginfo.cpp factorgraph.o
+utils/fginfo : utils/fginfo.cpp $(HEADERS) factorgraph.o bipgraph.o
+	$(CC) $(CCFLAGS) -o utils/fginfo utils/fginfo.cpp factorgraph.o bipgraph.o
