@@ -30,24 +30,34 @@
 #include <cstdio>
 #include <boost/foreach.hpp>
 
+
 #ifdef WINDOWS
-    #include <float.h>  // for _isnan (?)
-    #include <boost/math/special_functions/atanh.hpp>  // for atanh
-    #include <boost/math/special_functions/log1p.hpp>  // for log1p
-//    #include <xmath.h>
+    #include <xmath.h> // for NAN
+    #include <map>
+#else
+    #include <tr1/unordered_map>
 #endif
 
 
 #define foreach BOOST_FOREACH
 
 
+#ifdef WINDOWS
+    bool isnan( double x );
+    double atanh( double x );
+    double log1p( double x );
+#endif
+
+
 namespace dai {
 
 
 #ifdef WINDOWS
-    bool isnan( double x ) inline { return _isnan( x ); }
-    using boost::math:atanh;
-    using boost::math::log1p;
+    template <typename T, typename U>
+        class hash_map : public std::map<T,U> {};
+#else
+    template <typename T, typename U>
+        class hash_map : public std::tr1::unordered_map<T,U> {};
 #endif
 
 

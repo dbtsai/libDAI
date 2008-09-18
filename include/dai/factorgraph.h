@@ -25,7 +25,6 @@
 
 #include <iostream>
 #include <map>
-#include <tr1/unordered_map>
 #include <dai/bipgraph.h>
 #include <dai/factor.h>
 

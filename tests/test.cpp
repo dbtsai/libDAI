@@ -25,6 +25,7 @@
 #include <numeric>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <boost/program_options.hpp>
 #include <dai/util.h>
 #include <dai/alldai.h>
@@ -148,10 +149,10 @@ pair<string, Properties> parseMethod( const string &_s, const map<string,string>
     if( pos == string::npos )
         throw "Malformed method";
     size_t n = 0;
-    for( ; n < sizeof(DAINames) / sizeof(string); n++ )
+    for( ; strlen( DAINames[n] ) != 0; n++ )
         if( name == DAINames[n] )
             break;
-    if( n == sizeof(DAINames) / sizeof(string) )
+    if( strlen( DAINames[n] ) == 0 )
         throw "Unknown inference algorithm";
 
     stringstream ss;

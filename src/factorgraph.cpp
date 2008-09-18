@@ -27,7 +27,6 @@
 #include <string>
 #include <algorithm>
 #include <functional>
-#include <tr1/unordered_map>
 #include <dai/factorgraph.h>
 #include <dai/util.h>
 
@@ -62,7 +61,7 @@ FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _undoProbs(), _n
 /// Part of constructors (creates edges, neighbours and adjacency matrix)
 void FactorGraph::createGraph( size_t nrEdges ) {
     // create a mapping for indices
-    std::tr1::unordered_map<size_t, size_t> hashmap;
+    hash_map<size_t, size_t> hashmap;
     
     for( size_t i = 0; i < vars.size(); i++ )
         hashmap[var(i).label()] = i;

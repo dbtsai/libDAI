@@ -81,7 +81,7 @@ class LC : public DAIAlgFG {
 
         std::string identify() const;
         Factor belief (const Var &n) const { return( _beliefs[findVar(n)] ); }
-        Factor belief (const VarSet &/*ns*/) const { assert( 0 == 1 ); }
+        Factor belief (const VarSet &/*ns*/) const { assert( 0 == 1 ); return Factor(); }
         std::vector<Factor> beliefs() const { return _beliefs; }
         Complex logZ() const { return NAN; }
         void CalcBelief (size_t i);

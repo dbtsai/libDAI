@@ -71,7 +71,7 @@ class MR : public DAIAlgFG {
         void solveM();
         double run();
         Factor belief( const Var &n ) const;
-        Factor belief( const VarSet &/*ns*/ ) const { assert( 0 == 1 ); }
+        Factor belief( const VarSet &/*ns*/ ) const { assert( 0 == 1 ); return Factor(); }
         std::vector<Factor> beliefs() const;
         Complex logZ() const { return NAN; }
         void init() { assert( checkProperties() ); }
@@ -89,7 +89,7 @@ class MR : public DAIAlgFG {
         void sum_subs(size_t j, sub_nb A, double *sum_even, double *sum_odd);
 
         double sign(double a) { return (a >= 0) ? 1.0 : -1.0; }
-        MR* clone() const { assert( 0 == 1 ); }
+        MR* clone() const { return new MR(*this); }
 
         bool checkProperties();
 

@@ -31,7 +31,7 @@ namespace dai {
 
 
 /// Represents a discrete variable.
-/*  It contains the label of the variable, an integer-valued
+/**  It contains the label of the variable, an integer-valued
  *  unique ID for that variable, and the number of possible 
  *  values ("states") of the variable.
  */
