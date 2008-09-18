@@ -282,7 +282,7 @@ double LC::run() {
         }
     if( hasNaNs ) {
         cout << "LC::run:  initial _pancakes has NaNs!" << endl;
-        return NAN;
+        return -1.0;
     }
 
     size_t nredges = nrEdges();
@@ -306,7 +306,7 @@ double LC::run() {
             size_t _I = update_seq[t].second;
             _pancakes[i] = NewPancake( i, _I, hasNaNs);
             if( hasNaNs )
-                return NAN;
+                return -1.0;
             CalcBelief( i );
         }
 

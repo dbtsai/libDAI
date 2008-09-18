@@ -32,7 +32,6 @@
 
 
 #ifdef WINDOWS
-    #include <xmath.h> // for NAN
     #include <map>
 #else
     #include <tr1/unordered_map>

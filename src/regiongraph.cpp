@@ -114,7 +114,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
     // Create inner regions - store them in the bipartite graph
     IRs.reserve( betas.size() );
     for( set<VarSet>::const_iterator beta = betas.begin(); beta != betas.end(); beta++ )
-        IRs.push_back( Region(*beta,NAN) );
+        IRs.push_back( Region(*beta,0.0) );
     
     // Create edges
     vector<pair<size_t,size_t> > edges;
@@ -142,8 +142,9 @@ void RegionGraph::Calc_Counting_Numbers() {
     // Calculates counting numbers of inner regions based upon counting numbers of outer regions
     
     vector<vector<size_t> > ancestors(nrIRs());
+    vector<bool> assigned(nrIRs(), false);
     for( size_t beta = 0; beta < nrIRs(); beta++ ) {
-        IR(beta).c() = NAN;
+        IR(beta).c() = 0.0;
         for( size_t beta2 = 0; beta2 < nrIRs(); beta2++ )
             if( (beta2 != beta) && IR(beta2) >> IR(beta) )
                 ancestors[beta].push_back(beta2);
@@ -153,18 +154,19 @@ void RegionGraph::Calc_Counting_Numbers() {
     do {
         new_counting = false;
         for( size_t beta = 0; beta < nrIRs(); beta++ ) {
-            if( isnan( IR(beta).c() ) ) {
-                bool has_nan_ancestor = false;
-                for( vector<size_t>::const_iterator beta2 = ancestors[beta].begin(); (beta2 != ancestors[beta].end()) && !has_nan_ancestor; beta2++ )
-                    if( isnan( IR(*beta2).c() ) )
-                        has_nan_ancestor = true;
-                if( !has_nan_ancestor ) {
+            if( !assigned[beta] ) {
+                bool has_unassigned_ancestor = false;
+                for( vector<size_t>::const_iterator beta2 = ancestors[beta].begin(); (beta2 != ancestors[beta].end()) && !has_unassigned_ancestor; beta2++ )
+                    if( !assigned[*beta2] )
+                        has_unassigned_ancestor = true;
+                if( !has_unassigned_ancestor ) {
                     double c = 1.0;
                     foreach( const Neighbor &alpha, nbIR(beta) )
                         c -= OR(alpha).c();
                     for( vector<size_t>::const_iterator beta2 = ancestors[beta].begin(); beta2 != ancestors[beta].end(); beta2++ )
                         c -= IR(*beta2).c();
                     IR(beta).c() = c;
+                    assigned[beta] = true;
                     new_counting = true;
                 }
             }

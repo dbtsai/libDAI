@@ -73,7 +73,7 @@ class MR : public DAIAlgFG {
         Factor belief( const Var &n ) const;
         Factor belief( const VarSet &/*ns*/ ) const { assert( 0 == 1 ); return Factor(); }
         std::vector<Factor> beliefs() const;
-        Complex logZ() const { return NAN; }
+        Complex logZ() const { /*assert( 0 == 1 );*/ return 0.0; }
         void init() { assert( checkProperties() ); }
         static const char *Name;
         std::string identify() const;
