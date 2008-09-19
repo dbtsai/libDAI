@@ -22,6 +22,7 @@
 #include <iostream>
 #include <dai/properties.h>
 #include <dai/alldai.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -69,7 +70,7 @@ std::ostream& operator<< (std::ostream & os, const Property & p) {
         os << boost::any_cast<LC::UpdateType>(p.second);
 #endif
     else
-        throw "Unknown property type";
+        DAI_THROW(UNKNOWN_PROPERTY_TYPE);
     return( os );
 }
 
@@ -96,7 +97,7 @@ std::istream& operator >> (std::istream& is, Properties & ps) {
 
     // Check whether s is of the form "[.*]"
     if( (s.length() < 2) || (s.at(0) != '[') || (s.at(s.length()-1)) != ']' )
-        throw "Malformed property";
+        DAI_THROW(MALFORMED_PROPERTY);
 
     size_t N = s.length() - 1;
     for( size_t token_start = 1; token_start < N; ) {
@@ -107,7 +108,7 @@ std::istream& operator >> (std::istream& is, Properties & ps) {
             if( s[token_end] == '=' )
                 break;
         if( token_end == N )
-            throw "Malformed property key";
+            DAI_THROW(MALFORMED_PROPERTY);
         // we found a key
         std::string key = s.substr(token_start, token_end - token_start);
 
@@ -123,7 +124,7 @@ std::istream& operator >> (std::istream& is, Properties & ps) {
                 break;
         }
         if( !(level == 0) )
-            throw "Malformed property value";
+            DAI_THROW(MALFORMED_PROPERTY);
         // we found a vlue
         std::string value = s.substr(token_start, token_end - token_start);
 

@@ -111,7 +111,7 @@ double MF::run() {
 
         if( jan.hasNaNs() ) {
             cout << "MF::run():  ERROR: jan has NaNs!" << endl;
-            return NAN;
+            return 1.0;
         }
 
         diffs.push( dist( jan, _beliefs[i], Prob::DISTLINF ) );

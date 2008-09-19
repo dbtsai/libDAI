@@ -28,6 +28,7 @@
 #include <dai/factorgraph.h>
 #include <dai/daialg.h>
 #include <dai/enum.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -71,9 +72,15 @@ class MR : public DAIAlgFG {
         void solveM();
         double run();
         Factor belief( const Var &n ) const;
-        Factor belief( const VarSet &/*ns*/ ) const { assert( 0 == 1 ); return Factor(); }
+        Factor belief( const VarSet &/*ns*/ ) const { 
+            DAI_THROW(NOT_IMPLEMENTED);
+            return Factor(); 
+        }
         std::vector<Factor> beliefs() const;
-        Complex logZ() const { /*assert( 0 == 1 );*/ return 0.0; }
+        Complex logZ() const { 
+            DAI_THROW(NOT_IMPLEMENTED);
+            return 0.0; 
+        }
         void init() { assert( checkProperties() ); }
         static const char *Name;
         std::string identify() const;

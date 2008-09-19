@@ -108,7 +108,7 @@ MEXFLAGS = $(MEXFLAGS) /DSMALLMEM
 !ENDIF
 !ENDIF
 
-HEADERS = $(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/x2x.h
+HEADERS = $(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/x2x.h $(INC)/exceptions.h
 
 TARGETS = tests utils $(LIB)/libdai.lib example.exe
 # testregression disabled, it uses sh and awk
@@ -120,8 +120,8 @@ all : $(TARGETS)
 
 matlabs : matlab/dai.$(MEXEXT) matlab/dai_readfg.$(MEXEXT) matlab/dai_writefg.$(MEXEXT) matlab/dai_removeshortloops.$(MEXEXT) matlab/dai_potstrength.$(MEXEXT)
 
-$(LIB)/libdai.lib : bipgraph.obj daialg.obj alldai.obj clustergraph.obj factorgraph.obj properties.obj regiongraph.obj util.obj weightedgraph.obj x2x.obj $(OBJECTS)
-	lib /out:$(LIB)/libdai.lib bipgraph.obj daialg.obj alldai.obj clustergraph.obj factorgraph.obj properties.obj regiongraph.obj util.obj weightedgraph.obj x2x.obj $(OBJECTS)
+$(LIB)/libdai.lib : bipgraph.obj daialg.obj alldai.obj clustergraph.obj factorgraph.obj properties.obj regiongraph.obj util.obj weightedgraph.obj x2x.obj exceptions.obj $(OBJECTS)
+	lib /out:$(LIB)/libdai.lib bipgraph.obj daialg.obj alldai.obj clustergraph.obj factorgraph.obj properties.obj regiongraph.obj util.obj weightedgraph.obj x2x.obj exceptions.obj $(OBJECTS)
 
 tests : tests/test.exe
 
@@ -183,6 +183,9 @@ mr.obj : $(SRC)/mr.cpp $(INC)/mr.h $(HEADERS)
 properties.obj : $(SRC)/properties.cpp $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/properties.cpp
 
+exceptions.obj : $(SRC)/exceptions.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/exceptions.cpp
+
 alldai.obj : $(SRC)/alldai.cpp $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/alldai.cpp
 
@@ -229,14 +232,14 @@ matlab/matlab.obj : matlab/matlab.cpp matlab/matlab.h $(HEADERS)
 # UTILS
 ########
 
-utils/createfg.exe : utils/createfg.cpp $(HEADERS) factorgraph.obj weightedgraph.obj util.obj bipgraph.obj
-	$(CC) $(CCFLAGS) /Feutils/createfg utils/createfg.cpp factorgraph.obj weightedgraph.obj util.obj bipgraph.obj /link $(LIBS) $(BOOSTLIBS)
+utils/createfg.exe : utils/createfg.cpp $(HEADERS) factorgraph.obj weightedgraph.obj util.obj bipgraph.obj exceptions.obj
+	$(CC) $(CCFLAGS) /Feutils/createfg utils/createfg.cpp factorgraph.obj weightedgraph.obj util.obj bipgraph.obj exceptions.obj /link $(LIBS) $(BOOSTLIBS)
 
-utils/fg2dot.exe : utils/fg2dot.cpp $(HEADERS) factorgraph.obj
-	$(CC) $(CCFLAGS) /Feutils/fg2dot utils/fg2dot.cpp factorgraph.obj /link $(LIBS)
+utils/fg2dot.exe : utils/fg2dot.cpp $(HEADERS) factorgraph.obj exceptions.obj
+	$(CC) $(CCFLAGS) /Feutils/fg2dot utils/fg2dot.cpp factorgraph.obj exceptions.obj /link $(LIBS)
 
-utils/remove_short_loops.exe : utils/remove_short_loops.cpp $(HEADERS) factorgraph.obj
-	$(CC) $(CCFLAGS) /Feutils/remove_short_loops utils/remove_short_loops.cpp factorgraph.obj /link $(LIBS)
+utils/remove_short_loops.exe : utils/remove_short_loops.cpp $(HEADERS) factorgraph.obj exceptions.obj
+	$(CC) $(CCFLAGS) /Feutils/remove_short_loops utils/remove_short_loops.cpp factorgraph.obj exceptions.obj /link $(LIBS)
 
-utils/fginfo.exe : utils/fginfo.cpp $(HEADERS) factorgraph.obj bipgraph.obj
-	$(CC) $(CCFLAGS) /Feutils/fginfo utils/fginfo.cpp factorgraph.obj bipgraph.obj /link $(LIBS)
+utils/fginfo.exe : utils/fginfo.cpp $(HEADERS) factorgraph.obj bipgraph.obj exceptions.obj
+	$(CC) $(CCFLAGS) /Feutils/fginfo utils/fginfo.cpp factorgraph.obj bipgraph.obj exceptions.obj /link $(LIBS)

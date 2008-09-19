@@ -23,6 +23,7 @@
 #include <dai/hak.h>
 #include <dai/util.h>
 #include <dai/diffs.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -136,7 +137,7 @@ HAK::HAK(const FactorGraph & fg, const Properties &opts) : DAIAlgRG(opts) {
                 cout << *cli << endl;
         }
     } else
-        throw "Invalid Clusters type";
+        DAI_THROW(INTERNAL_ERROR);
 
     RegionGraph rg(fg,cl);
     RegionGraph::operator=(rg);
@@ -229,7 +230,7 @@ double HAK::doGBP() {
             Qb_new.normalize( _normtype );
             if( Qb_new.hasNaNs() ) {
                 cout << "HAK::doGBP:  Qb_new has NaNs!" << endl;
-                return NAN;
+                return 1.0;
             }
 //          _Qb[beta] = Qb_new.makeZero(1e-100);    // damping?
             _Qb[beta] = Qb_new;
@@ -246,7 +247,7 @@ double HAK::doGBP() {
                 Qa_new.normalize( _normtype );
                 if( Qa_new.hasNaNs() ) {
                     cout << "HAK::doGBP:  Qa_new has NaNs!" << endl;
-                    return NAN;
+                    return 1.0;
                 }
 //              _Qa[alpha] = Qa_new.makeZero(1e-100); // damping?
                 _Qa[alpha] = Qa_new;
@@ -330,7 +331,7 @@ double HAK::doDoubleLoop() {
 
         // Inner loop
         if( isnan( doGBP() ) )
-            return NAN;
+            return 1.0;
 
         // Calculate new single variable beliefs and compare with old ones
         for( size_t i = 0; i < nrVars(); ++i ) {

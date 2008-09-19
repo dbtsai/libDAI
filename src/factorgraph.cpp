@@ -29,6 +29,7 @@
 #include <functional>
 #include <dai/factorgraph.h>
 #include <dai/util.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -121,13 +122,13 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             getline(is,line);
         is >> nr_f;
         if( is.fail() )
-            throw "ReadFromFile: unable to read number of Factors";
+            DAI_THROW(INVALID_FACTORGRAPH_FILE);
         if( verbose >= 2 )
             cout << "Reading " << nr_f << " factors..." << endl;
 
         getline (is,line);
         if( is.fail() )
-            throw "ReadFromFile: empty line expected";
+            DAI_THROW(INVALID_FACTORGRAPH_FILE);
 
         for( size_t I = 0; I < nr_f; I++ ) {
             if( verbose >= 3 )

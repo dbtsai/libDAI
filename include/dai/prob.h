@@ -233,9 +233,6 @@ template <typename T> class TProb {
             assert( size() == q.size() );
 #endif
             for( size_t i = 0; i < size(); i++ ) {
-#ifdef DAI_DEBUG
-//              assert( q[i] != 0.0 );
-#endif
                 if( q[i] == 0.0 )
                     _p[i] = 0.0;
                 else

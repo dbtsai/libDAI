@@ -18,28 +18,12 @@ A disadvantage of this approach may be worse cachability.
 - Can the FactorGraph constructors be optimized further?
 - Move FactorGraph::_normType somewhere else (maybe to InfAlg or DAIAlg<T>)
 - Remove updatedFactor
-- Add Exceptions framework; this can e.g. be used as follows: if *.logZ() is
-called, it can return an exception if this method is not implemented, and the
-caller can catch this exception and handle it correctly. Then, you don't need
-a hasLogZ function/constant that tells whether this functionality is available.
-- Add an option to tests/test that it doesn't report the time needed; this is
-useful for the regression testing.
-
-DONE IN PREVIOUS COMMITS:
-- Added a few methods to BipartiteGraph
-- Improved ClusterGraph implementation (taken from SVN head)
-- Improved MaxSpanningTree algorithm (using boost::graph library, taken from SVN head)
-- Updated doxygen.conf
-- Made compatible with Visual C++
-- Merged improved index.h from svn
-- Rename stateSpace -> states
-- Optimized Diffs
-- Renamed Regenerate() -> create() 
 
 TODO FOR RELEASE:
 - Test Visual C++ compatibility
 - Figure out which libraries are required and document in README
-  boost headers, boost::program_options library
+  boost headers, boost::program_options library, boost::graph library,
+  boost::math library (under Windows)
 
 FILES IN SVN HEAD THAT ARE NO LONGER RELEVANT FOR GIT MASTER
 diffs.h
@@ -53,3 +37,5 @@ clustergraph.cpp
 varset.h
 var.h
 utils/createfg.cpp
+exceptions.h
+exceptions.cpp

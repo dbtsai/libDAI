@@ -247,7 +247,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const Properties &opts ) : JTree(fg, opts
             // find maximal spanning tree
             ConstructRG( MaxSpanningTreePrims( wg ) );
         } else {
-            assert( 0 == 1 );
+            DAI_THROW(INTERNAL_ERROR);
         }
     }
 }

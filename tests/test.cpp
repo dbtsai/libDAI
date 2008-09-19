@@ -47,8 +47,9 @@ class TestAI {
         double          logZ;
         double          maxdiff;
         double          time;
+        bool            has_logZ;
 
-        TestAI( const FactorGraph &fg, const string &_name, const Properties &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0) {
+        TestAI( const FactorGraph &fg, const string &_name, const Properties &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0), has_logZ(true) {
             double tic = toc();
             obj = newInfAlg( name, fg, opts );
             time += toc() - tic;
@@ -105,7 +106,12 @@ class TestAI {
                 obj->init();
                 obj->run();
                 time += toc() - tic;
-                logZ = real(obj->logZ());
+                try {
+                    logZ = real(obj->logZ());
+                    has_logZ = true;
+                } catch( Exception &e ) {
+                    has_logZ = false;
+                }
                 maxdiff = obj->MaxDiff();
                 q = allBeliefs();
             };
@@ -179,6 +185,7 @@ int main( int argc, char *argv[] ) {
         double tol;
         size_t maxiter;
         size_t verbose;
+        bool report_time = true;
 
         po::options_description opts_required("Required options");
         opts_required.add_options()
@@ -193,6 +200,7 @@ int main( int argc, char *argv[] ) {
             ("tol", po::value< double >(&tol), "Override tolerance")
             ("maxiter", po::value< size_t >(&maxiter), "Override maximum number of iterations")
             ("verbose", po::value< size_t >(&verbose), "Override verbosity")
+            ("report-time", po::value< bool >(&report_time), "Report calculation time")
         ;
 
         po::options_description cmdline_options;
@@ -204,7 +212,7 @@ int main( int argc, char *argv[] ) {
 
         if( vm.count("help") || !(vm.count("filename") && vm.count("methods")) ) {
             cout << "Reads factorgraph <filename.fg> and performs the approximate" << endl;
-            cout << "inference algorithms <method*>, reporting clocks, max and average" << endl;
+            cout << "inference algorithms <method*>, reporting calculation time, max and average" << endl;
             cout << "error and relative logZ error (comparing with the results of" << endl;
             cout << "<method0>, the base method, for which one can use JTREE_HUGIN)." << endl << endl;
             cout << opts_required << opts_optional << endl;
@@ -251,8 +259,10 @@ int main( int argc, char *argv[] ) {
             cout << "# " << filename << endl;
             cout.width( 40 );
             cout << left << "# METHOD" << "  ";
-            cout.width( 10 );
-            cout << right << "SECONDS" << "   ";
+            if( report_time ) {
+                cout.width( 10 );
+                cout << right << "SECONDS" << "   ";
+            }
             cout.width( 10 );
             cout << "MAX ERROR" << "  ";
             cout.width( 10 );
@@ -282,8 +292,10 @@ int main( int argc, char *argv[] ) {
                 cout.width( 40 );
 //                cout << left << piet.identify() << "  ";
                 cout << left << methods[m] << "  ";
-                cout.width( 10 );
-                cout << right << piet.time << "    ";
+                if( report_time ) {
+                    cout.width( 10 );
+                    cout << right << piet.time << "    ";
+                }
 
                 if( m > 0 ) {
                     cout.setf( ios_base::scientific );
@@ -295,8 +307,12 @@ int main( int argc, char *argv[] ) {
                     double ae = clipdouble( piet.avgErr(), 1e-9 );
                     cout << ae << "  ";
                     cout.width( 10 );
-                    double le = clipdouble( piet.logZ / logZ0 - 1.0, 1e-9 );
-                    cout << le << "  ";
+                    if( piet.has_logZ ) {
+                        double le = clipdouble( piet.logZ / logZ0 - 1.0, 1e-9 );
+                        cout << le << "  ";
+                    } else {
+                        cout << "N/A         ";
+                    }
                     cout.width( 10 );
                     double md = clipdouble( piet.maxdiff, 1e-9 );
                     if( isnan( me ) )

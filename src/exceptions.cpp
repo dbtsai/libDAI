@@ -19,49 +19,26 @@
 */
 
 
-#include <string>
-#include <dai/alldai.h>
 #include <dai/exceptions.h>
 
 
 namespace dai {
 
 
-using namespace std;
+    std::string Exception::ErrorStrings[NUM_ERRORS] = {
+        "This feature is not implemented",
+        "Unknown DAI algorithm",
+        "Unknown Property type",
+        "Malformed Property",
+        "Unknown ENUM value",
+        "Cannot read file",
+        "Cannot write file",
+        "Invalid FactorGraph file",
+        "Not all mandatory Properties specified",
+        "Multiple undo levels unsupported",
+        "FactorGraph is not connected",
+        "Internal error"
+    }; 
 
 
-InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const Properties &opts ) {
-#ifdef WITH_BP
-    if( name == BP::Name ) 
-        return new BP (fg, opts);
-#endif
-#ifdef WITH_MF
-    else if( name == MF::Name ) 
-        return new MF (fg, opts);
-#endif
-#ifdef WITH_HAK
-    else if( name == HAK::Name ) 
-        return new HAK (fg, opts);
-#endif
-#ifdef WITH_LC
-    else if( name == LC::Name )
-        return new LC (fg, opts);
-#endif
-#ifdef WITH_TREEEP
-    else if( name == TreeEP::Name )
-        return new TreeEP (fg, opts);
-#endif
-#ifdef WITH_JTREE
-    else if( name == JTree::Name )
-        return new JTree (fg, opts);
-#endif
-#ifdef WITH_MR
-    else if( name == MR::Name )
-        return new MR (fg, opts);
-#endif
-    else
-        DAI_THROW(UNKNOWN_DAI_ALGORITHM);
 }
-
-
-} // end of namespace dai
