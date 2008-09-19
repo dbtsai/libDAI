@@ -47,13 +47,12 @@ class FactorGraph {
 
     protected:
         std::map<size_t,Prob>  _undoProbs;
-        Prob::NormType         _normtype;
 
     public:
         /// Default constructor
-        FactorGraph() : G(), vars(), factors(), _undoProbs(), _normtype(Prob::NORMPROB) {};
+        FactorGraph() : G(), vars(), factors(), _undoProbs() {};
         /// Copy constructor
-        FactorGraph(const FactorGraph & x) : G(x.G), vars(x.vars), factors(x.factors), _undoProbs(x._undoProbs), _normtype(x._normtype) {};
+        FactorGraph(const FactorGraph & x) : G(x.G), vars(x.vars), factors(x.factors), _undoProbs(x._undoProbs) {};
         /// Construct FactorGraph from vector of Factors
         FactorGraph(const std::vector<Factor> &P);
         // Construct a FactorGraph from given factor and variable iterators
@@ -67,7 +66,6 @@ class FactorGraph {
                 vars       = x.vars;
                 factors    = x.factors;
                 _undoProbs = x._undoProbs;
-                _normtype  = x._normtype;
             }
             return *this;
         }
@@ -128,7 +126,6 @@ class FactorGraph {
         virtual void clamp( const Var & n, size_t i );
         
         bool hasNegatives() const;
-        Prob::NormType NormType() const { return _normtype; }
         
         std::vector<VarSet> Cliques() const;
 
@@ -136,8 +133,6 @@ class FactorGraph {
         void saveProbs( const VarSet &ns );
         virtual void undoProb( size_t I );
         void saveProb( size_t I );
-
-        virtual void updatedFactor( size_t /*I*/ ) {};
 
     private:
         /// Part of constructors (creates edges, neighbors and adjacency matrix)
@@ -147,7 +142,7 @@ class FactorGraph {
 
 // assumes that the set of variables in [var_begin,var_end) is the union of the variables in the factors in [fact_begin, fact_end)
 template<typename FactorInputIterator, typename VarInputIterator>
-FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : G(), _undoProbs(), _normtype(Prob::NORMPROB) {
+FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : G(), _undoProbs() {
     // add factors
     size_t nrEdges = 0;
     factors.reserve( nr_fact_hint );

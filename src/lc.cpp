@@ -153,7 +153,7 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const Properties &
         maxdiff = cav->MaxDiff();
         delete cav;
     }
-    Bi.normalize( _normtype );
+    Bi.normalize( Prob::NORMPROB );
     _cavitydists[i] = Bi;
 
     return maxdiff;
@@ -223,7 +223,7 @@ void LC::init() {
               _pancakes[i] *= _phis[i][I.iter];
         }
         
-        _pancakes[i].normalize( _normtype );
+        _pancakes[i].normalize( Prob::NORMPROB );
 
         CalcBelief(i);
     }
@@ -245,10 +245,10 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
     Factor A_Ii = (_pancakes[i] * factor(I).inverse() * _phis[i][_I].inverse()).part_sum( Ivars / var(i) );
     Factor quot = A_I.divided_by(A_Ii);
 
-    piet *= quot.divided_by( _phis[i][_I] ).normalized( _normtype );
-    _phis[i][_I] = quot.normalized( _normtype );
+    piet *= quot.divided_by( _phis[i][_I] ).normalized( Prob::NORMPROB );
+    _phis[i][_I] = quot.normalized( Prob::NORMPROB );
 
-    piet.normalize( _normtype );
+    piet.normalize( Prob::NORMPROB );
 
     if( piet.hasNaNs() ) {
         cout << "LC::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;

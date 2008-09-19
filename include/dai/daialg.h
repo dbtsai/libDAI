@@ -156,9 +156,6 @@ class InfAlg {
         /// Set all factors interacting with var(i) to 1
         virtual void makeCavity( size_t i ) = 0;
 
-        /// Factor I has been updated
-        virtual void updatedFactor( size_t I ) = 0;
-
         /// Get reference to underlying FactorGraph
         virtual FactorGraph &fg() = 0;
 
@@ -201,9 +198,6 @@ class DAIAlg : public InfAlg, public T {
 
         /// Set all factors interacting with var(i) to 1 (using T::makeCavity)
         void makeCavity( size_t i ) { T::makeCavity( i ); }
-
-        /// Factor I has been updated (using T::updatedFactor)
-        void updatedFactor( size_t I ) { T::updatedFactor(I); }
 
         /// Get reference to underlying FactorGraph
         FactorGraph &fg() { return (FactorGraph &)(*this); }

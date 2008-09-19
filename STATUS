@@ -16,8 +16,6 @@ A disadvantage of this approach may be worse cachability.
   to replace the linear searches that are performed every time for findVar()?
   No, a better idea is to avoid calls to findVar() as much as possible.
 - Can the FactorGraph constructors be optimized further?
-- Move FactorGraph::_normType somewhere else (maybe to InfAlg or DAIAlg<T>)
-- Remove updatedFactor
 
 TODO FOR RELEASE:
 - Test Visual C++ compatibility

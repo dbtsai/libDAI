@@ -107,7 +107,7 @@ double MF::run() {
             jan *= piet; 
         }
 
-        jan.normalize( _normtype );
+        jan.normalize( Prob::NORMPROB );
 
         if( jan.hasNaNs() ) {
             cout << "MF::run():  ERROR: jan has NaNs!" << endl;

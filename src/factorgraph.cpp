@@ -38,7 +38,7 @@ namespace dai {
 using namespace std;
 
 
-FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _undoProbs(), _normtype(Prob::NORMPROB) {
+FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _undoProbs() {
     // add factors, obtain variables
     set<Var> _vars;
     factors.reserve( P.size() );

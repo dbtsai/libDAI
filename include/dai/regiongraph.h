@@ -189,9 +189,6 @@ class RegionGraph : public FactorGraph {
         /// We have to overload FactorGraph::undoProb because the corresponding outer regions have to be recomputed
         void undoProb( size_t I ) { FactorGraph::undoProb( I ); RecomputeOR( I ); }
 
-        /// If updateFactor is called, we know that factor I has been changed and we should recompute the outer regions involving I
-        void updatedFactor( size_t I ) { RecomputeOR( I ); }
-
         /// Send RegionGraph to output stream
         friend std::ostream & operator << ( std::ostream & os, const RegionGraph & rg );
 };

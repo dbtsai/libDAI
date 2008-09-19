@@ -170,7 +170,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
     const ind_t ind = index(i,_I);
     for( size_t r = 0; r < prod.size(); ++r )
         marg[ind[r]] += prod[r];
-    marg.normalize( _normtype );
+    marg.normalize( Prob::NORMPROB );
     
     // Store result
     if( logDomain )
