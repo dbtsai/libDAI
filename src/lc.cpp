@@ -119,15 +119,15 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const Properties &
         cav->makeCavity( i );
 
         if( Cavity() == CavityType::FULL )
-            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
+            Bi = calcMarginal( *cav, cav->fg().delta(i), reInit() );
         else if( Cavity() == CavityType::PAIR )
-            Bi = calcMarginal2ndO( *cav, cav->delta(i), reInit() );
+            Bi = calcMarginal2ndO( *cav, cav->fg().delta(i), reInit() );
         else if( Cavity() == CavityType::PAIR2 ) {
-            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->delta(i), reInit() );
+            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->fg().delta(i), reInit() );
             for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
                 Bi *= pairbeliefs[ij];
         } else if( Cavity() == CavityType::PAIRINT ) {
-            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
+            Bi = calcMarginal( *cav, cav->fg().delta(i), reInit() );
             
             // Set interactions of order > 2 to zero
             size_t N = delta(i).size();
@@ -139,7 +139,7 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const Properties &
 //            x2x::logpnorm (N, p);
             x2x::logp2p (N, p);
         } else if( Cavity() == CavityType::PAIRCUM ) {
-            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
+            Bi = calcMarginal( *cav, cav->fg().delta(i), reInit() );
             
             // Set cumulants of order > 2 to zero
             size_t N = delta(i).size();

@@ -153,38 +153,17 @@ class InfAlg {
         /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$)
         virtual void clamp( const Var & n, size_t i ) = 0;
 
-        /// Return all variables that interact with var(i)
-        virtual VarSet delta( size_t i ) const = 0;
-
         /// Set all factors interacting with var(i) to 1
         virtual void makeCavity( size_t i ) = 0;
 
-        /// Get index of variable n
-        virtual size_t findVar( const Var & n ) const = 0;
-
-        /// Get index of first factor involving ns
-        virtual size_t findFactor( const VarSet &ns ) const = 0;
-
-        /// Get number of variables
-        virtual size_t nrVars() const = 0;
-
-        /// Get number of factors
-        virtual size_t nrFactors() const = 0;
-
-        /// Get const reference to variable i
-        virtual const Var & var(size_t i) const = 0;
-
-        /// Get reference to variable i
-        virtual Var & var(size_t i) = 0;
-
-        /// Get const reference to factor I
-        virtual const Factor & factor( size_t I ) const = 0;
-
-        /// Get reference to factor I
-        virtual Factor & factor( size_t I ) = 0;
-
         /// Factor I has been updated
         virtual void updatedFactor( size_t I ) = 0;
+
+        /// Get reference to underlying FactorGraph
+        virtual FactorGraph &fg() = 0;
+
+        /// Get const reference to underlying FactorGraph
+        virtual const FactorGraph &fg() const = 0;
 
         /// Checks whether all necessary properties have been set
         /// and casts string-valued properties to other values if necessary
@@ -220,38 +199,17 @@ class DAIAlg : public InfAlg, public T {
         /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$) (using T::clamp)
         void clamp( const Var & n, size_t i ) { T::clamp( n, i ); }
 
-        /// Return all variables that interact with var(i) (using T::delta)
-        VarSet delta( size_t i ) const { return T::delta( i ); }
-
         /// Set all factors interacting with var(i) to 1 (using T::makeCavity)
         void makeCavity( size_t i ) { T::makeCavity( i ); }
 
-        /// Get index of variable n (using T::findVar)
-        size_t findVar( const Var & n ) const { return T::findVar(n); }
-
-        /// Get index of first factor involving ns (using T::findFactor)
-        size_t findFactor( const VarSet &ns ) const { return T::findFactor(ns); }
-
-        /// Get number of variables (using T::nrFactors)
-        size_t nrVars() const { return T::nrVars(); }
-
-        /// Get number of factors (using T::nrFactors)
-        size_t nrFactors() const { return T::nrFactors(); }
-
-        /// Get const reference to variable i (using T::var)
-        const Var & var( size_t i ) const { return T::var(i); }
-
-        /// Get reference to variable i (using T::var)
-        Var & var(size_t i) { return T::var(i); }
-
-        /// Get const reference to factor I (using T::factor)
-        const Factor & factor( size_t I ) const { return T::factor(I); }
-
-        /// Get reference to factor I (using T::factor)
-        Factor & factor( size_t I ) { return T::factor(I); }
-
         /// Factor I has been updated (using T::updatedFactor)
         void updatedFactor( size_t I ) { T::updatedFactor(I); }
+
+        /// Get reference to underlying FactorGraph
+        FactorGraph &fg() { return (FactorGraph &)(*this); }
+
+        /// Get const reference to underlying FactorGraph
+        const FactorGraph &fg() const { return (const FactorGraph &)(*this); }
 };
 
 

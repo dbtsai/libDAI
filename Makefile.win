@@ -135,7 +135,7 @@ doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
 	doxygen doxygen.conf
 
 clean :
-	del *.obj example.exe matlab\*.$(MEXEXT) matlab\*.obj tests\test.exe utils\fg2dot.exe utils\createfg.exe utils\remove_short_loops.exe utils\fginfo.exe $(LIB)\libdai.lib
+	del *.obj *.ilk *.pdb *.exe matlab\*.$(MEXEXT) matlab\*.obj tests\test.exe tests\*.pdb tests\*.ilk utils\*.exe utils\*.pdb utils\*.ilk $(LIB)\libdai.lib
 
 
 bipgraph.obj : $(SRC)/bipgraph.cpp $(HEADERS)

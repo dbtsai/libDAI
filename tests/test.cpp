@@ -92,8 +92,8 @@ class TestAI {
 
         vector<Factor> allBeliefs() {
             vector<Factor> result;
-            for( size_t i = 0; i < obj->nrVars(); i++ )
-                result.push_back( obj->belief( obj->var(i) ) );
+            for( size_t i = 0; i < obj->fg().nrVars(); i++ )
+                result.push_back( obj->belief( obj->fg().var(i) ) );
             return result;
         }
 
