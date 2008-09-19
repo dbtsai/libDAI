@@ -77,7 +77,7 @@ class MR : public DAIAlgFG {
             return Factor(); 
         }
         std::vector<Factor> beliefs() const;
-        Complex logZ() const { 
+        Real logZ() const { 
             DAI_THROW(NOT_IMPLEMENTED);
             return 0.0; 
         }

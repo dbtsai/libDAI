@@ -168,8 +168,8 @@ vector<Factor> MF::beliefs() const {
 }
 
 
-Complex MF::logZ() const {
-    Complex sum = 0.0;
+Real MF::logZ() const {
+    Real sum = 0.0;
     
     for(size_t i=0; i < nrVars(); i++ )
         sum -= beliefV(i).entropy();
@@ -181,7 +181,7 @@ Complex MF::logZ() const {
         Factor piet;
         piet = factor(I).log0();
         piet *= henk;
-        sum -= Complex( piet.totalSum() );
+        sum -= piet.totalSum();
     }
 
     return -sum;

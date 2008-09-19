@@ -390,10 +390,10 @@ Factor BP::beliefF (size_t I) const {
 }
 
 
-Complex BP::logZ() const {
-    Complex sum = 0.0;
+Real BP::logZ() const {
+    Real sum = 0.0;
     for(size_t i = 0; i < nrVars(); ++i )
-        sum += Complex(1.0 - nbV(i).size()) * beliefV(i).entropy();
+        sum += (1.0 - nbV(i).size()) * beliefV(i).entropy();
     for( size_t I = 0; I < nrFactors(); ++I )
         sum -= KL_dist( beliefF(I), factor(I) );
     return sum;

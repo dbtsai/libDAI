@@ -132,7 +132,7 @@ class InfAlg {
         virtual std::vector<Factor> beliefs() const = 0;
 
         /// Get log partition sum
-        virtual Complex logZ() const = 0;
+        virtual Real logZ() const = 0;
 
         /// Clear messages and beliefs
         virtual void init() = 0;

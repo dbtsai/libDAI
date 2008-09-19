@@ -87,7 +87,7 @@ class LC : public DAIAlgFG {
             return Factor(); 
         }
         std::vector<Factor> beliefs() const { return _beliefs; }
-        Complex logZ() const { 
+        Real logZ() const { 
             DAI_THROW(NOT_IMPLEMENTED);
             return 0.0; 
         }

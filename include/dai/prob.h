@@ -23,7 +23,6 @@
 #define __defined_libdai_prob_h
 
 
-#include <complex>
 #include <cmath>
 #include <vector>
 #include <ostream>
@@ -38,15 +37,13 @@ namespace dai {
 
 
 typedef double                  Real;
-typedef std::complex<double>    Complex;
 
 template<typename T> class      TProb;
 typedef TProb<Real>             Prob;
-typedef TProb<Complex>          CProb;
 
 
 /// TProb<T> implements a probability vector of type T.
-/// T should be castable from and to double and to complex.
+/// T should be castable from and to double.
 template <typename T> class TProb {
     protected:
         /// The entries
@@ -54,7 +51,7 @@ template <typename T> class TProb {
 
     private:
         /// Calculate x times log(x), or 0 if x == 0
-        Complex xlogx( Real x ) const { return( x == 0.0 ? 0.0 : Complex(x) * std::log(Complex(x))); }
+        Real xlogx( Real x ) const { return( x == 0.0 ? 0.0 : x * std::log(x)); }
 
     public:
         /// NORMPROB means that the sum of all entries should be 1
@@ -331,15 +328,6 @@ template <typename T> class TProb {
             return l0;
         }
 
-        /// Pointwise (complex) log (or 0 if == 0)
-/*      CProb clog0() const {
-            CProb l0;
-            l0._p.reserve( size() );
-            for( size_t i = 0; i < size(); i++ )
-                l0._p.push_back( (_p[i] == 0.0) ? 0.0 : std::log( Complex( _p[i] ) ) );
-            return l0;
-        }*/
-
         /// Return distance of p and q
         friend Real dist( const TProb<T> & p, const TProb<T> & q, DistType dt ) {
 #ifdef DAI_DEBUG
@@ -369,16 +357,16 @@ template <typename T> class TProb {
             return result;
         }
 
-        /// Return (complex) Kullback-Leibler distance with q
-        friend Complex KL_dist( const TProb<T> & p, const TProb<T> & q ) {
+        /// Return Kullback-Leibler distance with q
+        friend Real KL_dist( const TProb<T> & p, const TProb<T> & q ) {
 #ifdef DAI_DEBUG
             assert( p.size() == q.size() );
 #endif
-            Complex result = 0.0;
+            Real result = 0.0;
             for( size_t i = 0; i < p.size(); i++ ) {
                 if( (Real) p[i] != 0.0 ) {
-                    Complex p_i = p[i];
-                    Complex q_i = q[i];
+                    Real p_i = p[i];
+                    Real q_i = q[i];
                     result += p_i * (std::log(p_i) - std::log(q_i));
                 }
             }
@@ -444,9 +432,9 @@ template <typename T> class TProb {
             return (std::find_if( _p.begin(), _p.end(), std::bind2nd( std::less_equal<Real>(), 0.0 ) ) != _p.end());
         }
 
-        /// Returns (complex) entropy
-        Complex entropy() const {
-            Complex S = 0.0;
+        /// Returns entropy
+        Real entropy() const {
+            Real S = 0.0;
             for( size_t i = 0; i < size(); i++ )
                 S -= xlogx(_p[i]);
             return S;

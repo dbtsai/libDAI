@@ -210,7 +210,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const Properties &opts ) : JTree(fg, opts
                         if( piet.vars() >> (v_i | *j) ) {
                             piet = piet.marginal( v_i | *j );
                             Factor pietf = piet.marginal(v_i) * piet.marginal(*j);
-                            wg[UEdge(i,findVar(*j))] = real( KL_dist( piet, pietf ) );
+                            wg[UEdge(i,findVar(*j))] = KL_dist( piet, pietf );
                         } else
                             wg[UEdge(i,findVar(*j))] = 0;
                     }
@@ -455,14 +455,14 @@ double TreeEP::run() {
 }
 
 
-Complex TreeEP::logZ() const {
+Real TreeEP::logZ() const {
     double sum = 0.0;
 
     // entropy of the tree
     for( size_t beta = 0; beta < nrIRs(); beta++ )
-        sum -= real(_Qb[beta].entropy());
+        sum -= _Qb[beta].entropy();
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        sum += real(_Qa[alpha].entropy());
+        sum += _Qa[alpha].entropy();
 
     // energy of the on-tree factors
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )

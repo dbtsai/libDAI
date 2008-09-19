@@ -103,7 +103,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
 
 
     // Save logZ
-    double logZ = real( obj->logZ() );
+    double logZ = obj->logZ();
 
     // Save maxdiff
     double maxdiff = obj->MaxDiff();

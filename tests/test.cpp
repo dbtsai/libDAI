@@ -107,7 +107,7 @@ class TestAI {
                 obj->run();
                 time += toc() - tic;
                 try {
-                    logZ = real(obj->logZ());
+                    logZ = obj->logZ();
                     has_logZ = true;
                 } catch( Exception &e ) {
                     has_logZ = false;

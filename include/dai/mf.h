@@ -64,7 +64,7 @@ class MF : public DAIAlgFG {
         Factor belief (const Var &n) const;
         Factor belief (const VarSet &ns) const;
         std::vector<Factor> beliefs() const;
-        Complex logZ() const;
+        Real logZ() const;
 
         void init( const VarSet &ns );
         void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
