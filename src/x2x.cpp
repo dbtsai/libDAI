@@ -24,7 +24,7 @@ CHANGES:
 
 #include <cmath>
 #include <cstring>
-
+#include <dai/util.h>
 
 
 namespace x2x {

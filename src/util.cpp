@@ -27,10 +27,26 @@
 
 #ifdef WINDOWS
     #include <windows.h>
+    #include <boost/math/special_functions/atanh.hpp>  // for atanh
+    #include <boost/math/special_functions/log1p.hpp>  // for log1p
+    #include <float.h>  // for _isnan
 #else
     // Assume POSIX compliant system. We need the following for querying the CPU time for this process
     #include <sys/times.h>
     #include <sys/param.h>
+#endif
+
+
+#ifdef WINDOWS
+bool isnan( double x ) {
+    return _isnan( x );
+}
+double atanh( double x ) {
+    return boost::math::atanh( x );
+}
+double log1p( double x ) {
+    return boost::math::log1p( x );
+}
 #endif
 
 
@@ -49,7 +65,6 @@ double toc() {
     return( (double)(tbuf.tms_utime + tbuf.tms_stime) / HZ );
 #endif
 }
-
 
 // This is a typedef for a random number generator.
 // Try boost::mt19937 or boost::ecuyer1988 instead of boost::minstd_rand

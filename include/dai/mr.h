@@ -29,6 +29,7 @@
 #include <dai/daialg.h>
 #include <dai/enum.h>
 #include <dai/properties.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -77,9 +78,15 @@ class MR : public DAIAlgFG {
         void solveM();
         double run();
         Factor belief( const Var &n ) const;
-        Factor belief( const VarSet &/*ns*/ ) const { assert( 0 == 1 ); }
+        Factor belief( const VarSet &/*ns*/ ) const { 
+            DAI_THROW(NOT_IMPLEMENTED);
+            return Factor(); 
+        }
         std::vector<Factor> beliefs() const;
-        Complex logZ() const { return NAN; }
+        Real logZ() const { 
+            DAI_THROW(NOT_IMPLEMENTED);
+            return 0.0; 
+        }
         void init() {}
         static const char *Name;
         std::string identify() const;
@@ -95,7 +102,7 @@ class MR : public DAIAlgFG {
         void sum_subs(size_t j, sub_nb A, double *sum_even, double *sum_odd);
 
         double sign(double a) { return (a >= 0) ? 1.0 : -1.0; }
-        MR* clone() const { assert( 0 == 1 ); }
+        MR* clone() const { return new MR(*this); }
 
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;

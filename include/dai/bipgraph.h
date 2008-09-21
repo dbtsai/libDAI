@@ -241,11 +241,34 @@ class BipartiteGraph {
             _nb2.push_back( nbs2new );
         }
 
-        /// Remove node of type 1 and all incident edges.
+        /// Remove node n1 of type 1 and all incident edges.
         void erase1( size_t n1 );
 
-        /// Remove node of type 2 and all incident edges.
+        /// Remove node n2 of type 2 and all incident edges.
         void erase2( size_t n2 );
+
+        /// Add edge between node n1 of type 1 and node n2 of type 2.
+        /** If check == true, only adds the edge if it does not exist already.
+         */
+        void addEdge( size_t n1, size_t n2, bool check = true ) {
+            assert( n1 < nr1() );
+            assert( n2 < nr2() );
+            bool exists = false;
+            if( check ) {
+                // Check whether the edge already exists
+                foreach( const Neighbor &nb2, nb1(n1) )
+                    if( nb2 == n2 ) {
+                        exists = true;
+                        break;
+                    }
+            }
+            if( !exists ) { // Add edge
+                Neighbor nb_1( _nb1[n1].size(), n2, _nb2[n2].size() );
+                Neighbor nb_2( nb_1.dual, n1, nb_1.iter );
+                _nb1[n1].push_back( nb_1 );
+                _nb2[n2].push_back( nb_2 );
+            }
+        }
 
         /// Calculate second-order neighbors (i.e., neighbors of neighbors) of node n1 of type 1.
         /** If include == true, include n1 itself, otherwise exclude n1.
@@ -282,11 +305,11 @@ void BipartiteGraph::create( size_t nr1, size_t nr2, EdgeInputIterator begin, Ed
     _nb2.resize( nr2 );
 
     for( EdgeInputIterator e = begin; e != end; e++ ) {
-        // Each edge yields a neighbor pair
-        Neighbor nb_1( _nb1[e->first].size(), e->second, _nb2[e->second].size() );
-        Neighbor nb_2( nb_1.dual, e->first, nb_1.iter );
-        _nb1[e->first].push_back( nb_1 );
-        _nb2[e->second].push_back( nb_2 );
+#ifdef DAI_DEBUG
+        addEdge( e->first, e->second, true );
+#else
+        addEdge( e->first, e->second, false );
+#endif
     }
 }
 

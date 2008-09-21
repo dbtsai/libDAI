@@ -27,9 +27,9 @@
 #include <string>
 #include <algorithm>
 #include <functional>
-#include <tr1/unordered_map>
 #include <dai/factorgraph.h>
 #include <dai/util.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -38,7 +38,7 @@ namespace dai {
 using namespace std;
 
 
-FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _undoProbs(), _normtype(Prob::NORMPROB) {
+FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _undoProbs() {
     // add factors, obtain variables
     set<Var> _vars;
     factors.reserve( P.size() );
@@ -62,7 +62,7 @@ FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _undoProbs(), _n
 /// Part of constructors (creates edges, neighbours and adjacency matrix)
 void FactorGraph::createGraph( size_t nrEdges ) {
     // create a mapping for indices
-    std::tr1::unordered_map<size_t, size_t> hashmap;
+    hash_map<size_t, size_t> hashmap;
     
     for( size_t i = 0; i < vars.size(); i++ )
         hashmap[var(i).label()] = i;
@@ -122,13 +122,13 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             getline(is,line);
         is >> nr_f;
         if( is.fail() )
-            throw "ReadFromFile: unable to read number of Factors";
+            DAI_THROW(INVALID_FACTORGRAPH_FILE);
         if( verbose >= 2 )
             cout << "Reading " << nr_f << " factors..." << endl;
 
         getline (is,line);
         if( is.fail() )
-            throw "ReadFromFile: empty line expected";
+            DAI_THROW(INVALID_FACTORGRAPH_FILE);
 
         for( size_t I = 0; I < nr_f; I++ ) {
             if( verbose >= 3 )

@@ -296,12 +296,12 @@ double JTree::run() {
 }
 
 
-Complex JTree::logZ() const {
-    Complex sum = 0.0;
+Real JTree::logZ() const {
+    Real sum = 0.0;
     for( size_t beta = 0; beta < nrIRs(); beta++ )
-        sum += Complex(IR(beta).c()) * _Qb[beta].entropy();
+        sum += IR(beta).c() * _Qb[beta].entropy();
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
-        sum += Complex(OR(alpha).c()) * _Qa[alpha].entropy();
+        sum += OR(alpha).c() * _Qa[alpha].entropy();
         sum += (OR(alpha).log0() * _Qa[alpha]).totalSum();
     }
     return sum;

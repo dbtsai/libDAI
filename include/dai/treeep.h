@@ -123,7 +123,7 @@ class TreeEP : public JTree {
         std::string identify() const;
         void init();
         double run();
-        Complex logZ() const;
+        Real logZ() const;
 
         bool offtree( size_t I ) const { return (fac2OR[I] == -1U); }
 

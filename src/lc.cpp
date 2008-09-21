@@ -125,15 +125,15 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet 
         cav->makeCavity( i );
 
         if( props.cavity == Properties::CavityType::FULL )
-            Bi = calcMarginal( *cav, cav->delta(i), props.reinit );
+            Bi = calcMarginal( *cav, cav->fg().delta(i), props.reinit );
         else if( props.cavity == Properties::CavityType::PAIR )
-            Bi = calcMarginal2ndO( *cav, cav->delta(i), props.reinit );
+            Bi = calcMarginal2ndO( *cav, cav->fg().delta(i), props.reinit );
         else if( props.cavity == Properties::CavityType::PAIR2 ) {
-            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->delta(i), props.reinit );
+            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->fg().delta(i), props.reinit );
             for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
                 Bi *= pairbeliefs[ij];
         } else if( props.cavity == Properties::CavityType::PAIRINT ) {
-            Bi = calcMarginal( *cav, cav->delta(i), props.reinit );
+            Bi = calcMarginal( *cav, cav->fg().delta(i), props.reinit );
             
             // Set interactions of order > 2 to zero
             size_t N = delta(i).size();
@@ -145,7 +145,7 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet 
 //            x2x::logpnorm (N, p);
             x2x::logp2p (N, p);
         } else if( props.cavity == Properties::CavityType::PAIRCUM ) {
-            Bi = calcMarginal( *cav, cav->delta(i), props.reinit );
+            Bi = calcMarginal( *cav, cav->fg().delta(i), props.reinit );
             
             // Set cumulants of order > 2 to zero
             size_t N = delta(i).size();
@@ -159,7 +159,7 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet 
         maxdiff = cav->maxDiff();
         delete cav;
     }
-    Bi.normalize( _normtype );
+    Bi.normalize( Prob::NORMPROB );
     _cavitydists[i] = Bi;
 
     return maxdiff;
@@ -229,7 +229,7 @@ void LC::init() {
               _pancakes[i] *= _phis[i][I.iter];
         }
         
-        _pancakes[i].normalize( _normtype );
+        _pancakes[i].normalize( Prob::NORMPROB );
 
         CalcBelief(i);
     }
@@ -251,10 +251,10 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
     Factor A_Ii = (_pancakes[i] * factor(I).inverse() * _phis[i][_I].inverse()).part_sum( Ivars / var(i) );
     Factor quot = A_I.divided_by(A_Ii);
 
-    piet *= quot.divided_by( _phis[i][_I] ).normalized( _normtype );
-    _phis[i][_I] = quot.normalized( _normtype );
+    piet *= quot.divided_by( _phis[i][_I] ).normalized( Prob::NORMPROB );
+    _phis[i][_I] = quot.normalized( Prob::NORMPROB );
 
-    piet.normalize( _normtype );
+    piet.normalize( Prob::NORMPROB );
 
     if( piet.hasNaNs() ) {
         cout << "LC::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;
@@ -290,7 +290,7 @@ double LC::run() {
         }
     if( hasNaNs ) {
         cout << "LC::run:  initial _pancakes has NaNs!" << endl;
-        return NAN;
+        return -1.0;
     }
 
     size_t nredges = nrEdges();
@@ -314,7 +314,7 @@ double LC::run() {
             size_t _I = update_seq[t].second;
             _pancakes[i] = NewPancake( i, _I, hasNaNs);
             if( hasNaNs )
-                return NAN;
+                return -1.0;
             CalcBelief( i );
         }
 

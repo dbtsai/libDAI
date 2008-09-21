@@ -38,7 +38,7 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
     if( !reInit )
         clamped->init();
 
-    Complex logZ0;
+    Real logZ0 = 0.0;
     for( State s(ns); s.valid(); s++ ) {
         // save unclamped factors connected to ns
         clamped->saveProbs( ns );
@@ -52,18 +52,16 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
             clamped->init();
         clamped->run();
 
-        Complex Z;
+        Real Z;
         if( s == 0 ) {
             logZ0 = clamped->logZ();
             Z = 1.0;
         } else {
             // subtract logZ0 to avoid very large numbers
             Z = exp(clamped->logZ() - logZ0);
-            if( fabs(imag(Z)) > 1e-5 )
-                cout << "Marginal:: WARNING: complex Z (" << Z << ")" << endl;
         }
 
-        Pns[s] = real(Z);
+        Pns[s] = Z;
         
         // restore clamped factors
         clamped->undoProbs( ns );
@@ -96,7 +94,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
     if( !reInit )
         clamped->init();
 
-    Complex logZ0;
+    Real logZ0 = 0.0;
     for( size_t j = 0; j < N; j++ ) {
         // clamp Var j to its possible values
         for( size_t j_val = 0; j_val < vns[j].states(); j_val++ ) {
@@ -115,10 +113,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
                 logZ0 = clamped->logZ();
             } else {
                 // subtract logZ0 to avoid very large numbers
-                Complex Z = exp(clamped->logZ() - logZ0);
-                if( fabs(imag(Z)) > 1e-5 )
-                    cout << "calcPairBelief::  Warning: complex Z: " << Z << endl;
-                Z_xj = real(Z);
+                Z_xj = exp(clamped->logZ() - logZ0);
             }
 
             for( size_t k = 0; k < N; k++ ) 
@@ -172,7 +167,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
     if( !reInit )
         clamped->init();
 
-    Complex logZ0;
+    Real logZ0 = 0.0;
     VarSet::const_iterator nj = ns.begin();
     for( long j = 0; j < (long)ns.size() - 1; j++, nj++ ) {
         size_t k = 0;
@@ -196,10 +191,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
                         logZ0 = clamped->logZ();
                     } else {
                         // subtract logZ0 to avoid very large numbers
-                        Complex Z = exp(clamped->logZ() - logZ0);
-                        if( fabs(imag(Z)) > 1e-5 )
-                            cout << "calcPairBelief::  Warning: complex Z: " << Z << endl;
-                        Z_xj = real(Z);
+                        Z_xj = exp(clamped->logZ() - logZ0);
                     }
 
                     // we assume that j.label() < k.label()

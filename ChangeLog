@@ -1,6 +1,9 @@
 libDAI-0.2.2 (2008-??-??)
 -------------------------
 
+* Now compiles also under Visual C++.
+* Added Exceptions framework.
+* Added more features to utils/createfg for creating factor graphs.
 * Pervasive change of BipartiteGraph implementation (based on an idea by
   Giuseppe Passino). BipartiteGraph no longer stores the node properties 
   (former _V1 and _V2), nor does it store a dense adjacency matrix anymore, 
@@ -44,7 +47,11 @@ libDAI-0.2.2 (2008-??-??)
   normtype is now Prob::NORMPROB by default.
 * VarSet is now implemented using a std::vector<Var> instead of a
   std::set<Var>, which yields a significant speed improvement.
+* Improved MaxSpanningTreePrims algorithm (uses boost::graph)
 * Small optimization in Diffs
+* Improved ClusterGraph implementation, yielding significant speedups
+  for the JunctionTree algorithm on large factorgraphs.
+* Improved documetation
 * Interface changes:
   - VarSet::
       stateSpace() -> states()
@@ -77,7 +84,6 @@ libDAI-0.2.2 (2008-??-??)
   - Factor::max() -> Factor::maxVal()
   - toc() in util.h now returns seconds as a double
   - VarSet::operator&&
-* Added possibility to build for Windows in Makefile
 
 
 libDAI-0.2.1 (2008-05-26)

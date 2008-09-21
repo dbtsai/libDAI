@@ -25,6 +25,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -53,7 +54,7 @@ namespace dai {
                    break;\
                }\
            if( i == sizeof(labels) / sizeof(char const *) )\
-               throw "Unknown " #x " value";\
+               DAI_THROW(UNKNOWN_ENUM_VALUE);\
         }\
 \
         operator value () const { return v; }\
@@ -99,7 +100,7 @@ namespace dai {
                    break;\
                }\
            if( i == sizeof(labels) / sizeof(char const *) )\
-               throw "Unknown " #x " value";\
+               DAI_THROW(UNKNOWN_ENUM_VALUE);\
         }\
 \
         operator value () const { return v; }\
@@ -145,7 +146,7 @@ namespace dai {
                    break;\
                }\
            if( i == sizeof(labels) / sizeof(char const *) )\
-               throw "Unknown " #x " value";\
+               DAI_THROW(UNKNOWN_ENUM_VALUE);\
         }\
 \
         operator value () const { return v; }\
@@ -191,7 +192,7 @@ namespace dai {
                    break;\
                }\
            if( i == sizeof(labels) / sizeof(char const *) )\
-               throw "Unknown " #x " value";\
+               DAI_THROW(UNKNOWN_ENUM_VALUE);\
         }\
 \
         operator value () const { return v; }\
@@ -237,7 +238,7 @@ namespace dai {
                    break;\
                }\
            if( i == sizeof(labels) / sizeof(char const *) )\
-               throw "Unknown " #x " value";\
+               DAI_THROW(UNKNOWN_ENUM_VALUE);\
         }\
 \
         operator value () const { return v; }\

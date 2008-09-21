@@ -1,0 +1,39 @@
+- Idea: a FactorGraph and a RegionGraph are often equipped with
+extra properties for nodes and edges. The code to initialize those
+is often quite similar; maybe this can be abstracted to classes
+like ExtFactorGraph and ExtRegionGraph (Ext stands for Extended), e.g.
+template <typename NodeProperties, typename EdgeProperties>
+class ExtFactorGraph : public FactorGraph {
+	public:
+		std::vector<NodeProperties>               nodeProps;
+		std::vector<std::vector<EdgeProperties> > edgeProps;
+	// blabla
+}
+A disadvantage of this approach may be worse cachability.
+- http://www.boost.org/development/requirements.html#Design_and_Programming
+- Would it be a good idea to cache second-order neighborhoods (delta's) in BipGraph?
+- Would it be a good idea to add the variable label -> index hashmap in FactorGraph,
+  to replace the linear searches that are performed every time for findVar()?
+  No, a better idea is to avoid calls to findVar() as much as possible.
+- Can the FactorGraph constructors be optimized further?
+
+TODO FOR RELEASE:
+- Test Visual C++ compatibility
+- Figure out which libraries are required and document in README
+  boost headers, boost::program_options library, boost::graph library,
+  boost::math library (under Windows)
+
+FILES IN SVN HEAD THAT ARE NO LONGER RELEVANT FOR GIT MASTER
+diffs.h
+index.h
+util.h
+util.cpp
+bipgraph.h
+weightedgraph.h
+clustergraph.h
+clustergraph.cpp
+varset.h
+var.h
+utils/createfg.cpp
+exceptions.h
+exceptions.cpp

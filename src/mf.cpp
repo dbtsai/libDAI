@@ -109,11 +109,11 @@ double MF::run() {
             jan *= piet; 
         }
 
-        jan.normalize( _normtype );
+        jan.normalize( Prob::NORMPROB );
 
         if( jan.hasNaNs() ) {
             cout << "MF::run():  ERROR: jan has NaNs!" << endl;
-            return NAN;
+            return 1.0;
         }
 
         diffs.push( dist( jan, _beliefs[i], Prob::DISTLINF ) );
@@ -171,8 +171,8 @@ vector<Factor> MF::beliefs() const {
 }
 
 
-Complex MF::logZ() const {
-    Complex sum = 0.0;
+Real MF::logZ() const {
+    Real sum = 0.0;
     
     for(size_t i=0; i < nrVars(); i++ )
         sum -= beliefV(i).entropy();
@@ -184,7 +184,7 @@ Complex MF::logZ() const {
         Factor piet;
         piet = factor(I).log0();
         piet *= henk;
-        sum -= Complex( piet.totalSum() );
+        sum -= piet.totalSum();
     }
 
     return -sum;

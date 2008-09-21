@@ -569,7 +569,7 @@ double MR::run() {
 
         return 0.0;
     } else
-        return NAN;
+        return -1.0;
 }
 
 

@@ -28,6 +28,7 @@
 #include <dai/enum.h>
 #include <dai/factorgraph.h>
 #include <dai/properties.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -92,19 +93,32 @@ class LC : public DAIAlgFG {
 
         std::string identify() const;
         Factor belief (const Var &n) const { return( _beliefs[findVar(n)] ); }
-        Factor belief (const VarSet &/*ns*/) const { assert( 0 == 1 ); }
+        Factor belief (const VarSet &/*ns*/) const { 
+            DAI_THROW(NOT_IMPLEMENTED);
+            return Factor(); 
+        }
         std::vector<Factor> beliefs() const { return _beliefs; }
-        Complex logZ() const { return NAN; }
+        Real logZ() const { 
+            DAI_THROW(NOT_IMPLEMENTED);
+            return 0.0; 
+        }
         void CalcBelief (size_t i);
         const Factor &belief (size_t i) const { return _beliefs[i]; };
         const Factor &pancake (size_t i) const { return _pancakes[i]; };
         const Factor &cavitydist (size_t i) const { return _cavitydists[i]; };
 
-        void clamp( const Var &/*n*/, size_t /*i*/ ) { assert( 0 == 1 ); }
-        void undoProbs( const VarSet &/*ns*/ ) { assert( 0 == 1 ); }
-        void saveProbs( const VarSet &/*ns*/ ) { assert( 0 == 1 ); }
-        virtual void makeCavity(const Var & /*n*/) { assert( 0 == 1 ); }
-
+        void clamp( const Var &/*n*/, size_t /*i*/ ) { 
+            DAI_THROW(NOT_IMPLEMENTED);
+        }
+        void undoProbs( const VarSet &/*ns*/ ) { 
+            DAI_THROW(NOT_IMPLEMENTED);
+        }
+        void saveProbs( const VarSet &/*ns*/ ) { 
+            DAI_THROW(NOT_IMPLEMENTED);
+        }
+        virtual void makeCavity(const Var & /*n*/) { 
+            DAI_THROW(NOT_IMPLEMENTED);
+        }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         double maxDiff() const { return maxdiff; }

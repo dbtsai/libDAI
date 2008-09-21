@@ -23,6 +23,7 @@
 #include <dai/hak.h>
 #include <dai/util.h>
 #include <dai/diffs.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -141,7 +142,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), props(),
                 cout << *cli << endl;
         }
     } else
-        throw "Invalid Clusters type";
+        DAI_THROW(INTERNAL_ERROR);
 
     RegionGraph rg(fg,cl);
     RegionGraph::operator=(rg);
@@ -229,10 +230,10 @@ double HAK::doGBP() {
                 Qb_new *= muab(alpha,_beta) ^ (1 / (nbIR(beta).size() + IR(beta).c()));
             }
 
-            Qb_new.normalize( _normtype );
+            Qb_new.normalize( Prob::NORMPROB );
             if( Qb_new.hasNaNs() ) {
                 cout << "HAK::doGBP:  Qb_new has NaNs!" << endl;
-                return NAN;
+                return 1.0;
             }
 //          _Qb[beta] = Qb_new.makeZero(1e-100);    // damping?
             _Qb[beta] = Qb_new;
@@ -246,10 +247,10 @@ double HAK::doGBP() {
                 foreach( const Neighbor &gamma, nbOR(alpha) )
                     Qa_new *= muba(alpha,gamma.iter);
                 Qa_new ^= (1.0 / OR(alpha).c());
-                Qa_new.normalize( _normtype );
+                Qa_new.normalize( Prob::NORMPROB );
                 if( Qa_new.hasNaNs() ) {
                     cout << "HAK::doGBP:  Qa_new has NaNs!" << endl;
-                    return NAN;
+                    return 1.0;
                 }
 //              _Qa[alpha] = Qa_new.makeZero(1e-100); // damping?
                 _Qa[alpha] = Qa_new;
@@ -334,7 +335,7 @@ double HAK::doDoubleLoop() {
 
         // Inner loop
         if( isnan( doGBP() ) )
-            return NAN;
+            return 1.0;
 
         // Calculate new single variable beliefs and compare with old ones
         for( size_t i = 0; i < nrVars(); ++i ) {
@@ -419,12 +420,12 @@ vector<Factor> HAK::beliefs() const {
 }
 
 
-Complex HAK::logZ() const {
-    Complex sum = 0.0;
+Real HAK::logZ() const {
+    Real sum = 0.0;
     for( size_t beta = 0; beta < nrIRs(); beta++ )
-        sum += Complex(IR(beta).c()) * Qb(beta).entropy();
+        sum += IR(beta).c() * Qb(beta).entropy();
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
-        sum += Complex(OR(alpha).c()) * Qa(alpha).entropy();
+        sum += OR(alpha).c() * Qa(alpha).entropy();
         sum += (OR(alpha).log0() * Qa(alpha)).totalSum();
     }
     return sum;

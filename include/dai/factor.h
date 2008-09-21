@@ -36,16 +36,15 @@ namespace dai {
 
 template<typename T> class      TFactor;
 typedef TFactor<Real>           Factor;
-typedef TFactor<Complex>        CFactor;
 
 
 // predefine friends
 template<typename T> Real           dist( const TFactor<T> & x, const TFactor<T> & y, Prob::DistType dt );
-template<typename T> Complex        KL_dist( const TFactor<T> & p, const TFactor<T> & q );
+template<typename T> Real           KL_dist( const TFactor<T> & p, const TFactor<T> & q );
 template<typename T> std::ostream&  operator<< (std::ostream& os, const TFactor<T>& P);
 
         
-// T should be castable from and to double and to complex
+// T should be castable from and to double
 template <typename T> class TFactor {
     protected:
         VarSet      _vs;
@@ -206,13 +205,6 @@ template <typename T> class TFactor {
             return l0; 
         }
 
-        CFactor clog0() const {
-            CFactor l0; 
-            l0._vs = _vs; 
-            l0._p = _p.clog0(); 
-            return l0; 
-        }
-
         T normalize( typename Prob::NormType norm ) { return _p.normalize( norm ); }
         TFactor<T> normalized( typename Prob::NormType norm ) const { 
             TFactor<T> result;
@@ -247,7 +239,7 @@ template <typename T> class TFactor {
         T totalSum() const { return _p.totalSum(); }
         T maxAbs() const { return _p.maxAbs(); }
         T maxVal() const { return _p.maxVal(); }
-        Complex entropy() const { return _p.entropy(); }
+        Real entropy() const { return _p.entropy(); }
         T strength( const Var &i, const Var &j ) const;
 
         friend Real dist( const TFactor<T> & x, const TFactor<T> & y, Prob::DistType dt ) {
@@ -260,7 +252,7 @@ template <typename T> class TFactor {
                 return dist( x._p, y._p, dt );
             }
         }
-        friend Complex KL_dist <> (const TFactor<T> & p, const TFactor<T> & q);
+        friend Real KL_dist <> (const TFactor<T> & p, const TFactor<T> & q);
         template<class U> friend std::ostream& operator<< (std::ostream& os, const TFactor<U>& P);
 };
 
@@ -302,7 +294,7 @@ template<typename T> TFactor<T> TFactor<T>::operator* (const TFactor<T>& Q) cons
 }
 
 
-template<typename T> Complex KL_dist(const TFactor<T> & P, const TFactor<T> & Q) {
+template<typename T> Real KL_dist(const TFactor<T> & P, const TFactor<T> & Q) {
     if( P._vs.empty() || Q._vs.empty() )
         return -1;
     else {

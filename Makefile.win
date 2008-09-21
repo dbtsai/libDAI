@@ -1,0 +1,245 @@
+#   Copyright (C) 2006-2008  Joris Mooij  [j dot mooij at science dot ru dot nl]
+#   Radboud University Nijmegen, The Netherlands
+#   
+#   This file is part of libDAI.
+#
+#   libDAI is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   libDAI is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with libDAI; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+# Enable/disable various approximate inference methods
+WITH_BP=true
+WITH_MF=true
+WITH_HAK=true
+WITH_LC=true
+WITH_TREEEP=true
+WITH_JTREE=true
+WITH_MR=true
+# Build with debug info?
+DEBUG=true
+# Build matlab interface?
+#WITH_MATLAB=true
+# New/old matlab version?
+NEW_MATLAB=true
+# Windows or linux (default)?
+WINDOWS=true
+
+# Directories
+INC=include/dai
+SRC=src
+LIB=lib
+
+# For some reason, we have to set the library path, although it is in the environment
+LIBS=/LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\ATLMFC\LIB" /LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\LIB" /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v6.0A\lib"
+# We use the BOOST Program Options library
+BOOSTLIBS=/LIBPATH:C:\boost_1_36_0\stage\lib
+
+# Compile using GNU C++ Compiler
+CC=cl
+OBJEXT=obj
+LIBEXT=lib
+
+# Flags for the C++ compiler
+CCFLAGS=/I./include /IC:\boost_1_36_0 /EHsc /Ox
+!IFDEF DEBUG
+CCFLAGS=$(CCFLAGS) /Zi /DDAI_DEBUG
+!ELSE
+CCFLAGS=$(CCFLAGS)
+!ENDIF
+
+!IFDEF WINDOWS
+CCFLAGS=$(CCFLAGS) /DWINDOWS
+!ENDIF
+
+!IFDEF WITH_BP
+CCFLAGS=$(CCFLAGS) /DWITH_BP
+OBJECTS=$(OBJECTS) bp.obj
+!ENDIF
+!IFDEF WITH_MF
+CCFLAGS=$(CCFLAGS) /DWITH_MF
+OBJECTS=$(OBJECTS) mf.obj
+!ENDIF
+!IFDEF WITH_HAK
+CCFLAGS=$(CCFLAGS) /DWITH_HAK
+OBJECTS=$(OBJECTS) hak.obj
+!ENDIF
+!IFDEF WITH_LC
+CCFLAGS=$(CCFLAGS) /DWITH_LC
+OBJECTS=$(OBJECTS) lc.obj
+!ENDIF
+!IFDEF WITH_TREEEP
+CCFLAGS=$(CCFLAGS) /DWITH_TREEEP
+OBJECTS=$(OBJECTS) treeep.obj
+!ENDIF
+!IFDEF WITH_JTREE
+CCFLAGS=$(CCFLAGS) /DWITH_JTREE
+OBJECTS=$(OBJECTS) jtree.obj
+!ENDIF
+!IFDEF WITH_MR
+CCFLAGS=$(CCFLAGS) /DWITH_MR
+OBJECTS=$(OBJECTS) mr.obj
+!ENDIF
+
+!IFDEF WITH_MATLAB
+# Replace the following by the directory where Matlab has been installed
+MATLABDIR = /opt/matlab/bin
+# Replace the following with the extension of compiled MEX files on this platform, e.g. .mexglx for x86
+MEXEXT = .mexglx
+MEX = $(MATLABDIR)/mex
+MEXFLAGS = -I.
+!IFDEF DEBUG
+MEXFLAGS = $(MEXFLAGS) -g /DDAI_DEBUG
+!ENDIF
+!IFDEF NEW_MATLAB
+MEXFLAGS = $(MEXFLAGS) -largeArrayDims
+!ELSE
+MEXFLAGS = $(MEXFLAGS) /DSMALLMEM
+!ENDIF
+!ENDIF
+
+HEADERS = $(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/x2x.h $(INC)/exceptions.h
+
+TARGETS = tests utils $(LIB)/libdai.lib example.exe
+# testregression disabled, it uses sh and awk
+# doc disabled, it uses doxygen
+!IFDEF WITH_MATLAB
+TARGETS = $(TARGETS) matlabs
+!ENDIF
+all : $(TARGETS)
+
+matlabs : matlab/dai.$(MEXEXT) matlab/dai_readfg.$(MEXEXT) matlab/dai_writefg.$(MEXEXT) matlab/dai_removeshortloops.$(MEXEXT) matlab/dai_potstrength.$(MEXEXT)
+
+$(LIB)/libdai.lib : bipgraph.obj daialg.obj alldai.obj clustergraph.obj factorgraph.obj properties.obj regiongraph.obj util.obj weightedgraph.obj x2x.obj exceptions.obj $(OBJECTS)
+	lib /out:$(LIB)/libdai.lib bipgraph.obj daialg.obj alldai.obj clustergraph.obj factorgraph.obj properties.obj regiongraph.obj util.obj weightedgraph.obj x2x.obj exceptions.obj $(OBJECTS)
+
+tests : tests/test.exe
+
+utils : utils/createfg.exe utils/fg2dot.exe utils/remove_short_loops.exe utils/fginfo.exe
+
+testregression : tests/test
+	echo Testing...this can take a while...
+	cd tests; time ./testregression; cd ..
+
+doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
+	doxygen doxygen.conf
+
+clean :
+	del *.obj *.ilk *.pdb *.exe matlab\*.$(MEXEXT) matlab\*.obj tests\test.exe tests\*.pdb tests\*.ilk utils\*.exe utils\*.pdb utils\*.ilk $(LIB)\libdai.lib
+
+
+bipgraph.obj : $(SRC)/bipgraph.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/bipgraph.cpp
+
+daialg.obj : $(SRC)/daialg.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/daialg.cpp
+
+bp.obj : $(SRC)/bp.cpp $(INC)/bp.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/bp.cpp
+
+lc.obj : $(SRC)/lc.cpp $(INC)/lc.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/lc.cpp
+
+mf.obj : $(SRC)/mf.cpp $(INC)/mf.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/mf.cpp
+
+factorgraph.obj : $(SRC)/factorgraph.cpp $(INC)/factorgraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/factorgraph.cpp
+
+util.obj : $(SRC)/util.cpp $(INC)/util.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/util.cpp
+
+regiongraph.obj : $(SRC)/regiongraph.cpp $(INC)/regiongraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/regiongraph.cpp
+
+hak.obj : $(SRC)/hak.cpp $(INC)/hak.h $(HEADERS) $(INC)/regiongraph.h
+	$(CC) $(CCFLAGS) -c $(SRC)/hak.cpp
+
+clustergraph.obj : $(SRC)/clustergraph.cpp $(INC)/clustergraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/clustergraph.cpp
+
+jtree.obj : $(SRC)/jtree.cpp $(INC)/jtree.h $(HEADERS) $(INC)/weightedgraph.h $(INC)/clustergraph.h $(INC)/regiongraph.h
+	$(CC) $(CCFLAGS) -c $(SRC)/jtree.cpp
+
+treeep.obj : $(SRC)/treeep.cpp $(INC)/treeep.h $(HEADERS) $(INC)/weightedgraph.h $(INC)/clustergraph.h $(INC)/regiongraph.h $(INC)/jtree.h
+	$(CC) $(CCFLAGS) -c $(SRC)/treeep.cpp
+
+weightedgraph.obj : $(SRC)/weightedgraph.cpp $(INC)/weightedgraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/weightedgraph.cpp
+
+mr.obj : $(SRC)/mr.cpp $(INC)/mr.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/mr.cpp
+
+properties.obj : $(SRC)/properties.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/properties.cpp
+
+exceptions.obj : $(SRC)/exceptions.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/exceptions.cpp
+
+alldai.obj : $(SRC)/alldai.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/alldai.cpp
+
+x2x.obj : $(SRC)/x2x.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/x2x.cpp
+
+
+# EXAMPLE
+##########
+
+example.exe : example.cpp $(HEADERS) $(LIB)/libdai.lib
+	$(CC) $(CCFLAGS) /Feexample example.cpp /link $(LIB)/libdai.lib $(LIBS)
+
+
+# TESTS
+########
+
+tests/test.exe : tests/test.cpp $(HEADERS) $(LIB)/libdai.lib
+	$(CC) $(CCFLAGS) /Fetests/test tests/test.cpp /link $(LIB)/libdai.lib $(LIBS) $(BOOSTLIBS)
+
+
+# MATLAB INTERFACE
+###################
+
+matlab/dai.$(MEXEXT) : matlab/dai.cpp $(HEADERS) matlab/matlab.obj $(LIB)/libdai.lib
+	$(MEX) $(MEXFLAGS) -o matlab/dai matlab/dai.cpp matlab/matlab.obj $(LIB)/libdai.lib
+
+matlab/dai_readfg.$(MEXEXT) : matlab/dai_readfg.cpp $(HEADERS) factorgraph.obj matlab/matlab.obj
+	$(MEX) $(MEXFLAGS) -o matlab/dai_readfg matlab/dai_readfg.cpp factorgraph.obj matlab/matlab.obj
+
+matlab/dai_writefg.$(MEXEXT) : matlab/dai_writefg.cpp $(HEADERS) factorgraph.obj matlab/matlab.obj
+	$(MEX) $(MEXFLAGS) -o matlab/dai_writefg matlab/dai_writefg.cpp factorgraph.obj matlab/matlab.obj
+
+matlab/dai_removeshortloops.$(MEXEXT) : matlab/dai_removeshortloops.cpp $(HEADERS) factorgraph.obj matlab/matlab.obj
+	$(MEX) $(MEXFLAGS) -o matlab/dai_removeshortloops matlab/dai_removeshortloops.cpp factorgraph.obj matlab/matlab.obj
+
+matlab/dai_potstrength.$(MEXEXT) : matlab/dai_potstrength.cpp $(HEADERS) matlab/matlab.obj
+	$(MEX) $(MEXFLAGS) -o matlab/dai_potstrength matlab/dai_potstrength.cpp matlab/matlab.obj
+
+matlab/matlab.obj : matlab/matlab.cpp matlab/matlab.h $(HEADERS)
+	$(MEX) $(MEXFLAGS) -outdir matlab -c matlab/matlab.cpp
+
+
+# UTILS
+########
+
+utils/createfg.exe : utils/createfg.cpp $(HEADERS) factorgraph.obj weightedgraph.obj util.obj bipgraph.obj exceptions.obj
+	$(CC) $(CCFLAGS) /Feutils/createfg utils/createfg.cpp factorgraph.obj weightedgraph.obj util.obj bipgraph.obj exceptions.obj /link $(LIBS) $(BOOSTLIBS)
+
+utils/fg2dot.exe : utils/fg2dot.cpp $(HEADERS) factorgraph.obj exceptions.obj
+	$(CC) $(CCFLAGS) /Feutils/fg2dot utils/fg2dot.cpp factorgraph.obj exceptions.obj /link $(LIBS)
+
+utils/remove_short_loops.exe : utils/remove_short_loops.cpp $(HEADERS) factorgraph.obj exceptions.obj
+	$(CC) $(CCFLAGS) /Feutils/remove_short_loops utils/remove_short_loops.cpp factorgraph.obj exceptions.obj /link $(LIBS)
+
+utils/fginfo.exe : utils/fginfo.cpp $(HEADERS) factorgraph.obj bipgraph.obj exceptions.obj
+	$(CC) $(CCFLAGS) /Feutils/fginfo utils/fginfo.cpp factorgraph.obj bipgraph.obj exceptions.obj /link $(LIBS)

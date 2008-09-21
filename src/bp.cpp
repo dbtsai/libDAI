@@ -172,7 +172,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
     const ind_t ind = index(i,_I);
     for( size_t r = 0; r < prod.size(); ++r )
         marg[ind[r]] += prod[r];
-    marg.normalize( _normtype );
+    marg.normalize( Prob::NORMPROB );
     
     // Store result
     if( props.logdomain )
@@ -393,10 +393,10 @@ Factor BP::beliefF (size_t I) const {
 }
 
 
-Complex BP::logZ() const {
-    Complex sum = 0.0;
+Real BP::logZ() const {
+    Real sum = 0.0;
     for(size_t i = 0; i < nrVars(); ++i )
-        sum += Complex(1.0 - nbV(i).size()) * beliefV(i).entropy();
+        sum += (1.0 - nbV(i).size()) * beliefV(i).entropy();
     for( size_t I = 0; I < nrFactors(); ++I )
         sum -= KL_dist( beliefF(I), factor(I) );
     return sum;
