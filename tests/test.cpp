@@ -47,7 +47,7 @@ class TestAI {
         double          maxdiff;
         double          time;
 
-        TestAI( const FactorGraph &fg, const string &_name, const Properties &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0) {
+        TestAI( const FactorGraph &fg, const string &_name, const PropertySet &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0) {
             double tic = toc();
             obj = newInfAlg( name, fg, opts );
             time += toc() - tic;
@@ -105,7 +105,7 @@ class TestAI {
                 obj->run();
                 time += toc() - tic;
                 logZ = real(obj->logZ());
-                maxdiff = obj->MaxDiff();
+                maxdiff = obj->maxDiff();
                 q = allBeliefs();
             };
         }
@@ -134,14 +134,14 @@ class TestAI {
 };
 
 
-pair<string, Properties> parseMethod( const string &_s, const map<string,string> & aliases ) {
+pair<string, PropertySet> parseMethod( const string &_s, const map<string,string> & aliases ) {
     string s = _s;
     if( aliases.find(_s) != aliases.end() )
         s = aliases.find(_s)->second;
 
-    pair<string, Properties> result;
+    pair<string, PropertySet> result;
     string & name = result.first;
-    Properties & opts = result.second;
+    PropertySet & opts = result.second;
 
     string::size_type pos = s.find_first_of('[');
     name = s.substr( 0, pos );
@@ -262,7 +262,7 @@ int main( int argc, char *argv[] ) {
             cout << "MAXDIFF" << endl;
 
             for( size_t m = 0; m < methods.size(); m++ ) {
-                pair<string, Properties> meth = parseMethod( methods[m], Aliases );
+                pair<string, PropertySet> meth = parseMethod( methods[m], Aliases );
 
                 if( vm.count("tol") )
                     meth.second.Set("tol",tol);

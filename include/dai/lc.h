@@ -27,6 +27,7 @@
 #include <dai/daialg.h>
 #include <dai/enum.h>
 #include <dai/factorgraph.h>
+#include <dai/properties.h>
 
 
 namespace dai {
@@ -43,21 +44,29 @@ class LC : public DAIAlgFG {
         std::vector<Factor>      _beliefs;
 
     public:
-        ENUM6(CavityType,FULL,PAIR,PAIR2,PAIRINT,PAIRCUM,UNIFORM)
-        ENUM3(UpdateType,SEQFIX,SEQRND,NONE)
+        struct Properties {
+            size_t verbose;
+            size_t maxiter;
+            double tol;
+            ENUM6(CavityType,FULL,PAIR,PAIR2,PAIRINT,PAIRCUM,UNIFORM)
+            CavityType cavity;
+            ENUM3(UpdateType,SEQFIX,SEQRND,NONE)
+            UpdateType updates;
+            std::string cavainame;
+            PropertySet cavaiopts;
+            bool reinit;
+        } props;
+        double maxdiff;
 
-        CavityType Cavity() const { return GetPropertyAs<CavityType>("cavity"); }
-        UpdateType Updates() const { return GetPropertyAs<UpdateType>("updates"); }
-        bool reInit() const { return GetPropertyAs<bool>("reinit"); }
-        
+    public:
         /// Default constructor
-        LC() : DAIAlgFG() {};
+        LC() : DAIAlgFG(), _pancakes(), _cavitydists(), _phis(), _beliefs(), props(), maxdiff() {}
         /// Copy constructor
-        LC(const LC & x) : DAIAlgFG(x), _pancakes(x._pancakes), _cavitydists(x._cavitydists), _phis(x._phis), _beliefs(x._beliefs) {};
+        LC(const LC & x) : DAIAlgFG(x), _pancakes(x._pancakes), _cavitydists(x._cavitydists), _phis(x._phis), _beliefs(x._beliefs), props(x.props), maxdiff(x.maxdiff) {}
         /// Clone function
         LC* clone() const { return new LC(*this); }
         /// Construct LC object from a FactorGraph and parameters
-        LC(const FactorGraph & fg, const Properties &opts);
+        LC( const FactorGraph & fg, const PropertySet &opts );
         /// Assignment operator
         LC& operator=(const LC & x) {
             if( this != &x ) {
@@ -66,13 +75,15 @@ class LC : public DAIAlgFG {
                 _cavitydists    = x._cavitydists;
                 _phis           = x._phis;
                 _beliefs        = x._beliefs;
+                props           = x.props;
+                maxdiff         = x.maxdiff;
             }
             return *this;
         }
 
         static const char *Name;
-        double CalcCavityDist( size_t i, const std::string &name, const Properties &opts );
-        double InitCavityDists( const std::string &name, const Properties &opts );
+        double CalcCavityDist( size_t i, const std::string &name, const PropertySet &opts );
+        double InitCavityDists( const std::string &name, const PropertySet &opts );
         long SetCavityDists( std::vector<Factor> &Q );
 
         void init();
@@ -85,15 +96,18 @@ class LC : public DAIAlgFG {
         std::vector<Factor> beliefs() const { return _beliefs; }
         Complex logZ() const { return NAN; }
         void CalcBelief (size_t i);
-        const Factor & belief (size_t i) const { return _beliefs[i]; };
-        const Factor & pancake (size_t i) const { return _pancakes[i]; };
-        const Factor & cavitydist (size_t i) const { return _cavitydists[i]; };
+        const Factor &belief (size_t i) const { return _beliefs[i]; };
+        const Factor &pancake (size_t i) const { return _pancakes[i]; };
+        const Factor &cavitydist (size_t i) const { return _cavitydists[i]; };
 
         void clamp( const Var &/*n*/, size_t /*i*/ ) { assert( 0 == 1 ); }
         void undoProbs( const VarSet &/*ns*/ ) { assert( 0 == 1 ); }
         void saveProbs( const VarSet &/*ns*/ ) { assert( 0 == 1 ); }
         virtual void makeCavity(const Var & /*n*/) { assert( 0 == 1 ); }
-        bool checkProperties();
+
+        void setProperties( const PropertySet &opts );
+        PropertySet getProperties() const;
+        double maxDiff() const { return maxdiff; }
 };
 
 

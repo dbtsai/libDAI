@@ -38,35 +38,35 @@ std::ostream& operator<< (std::ostream & os, const Property & p) {
         os << boost::any_cast<double>(p.second);
     else if( p.second.type() == typeid(bool) )
         os << boost::any_cast<bool>(p.second);
-    else if( p.second.type() == typeid(Properties) )
-        os << boost::any_cast<Properties>(p.second);
+    else if( p.second.type() == typeid(PropertySet) )
+        os << boost::any_cast<PropertySet>(p.second);
 #ifdef WITH_BP
-    else if( p.second.type() == typeid(BP::UpdateType) )
-        os << boost::any_cast<BP::UpdateType>(p.second);
+    else if( p.second.type() == typeid(BP::Properties::UpdateType) )
+        os << boost::any_cast<BP::Properties::UpdateType>(p.second);
 #endif
 #ifdef WITH_HAK
-    else if( p.second.type() == typeid(HAK::ClustersType) )
-        os << boost::any_cast<HAK::ClustersType>(p.second);
+    else if( p.second.type() == typeid(HAK::Properties::ClustersType) )
+        os << boost::any_cast<HAK::Properties::ClustersType>(p.second);
 #endif
 #ifdef WITH_JTREE
-    else if( p.second.type() == typeid(JTree::UpdateType) )
-        os << boost::any_cast<JTree::UpdateType>(p.second);
+    else if( p.second.type() == typeid(JTree::Properties::UpdateType) )
+        os << boost::any_cast<JTree::Properties::UpdateType>(p.second);
 #endif
 #ifdef WITH_MR
-    else if( p.second.type() == typeid(MR::UpdateType) )
-        os << boost::any_cast<MR::UpdateType>(p.second);
-    else if( p.second.type() == typeid(MR::InitType) )
-        os << boost::any_cast<MR::InitType>(p.second);
+    else if( p.second.type() == typeid(MR::Properties::UpdateType) )
+        os << boost::any_cast<MR::Properties::UpdateType>(p.second);
+    else if( p.second.type() == typeid(MR::Properties::InitType) )
+        os << boost::any_cast<MR::Properties::InitType>(p.second);
 #endif
 #ifdef WITH_TREEEP
-    else if( p.second.type() == typeid(TreeEP::TypeType) )
-        os << boost::any_cast<TreeEP::TypeType>(p.second);
+    else if( p.second.type() == typeid(TreeEP::Properties::TypeType) )
+        os << boost::any_cast<TreeEP::Properties::TypeType>(p.second);
 #endif
 #ifdef WITH_LC
-    else if( p.second.type() == typeid(LC::CavityType) )
-        os << boost::any_cast<LC::CavityType>(p.second);
-    else if( p.second.type() == typeid(LC::UpdateType) )
-        os << boost::any_cast<LC::UpdateType>(p.second);
+    else if( p.second.type() == typeid(LC::Properties::CavityType) )
+        os << boost::any_cast<LC::Properties::CavityType>(p.second);
+    else if( p.second.type() == typeid(LC::Properties::UpdateType) )
+        os << boost::any_cast<LC::Properties::UpdateType>(p.second);
 #endif
     else
         throw "Unknown property type";
@@ -74,10 +74,10 @@ std::ostream& operator<< (std::ostream & os, const Property & p) {
 }
 
 
-/// Sends a Properties object to an output stream
-std::ostream& operator<< (std::ostream & os, const Properties & ps) {
+/// Sends a PropertySet object to an output stream
+std::ostream& operator<< (std::ostream & os, const PropertySet & ps) {
     os << "[";
-    for( Properties::const_iterator p = ps.begin(); p != ps.end(); p++ ) {
+    for( PropertySet::const_iterator p = ps.begin(); p != ps.end(); p++ ) {
         if( p != ps.begin() )
             os << ",";
         os << (Property)*p;
@@ -87,9 +87,9 @@ std::ostream& operator<< (std::ostream & os, const Properties & ps) {
 }
 
 
-/// Reads a Properties object from an input stream, storing values as strings
-std::istream& operator >> (std::istream& is, Properties & ps) {
-    ps = Properties();
+/// Reads a PropertySet object from an input stream, storing values as strings
+std::istream& operator >> (std::istream& is, PropertySet & ps) {
+    ps = PropertySet();
 
     std::string s;
     is >> s;

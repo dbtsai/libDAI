@@ -28,6 +28,7 @@
 #include <dai/factorgraph.h>
 #include <dai/daialg.h>
 #include <dai/enum.h>
+#include <dai/properties.h>
 
 
 namespace dai {
@@ -55,13 +56,18 @@ class MR : public DAIAlgFG {
         std::vector<double> Mag;
 
     public:
-        ENUM2(UpdateType,FULL,LINEAR)
-        ENUM3(InitType,RESPPROP,CLAMPING,EXACT)
+        struct Properties {
+            size_t verbose;
+            double tol;
+            ENUM2(UpdateType,FULL,LINEAR)
+            ENUM3(InitType,RESPPROP,CLAMPING,EXACT)
+            UpdateType updates;
+            InitType inits;
+        } props;
+        double maxdiff;
 
-        UpdateType Updates() const { return GetPropertyAs<UpdateType>("updates"); }
-        InitType Inits() const { return GetPropertyAs<InitType>("inits"); }
-
-        MR( const FactorGraph & fg, const Properties &opts );
+    public:
+        MR( const FactorGraph & fg, const PropertySet &opts );
         void init(size_t Nin, double *_w, double *_th);
         void makekindex();
         void read_files();
@@ -74,7 +80,7 @@ class MR : public DAIAlgFG {
         Factor belief( const VarSet &/*ns*/ ) const { assert( 0 == 1 ); }
         std::vector<Factor> beliefs() const;
         Complex logZ() const { return NAN; }
-        void init() { assert( checkProperties() ); }
+        void init() {}
         static const char *Name;
         std::string identify() const;
         double _tJ(size_t i, sub_nb A);
@@ -91,8 +97,9 @@ class MR : public DAIAlgFG {
         double sign(double a) { return (a >= 0) ? 1.0 : -1.0; }
         MR* clone() const { assert( 0 == 1 ); }
 
-        bool checkProperties();
-
+        void setProperties( const PropertySet &opts );
+        PropertySet getProperties() const;
+        double maxDiff() const { return maxdiff; }
 }; 
 
 

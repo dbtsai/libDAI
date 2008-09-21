@@ -34,30 +34,35 @@ using namespace std;
 const char *HAK::Name = "HAK";
 
 
-bool HAK::checkProperties() {
-    if( !HasProperty("tol") )
-        return false;
-    if (!HasProperty("maxiter") )
-        return false;
-    if (!HasProperty("verbose") )
-        return false;
-    if( !HasProperty("doubleloop") )
-        return false;
-    if( !HasProperty("clusters") )
-        return false;
+void HAK::setProperties( const PropertySet &opts ) {
+    assert( opts.hasKey("tol") );
+    assert( opts.hasKey("maxiter") );
+    assert( opts.hasKey("verbose") );
+    assert( opts.hasKey("doubleloop") );
+    assert( opts.hasKey("clusters") );
     
-    ConvertPropertyTo<double>("tol");
-    ConvertPropertyTo<size_t>("maxiter");
-    ConvertPropertyTo<size_t>("verbose");
-    ConvertPropertyTo<bool>("doubleloop");
-    ConvertPropertyTo<ClustersType>("clusters");
+    props.tol = opts.getStringAs<double>("tol");
+    props.maxiter = opts.getStringAs<size_t>("maxiter");
+    props.verbose = opts.getStringAs<size_t>("verbose");
+    props.doubleloop = opts.getStringAs<bool>("doubleloop");
+    props.clusters = opts.getStringAs<Properties::ClustersType>("clusters");
 
-    if( HasProperty("loopdepth") )
-        ConvertPropertyTo<size_t>("loopdepth");
-    else if( Clusters() == ClustersType::LOOP )
-        return false;
+    if( opts.hasKey("loopdepth") )
+        props.loopdepth = opts.getStringAs<size_t>("loopdepth");
+    else
+        assert( props.clusters != Properties::ClustersType::LOOP );
+}
 
-    return true;
+
+PropertySet HAK::getProperties() const {
+    PropertySet opts;
+    opts.Set( "tol", props.tol );
+    opts.Set( "maxiter", props.maxiter );
+    opts.Set( "verbose", props.verbose );
+    opts.Set( "doubleloop", props.doubleloop );
+    opts.Set( "clusters", props.clusters );
+    opts.Set( "loopdepth", props.loopdepth );
+    return opts;
 }
 
 
@@ -92,8 +97,8 @@ void HAK::constructMessages() {
 }
 
 
-HAK::HAK(const RegionGraph & rg, const Properties &opts) : DAIAlgRG(rg, opts) {
-    assert( checkProperties() );
+HAK::HAK(const RegionGraph & rg, const PropertySet &opts ) : DAIAlgRG(rg) {
+    setProperties( opts );
 
     constructMessages();
 }
@@ -111,26 +116,26 @@ void HAK::findLoopClusters( const FactorGraph & fg, std::set<VarSet> &allcl, Var
 }
 
 
-HAK::HAK(const FactorGraph & fg, const Properties &opts) : DAIAlgRG(opts) {
-    assert( checkProperties() );
+HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), props(), maxdiff(0.0) {
+    setProperties( opts );
 
     vector<VarSet> cl;
-    if( Clusters() == ClustersType::MIN ) {
+    if( props.clusters == Properties::ClustersType::MIN ) {
         cl = fg.Cliques();
-    } else if( Clusters() == ClustersType::DELTA ) {
+    } else if( props.clusters == Properties::ClustersType::DELTA ) {
         for( size_t i = 0; i < fg.nrVars(); i++ )
             cl.push_back(fg.Delta(i)); 
-    } else if( Clusters() == ClustersType::LOOP ) {
+    } else if( props.clusters == Properties::ClustersType::LOOP ) {
         cl = fg.Cliques();
         set<VarSet> scl;
         for( size_t i0 = 0; i0 < fg.nrVars(); i0++ ) {
             VarSet i0d = fg.delta(i0);
-            if( LoopDepth() > 1 )
-                findLoopClusters( fg, scl, fg.var(i0), fg.var(i0), LoopDepth() - 1, fg.delta(i0) );
+            if( props.loopdepth > 1 )
+                findLoopClusters( fg, scl, fg.var(i0), fg.var(i0), props.loopdepth - 1, fg.delta(i0) );
         }
         for( set<VarSet>::const_iterator c = scl.begin(); c != scl.end(); c++ )
             cl.push_back(*c);
-        if( Verbose() >= 3 ) {
+        if( props.verbose >= 3 ) {
             cout << "HAK uses the following clusters: " << endl;
             for( vector<VarSet>::const_iterator cli = cl.begin(); cli != cl.end(); cli++ )
                 cout << *cli << endl;
@@ -142,14 +147,14 @@ HAK::HAK(const FactorGraph & fg, const Properties &opts) : DAIAlgRG(opts) {
     RegionGraph::operator=(rg);
     constructMessages();
 
-    if( Verbose() >= 3 )
+    if( props.verbose >= 3 )
         cout << "HAK regiongraph: " << *this << endl;
 }
 
 
 string HAK::identify() const { 
     stringstream result (stringstream::out);
-    result << Name << GetProperties();
+    result << Name << getProperties();
     return result.str();
 }
 
@@ -172,8 +177,6 @@ void HAK::init( const VarSet &ns ) {
 
 
 void HAK::init() {
-    assert( checkProperties() );
-
     for( vector<Factor>::iterator alpha = _Qa.begin(); alpha != _Qa.end(); alpha++ )
         alpha->fill( 1.0 / alpha->states() );
 
@@ -190,9 +193,9 @@ void HAK::init() {
 
 
 double HAK::doGBP() {
-    if( Verbose() >= 1 )
+    if( props.verbose >= 1 )
         cout << "Starting " << identify() << "...";
-    if( Verbose() >= 3)
+    if( props.verbose >= 3)
         cout << endl;
 
     double tic = toc();
@@ -213,7 +216,7 @@ double HAK::doGBP() {
     size_t iter = 0;
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter = 0; iter < MaxIter() && diffs.maxDiff() > Tol(); iter++ ) {
+    for( iter = 0; iter < props.maxiter && diffs.maxDiff() > props.tol; iter++ ) {
         for( size_t beta = 0; beta < nrIRs(); beta++ ) {
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
@@ -260,19 +263,20 @@ double HAK::doGBP() {
             old_beliefs[i] = new_belief;
         }
 
-        if( Verbose() >= 3 )
+        if( props.verbose >= 3 )
             cout << "HAK::doGBP:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
     }
 
-    updateMaxDiff( diffs.maxDiff() );
+    if( diffs.maxDiff() > maxdiff )
+        maxdiff = diffs.maxDiff();
 
-    if( Verbose() >= 1 ) {
-        if( diffs.maxDiff() > Tol() ) {
-            if( Verbose() == 1 )
+    if( props.verbose >= 1 ) {
+        if( diffs.maxDiff() > props.tol ) {
+            if( props.verbose == 1 )
                 cout << endl;
-            cout << "HAK::doGBP:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+            cout << "HAK::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
-            if( Verbose() >= 2 )
+            if( props.verbose >= 2 )
                 cout << "HAK::doGBP:  ";
             cout << "converged in " << iter << " passes (" << toc() - tic << " clocks)." << endl;
         }
@@ -283,9 +287,9 @@ double HAK::doGBP() {
 
 
 double HAK::doDoubleLoop() {
-    if( Verbose() >= 1 )
+    if( props.verbose >= 1 )
         cout << "Starting " << identify() << "...";
-    if( Verbose() >= 3)
+    if( props.verbose >= 3)
         cout << endl;
 
     double tic = toc();
@@ -310,14 +314,14 @@ double HAK::doDoubleLoop() {
     // Differences in single node beliefs
     Diffs diffs(nrVars(), 1.0);
 
-    size_t  outer_maxiter   = MaxIter();
-    double  outer_tol       = Tol();
-    size_t  outer_verbose   = Verbose();
-    double  org_maxdiff     = MaxDiff();
+    size_t  outer_maxiter   = props.maxiter;
+    double  outer_tol       = props.tol;
+    size_t  outer_verbose   = props.verbose;
+    double  org_maxdiff     = maxdiff;
 
     // Set parameters for inner loop
-    MaxIter( 5 );
-    Verbose( outer_verbose ? outer_verbose - 1 : 0 );
+    props.maxiter = 5;
+    props.verbose = outer_verbose ? outer_verbose - 1 : 0;
 
     size_t outer_iter = 0;
     for( outer_iter = 0; outer_iter < outer_maxiter && diffs.maxDiff() > outer_tol; outer_iter++ ) {
@@ -339,16 +343,17 @@ double HAK::doDoubleLoop() {
             old_beliefs[i] = new_belief;
         }
 
-        if( Verbose() >= 3 )
+        if( props.verbose >= 3 )
             cout << "HAK::doDoubleLoop:  maxdiff " << diffs.maxDiff() << " after " << outer_iter+1 << " passes" << endl;
     }
 
     // restore _maxiter, _verbose and _maxdiff
-    MaxIter( outer_maxiter );
-    Verbose( outer_verbose );
-    MaxDiff( org_maxdiff );
+    props.maxiter = outer_maxiter;
+    props.verbose = outer_verbose;
+    maxdiff = org_maxdiff;
 
-    updateMaxDiff( diffs.maxDiff() );
+    if( diffs.maxDiff() > maxdiff )
+        maxdiff = diffs.maxDiff();
 
     // Restore original outer regions
     ORs = org_ORs;
@@ -357,13 +362,13 @@ double HAK::doDoubleLoop() {
     for( size_t beta = 0; beta < nrIRs(); ++beta )
         IR(beta).c() = org_IR_cs[beta];
 
-    if( Verbose() >= 1 ) {
-        if( diffs.maxDiff() > Tol() ) {
-            if( Verbose() == 1 )
+    if( props.verbose >= 1 ) {
+        if( diffs.maxDiff() > props.tol ) {
+            if( props.verbose == 1 )
                 cout << endl;
                 cout << "HAK::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
             } else {
-                if( Verbose() >= 3 )
+                if( props.verbose >= 3 )
                     cout << "HAK::doDoubleLoop:  ";
                 cout << "converged in " << outer_iter << " passes (" << toc() - tic << " clocks)." << endl;
             }
@@ -374,7 +379,7 @@ double HAK::doDoubleLoop() {
 
 
 double HAK::run() {
-    if( DoubleLoop() )
+    if( props.doubleloop )
         return doDoubleLoop();
     else
         return doGBP();

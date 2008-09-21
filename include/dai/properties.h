@@ -43,12 +43,12 @@ typedef std::pair<PropertyKey, PropertyValue> Property;
 std::ostream& operator<< (std::ostream & os, const Property & p);
 
 
-/// The Properties class represents a set of properties
-class Properties : public std::map<PropertyKey, PropertyValue> {
+/// The PropertySet class represents a set of properties
+class PropertySet : public std::map<PropertyKey, PropertyValue> {
     public:
         /// Gets a property
         const PropertyValue & Get(const PropertyKey &key) const { 
-            Properties::const_iterator x = find(key); 
+            PropertySet::const_iterator x = find(key); 
 #ifdef DAI_DEBUG            
             if( x == this->end() )
                 std::cerr << "Get cannot find property " << key << std::endl;
@@ -58,7 +58,7 @@ class Properties : public std::map<PropertyKey, PropertyValue> {
         }
 
         /// Sets a property 
-        Properties & Set(const PropertyKey &key, const PropertyValue &val) { this->operator[](key) = val; return *this; }
+        PropertySet & Set(const PropertyKey &key, const PropertyValue &val) { this->operator[](key) = val; return *this; }
 
         /// Gets a property, casted as ValueType
         template<typename ValueType>
@@ -88,17 +88,33 @@ class Properties : public std::map<PropertyKey, PropertyValue> {
             }
         }
 
-        /// Shorthand for (temporarily) adding properties, e.g. Properties p()("method","BP")("verbose",1)("tol",1e-9)
-        Properties operator()(const PropertyKey &key, const PropertyValue &val) const { Properties copy = *this; return copy.Set(key,val); }
+        /// Converts a property from string to ValueType, if necessary
+        template<typename ValueType>
+        ValueType getStringAs(const PropertyKey &key) const { 
+            PropertyValue val = Get(key);
+            if( val.type() == typeid(std::string) ) {
+                std::stringstream ss;
+                ss << GetAs<std::string>(key);
+                ValueType result;
+                ss >> result;
+                return result;
+            } else if( val.type() == typeid(ValueType) ) {
+                return boost::any_cast<ValueType>(val);
+            } else
+                assert( 0 == 1 );
+        }
+
+        /// Shorthand for (temporarily) adding properties, e.g. PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
+        PropertySet operator()(const PropertyKey &key, const PropertyValue &val) const { PropertySet copy = *this; return copy.Set(key,val); }
 
         /// Check if a property with given key exists
-        bool hasKey(const PropertyKey &key) const { Properties::const_iterator x = find(key); return (x != this->end()); }
+        bool hasKey(const PropertyKey &key) const { PropertySet::const_iterator x = find(key); return (x != this->end()); }
 
-        /// Sends a Properties object to an output stream
-        friend std::ostream& operator<< (std::ostream & os, const Properties & ps);
+        /// Sends a PropertySet object to an output stream
+        friend std::ostream& operator<< (std::ostream & os, const PropertySet & ps);
 
-        /// Reads a Properties object from an input stream
-        friend std::istream& operator >> (std::istream& is, Properties & ps);
+        /// Reads a PropertySet object from an input stream
+        friend std::istream& operator >> (std::istream& is, PropertySet & ps);
 };
 
 

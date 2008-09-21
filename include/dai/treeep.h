@@ -32,6 +32,7 @@
 #include <dai/clustergraph.h>
 #include <dai/weightedgraph.h>
 #include <dai/jtree.h>
+#include <dai/properties.h>
 #include <dai/enum.h>
 
 
@@ -84,11 +85,20 @@ class TreeEP : public JTree {
         std::map<size_t, TreeEPSubTree>  _Q;
 
     public:
-        ENUM2(TypeType,ORG,ALT)
-        TypeType Type() const { return GetPropertyAs<TypeType>("type"); }
-        
-        TreeEP() : JTree(), _Q() {};
-        TreeEP( const TreeEP& x ) : JTree(x), _Q(x._Q) {
+        struct Properties {
+            size_t verbose;
+            size_t maxiter;
+            double tol;
+            ENUM2(TypeType,ORG,ALT)
+            TypeType type;
+        } props;
+        double maxdiff;
+
+    public:
+        /// Default constructor
+        TreeEP() : JTree(), _Q(), props(), maxdiff() {};
+        /// Copy constructor
+        TreeEP( const TreeEP& x ) : JTree(x), _Q(x._Q), props(x.props), maxdiff(x.maxdiff) {
             for( size_t I = 0; I < nrFactors(); I++ )
                 if( offtree( I ) )
                     _Q[I].I() = &factor(I);
@@ -101,10 +111,12 @@ class TreeEP : public JTree {
                 for( size_t I = 0; I < nrFactors(); I++ )
                     if( offtree( I ) )
                         _Q[I].I() = &factor(I);
+                props = x.props;
+                maxdiff = x.maxdiff;
             }
             return *this;
         }
-        TreeEP( const FactorGraph &fg, const Properties &opts );
+        TreeEP( const FactorGraph &fg, const PropertySet &opts );
         void ConstructRG( const DEdgeVec &tree );
 
         static const char *Name;
@@ -117,7 +129,10 @@ class TreeEP : public JTree {
 
         void init( const VarSet &/*ns*/ ) { init(); }
         void undoProbs( const VarSet &ns ) { RegionGraph::undoProbs( ns ); init( ns ); }
-        bool checkProperties();
+
+        void setProperties( const PropertySet &opts );
+        PropertySet getProperties() const;
+        double maxDiff() const { return maxdiff; }
 };
 
 

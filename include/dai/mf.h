@@ -26,6 +26,7 @@
 #include <string>
 #include <dai/daialg.h>
 #include <dai/factorgraph.h>
+#include <dai/properties.h>
 
 
 namespace dai {
@@ -34,23 +35,33 @@ namespace dai {
 class MF : public DAIAlgFG {
     protected:
         std::vector<Factor>  _beliefs;
+
+    public:
+        struct Properties {
+            size_t verbose;
+            size_t maxiter;
+            double tol;
+        } props;
+        double maxdiff;
         
     public:
         // default constructor
-        MF() : DAIAlgFG(), _beliefs() {};
+        MF() : DAIAlgFG(), _beliefs(), props(), maxdiff(0.0) {}
         // copy constructor
-        MF(const MF & x) : DAIAlgFG(x), _beliefs(x._beliefs) {};
+        MF( const MF& x ) : DAIAlgFG(x), _beliefs(x._beliefs), props(x.props), maxdiff(x.maxdiff) {}
         MF* clone() const { return new MF(*this); }
         // construct MF object from FactorGraph
-        MF(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts) {
-            assert( checkProperties() );
+        MF( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), props(), maxdiff(0.0) {
+            setProperties( opts );
             create();
         }
         // assignment operator
-        MF & operator=(const MF & x) {
-            if(this!=&x) {
-                DAIAlgFG::operator=(x);
+        MF& operator=( const MF &x ) {
+            if( this != &x ) {
+                DAIAlgFG::operator=( x );
                 _beliefs = x._beliefs;
+                props = x.props;
+                maxdiff = x.maxdiff;
             }
             return *this;
         }
@@ -68,7 +79,9 @@ class MF : public DAIAlgFG {
 
         void init( const VarSet &ns );
         void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
-        bool checkProperties();
+        void setProperties( const PropertySet &opts );
+        PropertySet getProperties() const;
+        double maxDiff() const { return maxdiff; }
 };
 
 

@@ -44,7 +44,7 @@ int main( int argc, char *argv[] ) {
             double  tol = 1e-9;
             size_t  verb = 1;
 
-            Properties opts;
+            PropertySet opts;
             opts.Set("maxiter",maxiter);
             opts.Set("tol",tol);
             opts.Set("verbose",verb);

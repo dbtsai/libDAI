@@ -26,6 +26,7 @@
 #include <string>
 #include <dai/daialg.h>
 #include <dai/factorgraph.h>
+#include <dai/properties.h>
 #include <dai/enum.h>
 
 
@@ -41,30 +42,38 @@ class BP : public DAIAlgFG {
             Prob   newMessage;
             double residual;
         };
-
         std::vector<std::vector<EdgeProp> > edges;
-        bool logDomain;
+    
+    public:
+        struct Properties {
+            size_t verbose;
+            size_t maxiter;
+            double tol;
+            bool logdomain;
+            ENUM4(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
+            UpdateType updates;
+        } props;
+        double maxdiff;
 
     public:
-        ENUM4(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
-        UpdateType Updates() const { return GetPropertyAs<UpdateType>("updates"); }
-
-        // default constructor
-        BP() : DAIAlgFG(), edges(), logDomain(false) {};
-        // copy constructor
-        BP(const BP & x) : DAIAlgFG(x), edges(x.edges), logDomain(x.logDomain) {};
+        /// Default constructor
+        BP() : DAIAlgFG(), edges(), props(), maxdiff(0.0) {};
+        /// Copy constructor
+        BP( const BP & x ) : DAIAlgFG(x), edges(x.edges), props(x.props), maxdiff(x.maxdiff) {};
+        /// Clone *this
         BP* clone() const { return new BP(*this); }
-        // construct BP object from FactorGraph
-        BP(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts), edges(), logDomain(false) {
-            assert( checkProperties() );
+        /// Construct from FactorGraph fg and PropertySet opts
+        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), edges(), props(), maxdiff(0.0) {
+            setProperties( opts );
             create();
         }
-        // assignment operator
-        BP & operator=(const BP & x) {
-            if(this!=&x) {
-                DAIAlgFG::operator=(x);
+        /// Assignment operator
+        BP& operator=( const BP & x ) {
+            if( this != &x ) {
+                DAIAlgFG::operator=( x );
                 edges = x.edges;
-                logDomain = x.logDomain;
+                props = x.props;
+                maxdiff = x.maxdiff;
             }
             return *this;
         }
@@ -79,13 +88,14 @@ class BP : public DAIAlgFG {
         const ind_t & index(size_t i, size_t _I) const { return edges[i][_I].index; }
         double & residual(size_t i, size_t _I) { return edges[i][_I].residual; }
         const double & residual(size_t i, size_t _I) const { return edges[i][_I].residual; }
-        void findMaxResidual( size_t &i, size_t &_I );
 
         std::string identify() const;
         void create();
         void init();
-        void calcNewMessage( size_t i, size_t _I );
         double run();
+
+        void findMaxResidual( size_t &i, size_t &_I );
+        void calcNewMessage( size_t i, size_t _I );
         Factor beliefV (size_t i) const;
         Factor beliefF (size_t I) const;
         Factor belief (const Var &n) const;
@@ -95,7 +105,10 @@ class BP : public DAIAlgFG {
 
         void init( const VarSet &ns );
         void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
-        bool checkProperties();
+
+        void setProperties( const PropertySet &opts );
+        PropertySet getProperties() const;
+        double maxDiff() const { return maxdiff; }
 };
 
 

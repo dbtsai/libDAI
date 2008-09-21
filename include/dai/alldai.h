@@ -25,6 +25,7 @@
 
 #include <string>
 #include <dai/daialg.h>
+#include <dai/properties.h>
 #ifdef WITH_BP
     #include <dai/bp.h>
 #endif
@@ -54,7 +55,7 @@ namespace dai {
 /// newInfAlg constructs a new approximate inference algorithm named name for the
 /// FactorGraph fg with optionts opts and returns a pointer to the new object.
 /// The caller needs to delete it (maybe some sort of smart_ptr might be useful here).
-InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Properties &opts );
+InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts );
 
 
 /// DAINames contains the names of all approximate inference algorithms

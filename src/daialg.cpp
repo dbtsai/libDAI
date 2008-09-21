@@ -48,8 +48,6 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
             clamped->clamp( *n, s(*n) );
         
         // run DAIAlg, calc logZ, store in Pns
-        if( clamped->Verbose() >= 2 )
-            cout << s << ": ";
         if( reInit )
             clamped->init();
         clamped->run();
@@ -102,9 +100,6 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
     for( size_t j = 0; j < N; j++ ) {
         // clamp Var j to its possible values
         for( size_t j_val = 0; j_val < vns[j].states(); j_val++ ) {
-            if( obj.Verbose() >= 2 )
-                cout << j << "/" << N-1 << " (" << j_val << "/" << vns[j].states() << "): ";
-
             // save unclamped factors connected to ns
             clamped->saveProbs( ns );
             

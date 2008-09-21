@@ -32,21 +32,25 @@ using namespace std;
 const char *JTree::Name = "JTREE";
 
 
-bool JTree::checkProperties() {
-    if (!HasProperty("verbose") )
-        return false;
-    if( !HasProperty("updates") )
-        return false;
+void JTree::setProperties( const PropertySet &opts ) {
+    assert( opts.hasKey("verbose") );
+    assert( opts.hasKey("updates") );
     
-    ConvertPropertyTo<size_t>("verbose");
-    ConvertPropertyTo<UpdateType>("updates");
-
-    return true;
+    props.verbose = opts.getStringAs<size_t>("verbose");
+    props.updates = opts.getStringAs<Properties::UpdateType>("updates");
 }
 
 
-JTree::JTree( const FactorGraph &fg, const Properties &opts, bool automatic ) : DAIAlgRG(fg, opts), _RTree(), _Qa(), _Qb(), _mes(), _logZ() {
-    assert( checkProperties() );
+PropertySet JTree::getProperties() const {
+    PropertySet opts;
+    opts.Set( "verbose", props.verbose );
+    opts.Set( "updates", props.updates );
+    return opts;
+}
+
+
+JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) : DAIAlgRG(fg), _RTree(), _Qa(), _Qb(), _mes(), _logZ(), props() {
+    setProperties( opts );
 
     if( automatic ) {
         // Copy VarSets of factors
@@ -56,16 +60,16 @@ JTree::JTree( const FactorGraph &fg, const Properties &opts, bool automatic ) : 
             cl.push_back( factor(I).vars() );
         ClusterGraph _cg( cl );
 
-        if( Verbose() >= 3 )
+        if( props.verbose >= 3 )
             cout << "Initial clusters: " << _cg << endl;
 
         // Retain only maximal clusters
         _cg.eraseNonMaximal();
-        if( Verbose() >= 3 )
+        if( props.verbose >= 3 )
             cout << "Maximal clusters: " << _cg << endl;
 
         vector<VarSet> ElimVec = _cg.VarElim_MinFill().eraseNonMaximal().toVector();
-        if( Verbose() >= 3 )
+        if( props.verbose >= 3 )
             cout << "VarElim_MinFill result: " << ElimVec << endl;
 
         GenerateJT( ElimVec );
@@ -145,7 +149,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
     // Check counting numbers
     Check_Counting_Numbers();
 
-    if( Verbose() >= 3 ) {
+    if( props.verbose >= 3 ) {
         cout << "Resulting regiongraph: " << *this << endl;
     }
 }
@@ -153,7 +157,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
 
 string JTree::identify() const {
     stringstream result (stringstream::out);
-    result << Name << GetProperties();
+    result << Name << getProperties();
     return result.str();
 }
 
@@ -284,9 +288,9 @@ void JTree::runShaferShenoy() {
 
 
 double JTree::run() {
-    if( Updates() == UpdateType::HUGIN )
+    if( props.updates == Properties::UpdateType::HUGIN )
         runHUGIN();
-    else if( Updates() == UpdateType::SHSH )
+    else if( props.updates == Properties::UpdateType::SHSH )
         runShaferShenoy();
     return 0.0;
 }

@@ -37,19 +37,23 @@ using namespace std;
 const char *MF::Name = "MF";
 
 
-bool MF::checkProperties() {
-    if( !HasProperty("tol") )
-        return false;
-    if (!HasProperty("maxiter") )
-        return false;
-    if (!HasProperty("verbose") )
-        return false;
-    
-    ConvertPropertyTo<double>("tol");
-    ConvertPropertyTo<size_t>("maxiter");
-    ConvertPropertyTo<size_t>("verbose");
+void MF::setProperties( const PropertySet &opts ) {
+    assert( opts.hasKey("tol") );
+    assert( opts.hasKey("maxiter") );
+    assert( opts.hasKey("verbose") );
 
-    return true;
+    props.tol = opts.getStringAs<double>("tol");
+    props.maxiter = opts.getStringAs<size_t>("maxiter");
+    props.verbose = opts.getStringAs<size_t>("verbose");
+}
+
+
+PropertySet MF::getProperties() const {
+    PropertySet opts;
+    opts.Set( "tol", props.tol );
+    opts.Set( "maxiter", props.maxiter );
+    opts.Set( "verbose", props.verbose );
+    return opts;
 }
 
 
@@ -66,14 +70,12 @@ void MF::create() {
 
 string MF::identify() const { 
     stringstream result (stringstream::out);
-    result << Name << GetProperties();
+    result << Name << getProperties();
     return result.str();
 }
 
 
 void MF::init() {
-    assert( checkProperties() );
-
     for( vector<Factor>::iterator qi = _beliefs.begin(); qi != _beliefs.end(); qi++ )
         qi->fill(1.0);
 }
@@ -82,14 +84,14 @@ void MF::init() {
 double MF::run() {
     double tic = toc();
 
-    if( Verbose() >= 1 )
+    if( props.verbose >= 1 )
         cout << "Starting " << identify() << "...";
 
     size_t pass_size = _beliefs.size();
     Diffs diffs(pass_size * 3, 1.0);
 
     size_t t=0;
-    for( t=0; t < (MaxIter()*pass_size) && diffs.maxDiff() > Tol(); t++ ) {
+    for( t=0; t < (props.maxiter*pass_size) && diffs.maxDiff() > props.tol; t++ ) {
         // choose random Var i
         size_t i = (size_t) (nrVars() * rnd_uniform());
 
@@ -119,15 +121,16 @@ double MF::run() {
         _beliefs[i] = jan;
     }
 
-    updateMaxDiff( diffs.maxDiff() );
+    if( diffs.maxDiff() > maxdiff )
+        maxdiff = diffs.maxDiff();
 
-    if( Verbose() >= 1 ) {
-        if( diffs.maxDiff() > Tol() ) {
-            if( Verbose() == 1 )
+    if( props.verbose >= 1 ) {
+        if( diffs.maxDiff() > props.tol ) {
+            if( props.verbose == 1 )
                 cout << endl;
-            cout << "MF::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+            cout << "MF::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
-            if( Verbose() >= 2 )
+            if( props.verbose >= 2 )
                 cout << "MF::run:  ";
             cout << "converged in " << t / pass_size << " passes (" << toc() - tic << " clocks)." << endl;
         }

@@ -39,37 +39,43 @@ using namespace std;
 const char *LC::Name = "LC";
 
 
-bool LC::checkProperties() {
-    if( !HasProperty("cavity") )
-        return false;
-    if( !HasProperty("updates") )
-        return false;
-    if( !HasProperty("tol") )
-        return false;
-    if (!HasProperty("maxiter") )
-        return false;
-    if (!HasProperty("verbose") )
-        return false;
-
-    ConvertPropertyTo<CavityType>("cavity");
-    ConvertPropertyTo<UpdateType>("updates");
-    ConvertPropertyTo<double>("tol");
-    ConvertPropertyTo<size_t>("maxiter");
-    ConvertPropertyTo<size_t>("verbose");
-
-    if (HasProperty("cavainame") )
-        ConvertPropertyTo<string>("cavainame");
-    if (HasProperty("cavaiopts") )
-        ConvertPropertyTo<Properties>("cavaiopts");
-    if( HasProperty("reinit") )
-        ConvertPropertyTo<bool>("reinit");
+void LC::setProperties( const PropertySet &opts ) {
+    assert( opts.hasKey("tol") );
+    assert( opts.hasKey("maxiter") );
+    assert( opts.hasKey("verbose") );
+    assert( opts.hasKey("cavity") );
+    assert( opts.hasKey("updates") );
     
-    return true;
+    props.tol = opts.getStringAs<double>("tol");
+    props.maxiter = opts.getStringAs<size_t>("maxiter");
+    props.verbose = opts.getStringAs<size_t>("verbose");
+    props.cavity = opts.getStringAs<Properties::CavityType>("cavity");
+    props.updates = opts.getStringAs<Properties::UpdateType>("updates");
+    if( opts.hasKey("cavainame") )
+        props.cavainame = opts.getStringAs<string>("cavainame");
+    if( opts.hasKey("cavaiopts") )
+        props.cavaiopts = opts.getStringAs<PropertySet>("cavaiopts");
+    if( opts.hasKey("reinit") )
+        props.reinit = opts.getStringAs<bool>("reinit");
 }
 
 
-LC::LC(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts) {
-    assert( checkProperties() );
+PropertySet LC::getProperties() const {
+    PropertySet opts;
+    opts.Set( "tol", props.tol );
+    opts.Set( "maxiter", props.maxiter );
+    opts.Set( "verbose", props.verbose );
+    opts.Set( "cavity", props.cavity );
+    opts.Set( "updates", props.updates );
+    opts.Set( "cavainame", props.cavainame );
+    opts.Set( "cavaiopts", props.cavaiopts );
+    opts.Set( "reinit", props.reinit );
+    return opts;
+}
+
+
+LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _pancakes(), _cavitydists(), _phis(), _beliefs(), props(), maxdiff(0.0) {
+    setProperties( opts );
 
     // create pancakes
     _pancakes.resize(nrVars());
@@ -95,7 +101,7 @@ LC::LC(const FactorGraph & fg, const Properties &opts) : DAIAlgFG(fg, opts) {
 
 string LC::identify() const { 
     stringstream result (stringstream::out);
-    result << Name << GetProperties();
+    result << Name << getProperties();
     return result.str();
 }
 
@@ -105,29 +111,29 @@ void LC::CalcBelief (size_t i) {
 }
 
 
-double LC::CalcCavityDist (size_t i, const std::string &name, const Properties &opts) {
+double LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet &opts) {
     Factor Bi;
     double maxdiff = 0;
 
-    if( Verbose() >= 2 )
+    if( props.verbose >= 2 )
         cout << "Initing cavity " << var(i) << "(" << delta(i).size() << " vars, " << delta(i).states() << " states)" << endl;
 
-    if( Cavity() == CavityType::UNIFORM )
+    if( props.cavity == Properties::CavityType::UNIFORM )
         Bi = Factor(delta(i));
     else {
         InfAlg *cav = newInfAlg( name, *this, opts );
         cav->makeCavity( i );
 
-        if( Cavity() == CavityType::FULL )
-            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
-        else if( Cavity() == CavityType::PAIR )
-            Bi = calcMarginal2ndO( *cav, cav->delta(i), reInit() );
-        else if( Cavity() == CavityType::PAIR2 ) {
-            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->delta(i), reInit() );
+        if( props.cavity == Properties::CavityType::FULL )
+            Bi = calcMarginal( *cav, cav->delta(i), props.reinit );
+        else if( props.cavity == Properties::CavityType::PAIR )
+            Bi = calcMarginal2ndO( *cav, cav->delta(i), props.reinit );
+        else if( props.cavity == Properties::CavityType::PAIR2 ) {
+            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->delta(i), props.reinit );
             for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
                 Bi *= pairbeliefs[ij];
-        } else if( Cavity() == CavityType::PAIRINT ) {
-            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
+        } else if( props.cavity == Properties::CavityType::PAIRINT ) {
+            Bi = calcMarginal( *cav, cav->delta(i), props.reinit );
             
             // Set interactions of order > 2 to zero
             size_t N = delta(i).size();
@@ -138,8 +144,8 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const Properties &
             x2x::w2logp (N, p);
 //            x2x::logpnorm (N, p);
             x2x::logp2p (N, p);
-        } else if( Cavity() == CavityType::PAIRCUM ) {
-            Bi = calcMarginal( *cav, cav->delta(i), reInit() );
+        } else if( props.cavity == Properties::CavityType::PAIRCUM ) {
+            Bi = calcMarginal( *cav, cav->delta(i), props.reinit );
             
             // Set cumulants of order > 2 to zero
             size_t N = delta(i).size();
@@ -150,7 +156,7 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const Properties &
             x2x::c2m (N, p, N);
             x2x::m2p (N, p);
         }
-        maxdiff = cav->MaxDiff();
+        maxdiff = cav->maxDiff();
         delete cav;
     }
     Bi.normalize( _normtype );
@@ -160,18 +166,18 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const Properties &
 }
 
 
-double LC::InitCavityDists (const std::string &name, const Properties &opts) {
+double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
     double tic = toc();
 
-    if( Verbose() >= 1 ) {
+    if( props.verbose >= 1 ) {
         cout << "LC::InitCavityDists:  ";
-        if( Cavity() == CavityType::UNIFORM )
+        if( props.cavity == Properties::CavityType::UNIFORM )
             cout << "Using uniform initial cavity distributions" << endl;
-        else if( Cavity() == CavityType::FULL )
+        else if( props.cavity == Properties::CavityType::FULL )
             cout << "Using full " << name << opts << "...";
-        else if( Cavity() == CavityType::PAIR )
+        else if( props.cavity == Properties::CavityType::PAIR )
             cout << "Using pairwise " << name << opts << "...";
-        else if( Cavity() == CavityType::PAIR2 )
+        else if( props.cavity == Properties::CavityType::PAIR2 )
             cout << "Using pairwise(new) " << name << opts << "...";
     }
 
@@ -183,7 +189,7 @@ double LC::InitCavityDists (const std::string &name, const Properties &opts) {
     }
     init();
 
-    if( Verbose() >= 1 ) {
+    if( props.verbose >= 1 ) {
         cout << "used " << toc() - tic << " clocks." << endl;
     }
 
@@ -192,7 +198,7 @@ double LC::InitCavityDists (const std::string &name, const Properties &opts) {
 
 
 long LC::SetCavityDists( std::vector<Factor> &Q ) {
-    if( Verbose() >= 1 ) 
+    if( props.verbose >= 1 ) 
         cout << "LC::SetCavityDists:  Setting initial cavity distributions" << endl;
     if( Q.size() != nrVars() )
         return -1;
@@ -210,7 +216,7 @@ long LC::SetCavityDists( std::vector<Factor> &Q ) {
 void LC::init() {
     for( size_t i = 0; i < nrVars(); ++i )
         foreach( const Neighbor &I, nbV(i) )
-            if( Updates() == UpdateType::SEQRND )
+            if( props.updates == Properties::UpdateType::SEQRND )
                 _phis[i][I.iter].randomize();
             else
                 _phis[i][I.iter].fill(1.0);
@@ -219,7 +225,7 @@ void LC::init() {
         
         foreach( const Neighbor &I, nbV(i) ) {
             _pancakes[i] *= factor(I);
-            if( Updates() == UpdateType::SEQRND )
+            if( props.updates == Properties::UpdateType::SEQRND )
               _pancakes[i] *= _phis[i][I.iter];
         }
         
@@ -260,15 +266,17 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
 
 
 double LC::run() {
-    if( Verbose() >= 1 )
+    if( props.verbose >= 1 )
         cout << "Starting " << identify() << "...";
-    if( Verbose() >= 2 )
+    if( props.verbose >= 2 )
         cout << endl;
 
     double tic = toc();
     Diffs diffs(nrVars(), 1.0);
 
-    updateMaxDiff( InitCavityDists(GetPropertyAs<string>("cavainame"), GetPropertyAs<Properties>("cavaiopts")) );
+    double md = InitCavityDists( props.cavainame, props.cavaiopts );
+    if( md > maxdiff )
+        maxdiff = md;
 
     vector<Factor> old_beliefs;
     for(size_t i=0; i < nrVars(); i++ )
@@ -296,9 +304,9 @@ double LC::run() {
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter=0; iter < MaxIter() && diffs.maxDiff() > Tol(); iter++ ) {
+    for( iter=0; iter < props.maxiter && diffs.maxDiff() > props.tol; iter++ ) {
         // Sequential updates
-        if( Updates() == UpdateType::SEQRND )
+        if( props.updates == Properties::UpdateType::SEQRND )
             random_shuffle( update_seq.begin(), update_seq.end() );
         
         for( size_t t=0; t < nredges; t++ ) {
@@ -316,19 +324,20 @@ double LC::run() {
             old_beliefs[i] = belief(i);
         }
 
-        if( Verbose() >= 3 )
+        if( props.verbose >= 3 )
             cout << "LC::run:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
     }
 
-    updateMaxDiff( diffs.maxDiff() );
+    if( diffs.maxDiff() > maxdiff )
+        maxdiff = diffs.maxDiff();
 
-    if( Verbose() >= 1 ) {
-        if( diffs.maxDiff() > Tol() ) {
-            if( Verbose() == 1 )
+    if( props.verbose >= 1 ) {
+        if( diffs.maxDiff() > props.tol ) {
+            if( props.verbose == 1 )
                 cout << endl;
-                cout << "LC::run:  WARNING: not converged within " << MaxIter() << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+                cout << "LC::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
-            if( Verbose() >= 2 )
+            if( props.verbose >= 2 )
                 cout << "LC::run:  ";
                 cout << "converged in " << iter << " passes (" << toc() - tic << " clocks)." << endl;
         }

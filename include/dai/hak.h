@@ -27,6 +27,7 @@
 #include <dai/daialg.h>
 #include <dai/regiongraph.h>
 #include <dai/enum.h>
+#include <dai/properties.h>
 
 
 namespace dai {
@@ -39,41 +40,50 @@ class HAK : public DAIAlgRG {
         std::vector<Factor>                _Qb;
         std::vector<std::vector<Factor> >  _muab;
         std::vector<std::vector<Factor> >  _muba;
+
+    public:
+        struct Properties {
+            size_t verbose;
+            size_t maxiter;
+            double tol;
+            ENUM3(ClustersType,MIN,DELTA,LOOP)
+            ClustersType clusters;
+            bool doubleloop;
+            size_t loopdepth;
+        } props;
+        double maxdiff;
         
     public:
         /// Default constructor
-        HAK() : DAIAlgRG() {};
+        HAK() : DAIAlgRG(), _Qa(), _Qb(), _muab(), _muba(), props(), maxdiff() {}
 
         /// Copy constructor
-        HAK(const HAK & x) : DAIAlgRG(x), _Qa(x._Qa), _Qb(x._Qb), _muab(x._muab), _muba(x._muba) {};
+        HAK(const HAK & x) : DAIAlgRG(x), _Qa(x._Qa), _Qb(x._Qb), _muab(x._muab), _muba(x._muba), props(x.props), maxdiff(x.maxdiff) {}
 
         /// Clone function
         HAK* clone() const { return new HAK(*this); }
         
         /// Construct from RegionGraph
-        HAK(const RegionGraph & rg, const Properties &opts);
+        HAK(const RegionGraph & rg, const PropertySet &opts);
 
         /// Construct from RactorGraph using "clusters" option
-        HAK(const FactorGraph & fg, const Properties &opts);
+        HAK(const FactorGraph & fg, const PropertySet &opts);
 
         /// Assignment operator
         HAK & operator=(const HAK & x) {
             if( this != &x ) {
                 DAIAlgRG::operator=(x);
-                _Qa         = x._Qa;
-                _Qb         = x._Qb;
-                _muab       = x._muab;
-                _muba       = x._muba;
+                _Qa    = x._Qa;
+                _Qb    = x._Qb;
+                _muab  = x._muab;
+                _muba  = x._muba;
+                props  = x.props;
+                maxdiff = x.maxdiff;
             }
             return *this;
         }
         
         static const char *Name;
-
-        ENUM3(ClustersType,MIN,DELTA,LOOP)
-        ClustersType Clusters() const { return GetPropertyAs<ClustersType>("clusters"); }
-        bool DoubleLoop() { return GetPropertyAs<bool>("doubleloop"); }
-        size_t LoopDepth() { return GetPropertyAs<size_t>("loopdepth"); }
 
         Factor & muab( size_t alpha, size_t _beta ) { return _muab[alpha][_beta]; }
         Factor & muba( size_t alpha, size_t _beta ) { return _muba[alpha][_beta]; }
@@ -92,7 +102,9 @@ class HAK : public DAIAlgRG {
 
         void init( const VarSet &ns );
         void undoProbs( const VarSet &ns ) { RegionGraph::undoProbs( ns ); init( ns ); }
-        bool checkProperties();
+        void setProperties( const PropertySet &opts );
+        PropertySet getProperties() const;
+        double maxDiff() const { return maxdiff; }
 
     private:
         void constructMessages();
