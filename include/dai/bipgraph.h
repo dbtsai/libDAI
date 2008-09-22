@@ -36,12 +36,13 @@ namespace dai {
 /// A BipartiteGraph represents the neighborhood structure of nodes in a bipartite graph.
 /** A bipartite graph has two types of nodes: type 1 and type 2. Edges can occur only between
  *  nodes of different type. Nodes are indexed by an unsigned integer, edges are indexed as
- *  a pair of unsigned integers (where the pair (a,b) means the b'th neighbor of the a'th node).
- *  The BipartiteGraph stores neighborhood structures as vectors of vectors of Neighbor entries.
+ *  a pair of unsigned integers, where the pair (a,b) means the b'th neighbor of the a'th node.
+ *  The BipartiteGraph stores neighborhood structures as vectors of vectors of Neighbor entries:
+ *  each node has a vector of Neighbor entries, which is also known as a Neighbors type.
  */
 class BipartiteGraph {
     public:
-        /// A Neighbor describes a neighboring node of some other node.
+        /// A Neighbor describes a neighboring node of some other node in a BipartiteGraph.
         /** Iterating over all neighbors of node n1 of type 1 can be done in the following way:
          *  \code
          *      foreach( const BipartiteGraph::Neighbor &n2, nb1(n1) ) {
@@ -60,7 +61,7 @@ class BipartiteGraph {
             unsigned node;
             /// Contains the "dual" iter
             unsigned dual;
-            /// Cast to unsigned returns node
+            /// Cast to unsigned returns node member
             operator unsigned () const { return node; }
             /// Default constructor
             Neighbor() {}
@@ -71,7 +72,7 @@ class BipartiteGraph {
         /// Neighbors is a vector of Neighbor entries; each node has an associated Neighbors variable, which describes its neighbors.
         typedef std::vector<Neighbor> Neighbors;
 
-        /// Edge is used as index of an edge: an Edge(a,b) corresponds to the edge between the a'th node and its b'th neighbor.
+        /// Edge is used as index of an edge: an Edge(a,b) corresponds to the edge between the a'th node and its b'th neighbor. It depends on the context whether the first node (with index a) is of type 1 or of type 2.
         typedef std::pair<size_t,size_t> Edge;
 
     private:
@@ -187,7 +188,7 @@ class BipartiteGraph {
         /// Returns number of nodes of type 2
         size_t nr2() const { return _nb2.size(); }
         
-        /// Calculates the number of edges
+        /// Calculates the number of edges, using O(nr1()) time
         size_t nrEdges() const {
             size_t sum = 0;
             for( size_t i1 = 0; i1 < nr1(); i1++ )

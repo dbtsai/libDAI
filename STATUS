@@ -10,12 +10,15 @@ class ExtFactorGraph : public FactorGraph {
 	// blabla
 }
 A disadvantage of this approach may be worse cachability.
+- BipartiteGraph::isConnected should be optimized.
 - http://www.boost.org/development/requirements.html#Design_and_Programming
 - Would it be a good idea to cache second-order neighborhoods (delta's) in BipGraph?
 - Would it be a good idea to add the variable label -> index hashmap in FactorGraph,
   to replace the linear searches that are performed every time for findVar()?
   No, a better idea is to avoid calls to findVar() as much as possible.
 - Can the FactorGraph constructors be optimized further?
+- Solve the proliferation of type checks for all different ENUM's in
+properties.cpp
 
 TODO FOR RELEASE:
 - Test Visual C++ compatibility
@@ -37,3 +40,7 @@ var.h
 utils/createfg.cpp
 exceptions.h
 exceptions.cpp
+
+DOCUMENTATION READY:
+- bipgraph.h, bipgraph.cpp
+- var.h

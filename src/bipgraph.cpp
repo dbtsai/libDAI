@@ -28,7 +28,6 @@ namespace dai {
 using namespace std;
 
 
-/// Remove node of type 1 and all incident edges.
 void BipartiteGraph::erase1( size_t n1 ) {
     assert( n1 < nr1() );
     // Erase neighbor entry of node n1
@@ -55,7 +54,6 @@ void BipartiteGraph::erase1( size_t n1 ) {
 }
 
 
-/// Remove node of type 2 and all incident edges.
 void BipartiteGraph::erase2( size_t n2 ) {
     assert( n2 < nr2() );
     // Erase neighbor entry of node n2
@@ -82,10 +80,8 @@ void BipartiteGraph::erase2( size_t n2 ) {
 }
 
 
-/// Calculate second-order neighbors (i.e., neighbors of neighbors) of node n1 of type 1.
-/** If include == true, include n1 itself, otherwise exclude n1.
- */
 std::vector<size_t> BipartiteGraph::delta1( size_t n1, bool include ) const {
+    // get all second-order neighbors
     std::vector<size_t> result;
     foreach( const Neighbor &n2, nb1(n1) )
         foreach( const Neighbor &m1, nb2(n2) )
@@ -98,10 +94,8 @@ std::vector<size_t> BipartiteGraph::delta1( size_t n1, bool include ) const {
 }
 
 
-/// Calculate second-order neighbors (i.e., neighbors of neighbors) of node n2 of type 2.
-/** If include == true, include n2 itself, otherwise exclude n2.
- */
 std::vector<size_t> BipartiteGraph::delta2( size_t n2, bool include ) const {
+    // store all second-order neighbors
     std::vector<size_t> result;
     foreach( const Neighbor &n1, nb2(n2) )
         foreach( const Neighbor &m2, nb1(n1) )
@@ -114,7 +108,6 @@ std::vector<size_t> BipartiteGraph::delta2( size_t n2, bool include ) const {
 }
 
 
-/// Returns true if the graph is connected
 bool BipartiteGraph::isConnected() const {
     if( nr1() == 0 ) {
         return true;
@@ -166,10 +159,6 @@ bool BipartiteGraph::isConnected() const {
 }
 
 
-/// Returns true if the graph is a tree, i.e., if it is singly connected and connected.
-/** This is equivalent to whether for each pair of vertices in the graph, there exists
- *  a unique path in the graph that starts at the first and ends at the second vertex.
- */
 bool BipartiteGraph::isTree() const {
     using namespace std;
     vector<levelType> levels;
@@ -238,7 +227,6 @@ bool BipartiteGraph::isTree() const {
 }
 
 
-/// Stream to output stream os in graphviz .dot syntax
 void BipartiteGraph::display( std::ostream& os ) const {
     using namespace std;
     os << "graph G {" << endl;
@@ -255,7 +243,6 @@ void BipartiteGraph::display( std::ostream& os ) const {
 }
 
 
-/// Checks internal consistency
 void BipartiteGraph::check() const {
     size_t N1 = nr1();
     size_t N2 = nr2();

@@ -36,14 +36,14 @@
 namespace dai {
 
 
-/// Represents a set of variables.
+/// A VarSet represents a set of variables.
 /**
- *  It is implemented as an ordered vector<Var> for efficiency reasons
- *  (this is more efficient than a set<Var>). In addition, it provides 
- *  an interface for common set-theoretic operations.
+ *  It is implemented as an ordered std::vector<Var> for efficiency reasons
+ *  (indeed, it was found that a std::set<Var> usually has more overhead). 
+ *  In addition, it provides an interface for common set-theoretic operations.
  */
 class VarSet {
-    protected:
+    private:
         /// The variables in this set
         std::vector<Var> _vars;
 
@@ -73,7 +73,7 @@ class VarSet {
         }
 
         /// Construct from a range of iterators
-        /*  The value_type of the VarIterator should be Var.
+        /** The value_type of the VarIterator should be Var.
          *  For efficiency, the number of variables can be
          *  speficied by sizeHint.
          */
@@ -100,13 +100,13 @@ class VarSet {
         }
         
 
-        /// Return the product of the number of states of each variable in this set
+        /// Returns the product of the number of states of each variable in this set
         size_t states() const { 
             return _states; 
         }
         
 
-        /// Setminus operator (result contains all variables except those in ns)
+        /// Setminus operator (result contains all variables in *this, except those in ns)
         VarSet operator/ ( const VarSet& ns ) const {
             VarSet res;
             std::set_difference( _vars.begin(), _vars.end(), ns._vars.begin(), ns._vars.end(), inserter( res._vars, res._vars.begin() ) );
@@ -114,7 +114,7 @@ class VarSet {
             return res;
         }
 
-        /// Set-union operator (result contains all variables plus those in ns)
+        /// Set-union operator (result contains all variables in *this, plus those in ns)
         VarSet operator| ( const VarSet& ns ) const {
             VarSet res;
             std::set_union( _vars.begin(), _vars.end(), ns._vars.begin(), ns._vars.end(), inserter( res._vars, res._vars.begin() ) );
@@ -122,7 +122,7 @@ class VarSet {
             return res;
         }
 
-        /// Set-intersection operator (result contains all variables that are also contained in ns)
+        /// Set-intersection operator (result contains all variables in *this that are also contained in ns)
         VarSet operator& ( const VarSet& ns ) const {
             VarSet res;
             std::set_intersection( _vars.begin(), _vars.end(), ns._vars.begin(), ns._vars.end(), inserter( res._vars, res._vars.begin() ) );
@@ -195,13 +195,13 @@ class VarSet {
             return( os );
         }
 
-        // Constant iterator
+        /// Constant iterator over Vars
         typedef std::vector<Var>::const_iterator const_iterator;
-        /// Iterator
+        /// Iterator over Vars
         typedef std::vector<Var>::iterator iterator;
-        // Constant reverse iterator
+        /// Constant reverse iterator over Vars
         typedef std::vector<Var>::const_reverse_iterator const_reverse_iterator;
-        /// Reverse Iterator
+        /// Reverse iterator over Vars
         typedef std::vector<Var>::reverse_iterator reverse_iterator;
         
         /// Returns iterator that points to the first variable
@@ -229,7 +229,7 @@ class VarSet {
         std::vector<Var>::size_type size() const { return _vars.size(); }
 
 
-        /// Returns whether the set is empty
+        /// Returns whether the VarSet is empty
         bool empty() const { return _vars.size() == 0; }
 
 
@@ -263,8 +263,8 @@ class VarSet {
             return state;
         }
 
-    protected:
-        /// Calculate number of states
+    private:
+        /// Calculates the number of states
         size_t calcStates() {
             _states = 1;
             foreach( Var &i, _vars )

@@ -37,7 +37,7 @@ namespace dai {
  */
 class Var {
     private:
-        /// Internal label of the variable
+        /// Label of the variable (its unique ID)
         long    _label;
 
         /// Number of possible values
@@ -49,30 +49,30 @@ class Var {
         /// Constructor
         Var( long label, size_t states ) : _label(label), _states(states) {}
 
-        /// Gets the label
+        /// Returns the label
         long label() const { return _label; }
         /// Returns reference to label
         long & label() { return _label; }
 
-        /// Gets the number of states
+        /// Returns the number of states
         size_t states () const { return _states; }
         /// Returns reference to number of states
         size_t& states () { return _states; }
 
-        /// Smaller-than operator (compares labels)
+        /// Smaller-than operator (only compares labels)
         bool operator < ( const Var& n ) const { return( _label <  n._label ); }
-        /// Larger-than operator (compares labels)
+        /// Larger-than operator (only compares labels)
         bool operator > ( const Var& n ) const { return( _label >  n._label ); }
-        /// Smaller-than-or-equal-to operator (compares labels)
+        /// Smaller-than-or-equal-to operator (only compares labels)
         bool operator <= ( const Var& n ) const { return( _label <= n._label ); }
-        /// Larger-than-or-equal-to operator (compares labels)
+        /// Larger-than-or-equal-to operator (only compares labels)
         bool operator >= ( const Var& n ) const { return( _label >= n._label ); }
-        /// Not-equal-to operator (compares labels)
+        /// Not-equal-to operator (only compares labels)
         bool operator != ( const Var& n ) const { return( _label != n._label ); }
-        /// Equal-to operator (compares labels)
+        /// Equal-to operator (only compares labels)
         bool operator == ( const Var& n ) const { return( _label == n._label ); }
 
-        /// Write this Var to stream
+        /// Write a Var to output stream
         friend std::ostream& operator << ( std::ostream& os, const Var& n ) {
             return( os << "[" << n.label() << "]" );
         }
