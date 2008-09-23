@@ -89,7 +89,7 @@ class TreeEP : public JTree {
             size_t verbose;
             size_t maxiter;
             double tol;
-            ENUM2(TypeType,ORG,ALT)
+            DAI_ENUM(TypeType,ORG,ALT)
             TypeType type;
         } props;
         double maxdiff;

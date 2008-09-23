@@ -49,7 +49,7 @@ class JTree : public DAIAlgRG {
     public:
         struct Properties {
             size_t verbose;
-            ENUM2(UpdateType,HUGIN,SHSH)
+            DAI_ENUM(UpdateType,HUGIN,SHSH)
             UpdateType updates;
         } props;
 

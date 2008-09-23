@@ -60,8 +60,8 @@ class MR : public DAIAlgFG {
         struct Properties {
             size_t verbose;
             double tol;
-            ENUM2(UpdateType,FULL,LINEAR)
-            ENUM3(InitType,RESPPROP,CLAMPING,EXACT)
+            DAI_ENUM(UpdateType,FULL,LINEAR)
+            DAI_ENUM(InitType,RESPPROP,CLAMPING,EXACT)
             UpdateType updates;
             InitType inits;
         } props;

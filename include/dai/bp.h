@@ -50,7 +50,7 @@ class BP : public DAIAlgFG {
             size_t maxiter;
             double tol;
             bool logdomain;
-            ENUM4(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
+            DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
             UpdateType updates;
         } props;
         double maxdiff;

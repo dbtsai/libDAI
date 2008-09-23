@@ -49,9 +49,9 @@ class LC : public DAIAlgFG {
             size_t verbose;
             size_t maxiter;
             double tol;
-            ENUM6(CavityType,FULL,PAIR,PAIR2,PAIRINT,PAIRCUM,UNIFORM)
+            DAI_ENUM(CavityType,FULL,PAIR,PAIR2,PAIRINT,PAIRCUM,UNIFORM)
             CavityType cavity;
-            ENUM3(UpdateType,SEQFIX,SEQRND,NONE)
+            DAI_ENUM(UpdateType,SEQFIX,SEQRND,NONE)
             UpdateType updates;
             std::string cavainame;
             PropertySet cavaiopts;

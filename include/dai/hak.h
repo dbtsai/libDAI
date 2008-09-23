@@ -46,7 +46,7 @@ class HAK : public DAIAlgRG {
             size_t verbose;
             size_t maxiter;
             double tol;
-            ENUM3(ClustersType,MIN,DELTA,LOOP)
+            DAI_ENUM(ClustersType,MIN,DELTA,LOOP)
             ClustersType clusters;
             bool doubleloop;
             size_t loopdepth;

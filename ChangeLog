@@ -3,6 +3,7 @@ libDAI-0.2.2 (2008-??-??)
 
 * Now compiles also under Visual C++.
 * Added Exceptions framework.
+* Replaced ENUM2,ENUM3,ENUM4,ENUM5,ENUM6 by single DAI_ENUM macro.
 * Added more features to utils/createfg for creating factor graphs.
 * Pervasive change of BipartiteGraph implementation (based on an idea by
   Giuseppe Passino). BipartiteGraph no longer stores the node properties 
