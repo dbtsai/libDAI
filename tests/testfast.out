@@ -1,6 +1,7 @@
 # testfast.fg
 # METHOD                                  MAX ERROR   AVG ERROR   LOGZ ERROR  MAXDIFF   
-JTREE_HUGIN                               
+EXACT[verbose=0]                          
+JTREE_HUGIN                               1.000e-09   1.000e-09   1.000e-09   1.000e-09 
 JTREE_SHSH                                1.000e-09   1.000e-09   1.000e-09   1.000e-09 
 BP_SEQFIX                                 9.483e-02   3.078e-02   1.737e-02   1.000e-09 
 BP_SEQRND                                 9.483e-02   3.078e-02   1.737e-02   1.000e-09 

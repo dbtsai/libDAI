@@ -48,34 +48,12 @@ class TestAI {
         double          maxdiff;
         double          time;
         bool            has_logZ;
+        bool            has_maxdiff;
 
         TestAI( const FactorGraph &fg, const string &_name, const PropertySet &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0), has_logZ(true) {
             double tic = toc();
             obj = newInfAlg( name, fg, opts );
             time += toc() - tic;
-/*
-            } else if( method.substr(0,5) == "EXACT" ) { // EXACT
-                // Look if the network is small enough to do brute-force exact method
-                bool toolarge = false;
-                size_t total_statespace = 1;
-                for( size_t i = 0; i < fg.nrVars(); i++ ) {
-                    total_statespace *= fg.var(i).states();
-                    if( total_statespace > (1UL << 16) )
-                        toolarge = true;
-                }
-
-                if( !toolarge ) {
-                    Factor piet;
-                    for( size_t I = 0; I < fg.nrFactors(); I++ )
-                        piet *= fg.factor( I );
-                    for( size_t i = 0; i < fg.nrVars(); i++ )
-                        q.push_back(piet.marginal(fg.var(i)));
-                    time += toc() - tic;
-                    logZ = fg.ExactlogZ();
-                } else
-                    throw "Network too large for EXACT method";
-            }
-*/
         }
 
         ~TestAI() { 
@@ -99,9 +77,6 @@ class TestAI {
 
         void doAI() {
             double tic = toc();
-//            if( name == "EXACT" ) {
-//                // calculation has already been done
-//            } 
             if( obj != NULL ) {
                 obj->init();
                 obj->run();
@@ -112,7 +87,12 @@ class TestAI {
                 } catch( Exception &e ) {
                     has_logZ = false;
                 }
-                maxdiff = obj->maxDiff();
+                try {
+                    maxdiff = obj->maxDiff();
+                    has_maxdiff = true;
+                } catch( Exception &e ) {
+                    has_maxdiff = false;
+                }
                 q = allBeliefs();
             };
         }
@@ -185,6 +165,7 @@ int main( int argc, char *argv[] ) {
         double tol;
         size_t maxiter;
         size_t verbose;
+        bool marginals = false;
         bool report_time = true;
 
         po::options_description opts_required("Required options");
@@ -200,6 +181,7 @@ int main( int argc, char *argv[] ) {
             ("tol", po::value< double >(&tol), "Override tolerance")
             ("maxiter", po::value< size_t >(&maxiter), "Override maximum number of iterations")
             ("verbose", po::value< size_t >(&verbose), "Override verbosity")
+            ("marginals", po::value< bool >(&marginals), "Output single node marginals?")
             ("report-time", po::value< bool >(&report_time), "Report calculation time")
         ;
 
@@ -314,14 +296,23 @@ int main( int argc, char *argv[] ) {
                         cout << "N/A         ";
                     }
                     cout.width( 10 );
-                    double md = clipdouble( piet.maxdiff, 1e-9 );
-                    if( isnan( me ) )
-                        md = me;
-                    if( isnan( ae ) )
-                        md = ae;
-                    cout << md << endl;
+                    if( piet.has_maxdiff ) {
+                        double md = clipdouble( piet.maxdiff, 1e-9 );
+                        if( isnan( me ) )
+                            md = me;
+                        if( isnan( ae ) )
+                            md = ae;
+                        cout << md << endl;
+                    } else {
+                        cout << "N/A       ";
+                    }
                 } else
                     cout << endl;
+
+                if( marginals ) {
+                    for( size_t i = 0; i < piet.q.size(); i++ )
+                        cout << "# " << piet.q[i] << endl;
+                }
             }
         }
     } catch(const char *e) {

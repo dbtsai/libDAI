@@ -19,14 +19,16 @@ A disadvantage of this approach may be worse cachability.
 - Can the FactorGraph constructors be optimized further?
 - Solve the proliferation of type checks for all different ENUM's in
 properties.cpp
+- Remove x2x?
 
 TODO FOR RELEASE:
 - Test Visual C++ compatibility
 - Figure out which libraries are required and document in README
   boost headers, boost::program_options library, boost::graph library,
   boost::math library (under Windows)
+- Change email address
 
-FILES IN SVN HEAD THAT ARE NO LONGER RELEVANT FOR GIT MASTER
+FILES IN SVN HEAD THAT ARE NO LONGER RELEVANT FOR GIT MASTER:
 diffs.h
 index.h
 util.h
@@ -41,6 +43,51 @@ utils/createfg.cpp
 exceptions.h
 exceptions.cpp
 enum.h
+doxygen.conf
+example.cpp
+FILEFORMAT
+Makefile
+exact.h
+exact.cpp
+alldai.h
+alldai.cpp
+
+FILES IN SVN HEAD THAT ARE STILL RELEVANT:
+weightedgraph.cpp
+ChangeLog
+README
+TODO
+prob.h
+properties.h
+properties.cpp
+factor.h
+factor.cpp
+factorgraph.h
+factorgraph.cpp
+regiongraph.h
+regiongraph.cpp
+
+daialg.h
+daialg.cpp
+bp.h
+bp.cpp
+hak.h
+hak.cpp
+jtree.h
+jtree.cpp
+lc.h
+lc.cpp
+mf.h
+mf.cpp
+mr.h
+mr.cpp
+treeep.h
+treeep.cpp
+
+matlab/*
+tests/*
+utils/*
+
 
 DOCUMENTATION READY:
 - bipgraph.h, bipgraph.cpp

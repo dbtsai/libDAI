@@ -40,7 +40,7 @@ int main( int argc, char *argv[] ) {
             cout << "Error reading " << argv[1] << endl;
             return 2;
         } else {
-            size_t  maxiter = 1000;
+            size_t  maxiter = 10000;
             double  tol = 1e-9;
             size_t  verb = 1;
 
@@ -53,17 +53,28 @@ int main( int argc, char *argv[] ) {
             jt.init();
             jt.run();
 
+            BP bp(fg, opts("updates",string("SEQFIX"))("logdomain",false));
+            bp.init();
+            bp.run();
+
             cout << "Exact single node marginals:" << endl;
             for( size_t i = 0; i < fg.nrVars(); i++ )
                 cout << jt.belief(fg.var(i)) << endl;
 
-            BP bp(fg, opts("updates",string("SEQMAX"))("logdomain",false));
-            bp.init();
-            bp.run();
-
             cout << "Approximate (loopy belief propagation) single node marginals:" << endl;
             for( size_t i = 0; i < fg.nrVars(); i++ )
                 cout << bp.belief(fg.var(i)) << endl;
+
+            cout << "Exact factor marginals:" << endl;
+            for( size_t I = 0; I < fg.nrFactors(); I++ )
+                cout << jt.belief(fg.factor(I).vars()) << endl;
+
+            cout << "Approximate (loopy belief propagation) factor marginals:" << endl;
+            for( size_t I = 0; I < fg.nrFactors(); I++ )
+                cout << bp.belief(fg.factor(I).vars()) << "=" << bp.beliefF(I) << endl;
+
+            cout << "Exact log partition sum: " << jt.logZ() << endl;
+            cout << "Approximate (loopy belief propagation) log partition sum: " << bp.logZ() << endl;
         }
     }
 

@@ -26,6 +26,7 @@
 #include <string>
 #include <dai/daialg.h>
 #include <dai/properties.h>
+#include <dai/exactinf.h>
 #ifdef WITH_BP
     #include <dai/bp.h>
 #endif
@@ -61,6 +62,7 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
 /// DAINames contains the names of all approximate inference algorithms
 
 static const char* DAINames[] = {
+    ExactInf::Name,
 #ifdef WITH_BP
     BP::Name, 
 #endif

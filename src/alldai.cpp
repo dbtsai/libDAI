@@ -32,6 +32,8 @@ using namespace std;
 
 
 InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const PropertySet &opts ) {
+    if( name == ExactInf::Name )
+        return new ExactInf (fg, opts);
 #ifdef WITH_BP
     if( name == BP::Name ) 
         return new BP (fg, opts);
