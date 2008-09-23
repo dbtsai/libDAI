@@ -40,6 +40,7 @@ var.h
 utils/createfg.cpp
 exceptions.h
 exceptions.cpp
+enum.h
 
 DOCUMENTATION READY:
 - bipgraph.h, bipgraph.cpp

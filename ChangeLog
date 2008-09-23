@@ -4,6 +4,7 @@ libDAI-0.2.2 (2008-??-??)
 * Now compiles also under Visual C++.
 * Added Exceptions framework.
 * Replaced ENUM2,ENUM3,ENUM4,ENUM5,ENUM6 by single DAI_ENUM macro.
+* Removed utils/remove_short_loops and matlab/remove_short_loops.
 * Added more features to utils/createfg for creating factor graphs.
 * Pervasive change of BipartiteGraph implementation (based on an idea by
   Giuseppe Passino). BipartiteGraph no longer stores the node properties 
@@ -50,6 +51,14 @@ libDAI-0.2.2 (2008-??-??)
   std::set<Var>, which yields a significant speed improvement.
 * Improved MaxSpanningTreePrims algorithm (uses boost::graph)
 * Small optimization in Diffs
+* Replaced Complex with real numbers (negative potentials is just not
+  used enough to warrant the additional "complexity" :))
+* Moved Properties and MaxDiff frameworks from InfAlg to each individual
+  inference algorithm, because the Properties framework was not as 
+  convenient as I hoped, and not every inference algorithm needs a maxdiff
+  variable. Also, replaced some FactorGraph functionality in InfAlg by a
+  function that returns the FactorGraph. The result is cleaner (less 
+  entangled) code.
 * Improved ClusterGraph implementation, yielding significant speedups
   for the JunctionTree algorithm on large factorgraphs.
 * Improved documetation
@@ -71,6 +80,8 @@ libDAI-0.2.2 (2008-??-??)
       removed ExactMarginal(const VarSet &)
       removed ExactlogZ()
       moved isConnected() to BipartiteGraph
+      removed updatedFactor(size_t)
+      removed _normtype and NormType()
   - RegionGraph::
       nr_ORs() -> nrORs()
       nr_IRs() -> nrIRs()
@@ -85,6 +96,7 @@ libDAI-0.2.2 (2008-??-??)
   - Factor::max() -> Factor::maxVal()
   - toc() in util.h now returns seconds as a double
   - VarSet::operator&&
+  - Properties -> PropertySet
 
 
 libDAI-0.2.1 (2008-05-26)
