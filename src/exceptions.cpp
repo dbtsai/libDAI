@@ -37,6 +37,7 @@ namespace dai {
         "Not all mandatory Properties specified",
         "Multiple undo levels unsupported",
         "FactorGraph is not connected",
+        "Impossible typecast",
         "Internal error"
     }; 
 

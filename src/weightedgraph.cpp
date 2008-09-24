@@ -31,15 +31,6 @@ namespace dai {
 using namespace std;
 
 
-ostream & operator << (ostream & os, const DEdgeVec & rt) {
-    os << "[";
-    for( size_t n = 0; n < rt.size(); n++ )
-        os << rt[n] << ", ";
-    os << "]";
-    return os;
-}
-
-
 /// Calculate rooted tree from a tree T and a root
 DEdgeVec GrowRootedTree( const Graph & T, size_t Root ) {
     DEdgeVec result;

@@ -52,6 +52,7 @@ namespace dai {
               NOT_ALL_PROPERTIES_SPECIFIED,
               MULTIPLE_UNDO,
               FACTORGRAPH_NOT_CONNECTED,
+              IMPOSSIBLE_TYPECAST,
               INTERNAL_ERROR,
               NUM_ERRORS};  // NUM_ERRORS should be the last entry
 

@@ -35,6 +35,7 @@ util.h
 util.cpp
 bipgraph.h
 weightedgraph.h
+weightedgraph.cpp
 clustergraph.h
 clustergraph.cpp
 varset.h
@@ -51,15 +52,14 @@ exact.h
 exact.cpp
 alldai.h
 alldai.cpp
+properties.h
+properties.cpp
 
 FILES IN SVN HEAD THAT ARE STILL RELEVANT:
-weightedgraph.cpp
 ChangeLog
 README
 TODO
 prob.h
-properties.h
-properties.cpp
 factor.h
 factor.cpp
 factorgraph.h

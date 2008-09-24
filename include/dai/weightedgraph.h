@@ -93,7 +93,6 @@ class UEdge {
 
 typedef std::vector<UEdge>  UEdgeVec;
 typedef std::vector<DEdge>  DEdgeVec;
-std::ostream & operator << (std::ostream & os, const DEdgeVec & rt);
 template<class T> class WeightedGraph : public std::map<UEdge, T> {};
 typedef std::set<UEdge>     Graph;
 

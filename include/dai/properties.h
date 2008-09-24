@@ -29,6 +29,7 @@
 #include <map>
 #include <cassert>
 #include <typeinfo>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -51,7 +52,7 @@ class PropertySet : public std::map<PropertyKey, PropertyValue> {
             PropertySet::const_iterator x = find(key); 
 #ifdef DAI_DEBUG            
             if( x == this->end() )
-                std::cerr << "Get cannot find property " << key << std::endl;
+                std::cerr << "PropertySet::Get cannot find property " << key << std::endl;
 #endif
             assert( x != this->end() ); 
             return x->second; 
@@ -100,8 +101,10 @@ class PropertySet : public std::map<PropertyKey, PropertyValue> {
                 return result;
             } else if( val.type() == typeid(ValueType) ) {
                 return boost::any_cast<ValueType>(val);
-            } else
-                assert( 0 == 1 );
+            } else {
+                DAI_THROW(IMPOSSIBLE_TYPECAST);
+                return ValueType();
+            }
         }
 
         /// Shorthand for (temporarily) adding properties, e.g. PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
