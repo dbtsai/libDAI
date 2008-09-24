@@ -106,8 +106,10 @@ class BP : public DAIAlgFG {
         void init( const VarSet &ns );
         void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
 
+        /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
+        std::string printProperties() const;
         double maxDiff() const { return maxdiff; }
 };
 

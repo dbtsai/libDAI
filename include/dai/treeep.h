@@ -132,6 +132,7 @@ class TreeEP : public JTree {
 
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
+        std::string printProperties() const;
         double maxDiff() const { return maxdiff; }
 };
 

@@ -67,6 +67,19 @@ PropertySet HAK::getProperties() const {
 }
 
 
+string HAK::printProperties() const {
+    stringstream s( stringstream::out );
+    s << "[";
+    s << "tol=" << props.tol << ",";
+    s << "maxiter=" << props.maxiter << ",";
+    s << "verbose=" << props.verbose << ",";
+    s << "doubleloop=" << props.doubleloop << ",";
+    s << "clusters=" << props.clusters << ",";
+    s << "loopdepth=" << props.loopdepth << "]";
+    return s.str();
+}
+
+
 void HAK::constructMessages() {
     // Create outer beliefs
     _Qa.clear();
@@ -154,9 +167,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), props(),
 
 
 string HAK::identify() const { 
-    stringstream result (stringstream::out);
-    result << Name << getProperties();
-    return result.str();
+    return string(Name) + printProperties();
 }
 
 

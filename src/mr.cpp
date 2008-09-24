@@ -62,6 +62,17 @@ PropertySet MR::getProperties() const {
 }
 
 
+string MR::printProperties() const {
+    stringstream s( stringstream::out );
+    s << "[";
+    s << "tol=" << props.tol << ",";
+    s << "verbose=" << props.verbose << ",";
+    s << "updates=" << props.updates << ",";
+    s << "inits=" << props.inits << "]";
+    return s.str();
+}
+
+
 // init N, con, nb, tJ, theta
 void MR::init(size_t Nin, double *_w, double *_th) {
     size_t i,j;
@@ -521,9 +532,7 @@ void MR::init_cor() {
 
 
 string MR::identify() const { 
-    stringstream result (stringstream::out);
-    result << Name << getProperties();
-    return result.str();
+    return string(Name) + printProperties();
 }
 
 

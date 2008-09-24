@@ -46,6 +46,14 @@ PropertySet ExactInf::getProperties() const {
 }
 
 
+string ExactInf::printProperties() const {
+    stringstream s( stringstream::out );
+    s << "[";
+    s << "verbose=" << props.verbose << "]";
+    return s.str();
+}
+
+
 void ExactInf::create() {
     // clear variable beliefs and reserve space
     _beliefsV.clear();
@@ -115,9 +123,7 @@ Factor ExactInf::belief( const VarSet &ns ) const {
 
 
 string ExactInf::identify() const { 
-    stringstream result (stringstream::out);
-    result << Name << getProperties();
-    return result.str();
+    return string(Name) + printProperties();
 }
 
 
