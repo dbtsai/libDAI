@@ -20,7 +20,9 @@ libDAI-0.2.2 (2008-??-??)
   - Replaced multind by Permute
   - Added MultiFor
   - Added State
+* Improved factor.h (merged from SVN head): mainly new functionality
 * Moved everything into namespace "dai"
+* Added ExactInf class for brute force exact inference
 * Renamed DEBUG to DAI_DEBUG to avoid conflicts
 * Added conditional compilation of inference methods
 * Contributions by Peter Gober:
@@ -93,7 +95,9 @@ libDAI-0.2.2 (2008-??-??)
       max() -> maxDiff()
       max_size() -> maxSize()
   - Prob::max() -> Prob::maxVal()
-  - Factor::max() -> Factor::maxVal()
+  - Factor::
+      max() -> maxVal()
+      part_sum() -> partSum()
   - toc() in util.h now returns seconds as a double
   - VarSet::operator&&
   - Properties -> PropertySet

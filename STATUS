@@ -17,8 +17,6 @@ A disadvantage of this approach may be worse cachability.
   to replace the linear searches that are performed every time for findVar()?
   No, a better idea is to avoid calls to findVar() as much as possible.
 - Can the FactorGraph constructors be optimized further?
-- Solve the proliferation of type checks for all different ENUM's in
-properties.cpp
 - Remove x2x?
 
 TODO FOR RELEASE:
@@ -54,14 +52,13 @@ alldai.h
 alldai.cpp
 properties.h
 properties.cpp
+factor.h
 
 FILES IN SVN HEAD THAT ARE STILL RELEVANT:
 ChangeLog
 README
 TODO
 prob.h
-factor.h
-factor.cpp
 factorgraph.h
 factorgraph.cpp
 regiongraph.h

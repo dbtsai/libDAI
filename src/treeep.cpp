@@ -151,14 +151,14 @@ void TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &
                     delta[s(*n)] = 1.0;
                     _Qa[_RTree[i].n2] *= delta;
                 }
-            Factor new_Qb = _Qa[_RTree[i].n2].part_sum( _Qb[i].vars() );
+            Factor new_Qb = _Qa[_RTree[i].n2].partSum( _Qb[i].vars() );
             _Qa[_RTree[i].n1] *= new_Qb.divided_by( _Qb[i] ); 
             _Qb[i] = new_Qb;
         }
 
         // DistributeEvidence
         for( size_t i = 0; i < _RTree.size(); i++ ) {
-            Factor new_Qb = _Qa[_RTree[i].n1].part_sum( _Qb[i].vars() );
+            Factor new_Qb = _Qa[_RTree[i].n1].partSum( _Qb[i].vars() );
             _Qa[_RTree[i].n2] *= new_Qb.divided_by( _Qb[i] ); 
             _Qb[i] = new_Qb;
         }

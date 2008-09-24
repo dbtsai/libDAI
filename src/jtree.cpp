@@ -215,7 +215,7 @@ void JTree::runHUGIN() {
     for( size_t i = _RTree.size(); (i--) != 0; ) {
 //      Make outer region _RTree[i].n1 consistent with outer region _RTree[i].n2
 //      IR(i) = seperator OR(_RTree[i].n1) && OR(_RTree[i].n2)
-        Factor new_Qb = _Qa[_RTree[i].n2].part_sum( IR( i ) );
+        Factor new_Qb = _Qa[_RTree[i].n2].partSum( IR( i ) );
         _logZ += log(new_Qb.normalize( Prob::NORMPROB ));
         _Qa[_RTree[i].n1] *= new_Qb.divided_by( _Qb[i] ); 
         _Qb[i] = new_Qb;
@@ -256,7 +256,7 @@ void JTree::runShaferShenoy() {
         foreach( const Neighbor &k, nbOR(i) )
             if( k != e ) 
                 piet *= message( i, k.iter );
-        message( j, _e ) = piet.part_sum( IR(e) );
+        message( j, _e ) = piet.partSum( IR(e) );
         _logZ += log( message(j,_e).normalize( Prob::NORMPROB ) );
     }
 
@@ -494,7 +494,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                             _Qa[T[i].n2] *= piet; 
                         }
 
-                    Factor new_Qb = _Qa[T[i].n2].part_sum( IR( b[i] ) );
+                    Factor new_Qb = _Qa[T[i].n2].partSum( IR( b[i] ) );
                     logZ += log(new_Qb.normalize( Prob::NORMPROB ));
                     _Qa[T[i].n1] *= new_Qb.divided_by( _Qb[b[i]] ); 
                     _Qb[b[i]] = new_Qb;
@@ -503,7 +503,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
 
                 Factor piet( nsrem, 0.0 );
                 piet[s] = exp(logZ);
-                Pns += piet * _Qa[T[0].n1].part_sum( ns / nsrem );      // OPTIMIZE ME
+                Pns += piet * _Qa[T[0].n1].partSum( ns / nsrem );      // OPTIMIZE ME
 
                 // Restore clamped beliefs
                 for( map<size_t,Factor>::const_iterator alpha = _Qa_old.begin(); alpha != _Qa_old.end(); alpha++ )

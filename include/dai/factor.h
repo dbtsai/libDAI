@@ -41,6 +41,9 @@ typedef TFactor<Real>           Factor;
 // predefine friends
 template<typename T> Real           dist( const TFactor<T> & x, const TFactor<T> & y, Prob::DistType dt );
 template<typename T> Real           KL_dist( const TFactor<T> & p, const TFactor<T> & q );
+template<typename T> Real           MutualInfo( const TFactor<T> & p );
+template<typename T> TFactor<T>     max( const TFactor<T> & P, const TFactor<T> & Q );
+template<typename T> TFactor<T>     min( const TFactor<T> & P, const TFactor<T> & Q );
 template<typename T> std::ostream&  operator<< (std::ostream& os, const TFactor<T>& P);
 
         
@@ -51,9 +54,9 @@ template <typename T> class TFactor {
         TProb<T>    _p;
 
     public:
-        // Default constructor
-        TFactor () : _vs(), _p(1,1.0) {}
-        
+        // Construct Factor with empty VarSet but nonempty _p
+        TFactor ( Real p = 1.0 ) : _vs(), _p(1,p) {}
+
         // Construct Factor from VarSet
         TFactor( const VarSet& ns ) : _vs(ns), _p(_vs.states()) {}
         
@@ -64,7 +67,7 @@ template <typename T> class TFactor {
         TFactor( const VarSet& ns, const Real* p ) : _vs(ns), _p(_vs.states(),p) {}
 
         // Construct Factor from VarSet and TProb<T>
-        TFactor( const VarSet& ns, const TProb<T> p ) : _vs(ns), _p(p) {
+        TFactor( const VarSet& ns, const TProb<T>& p ) : _vs(ns), _p(p) {
 #ifdef DAI_DEBUG
             assert( _vs.states() == _p.size() );
 #endif
@@ -120,7 +123,9 @@ template <typename T> class TFactor {
             return *this;
         }
         TFactor<T> operator* (const TFactor<T>& Q) const;
+        TFactor<T> operator/ (const TFactor<T>& Q) const;
         TFactor<T>& operator*= (const TFactor<T>& Q) { return( *this = (*this * Q) ); }
+        TFactor<T>& operator/= (const TFactor<T>& Q) { return( *this = (*this / Q) ); }
         TFactor<T> operator+ (const TFactor<T>& Q) const {
 #ifdef DAI_DEBUG
             assert( Q._vs == _vs );
@@ -151,12 +156,35 @@ template <typename T> class TFactor {
             _p -= Q._p;
             return *this;
         }
+        TFactor<T>& operator+= (T q) { 
+            _p += q;
+            return *this;
+        }
+        TFactor<T>& operator-= (T q) { 
+            _p -= q;
+            return *this;
+        }
+        TFactor<T> operator+ (T q) const {
+            TFactor<T> result(*this); 
+            result._p += q; 
+            return result; 
+        }
+        TFactor<T> operator- (T q) const {
+            TFactor<T> result(*this); 
+            result._p -= q; 
+            return result; 
+        }
 
         TFactor<T> operator^ (Real a) const { TFactor<T> x; x._vs = _vs; x._p = _p^a; return x; }
         TFactor<T>& operator^= (Real a) { _p ^= a; return *this; }
 
         TFactor<T>& makeZero( Real epsilon ) {
             _p.makeZero( epsilon );
+            return *this;
+        }
+
+        TFactor<T>& makePositive( Real epsilon ) {
+            _p.makePositive( epsilon );
             return *this;
         }
             
@@ -191,6 +219,13 @@ template <typename T> class TFactor {
             return e; 
         }
 
+        TFactor<T> abs() const { 
+            TFactor<T> e; 
+            e._vs = _vs; 
+            e._p = _p.abs(); 
+            return e; 
+        }
+
         TFactor<T> log() const {
             TFactor<T> l; 
             l._vs = _vs; 
@@ -205,8 +240,8 @@ template <typename T> class TFactor {
             return l0; 
         }
 
-        T normalize( typename Prob::NormType norm ) { return _p.normalize( norm ); }
-        TFactor<T> normalized( typename Prob::NormType norm ) const { 
+        T normalize( typename Prob::NormType norm = Prob::NORMPROB ) { return _p.normalize( norm ); }
+        TFactor<T> normalized( typename Prob::NormType norm = Prob::NORMPROB ) const { 
             TFactor<T> result;
             result._vs = _vs;
             result._p = _p.normalized( norm );
@@ -229,16 +264,29 @@ template <typename T> class TFactor {
             return result;
         }
 
-        // returns unnormalized marginal
-        TFactor<T> part_sum(const VarSet & ns) const;
-        // returns normalized marginal
-        TFactor<T> marginal(const VarSet & ns) const { return part_sum(ns).normalized( Prob::NORMPROB ); }
+        // returns unnormalized marginal; ns should be a subset of vars()
+        TFactor<T> partSum(const VarSet & ns) const;
+        // returns (normalized by default) marginal; ns should be a subset of vars()
+        TFactor<T> marginal(const VarSet & ns, bool normed = true) const { if(normed) return partSum(ns).normalized(); else return partSum(ns); }
+        // sums out all variables except those in ns
+        TFactor<T> notSum(const VarSet & ns) const { return partSum(vars() ^ ns); }
+
+        // embeds this factor in larger varset ns
+        TFactor<T> embed(const VarSet & ns) const { 
+            VarSet vs = vars();
+            assert( ns >> vs );
+            if( vs == ns )
+                return *this;
+            else
+                return (*this) * Factor(ns / vs, 1.0);
+        }
 
         bool hasNaNs() const { return _p.hasNaNs(); }
         bool hasNegatives() const { return _p.hasNegatives(); }
         T totalSum() const { return _p.totalSum(); }
         T maxAbs() const { return _p.maxAbs(); }
         T maxVal() const { return _p.maxVal(); }
+        T minVal() const { return _p.minVal(); }
         Real entropy() const { return _p.entropy(); }
         T strength( const Var &i, const Var &j ) const;
 
@@ -253,11 +301,12 @@ template <typename T> class TFactor {
             }
         }
         friend Real KL_dist <> (const TFactor<T> & p, const TFactor<T> & q);
+        friend Real MutualInfo <> ( const TFactor<T> & P );
         template<class U> friend std::ostream& operator<< (std::ostream& os, const TFactor<U>& P);
 };
 
 
-template<typename T> TFactor<T> TFactor<T>::part_sum(const VarSet & ns) const {
+template<typename T> TFactor<T> TFactor<T>::partSum(const VarSet & ns) const {
 #ifdef DAI_DEBUG
     assert( ns << _vs );
 #endif
@@ -294,6 +343,19 @@ template<typename T> TFactor<T> TFactor<T>::operator* (const TFactor<T>& Q) cons
 }
 
 
+template<typename T> TFactor<T> TFactor<T>::operator/ (const TFactor<T>& Q) const {
+    TFactor<T> quot( _vs + Q._vs, 0.0 );
+
+    IndexFor i1(_vs, quot._vs);
+    IndexFor i2(Q._vs, quot._vs);
+
+    for( size_t i = 0; i < quot._p.size(); i++, ++i1, ++i2 )
+        quot._p[i] += _p[i1] / Q._p[i2];
+
+    return quot;
+}
+
+
 template<typename T> Real KL_dist(const TFactor<T> & P, const TFactor<T> & Q) {
     if( P._vs.empty() || Q._vs.empty() )
         return -1;
@@ -306,6 +368,26 @@ template<typename T> Real KL_dist(const TFactor<T> & P, const TFactor<T> & Q) {
 }
 
 
+// calculate mutual information of x_i and x_j where P.vars() = \{x_i,x_j\}
+template<typename T> Real MutualInfo(const TFactor<T> & P) {
+    assert( P._vs.size() == 2 );
+    VarSet::const_iterator it = P._vs.begin();
+    Var i = *it; it++; Var j = *it;
+    TFactor<T> projection = P.marginal(i) * P.marginal(j);
+    return real( KL_dist( P.normalized(), projection ) );
+}
+
+
+template<typename T> TFactor<T> max( const TFactor<T> & P, const TFactor<T> & Q ) {
+    assert( P._vs == Q._vs );
+    return TFactor<T>( P._vs, min( P.p(), Q.p() ) );
+}
+
+template<typename T> TFactor<T> min( const TFactor<T> & P, const TFactor<T> & Q ) {
+    assert( P._vs == Q._vs );
+    return TFactor<T>( P._vs, max( P.p(), Q.p() ) );
+}
+
 // calculate N(psi, i, j)
 template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const {
 #ifdef DAI_DEBUG
@@ -313,7 +395,7 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
     assert( _vs.contains( j ) );
     assert( i != j );
 #endif
-    VarSet ij = i | j;
+    VarSet ij(i, j);
 
     T max = 0.0;
     for( size_t alpha1 = 0; alpha1 < i.states(); alpha1++ )
@@ -344,8 +426,8 @@ template<typename T> TFactor<T> RemoveFirstOrderInteractions( const TFactor<T> &
     VarSet vars = psi.vars();
     for( size_t iter = 0; iter < 100; iter++ ) {
         for( VarSet::const_iterator n = vars.begin(); n != vars.end(); n++ )
-            result = result * result.part_sum(*n).inverse();
-        result.normalize( Prob::NORMPROB );
+            result = result * result.partSum(*n).inverse();
+        result.normalize();
     }
 
     return result;
