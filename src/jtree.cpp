@@ -49,6 +49,15 @@ PropertySet JTree::getProperties() const {
 }
 
 
+string JTree::printProperties() const {
+    stringstream s( stringstream::out );
+    s << "[";
+    s << "verbose=" << props.verbose << ",";
+    s << "updates=" << props.updates << "]";
+    return s.str();
+}
+
+
 JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) : DAIAlgRG(fg), _RTree(), _Qa(), _Qb(), _mes(), _logZ(), props() {
     setProperties( opts );
 
@@ -156,9 +165,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
 
 
 string JTree::identify() const {
-    stringstream result (stringstream::out);
-    result << Name << getProperties();
-    return result.str();
+    return string(Name) + printProperties();
 }
 
 

@@ -65,6 +65,18 @@ PropertySet BP::getProperties() const {
 }
 
 
+string BP::printProperties() const {
+    stringstream s( stringstream::out );
+    s << "[";
+    s << "tol=" << props.tol << ",";
+    s << "maxiter=" << props.maxiter << ",";
+    s << "verbose=" << props.verbose << ",";
+    s << "logdomain=" << props.logdomain << ",";
+    s << "updates=" << props.updates << "]";
+    return s.str();
+}
+
+
 void BP::create() {
     // create edge properties
     edges.clear();
@@ -404,9 +416,7 @@ Real BP::logZ() const {
 
 
 string BP::identify() const { 
-    stringstream result (stringstream::out);
-    result << Name << getProperties();
-    return result.str();
+    return string(Name) + printProperties();
 }
 
 

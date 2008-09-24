@@ -60,6 +60,17 @@ PropertySet TreeEP::getProperties() const {
 }
 
 
+string TreeEP::printProperties() const {
+    stringstream s( stringstream::out );
+    s << "[";
+    s << "tol=" << props.tol << ",";
+    s << "maxiter=" << props.maxiter << ",";
+    s << "verbose=" << props.verbose << ",";
+    s << "type=" << props.type << "]";
+    return s.str();
+}
+
+
 TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I ) : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(I), _ns(), _nsrem(), _logZ(0.0) {
     _ns = _I->vars();
 
@@ -386,9 +397,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
 
 
 string TreeEP::identify() const { 
-    stringstream result (stringstream::out);
-    result << Name << getProperties();
-    return result.str();
+    return string(Name) + printProperties();
 }
 
 

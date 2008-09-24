@@ -74,6 +74,21 @@ PropertySet LC::getProperties() const {
 }
 
 
+string LC::printProperties() const {
+    stringstream s( stringstream::out );
+    s << "[";
+    s << "tol=" << props.tol << ",";
+    s << "maxiter=" << props.maxiter << ",";
+    s << "verbose=" << props.verbose << ",";
+    s << "cavity=" << props.cavity << ",";
+    s << "updates=" << props.updates << ",";
+    s << "cavainame=" << props.cavainame << ",";
+    s << "cavaiopts=" << props.cavaiopts << ",";
+    s << "reinit=" << props.reinit << "]";
+    return s.str();
+}
+
+
 LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _pancakes(), _cavitydists(), _phis(), _beliefs(), props(), maxdiff(0.0) {
     setProperties( opts );
 
@@ -100,9 +115,7 @@ LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _panca
 
 
 string LC::identify() const { 
-    stringstream result (stringstream::out);
-    result << Name << getProperties();
-    return result.str();
+    return string(Name) + printProperties();
 }
 
 

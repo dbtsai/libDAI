@@ -21,7 +21,6 @@
 
 #include <iostream>
 #include <dai/properties.h>
-#include <dai/alldai.h>
 #include <dai/exceptions.h>
 
 
@@ -41,34 +40,6 @@ std::ostream& operator<< (std::ostream & os, const Property & p) {
         os << boost::any_cast<bool>(p.second);
     else if( p.second.type() == typeid(PropertySet) )
         os << boost::any_cast<PropertySet>(p.second);
-#ifdef WITH_BP
-    else if( p.second.type() == typeid(BP::Properties::UpdateType) )
-        os << boost::any_cast<BP::Properties::UpdateType>(p.second);
-#endif
-#ifdef WITH_HAK
-    else if( p.second.type() == typeid(HAK::Properties::ClustersType) )
-        os << boost::any_cast<HAK::Properties::ClustersType>(p.second);
-#endif
-#ifdef WITH_JTREE
-    else if( p.second.type() == typeid(JTree::Properties::UpdateType) )
-        os << boost::any_cast<JTree::Properties::UpdateType>(p.second);
-#endif
-#ifdef WITH_MR
-    else if( p.second.type() == typeid(MR::Properties::UpdateType) )
-        os << boost::any_cast<MR::Properties::UpdateType>(p.second);
-    else if( p.second.type() == typeid(MR::Properties::InitType) )
-        os << boost::any_cast<MR::Properties::InitType>(p.second);
-#endif
-#ifdef WITH_TREEEP
-    else if( p.second.type() == typeid(TreeEP::Properties::TypeType) )
-        os << boost::any_cast<TreeEP::Properties::TypeType>(p.second);
-#endif
-#ifdef WITH_LC
-    else if( p.second.type() == typeid(LC::Properties::CavityType) )
-        os << boost::any_cast<LC::Properties::CavityType>(p.second);
-    else if( p.second.type() == typeid(LC::Properties::UpdateType) )
-        os << boost::any_cast<LC::Properties::UpdateType>(p.second);
-#endif
     else
         DAI_THROW(UNKNOWN_PROPERTY_TYPE);
     return( os );

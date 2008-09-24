@@ -57,6 +57,16 @@ PropertySet MF::getProperties() const {
 }
 
 
+string MF::printProperties() const {
+    stringstream s( stringstream::out );
+    s << "[";
+    s << "tol=" << props.tol << ",";
+    s << "maxiter=" << props.maxiter << ",";
+    s << "verbose=" << props.verbose << "]";
+    return s.str();
+}
+
+
 void MF::create() {
     // clear beliefs
     _beliefs.clear();
@@ -69,9 +79,7 @@ void MF::create() {
 
 
 string MF::identify() const { 
-    stringstream result (stringstream::out);
-    result << Name << getProperties();
-    return result.str();
+    return string(Name) + printProperties();
 }
 
 

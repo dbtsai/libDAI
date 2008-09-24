@@ -89,7 +89,7 @@ class PropertySet : public std::map<PropertyKey, PropertyValue> {
             }
         }
 
-        /// Converts a property from string to ValueType, if necessary
+        /// Converts a property from string to ValueType (if necessary)
         template<typename ValueType>
         ValueType getStringAs(const PropertyKey &key) const { 
             PropertyValue val = Get(key);
@@ -104,6 +104,18 @@ class PropertySet : public std::map<PropertyKey, PropertyValue> {
             } else {
                 DAI_THROW(IMPOSSIBLE_TYPECAST);
                 return ValueType();
+            }
+        }
+
+        /// Converts a property from ValueType to string (if necessary)
+        template<typename ValueType>
+        PropertySet & setAsString(const PropertyKey &key, ValueType &val) { 
+            if( val.type() == typeid(std::string) ) {
+                return Set(key, val);
+            } else {
+                std::stringstream ss (std::stringstream::out);
+                ss << val;
+                return Set(key, ss.str());
             }
         }
 
