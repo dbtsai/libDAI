@@ -42,13 +42,13 @@ class FactorGraph {
         typedef BipartiteGraph::Edge      Edge;
 
     private:
-        std::map<size_t,Factor>  _backupFactors;
+        std::map<size_t,Factor>  _backup;
 
     public:
         /// Default constructor
-        FactorGraph() : G(), vars(), factors(), _backupFactors() {}
+        FactorGraph() : G(), vars(), factors(), _backup() {}
         /// Copy constructor
-        FactorGraph(const FactorGraph & x) : G(x.G), vars(x.vars), factors(x.factors), _backupFactors(x._backupFactors) {}
+        FactorGraph(const FactorGraph & x) : G(x.G), vars(x.vars), factors(x.factors), _backup(x._backup) {}
         /// Construct FactorGraph from vector of Factors
         FactorGraph(const std::vector<Factor> &P);
         // Construct a FactorGraph from given factor and variable iterators
@@ -61,7 +61,7 @@ class FactorGraph {
                 G          = x.G;
                 vars       = x.vars;
                 factors    = x.factors;
-                _backupFactors = x._backupFactors;
+                _backup = x._backup;
             }
             return *this;
         }
@@ -185,7 +185,7 @@ class FactorGraph {
 
         void ReadFromFile(const char *filename);
         void WriteToFile(const char *filename) const;
-        void display( std::ostream& os ) const;
+        void printDot( std::ostream& os ) const;
         
         std::vector<VarSet> Cliques() const;
 
@@ -199,7 +199,6 @@ class FactorGraph {
         bool isPairwise() const;
         bool isBinary() const;
 
-    private:
         void restoreFactor( size_t I );
         void backupFactor( size_t I );
         void restoreFactors( const VarSet &ns );
@@ -211,7 +210,7 @@ class FactorGraph {
 
 // assumes that the set of variables in [var_begin,var_end) is the union of the variables in the factors in [fact_begin, fact_end)
 template<typename FactorInputIterator, typename VarInputIterator>
-FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : G(), _backupFactors() {
+FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : G(), _backup() {
     // add factors
     size_t nrEdges = 0;
     factors.reserve( nr_fact_hint );

@@ -87,7 +87,7 @@ class JTree : public DAIAlgRG {
         Real logZ() const;
 
         void init( const VarSet &/*ns*/ ) {}
-        void undoProbs( const VarSet &ns ) { RegionGraph::undoProbs( ns ); init( ns ); }
+        void restoreFactors( const VarSet &ns ) { RegionGraph::restoreFactors( ns ); init( ns ); }
 
         size_t findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t PreviousRoot=(size_t)-1 ) const;
         Factor calcMarginal( const VarSet& ns );

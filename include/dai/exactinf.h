@@ -117,7 +117,7 @@ class ExactInf : public DAIAlgFG {
         static const char *Name;
 
         void create();
-        void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
+        void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors(ns); init(ns); }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;

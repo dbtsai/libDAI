@@ -227,7 +227,7 @@ bool BipartiteGraph::isTree() const {
 }
 
 
-void BipartiteGraph::display( std::ostream& os ) const {
+void BipartiteGraph::printDot( std::ostream& os ) const {
     using namespace std;
     os << "graph G {" << endl;
     os << "node[shape=circle,width=0.4,fixedsize=true];" << endl;

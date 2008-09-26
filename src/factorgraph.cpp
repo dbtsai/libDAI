@@ -38,7 +38,7 @@ namespace dai {
 using namespace std;
 
 
-FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _undoProbs() {
+FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _backup() {
     // add factors, obtain variables
     set<Var> _vars;
     factors.reserve( P.size() );
@@ -281,7 +281,7 @@ void FactorGraph::WriteToFile( const char *filename ) const {
 }
 
 
-void FactorGraph::display( ostream &os ) const {
+void FactorGraph::printDot( std::ostream &os ) const {
     os << "graph G {" << endl;
     os << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
     for( size_t i = 0; i < nrVars(); i++ )
@@ -334,18 +334,18 @@ void FactorGraph::clamp( const Var & n, size_t i, bool backup ) {
 
 
 void FactorGraph::backupFactor( size_t I ) {
-    map<size_t,Factor>::iterator it = _backupFactors.find( I );
-    if( it != _backupFactors.end() )
+    map<size_t,Factor>::iterator it = _backup.find( I );
+    if( it != _backup.end() )
         DAI_THROW( MULTIPLE_UNDO );
-    _backupFactors[I] = factor(I);
+    _backup[I] = factor(I);
 }
 
 
 void FactorGraph::restoreFactor( size_t I ) {
-    map<size_t,Factor>::iterator it = _backupFactors.find( I );
-    if( it != _backupFactors.end() ) {
+    map<size_t,Factor>::iterator it = _backup.find( I );
+    if( it != _backup.end() ) {
         setFactor(I, it->second);
-        _backupFactors.erase(it);
+        _backup.erase(it);
     }
 }
 
@@ -359,10 +359,10 @@ void FactorGraph::backupFactors( const VarSet &ns ) {
 
 void FactorGraph::restoreFactors( const VarSet &ns ) {
     map<size_t,Factor> facs;
-    for( map<size_t,Factor>::iterator uI = _backupFactors.begin(); uI != _backupFactors.end(); ) {
+    for( map<size_t,Factor>::iterator uI = _backup.begin(); uI != _backup.end(); ) {
         if( factor(uI->first).vars().intersects( ns ) ) {
             facs.insert( *uI );
-            _backupFactors.erase(uI++);
+            _backup.erase(uI++);
         } else
             uI++;
     }
@@ -371,8 +371,8 @@ void FactorGraph::restoreFactors( const VarSet &ns ) {
 
 
 void FactorGraph::restoreFactors() {
-    setFactors( _backupFactors );
-    _backupFactors.clear();
+    setFactors( _backup );
+    _backup.clear();
 }
 
 void FactorGraph::backupFactors( const std::set<size_t> & facs ) {
@@ -451,7 +451,7 @@ FactorGraph FactorGraph::maximalFactors() const {
     for( size_t I = 0; I < nrFactors(); I++ )
         facs[newindex[maxfac[I]]] *= factor(I);
 
-    return FactorGraph( facs.begin(), facs.end(), vars().begin(), vars().end(), facs.size(), nrVars() );
+    return FactorGraph( facs.begin(), facs.end(), vars.begin(), vars.end(), facs.size(), nrVars() );
 }
 
 

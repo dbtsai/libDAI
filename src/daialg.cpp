@@ -41,7 +41,7 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
     Real logZ0 = 0.0;
     for( State s(ns); s.valid(); s++ ) {
         // save unclamped factors connected to ns
-        clamped->saveProbs( ns );
+        clamped->backupFactors( ns );
 
         // set clamping Factors to delta functions
         for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
@@ -64,7 +64,7 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
         Pns[s] = Z;
         
         // restore clamped factors
-        clamped->undoProbs( ns );
+        clamped->restoreFactors( ns );
     }
 
     delete clamped;
@@ -99,7 +99,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
         // clamp Var j to its possible values
         for( size_t j_val = 0; j_val < vns[j].states(); j_val++ ) {
             // save unclamped factors connected to ns
-            clamped->saveProbs( ns );
+            clamped->backupFactors( ns );
             
             clamped->clamp( vns[j], j_val );
             if( reInit )
@@ -127,7 +127,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
                 }
 
             // restore clamped factors
-            clamped->undoProbs( ns );
+            clamped->restoreFactors( ns );
         }
     }
     
@@ -178,7 +178,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
             for( size_t j_val = 0; j_val < nj->states(); j_val++ ) 
                 for( size_t k_val = 0; k_val < nk->states(); k_val++ ) {
                     // save unclamped factors connected to ns
-                    clamped->saveProbs( ns );
+                    clamped->backupFactors( ns );
             
                     clamped->clamp( *nj, j_val );
                     clamped->clamp( *nk, k_val );
@@ -199,7 +199,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
                     pairbelief[j_val + (k_val * nj->states())] = Z_xj;
 
                     // restore clamped factors
-                    clamped->undoProbs( ns );
+                    clamped->restoreFactors( ns );
                 }
         
             result.push_back( pairbelief );

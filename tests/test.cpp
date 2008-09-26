@@ -231,88 +231,85 @@ int main( int argc, char *argv[] ) {
         }
 
         FactorGraph fg;
-        if( fg.ReadFromFile(filename.c_str()) ) {
-            cout << "Error reading " << filename << endl;
-            return 2;
-        } else {
-            vector<Factor> q0;
-            double logZ0 = 0.0;
+        fg.ReadFromFile(filename.c_str());
 
-            cout << "# " << filename << endl;
+        vector<Factor> q0;
+        double logZ0 = 0.0;
+
+        cout << "# " << filename << endl;
+        cout.width( 40 );
+        cout << left << "# METHOD" << "  ";
+        if( report_time ) {
+            cout.width( 10 );
+            cout << right << "SECONDS" << "   ";
+        }
+        cout.width( 10 );
+        cout << "MAX ERROR" << "  ";
+        cout.width( 10 );
+        cout << "AVG ERROR" << "  ";
+        cout.width( 10 );
+        cout << "LOGZ ERROR" << "  ";
+        cout.width( 10 );
+        cout << "MAXDIFF" << endl;
+
+        for( size_t m = 0; m < methods.size(); m++ ) {
+            pair<string, PropertySet> meth = parseMethod( methods[m], Aliases );
+
+            if( vm.count("tol") )
+                meth.second.Set("tol",tol);
+            if( vm.count("maxiter") )
+                meth.second.Set("maxiter",maxiter);
+            if( vm.count("verbose") )
+                meth.second.Set("verbose",verbose);
+            TestAI piet(fg, meth.first, meth.second );
+            piet.doAI();
+            if( m == 0 ) {
+                q0 = piet.q;
+                logZ0 = piet.logZ;
+            }
+            piet.calcErrs(q0);
+
             cout.width( 40 );
-            cout << left << "# METHOD" << "  ";
+//                cout << left << piet.identify() << "  ";
+            cout << left << methods[m] << "  ";
             if( report_time ) {
                 cout.width( 10 );
-                cout << right << "SECONDS" << "   ";
+                cout << right << piet.time << "    ";
             }
-            cout.width( 10 );
-            cout << "MAX ERROR" << "  ";
-            cout.width( 10 );
-            cout << "AVG ERROR" << "  ";
-            cout.width( 10 );
-            cout << "LOGZ ERROR" << "  ";
-            cout.width( 10 );
-            cout << "MAXDIFF" << endl;
 
-            for( size_t m = 0; m < methods.size(); m++ ) {
-                pair<string, PropertySet> meth = parseMethod( methods[m], Aliases );
-
-                if( vm.count("tol") )
-                    meth.second.Set("tol",tol);
-                if( vm.count("maxiter") )
-                    meth.second.Set("maxiter",maxiter);
-                if( vm.count("verbose") )
-                    meth.second.Set("verbose",verbose);
-                TestAI piet(fg, meth.first, meth.second );
-                piet.doAI();
-                if( m == 0 ) {
-                    q0 = piet.q;
-                    logZ0 = piet.logZ;
+            if( m > 0 ) {
+                cout.setf( ios_base::scientific );
+                cout.precision( 3 );
+                cout.width( 10 ); 
+                double me = clipdouble( piet.maxErr(), 1e-9 );
+                cout << me << "  ";
+                cout.width( 10 );
+                double ae = clipdouble( piet.avgErr(), 1e-9 );
+                cout << ae << "  ";
+                cout.width( 10 );
+                if( piet.has_logZ ) {
+                    double le = clipdouble( piet.logZ / logZ0 - 1.0, 1e-9 );
+                    cout << le << "  ";
+                } else {
+                    cout << "N/A         ";
                 }
-                piet.calcErrs(q0);
-
-                cout.width( 40 );
-//                cout << left << piet.identify() << "  ";
-                cout << left << methods[m] << "  ";
-                if( report_time ) {
-                    cout.width( 10 );
-                    cout << right << piet.time << "    ";
+                cout.width( 10 );
+                if( piet.has_maxdiff ) {
+                    double md = clipdouble( piet.maxdiff, 1e-9 );
+                    if( isnan( me ) )
+                        md = me;
+                    if( isnan( ae ) )
+                        md = ae;
+                    cout << md << endl;
+                } else {
+                    cout << "N/A       ";
                 }
+            } else
+                cout << endl;
 
-                if( m > 0 ) {
-                    cout.setf( ios_base::scientific );
-                    cout.precision( 3 );
-                    cout.width( 10 ); 
-                    double me = clipdouble( piet.maxErr(), 1e-9 );
-                    cout << me << "  ";
-                    cout.width( 10 );
-                    double ae = clipdouble( piet.avgErr(), 1e-9 );
-                    cout << ae << "  ";
-                    cout.width( 10 );
-                    if( piet.has_logZ ) {
-                        double le = clipdouble( piet.logZ / logZ0 - 1.0, 1e-9 );
-                        cout << le << "  ";
-                    } else {
-                        cout << "N/A         ";
-                    }
-                    cout.width( 10 );
-                    if( piet.has_maxdiff ) {
-                        double md = clipdouble( piet.maxdiff, 1e-9 );
-                        if( isnan( me ) )
-                            md = me;
-                        if( isnan( ae ) )
-                            md = ae;
-                        cout << md << endl;
-                    } else {
-                        cout << "N/A       ";
-                    }
-                } else
-                    cout << endl;
-
-                if( marginals ) {
-                    for( size_t i = 0; i < piet.q.size(); i++ )
-                        cout << "# " << piet.q[i] << endl;
-                }
+            if( marginals ) {
+                for( size_t i = 0; i < piet.q.size(); i++ )
+                    cout << "# " << piet.q[i] << endl;
             }
         }
     } catch(const char *e) {

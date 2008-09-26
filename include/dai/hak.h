@@ -101,7 +101,7 @@ class HAK : public DAIAlgRG {
         Real logZ () const;
 
         void init( const VarSet &ns );
-        void undoProbs( const VarSet &ns ) { RegionGraph::undoProbs( ns ); init( ns ); }
+        void restoreFactors( const VarSet &ns ) { RegionGraph::restoreFactors( ns ); init( ns ); }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;

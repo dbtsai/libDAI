@@ -20,6 +20,7 @@
 
 
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <string>
 #include <dai/factorgraph.h>
@@ -40,29 +41,22 @@ int main( int argc, char *argv[] ) {
         FactorGraph fg;
         char *infile = argv[1];
 
-        if( fg.ReadFromFile( infile ) ) {
-            cerr << "Error reading file " << infile << endl;
-            return 2;
-        } else {
-            if( string( argv[2] ) != "-" ) 
-                fg.WriteToDotFile( argv[2] );
-            else {
-                cout << "graph G {" << endl;
-                cout << "graph[size=\"9,9\"];" << endl;
-                cout << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
-                for( size_t i = 0; i < fg.nrVars(); i++ )
-                    cout << "\tx" << fg.var(i).label() << ";" << endl;
-                cout << "node[shape=box,style=filled,color=lightgrey,width=0.3,height=0.3,fixedsize=true];" << endl;
-                for( size_t I = 0; I < fg.nrFactors(); I++ )
-                    cout << "\tp" << I << ";" << endl;
-                for( size_t i = 0; i < fg.nrVars(); i++ )
-                    foreach( const FactorGraph::Neighbor &I, fg.nbV(i) )
-                        cout << "\tx" << fg.var(i).label() << " -- p" << I << ";" << endl;
-                cout << "}" << endl;
-            }
+        fg.ReadFromFile( infile );
 
-            return 0;
+        ostream *os = &cout;
+        ofstream outfile;
+        if( string( argv[2] ) != "-" ) {
+            outfile.open( argv[2] );
+            if( !outfile.is_open() ) {
+                cerr << "Cannot open " << argv[2] << " for writing" << endl;
+                return 1;
+            }
+            os = &outfile;
         }
+
+        fg.printDot( *os );
+
+        return 0;
     }
 }
 

@@ -38,33 +38,31 @@ int main( int argc, char *argv[] ) {
         FactorGraph fg;
         char *infile = argv[1];
 
-        if( fg.ReadFromFile( infile ) ) {
-            cerr << "Error reading file " << infile << endl;
-            return 2;
-        } else {
-            cout << "Number of variables: " << fg.nrVars() << endl;
-            cout << "Number of factors:   " << fg.nrFactors() << endl;
-            cout << "Connected:           " << fg.G.isConnected() << endl;
+        fg.ReadFromFile( infile );
+        cout << "Number of variables:   " << fg.nrVars() << endl;
+        cout << "Number of factors:     " << fg.nrFactors() << endl;
+        cout << "Connected:             " << fg.isConnected() << endl;
+        cout << "Binary variables?      " << fg.isBinary() << endl;
+        cout << "Pairwise interactions? " << fg.isPairwise() << endl;
 //          cout << "Treewidth:           " << endl;
 
-            double cavsum_lcbp = 0.0;
-            double cavsum_lcbp2 = 0.0;
-            size_t max_Delta_size = 0;
-            for( size_t i = 0; i < fg.nrVars(); i++ ) {
-                VarSet di = fg.delta(i);
-                size_t Ds = fg.Delta(i).states();
-                if( Ds > max_Delta_size )
-                    max_Delta_size = Ds;
-                cavsum_lcbp += di.states();
-                for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
-                    cavsum_lcbp2 += j->states();
-            }
-            cout << "Maximum pancake has " << max_Delta_size << " states" << endl;
-            cout << "LCBP with full cavities needs " << cavsum_lcbp << " BP runs" << endl;
-            cout << "LCBP with only pairinteractions needs " << cavsum_lcbp2 << " BP runs" << endl;
-
-            return 0;
+        double cavsum_lcbp = 0.0;
+        double cavsum_lcbp2 = 0.0;
+        size_t max_Delta_size = 0;
+        for( size_t i = 0; i < fg.nrVars(); i++ ) {
+            VarSet di = fg.delta(i);
+            size_t Ds = fg.Delta(i).states();
+            if( Ds > max_Delta_size )
+                max_Delta_size = Ds;
+            cavsum_lcbp += di.states();
+            for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
+                cavsum_lcbp2 += j->states();
         }
+        cout << "Maximum pancake has " << max_Delta_size << " states" << endl;
+        cout << "LCBP with full cavities needs " << cavsum_lcbp << " BP runs" << endl;
+        cout << "LCBP with only pairinteractions needs " << cavsum_lcbp2 << " BP runs" << endl;
+
+        return 0;
     }
 }
 

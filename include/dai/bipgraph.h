@@ -291,7 +291,7 @@ class BipartiteGraph {
         bool isTree() const;
 
         /// Stream to output stream os in graphviz .dot syntax
-        void display( std::ostream& os ) const;
+        void printDot( std::ostream& os ) const;
 
         /// Checks internal consistency
         void check() const;

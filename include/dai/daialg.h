@@ -67,14 +67,14 @@ class InfAlg {
         virtual double run() = 0;
 
         /// Save factor I
-        virtual void saveProb( size_t I ) = 0;
+        virtual void backupFactor( size_t I ) = 0;
         /// Save Factors involving ns
-        virtual void saveProbs( const VarSet &ns ) = 0;
+        virtual void backupFactors( const VarSet &ns ) = 0;
 
         /// Restore factor I
-        virtual void undoProb( size_t I ) = 0;
+        virtual void restoreFactor( size_t I ) = 0;
         /// Restore Factors involving ns
-        virtual void undoProbs( const VarSet &ns ) = 0;
+        virtual void restoreFactors( const VarSet &ns ) = 0;
 
         /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$)
         virtual void clamp( const Var & n, size_t i ) = 0;
@@ -105,15 +105,15 @@ class DAIAlg : public InfAlg, public T {
         /// Copy constructor
         DAIAlg( const DAIAlg & x ) : InfAlg(x), T(x) {}
 
-        /// Save factor I (using T::saveProb)
-        void saveProb( size_t I ) { T::saveProb( I ); }
-        /// Save Factors involving ns (using T::saveProbs)
-        void saveProbs( const VarSet &ns ) { T::saveProbs( ns ); }
+        /// Save factor I (using T::backupFactor)
+        void backupFactor( size_t I ) { T::backupFactor( I ); }
+        /// Save Factors involving ns (using T::backupFactors)
+        void backupFactors( const VarSet &ns ) { T::backupFactors( ns ); }
 
-        /// Restore factor I (using T::undoProb)
-        void undoProb( size_t I ) { T::undoProb( I ); }
-        /// Restore Factors involving ns (using T::undoProbs)
-        void undoProbs( const VarSet &ns ) { T::undoProbs( ns ); }
+        /// Restore factor I (using T::restoreFactor)
+        void restoreFactor( size_t I ) { T::restoreFactor( I ); }
+        /// Restore Factors involving ns (using T::restoreFactors)
+        void restoreFactors( const VarSet &ns ) { T::restoreFactors( ns ); }
 
         /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$) (using T::clamp)
         void clamp( const Var & n, size_t i ) { T::clamp( n, i ); }

@@ -200,7 +200,7 @@ double TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Fac
 TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opts("updates",string("HUGIN")), false), props(), maxdiff(0.0) {
     setProperties( opts );
 
-    assert( fg.G.isConnected() );
+    assert( fg.isConnected() );
 
     if( opts.hasKey("tree") ) {
         ConstructRG( opts.GetAs<DEdgeVec>("tree") );

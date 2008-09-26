@@ -78,7 +78,7 @@ class MF : public DAIAlgFG {
         Real logZ() const;
 
         void init( const VarSet &ns );
-        void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
+        void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors(ns); init(ns); }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;

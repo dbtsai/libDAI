@@ -104,7 +104,7 @@ class BP : public DAIAlgFG {
         Real logZ() const;
 
         void init( const VarSet &ns );
-        void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs(ns); init(ns); }
+        void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors(ns); init(ns); }
 
         /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member
         void setProperties( const PropertySet &opts );

@@ -128,7 +128,7 @@ class TreeEP : public JTree {
         bool offtree( size_t I ) const { return (fac2OR[I] == -1U); }
 
         void init( const VarSet &/*ns*/ ) { init(); }
-        void undoProbs( const VarSet &ns ) { RegionGraph::undoProbs( ns ); init( ns ); }
+        void restoreFactors( const VarSet &ns ) { RegionGraph::restoreFactors( ns ); init( ns ); }
 
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;

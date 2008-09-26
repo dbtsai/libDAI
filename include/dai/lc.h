@@ -110,10 +110,10 @@ class LC : public DAIAlgFG {
         void clamp( const Var &/*n*/, size_t /*i*/ ) { 
             DAI_THROW(NOT_IMPLEMENTED);
         }
-        void undoProbs( const VarSet &/*ns*/ ) { 
+        void restoreFactors( const VarSet &/*ns*/ ) { 
             DAI_THROW(NOT_IMPLEMENTED);
         }
-        void saveProbs( const VarSet &/*ns*/ ) { 
+        void backupFactors( const VarSet &/*ns*/ ) { 
             DAI_THROW(NOT_IMPLEMENTED);
         }
         virtual void makeCavity(const Var & /*n*/) { 
