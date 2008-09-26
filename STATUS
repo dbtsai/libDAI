@@ -97,14 +97,14 @@ tests/
 	test.cpp
 mf.h
 mf.cpp
+bp.h
+bp.cpp
 
 FILES IN SVN HEAD THAT ARE STILL RELEVANT:
 ChangeLog
 README
 TODO
 
-bp.h
-bp.cpp
 hak.h
 hak.cpp
 jtree.h
