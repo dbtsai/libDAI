@@ -41,10 +41,10 @@ using namespace std;
 FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _backup() {
     // add factors, obtain variables
     set<Var> _vars;
-    factors.reserve( P.size() );
+    _factors.reserve( P.size() );
     size_t nrEdges = 0;
     for( vector<Factor>::const_iterator p2 = P.begin(); p2 != P.end(); p2++ ) {
-        factors.push_back( *p2 );
+        _factors.push_back( *p2 );
         copy( p2->vars().begin(), p2->vars().end(), inserter( _vars, _vars.begin() ) );
         nrEdges += p2->vars().size();
     }
@@ -114,7 +114,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
     long verbose = 0;
 
     try {
-        vector<Factor> factors;
+        vector<Factor> facs;
         size_t nr_Factors;
         string line;
         
@@ -175,7 +175,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
                     vardims[labels[mi]] = dims[mi];
                 I_vars |= Var(labels[mi], dims[mi]);
             }
-            factors.push_back( Factor( I_vars, 0.0 ) );
+            facs.push_back( Factor( I_vars, 0.0 ) );
             
             // calculate permutation sigma (internally, members are sorted)
             vector<size_t> sigma(nr_members,0);
@@ -210,14 +210,14 @@ istream& operator >> (istream& is, FactorGraph& fg) {
 
                 // store value, but permute indices first according
                 // to internal representation
-                factors.back()[permindex.convert_linear_index( li  )] = val;
+                facs.back()[permindex.convert_linear_index( li  )] = val;
             }
         }
 
         if( verbose >= 3 )
-            cout << "factors:" << factors << endl;
+            cout << "factors:" << facs << endl;
 
-        fg = FactorGraph(factors);
+        fg = FactorGraph(facs);
     } catch (char *e) {
         cout << e << endl;
     }

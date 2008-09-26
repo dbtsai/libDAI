@@ -36,19 +36,19 @@ class FactorGraph {
     public:
         BipartiteGraph         G;
         std::vector<Var>       vars;
-        std::vector<Factor>    factors;
         typedef BipartiteGraph::Neighbor  Neighbor;
         typedef BipartiteGraph::Neighbors Neighbors;
         typedef BipartiteGraph::Edge      Edge;
 
     private:
+        std::vector<Factor>      _factors;
         std::map<size_t,Factor>  _backup;
 
     public:
         /// Default constructor
-        FactorGraph() : G(), vars(), factors(), _backup() {}
+        FactorGraph() : G(), vars(), _factors(), _backup() {}
         /// Copy constructor
-        FactorGraph(const FactorGraph & x) : G(x.G), vars(x.vars), factors(x.factors), _backup(x._backup) {}
+        FactorGraph(const FactorGraph & x) : G(x.G), vars(x.vars), _factors(x._factors), _backup(x._backup) {}
         /// Construct FactorGraph from vector of Factors
         FactorGraph(const std::vector<Factor> &P);
         // Construct a FactorGraph from given factor and variable iterators
@@ -60,8 +60,8 @@ class FactorGraph {
             if( this != &x ) {
                 G          = x.G;
                 vars       = x.vars;
-                factors    = x.factors;
-                _backup = x._backup;
+                _factors   = x._factors;
+                _backup    = x._backup;
             }
             return *this;
         }
@@ -81,14 +81,17 @@ class FactorGraph {
         Var & var(size_t i) { return vars[i]; }
         /// Get const reference to i'th variable
         const Var & var(size_t i) const { return vars[i]; }
-        Factor & factor(size_t I) { return factors[I]; }
         /// Get const reference to I'th factor
-        const Factor & factor(size_t I) const { return factors[I]; }
+        Factor & factor(size_t I) { return _factors[I]; }
+        /// Get const reference to I'th factor
+        const Factor & factor(size_t I) const { return _factors[I]; }
+        /// Get const reference to all factors
+        const std::vector<Factor> & factors() const { return _factors; }
 
         /// Get number of variables
         size_t nrVars() const { return vars.size(); }
         /// Get number of factors
-        size_t nrFactors() const { return factors.size(); }
+        size_t nrFactors() const { return _factors.size(); }
         size_t nrEdges() const { return G.nrEdges(); }
 
         /// Provides read access to neighbors of variable
@@ -149,10 +152,10 @@ class FactorGraph {
 
         /// Set the content of the I'th factor and make a backup of its old content if backup == true
         virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {
-            assert( newFactor.vars() == factors[I].vars() ); 
+            assert( newFactor.vars() == factor(I).vars() ); 
             if( backup )
                 backupFactor( I );
-            factors[I] = newFactor; 
+            _factors[I] = newFactor; 
         }
 
         /// Set the contents of all factors as specified by facs and make a backup of the old contents if backup == true
@@ -213,9 +216,9 @@ template<typename FactorInputIterator, typename VarInputIterator>
 FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : G(), _backup() {
     // add factors
     size_t nrEdges = 0;
-    factors.reserve( nr_fact_hint );
+    _factors.reserve( nr_fact_hint );
     for( FactorInputIterator p2 = fact_begin; p2 != fact_end; ++p2 ) {
-        factors.push_back( *p2 );
+        _factors.push_back( *p2 );
         nrEdges += p2->vars().size();
     }
 

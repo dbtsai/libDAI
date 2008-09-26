@@ -73,11 +73,11 @@ class ExactInf : public DAIAlgFG {
             return *this;
         }
 
-/*        /// Create (virtual constructor)
+        /// Create (virtual constructor)
         virtual ExactInf* create() const {
             return new ExactInf();
         }
-*/
+
         /// Return maximum difference between single node 
         /// beliefs for two consecutive iterations
         virtual double maxDiff() const {
@@ -108,7 +108,9 @@ class ExactInf : public DAIAlgFG {
         virtual void init();
 
         /// Clear messages and beliefs corresponding to the nodes in ns
-        virtual void init( const VarSet &/*ns*/ ) {}
+        virtual void init( const VarSet &/*ns*/ ) {
+            DAI_THROW(NOT_IMPLEMENTED);
+        }
 
         /// The actual approximate inference algorithm
         virtual double run();

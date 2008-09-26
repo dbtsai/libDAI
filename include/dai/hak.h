@@ -63,6 +63,9 @@ class HAK : public DAIAlgRG {
         /// Clone function
         HAK* clone() const { return new HAK(*this); }
         
+        /// Create (virtual constructor)
+        virtual HAK* create() const { return new HAK(); }
+
         /// Construct from RegionGraph
         HAK(const RegionGraph & rg, const PropertySet &opts);
 
@@ -94,13 +97,14 @@ class HAK : public DAIAlgRG {
         double doDoubleLoop();
         double run();
         void init();
+        /// Clear messages and beliefs corresponding to the nodes in ns
+        virtual void init( const VarSet &ns );
         std::string identify() const;
         Factor belief( const Var &n ) const;
         Factor belief( const VarSet &ns ) const;
         std::vector<Factor> beliefs() const;
         Real logZ () const;
 
-        void init( const VarSet &ns );
         void restoreFactors( const VarSet &ns ) { RegionGraph::restoreFactors( ns ); init( ns ); }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;

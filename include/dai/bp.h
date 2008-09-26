@@ -60,8 +60,10 @@ class BP : public DAIAlgFG {
         BP() : DAIAlgFG(), edges(), props(), maxdiff(0.0) {};
         /// Copy constructor
         BP( const BP & x ) : DAIAlgFG(x), edges(x.edges), props(x.props), maxdiff(x.maxdiff) {};
-        /// Clone *this
+        /// Clone *this (virtual copy constructor)
         BP* clone() const { return new BP(*this); }
+        /// Create (virtual constructor)
+        virtual BP* create() const { return new BP; }
         /// Construct from FactorGraph fg and PropertySet opts
         BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), edges(), props(), maxdiff(0.0) {
             setProperties( opts );
@@ -92,6 +94,8 @@ class BP : public DAIAlgFG {
         std::string identify() const;
         void create();
         void init();
+        /// Clear messages and beliefs corresponding to the nodes in ns
+        virtual void init( const VarSet &ns );
         double run();
 
         void findMaxResidual( size_t &i, size_t &_I );
@@ -103,7 +107,6 @@ class BP : public DAIAlgFG {
         std::vector<Factor> beliefs() const;
         Real logZ() const;
 
-        void init( const VarSet &ns );
         void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors(ns); init(ns); }
 
         /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member

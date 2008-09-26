@@ -68,6 +68,7 @@ class MR : public DAIAlgFG {
         double maxdiff;
 
     public:
+        MR() {}
         MR( const FactorGraph & fg, const PropertySet &opts );
         void init(size_t Nin, double *_w, double *_th);
         void makekindex();
@@ -88,6 +89,10 @@ class MR : public DAIAlgFG {
             return 0.0; 
         }
         void init() {}
+        /// Clear messages and beliefs corresponding to the nodes in ns
+        virtual void init( const VarSet &/*ns*/ ) {
+            DAI_THROW(NOT_IMPLEMENTED);
+        }
         static const char *Name;
         std::string identify() const;
         double _tJ(size_t i, sub_nb A);
@@ -103,6 +108,8 @@ class MR : public DAIAlgFG {
 
         double sign(double a) { return (a >= 0) ? 1.0 : -1.0; }
         MR* clone() const { return new MR(*this); }
+        /// Create (virtual constructor)
+        virtual MR* create() const { return new MR(); }
 
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;

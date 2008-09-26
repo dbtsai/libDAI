@@ -104,6 +104,8 @@ class TreeEP : public JTree {
                     _Q[I].I() = &factor(I);
         }
         TreeEP* clone() const { return new TreeEP(*this); }
+        /// Create (virtual constructor)
+        virtual TreeEP* create() const { return new TreeEP(); }
         TreeEP & operator=( const TreeEP& x ) {
             if( this != &x ) {
                 JTree::operator=(x);
@@ -122,12 +124,13 @@ class TreeEP : public JTree {
         static const char *Name;
         std::string identify() const;
         void init();
+        /// Clear messages and beliefs corresponding to the nodes in ns
+        virtual void init( const VarSet &/*ns*/ ) { init(); }
         double run();
         Real logZ() const;
 
         bool offtree( size_t I ) const { return (fac2OR[I] == -1U); }
 
-        void init( const VarSet &/*ns*/ ) { init(); }
         void restoreFactors( const VarSet &ns ) { RegionGraph::restoreFactors( ns ); init( ns ); }
 
         void setProperties( const PropertySet &opts );

@@ -66,6 +66,8 @@ class LC : public DAIAlgFG {
         LC(const LC & x) : DAIAlgFG(x), _pancakes(x._pancakes), _cavitydists(x._cavitydists), _phis(x._phis), _beliefs(x._beliefs), props(x.props), maxdiff(x.maxdiff) {}
         /// Clone function
         LC* clone() const { return new LC(*this); }
+        /// Create (virtual constructor)
+        virtual LC* create() const { return new LC(); }
         /// Construct LC object from a FactorGraph and parameters
         LC( const FactorGraph & fg, const PropertySet &opts );
         /// Assignment operator
@@ -88,6 +90,10 @@ class LC : public DAIAlgFG {
         long SetCavityDists( std::vector<Factor> &Q );
 
         void init();
+        /// Clear messages and beliefs corresponding to the nodes in ns
+        virtual void init( const VarSet &/*ns*/ ) {
+            DAI_THROW(NOT_IMPLEMENTED);
+        }
         Factor NewPancake (size_t i, size_t _I, bool & hasNaNs);
         double run();
 

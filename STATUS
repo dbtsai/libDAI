@@ -10,6 +10,9 @@ class ExtFactorGraph : public FactorGraph {
 	// blabla
 }
 A disadvantage of this approach may be worse cachability.
+A problem is if there are nog properties for nodes (type 1), nodes (type 2)
+or edges. Maybe this can be solved using specializations, or using variadac
+template arguments or something similar?
 - BipartiteGraph::isConnected should be optimized.
 - http://www.boost.org/development/requirements.html#Design_and_Programming
 - Would it be a good idea to cache second-order neighborhoods (delta's) in BipGraph?
@@ -18,6 +21,9 @@ A disadvantage of this approach may be worse cachability.
   No, a better idea is to avoid calls to findVar() as much as possible.
 - Can the FactorGraph constructors be optimized further?
 - Remove x2x?
+- Add iterations (like maxdiff, but counts iterations) to some algorithms
+- A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a
+reference to it
 
 TODO FOR RELEASE:
 - Test Visual C++ compatibility
@@ -56,15 +62,15 @@ factor.h
 prob.h
 factorgraph.h
 factorgraph.cpp
+regiongraph.h
+regiongraph.cpp
+daialg.h
+daialg.cpp
 
 FILES IN SVN HEAD THAT ARE STILL RELEVANT:
 ChangeLog
 README
 TODO
-regiongraph.h
-regiongraph.cpp
-daialg.h
-daialg.cpp
 
 bp.h
 bp.cpp

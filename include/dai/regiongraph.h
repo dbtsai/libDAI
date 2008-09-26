@@ -136,6 +136,32 @@ class RegionGraph : public FactorGraph {
             return *this;
         }
 
+        /// Create (virtual default constructor)
+        virtual RegionGraph* create() const {
+            return new RegionGraph();
+        }
+
+        /// Clone (virtual copy constructor)
+        virtual RegionGraph* clone() const {
+            return new RegionGraph(*this);
+        }
+
+        /// Set the content of the I'th factor and make a backup of its old content if backup == true
+        virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {
+            FactorGraph::setFactor( I, newFactor, backup ); 
+            RecomputeOR( I ); 
+        }
+
+        /// Set the contents of all factors as specified by facs and make a backup of the old contents if backup == true
+        virtual void setFactors( const std::map<size_t, Factor> & facs, bool backup = false ) {
+            FactorGraph::setFactors( facs, backup );
+            VarSet ns;
+            for( std::map<size_t, Factor>::const_iterator fac = facs.begin(); fac != facs.end(); fac++ )
+                ns |= fac->second.vars();
+            RecomputeORs( ns ); 
+        }
+
+
         /// Provides read access to outer region
         const FRegion & OR(size_t alpha) const { return ORs[alpha]; }
         /// Provides access to outer region
@@ -176,18 +202,6 @@ class RegionGraph : public FactorGraph {
 
         /// Recompute all outer regions involving factor I
         void RecomputeOR( size_t I );
-
-        /// We have to overload FactorGraph::clamp because the corresponding outer regions have to be recomputed
-        void clamp( const Var &n, size_t i ) { FactorGraph::clamp( n, i ); RecomputeORs( n ); }
-
-        /// We have to overload FactorGraph::makeCavity because the corresponding outer regions have to be recomputed
-        void makeCavity( size_t i ) { FactorGraph::makeCavity( i ); RecomputeORs( var(i) ); }
-
-        /// We have to overload FactorGraph::restoreFactors because the corresponding outer regions have to be recomputed
-        void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors( ns ); RecomputeORs( ns ); }
-
-        /// We have to overload FactorGraph::restoreFactor because the corresponding outer regions have to be recomputed
-        void restoreFactor( size_t I ) { FactorGraph::restoreFactor( I ); RecomputeOR( I ); }
 
         /// Send RegionGraph to output stream
         friend std::ostream & operator << ( std::ostream & os, const RegionGraph & rg );

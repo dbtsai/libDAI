@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <boost/dynamic_bitset.hpp>
 #include <dai/regiongraph.h>
 #include <dai/factorgraph.h>
 #include <dai/clustergraph.h>
@@ -46,7 +47,6 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors,
         for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
                 fac2OR.push_back( alpha );
-//              OR(alpha) *= factor(I);
                 break;
             }
         assert( alpha != nrORs() );
@@ -82,7 +82,6 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
         for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
                 fac2OR.push_back( alpha );
-//              OR(alpha) *= factor(I);
                 break;
             }
         assert( alpha != nrORs() );
@@ -93,9 +92,9 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
     set<VarSet> betas;
     for( size_t alpha = 0; alpha < cg.clusters.size(); alpha++ )
         for( size_t alpha2 = alpha; (++alpha2) != cg.clusters.size(); ) {
-            VarSet intersect = cg.clusters[alpha] & cg.clusters[alpha2];
-            if( intersect.size() > 0 )
-                betas.insert( intersect );
+            VarSet intersection = cg.clusters[alpha] & cg.clusters[alpha2];
+            if( intersection.size() > 0 )
+                betas.insert( intersection );
         }
 
     // Create inner regions - subsequent passes
@@ -104,9 +103,9 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
         new_betas.clear();
         for( set<VarSet>::const_iterator gamma = betas.begin(); gamma != betas.end(); gamma++ )
             for( set<VarSet>::const_iterator gamma2 = gamma; (++gamma2) != betas.end(); ) {
-                VarSet intersect = (*gamma) & (*gamma2);
-                if( (intersect.size() > 0) && (betas.count(intersect) == 0) )
-                    new_betas.insert( intersect );
+                VarSet intersection = (*gamma) & (*gamma2);
+                if( (intersection.size() > 0) && (betas.count(intersection) == 0) )
+                    new_betas.insert( intersection );
             }
         betas.insert(new_betas.begin(), new_betas.end());
     } while( new_betas.size() );
@@ -142,7 +141,7 @@ void RegionGraph::Calc_Counting_Numbers() {
     // Calculates counting numbers of inner regions based upon counting numbers of outer regions
     
     vector<vector<size_t> > ancestors(nrIRs());
-    vector<bool> assigned(nrIRs(), false);
+    boost::dynamic_bitset<> assigned(nrIRs());
     for( size_t beta = 0; beta < nrIRs(); beta++ ) {
         IR(beta).c() = 0.0;
         for( size_t beta2 = 0; beta2 < nrIRs(); beta2++ )
@@ -166,7 +165,7 @@ void RegionGraph::Calc_Counting_Numbers() {
                     for( vector<size_t>::const_iterator beta2 = ancestors[beta].begin(); beta2 != ancestors[beta].end(); beta2++ )
                         c -= IR(*beta2).c();
                     IR(beta).c() = c;
-                    assigned[beta] = true;
+                    assigned.set(beta, true);
                     new_counting = true;
                 }
             }
@@ -232,11 +231,16 @@ void RegionGraph::RecomputeOR( size_t I ) {
 ostream & operator << (ostream & os, const RegionGraph & rg) {
     os << "Outer regions" << endl;
     for( size_t alpha = 0; alpha < rg.nrORs(); alpha++ )
-        os << rg.OR(alpha).vars() << ": c = " << rg.OR(alpha).c() << endl;
+        os << alpha << ": " << rg.OR(alpha).vars() << ": c = " << rg.OR(alpha).c() << endl;
 
     os << "Inner regions" << endl;
     for( size_t beta = 0; beta < rg.nrIRs(); beta++ )
-        os << (VarSet)rg.IR(beta) << ": c = " << rg.IR(beta).c() << endl;
+        os << beta << ": " << (VarSet)rg.IR(beta) << ": c = " << rg.IR(beta).c() << endl;
+
+    os << "Edges" << endl;
+    for( size_t alpha = 0; alpha < rg.nrORs(); alpha++ )
+        foreach( const RegionGraph::Neighbor &beta, rg.nbOR(alpha) )
+            os << alpha << "->" << beta << endl;   
 
     return(os);
 }

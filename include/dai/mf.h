@@ -50,6 +50,8 @@ class MF : public DAIAlgFG {
         // copy constructor
         MF( const MF& x ) : DAIAlgFG(x), _beliefs(x._beliefs), props(x.props), maxdiff(x.maxdiff) {}
         MF* clone() const { return new MF(*this); }
+        /// Create (virtual constructor)
+        virtual MF* create() const { return new MF(); }
         // construct MF object from FactorGraph
         MF( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), props(), maxdiff(0.0) {
             setProperties( opts );
@@ -70,6 +72,8 @@ class MF : public DAIAlgFG {
         std::string identify() const;
         void create();
         void init();
+        /// Clear messages and beliefs corresponding to the nodes in ns
+        virtual void init( const VarSet &ns );
         double run();
         Factor beliefV (size_t i) const;
         Factor belief (const Var &n) const;
@@ -77,7 +81,6 @@ class MF : public DAIAlgFG {
         std::vector<Factor> beliefs() const;
         Real logZ() const;
 
-        void init( const VarSet &ns );
         void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors(ns); init(ns); }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
