@@ -53,7 +53,7 @@ FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _undoProbs() {
     vars.reserve( _vars.size() );
     for( set<Var>::const_iterator p1 = _vars.begin(); p1 != _vars.end(); p1++ )
         vars.push_back( *p1 );
-    
+
     // create graph structure
     createGraph( nrEdges );
 }
@@ -115,22 +115,23 @@ istream& operator >> (istream& is, FactorGraph& fg) {
 
     try {
         vector<Factor> factors;
-        size_t nr_f;
+        size_t nr_Factors;
         string line;
         
         while( (is.peek()) == '#' )
             getline(is,line);
-        is >> nr_f;
+        is >> nr_Factors;
         if( is.fail() )
             DAI_THROW(INVALID_FACTORGRAPH_FILE);
         if( verbose >= 2 )
-            cout << "Reading " << nr_f << " factors..." << endl;
+            cout << "Reading " << nr_Factors << " factors..." << endl;
 
         getline (is,line);
         if( is.fail() )
             DAI_THROW(INVALID_FACTORGRAPH_FILE);
 
-        for( size_t I = 0; I < nr_f; I++ ) {
+        map<long,size_t> vardims;
+        for( size_t I = 0; I < nr_Factors; I++ ) {
             if( verbose >= 3 )
                 cout << "Reading factor " << I << "..." << endl;
             size_t nr_members;
@@ -148,11 +149,8 @@ istream& operator >> (istream& is, FactorGraph& fg) {
                 is >> mi_label;
                 labels.push_back(mi_label);
             }
-            if( verbose >= 3 ) {
-                cout << "  labels: ";
-                copy (labels.begin(), labels.end(), ostream_iterator<int>(cout, " "));
-                cout << endl;
-            }
+            if( verbose >= 3 )
+                cout << "  labels: " << labels << endl;
 
             vector<size_t> dims;
             for( size_t mi = 0; mi < nr_members; mi++ ) {
@@ -162,17 +160,22 @@ istream& operator >> (istream& is, FactorGraph& fg) {
                 is >> mi_dim;
                 dims.push_back(mi_dim);
             }
-            if( verbose >= 3 ) {
-                cout << "  dimensions: ";
-                copy (dims.begin(), dims.end(), ostream_iterator<int>(cout, " "));
-                cout << endl;
-            }
+            if( verbose >= 3 )
+                cout << "  dimensions: " << dims << endl;
 
             // add the Factor
             VarSet I_vars;
-            for( size_t mi = 0; mi < nr_members; mi++ )
+            for( size_t mi = 0; mi < nr_members; mi++ ) {
+                map<long,size_t>::iterator vdi = vardims.find( labels[mi] );
+                if( vdi != vardims.end() ) {
+                    // check whether dimensions are consistent
+                    if( vdi->second != dims[mi] )
+                        DAI_THROW(INVALID_FACTORGRAPH_FILE);
+                } else
+                    vardims[labels[mi]] = dims[mi];
                 I_vars |= Var(labels[mi], dims[mi]);
-            factors.push_back(Factor(I_vars,0.0));
+            }
+            factors.push_back( Factor( I_vars, 0.0 ) );
             
             // calculate permutation sigma (internally, members are sorted)
             vector<size_t> sigma(nr_members,0);
@@ -182,11 +185,8 @@ istream& operator >> (istream& is, FactorGraph& fg) {
                 vector<long>::iterator j_loc = find(labels.begin(),labels.end(),search_for);
                 sigma[mi] = j_loc - labels.begin();
             }
-            if( verbose >= 3 ) {
-                cout << "  sigma: ";
-                copy( sigma.begin(), sigma.end(), ostream_iterator<int>(cout," "));
-                cout << endl;
-            }
+            if( verbose >= 3 )
+                cout << "  sigma: " << sigma << endl;
 
             // calculate multindices
             Permute permindex( dims, sigma );
@@ -214,10 +214,8 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             }
         }
 
-        if( verbose >= 3 ) {
-            cout << "factors:" << endl;
-            copy(factors.begin(), factors.end(), ostream_iterator<Factor>(cout,"\n"));
-        }
+        if( verbose >= 3 )
+            cout << "factors:" << factors << endl;
 
         fg = FactorGraph(factors);
     } catch (char *e) {
@@ -229,141 +227,72 @@ istream& operator >> (istream& is, FactorGraph& fg) {
 
 
 VarSet FactorGraph::delta( unsigned i ) const {
-    // calculate Markov Blanket
-    VarSet del;
-    foreach( const Neighbor &I, nbV(i) ) // for all neighboring factors I of i
-        foreach( const Neighbor &j, nbF(I) ) // for all neighboring variables j of I
-            if( j != i )
-                del |= var(j);
-
-    return del;
+    return( Delta(i) / var(i) );
 }
 
 
 VarSet FactorGraph::Delta( unsigned i ) const {
-    return( delta(i) | var(i) );
-}
-
-
-void FactorGraph::makeCavity( unsigned i ) {
-    // fills all Factors that include var(i) with ones
+    // calculate Markov Blanket
+    VarSet Del;
     foreach( const Neighbor &I, nbV(i) ) // for all neighboring factors I of i
-        factor(I).fill( 1.0 );
+        foreach( const Neighbor &j, nbF(I) ) // for all neighboring variables j of I
+            Del |= var(j);
+
+    return Del;
 }
 
 
-bool FactorGraph::hasNegatives() const {
-    bool result = false;
-    for( size_t I = 0; I < nrFactors() && !result; I++ )
-        if( factor(I).hasNegatives() )
-            result = true;
+VarSet FactorGraph::Delta( const VarSet &ns ) const {
+    VarSet result;
+    for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ ) 
+        result |= Delta(findVar(*n));
     return result;
 }
- 
 
-long FactorGraph::ReadFromFile(const char *filename) {
+
+void FactorGraph::makeCavity( unsigned i, bool backup ) {
+    // fills all Factors that include var(i) with ones
+    map<size_t,Factor> newFacs;
+    foreach( const Neighbor &I, nbV(i) ) // for all neighboring factors I of i
+        newFacs[I] = Factor(factor(I).vars(), 1.0);
+    setFactors( newFacs, backup );
+}
+
+
+void FactorGraph::ReadFromFile( const char *filename ) {
     ifstream infile;
-    infile.open (filename);
-    if (infile.is_open()) {
+    infile.open( filename );
+    if( infile.is_open() ) {
         infile >> *this;
         infile.close();
-        return 0;
-    } else {
-        cout << "ERROR OPENING FILE" << endl;
-        return 1;
-    }
+    } else
+        DAI_THROW(CANNOT_READ_FILE);
 }
 
 
-long FactorGraph::WriteToFile(const char *filename) const {
+void FactorGraph::WriteToFile( const char *filename ) const {
     ofstream outfile;
-    outfile.open (filename);
-    if (outfile.is_open()) {
-        try {
-            outfile << *this;
-        } catch (char *e) {
-            cout << e << endl;
-            return 1;
-        }
+    outfile.open( filename );
+    if( outfile.is_open() ) {
+        outfile << *this;
         outfile.close();
-        return 0;
-    } else {
-        cout << "ERROR OPENING FILE" << endl;
-        return 1;
-    }
+    } else
+        DAI_THROW(CANNOT_WRITE_FILE);
 }
 
 
-long FactorGraph::WriteToDotFile(const char *filename) const {
-    ofstream outfile;
-    outfile.open (filename);
-    if (outfile.is_open()) {
-        try {
-            outfile << "graph G {" << endl;
-            outfile << "graph[size=\"9,9\"];" << endl;
-            outfile << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
-            for( size_t i = 0; i < nrVars(); i++ )
-                outfile << "\tx" << var(i).label() << ";" << endl;
-            outfile << "node[shape=box,style=filled,color=lightgrey,width=0.3,height=0.3,fixedsize=true];" << endl;
-            for( size_t I = 0; I < nrFactors(); I++ )
-                outfile << "\tp" << I << ";" << endl;
-            for( size_t i = 0; i < nrVars(); i++ )
-                foreach( const Neighbor &I, nbV(i) )  // for all neighboring factors I of i
-                    outfile << "\tx" << var(i).label() << " -- p" << I << ";" << endl;
-            outfile << "}" << endl;
-        } catch (char *e) {
-            cout << e << endl;
-            return 1;
-        }
-        outfile.close();
-        return 0;
-    } else {
-        cout << "ERROR OPENING FILE" << endl;
-        return 1;
-    }
-}
-
-
-bool hasShortLoops( const vector<Factor> &P ) {
-    bool found = false;
-    vector<Factor>::const_iterator I, J;
-    for( I = P.begin(); I != P.end(); I++ ) {
-        J = I;
-        J++;
-        for( ; J != P.end(); J++ )
-            if( (I->vars() & J->vars()).size() >= 2 ) {
-                found = true;
-                break;
-            }
-        if( found )
-            break;
-    }
-    return found;
-}
-
-
-void RemoveShortLoops(vector<Factor> &P) {
-    bool found = true;
-    while( found ) {
-        found = false;
-        vector<Factor>::iterator I, J;
-        for( I = P.begin(); I != P.end(); I++ ) {
-            J = I;
-            J++;
-            for( ; J != P.end(); J++ )
-                if( (I->vars() & J->vars()).size() >= 2 ) {
-                    found = true;
-                    break;
-                }
-            if( found )
-                break;
-        }
-        if( found ) {
-            cout << "Merging factors " << I->vars() << " and " << J->vars() << endl;
-            *I *= *J;
-            P.erase(J);
-        }
-    }
+void FactorGraph::display( ostream &os ) const {
+    os << "graph G {" << endl;
+    os << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
+    for( size_t i = 0; i < nrVars(); i++ )
+        os << "\tv" << var(i).label() << ";" << endl;
+    os << "node[shape=box,width=0.3,height=0.3,fixedsize=true];" << endl;
+    for( size_t I = 0; I < nrFactors(); I++ )
+        os << "\tf" << I << ";" << endl;
+    for( size_t i = 0; i < nrVars(); i++ )
+        foreach( const Neighbor &I, nbV(i) )  // for all neighboring factors I of i
+            os << "\tv" << var(i).label() << " -- f" << I << ";" << endl;
+    os << "}" << endl;
 }
 
 
@@ -373,7 +302,7 @@ vector<VarSet> FactorGraph::Cliques() const {
     for( size_t I = 0; I < nrFactors(); I++ ) {
         bool maximal = true;
         for( size_t J = 0; (J < nrFactors()) && maximal; J++ )
-            if( (factor(J).vars() >> factor(I).vars()) && !(factor(J).vars() == factor(I).vars()) )
+            if( (factor(J).vars() >> factor(I).vars()) && (factor(J).vars() != factor(I).vars()) )
                 maximal = false;
         
         if( maximal )
@@ -384,7 +313,7 @@ vector<VarSet> FactorGraph::Cliques() const {
 }
 
 
-void FactorGraph::clamp( const Var & n, size_t i ) {
+void FactorGraph::clamp( const Var & n, size_t i, bool backup ) {
     assert( i <= n.states() );
 
     // Multiply each factor that contains the variable with a delta function
@@ -392,52 +321,137 @@ void FactorGraph::clamp( const Var & n, size_t i ) {
     Factor delta_n_i(n,0.0);
     delta_n_i[i] = 1.0;
 
+    map<size_t, Factor> newFacs;
     // For all factors that contain n
     for( size_t I = 0; I < nrFactors(); I++ ) 
         if( factor(I).vars().contains( n ) )
             // Multiply it with a delta function
-            factor(I) *= delta_n_i;
+            newFacs[I] = factor(I) * delta_n_i;
+    setFactors( newFacs, backup );
 
     return;
 }
 
 
-void FactorGraph::saveProb( size_t I ) {
-    map<size_t,Prob>::iterator it = _undoProbs.find( I );
-    if( it != _undoProbs.end() )
-        cout << "FactorGraph::saveProb:  WARNING: _undoProbs[I] already defined!" << endl;
-    _undoProbs[I] = factor(I).p();
+void FactorGraph::backupFactor( size_t I ) {
+    map<size_t,Factor>::iterator it = _backupFactors.find( I );
+    if( it != _backupFactors.end() )
+        DAI_THROW( MULTIPLE_UNDO );
+    _backupFactors[I] = factor(I);
 }
 
 
-void FactorGraph::undoProb( size_t I ) {
-    map<size_t,Prob>::iterator it = _undoProbs.find( I );
-    if( it != _undoProbs.end() ) {
-        factor(I).p() = (*it).second;
-        _undoProbs.erase(it);
+void FactorGraph::restoreFactor( size_t I ) {
+    map<size_t,Factor>::iterator it = _backupFactors.find( I );
+    if( it != _backupFactors.end() ) {
+        setFactor(I, it->second);
+        _backupFactors.erase(it);
     }
 }
 
 
-void FactorGraph::saveProbs( const VarSet &ns ) {
-    if( !_undoProbs.empty() )
-        cout << "FactorGraph::saveProbs:  WARNING: _undoProbs not empy!" << endl;
+void FactorGraph::backupFactors( const VarSet &ns ) {
     for( size_t I = 0; I < nrFactors(); I++ )
         if( factor(I).vars().intersects( ns ) )
-            _undoProbs[I] = factor(I).p();
+            backupFactor( I );
 }
 
 
-void FactorGraph::undoProbs( const VarSet &ns ) {
-    for( map<size_t,Prob>::iterator uI = _undoProbs.begin(); uI != _undoProbs.end(); ) {
-        if( factor((*uI).first).vars().intersects( ns ) ) {
-//          cout << "undoing " << factor((*uI).first).vars() << endl;
-//          cout << "from " << factor((*uI).first).p() << " to " << (*uI).second << endl;
-            factor((*uI).first).p() = (*uI).second;
-            _undoProbs.erase(uI++);
+void FactorGraph::restoreFactors( const VarSet &ns ) {
+    map<size_t,Factor> facs;
+    for( map<size_t,Factor>::iterator uI = _backupFactors.begin(); uI != _backupFactors.end(); ) {
+        if( factor(uI->first).vars().intersects( ns ) ) {
+            facs.insert( *uI );
+            _backupFactors.erase(uI++);
         } else
             uI++;
     }
+    setFactors( facs );
+}
+
+
+void FactorGraph::restoreFactors() {
+    setFactors( _backupFactors );
+    _backupFactors.clear();
+}
+
+void FactorGraph::backupFactors( const std::set<size_t> & facs ) {
+    for( std::set<size_t>::const_iterator fac = facs.begin(); fac != facs.end(); fac++ )
+        backupFactor( *fac );
+}
+
+
+bool FactorGraph::isPairwise() const {
+    bool pairwise = true;
+    for( size_t I = 0; I < nrFactors() && pairwise; I++ )
+        if( factor(I).vars().size() > 2 )
+            pairwise = false;
+    return pairwise;
+}
+
+
+bool FactorGraph::isBinary() const {
+    bool binary = true;
+    for( size_t i = 0; i < nrVars() && binary; i++ )
+        if( var(i).states() > 2 )
+            binary = false;
+    return binary;
+}
+
+
+FactorGraph FactorGraph::clamped( const Var & v_i, size_t state ) const {
+    Real zeroth_order = 1.0;
+    vector<Factor> clamped_facs;
+    for( size_t I = 0; I < nrFactors(); I++ ) {
+        VarSet v_I = factor(I).vars();
+        Factor new_factor;
+        if( v_I.intersects( v_i ) )
+            new_factor = factor(I).slice( v_i, state );
+        else
+            new_factor = factor(I);
+
+        if( new_factor.vars().size() != 0 ) {
+            size_t J = 0;
+            // if it can be merged with a previous one, do that
+            for( J = 0; J < clamped_facs.size(); J++ )
+                if( clamped_facs[J].vars() == new_factor.vars() ) {
+                    clamped_facs[J] *= new_factor;
+                    break;
+                }
+            // otherwise, push it back
+            if( J == clamped_facs.size() || clamped_facs.size() == 0 )
+                clamped_facs.push_back( new_factor );
+        } else
+            zeroth_order *= new_factor[0];
+    }
+    *(clamped_facs.begin()) *= zeroth_order;
+    return FactorGraph( clamped_facs );
+}
+
+
+FactorGraph FactorGraph::maximalFactors() const {
+    vector<size_t> maxfac( nrFactors() );
+    map<size_t,size_t> newindex;
+    size_t nrmax = 0;
+    for( size_t I = 0; I < nrFactors(); I++ ) {
+        maxfac[I] = I;
+        VarSet maxfacvars = factor(maxfac[I]).vars();
+        for( size_t J = 0; J < nrFactors(); J++ ) {
+            VarSet Jvars = factor(J).vars();
+            if( Jvars >> maxfacvars && (Jvars != maxfacvars) ) {
+                maxfac[I] = J;
+                maxfacvars = factor(maxfac[I]).vars();
+            }
+        }
+        if( maxfac[I] == I )
+            newindex[I] = nrmax++;
+    }
+
+    vector<Factor> facs( nrmax );
+    for( size_t I = 0; I < nrFactors(); I++ )
+        facs[newindex[maxfac[I]]] *= factor(I);
+
+    return FactorGraph( facs.begin(), facs.end(), vars().begin(), vars().end(), facs.size(), nrVars() );
 }
 
 

@@ -42,6 +42,11 @@ template<typename T> class      TProb;
 typedef TProb<Real>             Prob;
 
 
+// predefine friends
+template<typename T> TProb<T> min( const TProb<T> &a, const TProb<T> &b );
+template<typename T> TProb<T> max( const TProb<T> &a, const TProb<T> &b );
+
+
 /// TProb<T> implements a probability vector of type T.
 /// T should be castable from and to double.
 template <typename T> class TProb {
@@ -63,7 +68,7 @@ template <typename T> class TProb {
         typedef enum { DISTL1, DISTLINF, DISTTV } DistType;
         
         /// Default constructor
-        TProb() {}
+        TProb() : _p() {}
         
         /// Construct uniform distribution of given length
         explicit TProb( size_t n ) : _p(std::vector<T>(n, 1.0 / n)) {}
@@ -81,7 +86,13 @@ template <typename T> class TProb {
         std::vector<T> & p() { return _p; }
         
         /// Provide read access to ith element of _p
-        T operator[]( size_t i ) const { return _p[i]; }
+        T operator[]( size_t i ) const { 
+#ifdef DAI_DEBUG
+            return _p.at(i);
+#else
+            return _p[i];
+#endif
+        }
         
         /// Provide full access to ith element of _p
         T& operator[]( size_t i ) { return _p[i]; }
@@ -109,6 +120,14 @@ template <typename T> class TProb {
                 if( fabs((Real)_p[i]) < epsilon )
                     _p[i] = 0;
 //            std::replace_if( _p.begin(), _p.end(), fabs((Real)boost::lambda::_1) < epsilon, 0.0 );
+            return *this;
+        }
+
+        /// Make entries epsilon if they are smaller than epsilon
+        TProb<T>& makePositive (Real epsilon) {
+            for( size_t i = 0; i < size(); i++ )
+                if( (0 < (Real)_p[i]) && ((Real)_p[i] < epsilon) )
+                    _p[i] = epsilon;
             return *this;
         }
 
@@ -140,7 +159,7 @@ template <typename T> class TProb {
             quot /= x;
             return quot;
         }
-        
+
         /// addition of x
         TProb<T>& operator+= (T x) {
             std::transform( _p.begin(), _p.end(), _p.begin(), std::bind2nd( std::plus<T>(), x ) );
@@ -165,6 +184,17 @@ template <typename T> class TProb {
             TProb<T> diff( *this );
             diff -= x;
             return diff;
+        }
+
+        /// Pointwise comparison
+        bool operator<= (const TProb<T> & q) const {
+#ifdef DAI_DEBUG
+            assert( size() == q.size() );
+#endif
+            for( size_t i = 0; i < size(); i++ )
+                if( !(_p[i] <= q[i]) )
+                    return false;
+            return true;
         }
 
         /// Pointwise multiplication with q
@@ -288,6 +318,30 @@ template <typename T> class TProb {
             return power;
         }
 
+        /// Pointwise signum
+        TProb<T> sgn() const {
+            TProb<T> x;
+            x._p.reserve( size() );
+            for( size_t i = 0; i < size(); i++ ) {
+                T s = 0;
+                if( _p[i] > 0 )
+                    s = 1;
+                else if( _p[i] < 0 )
+                    s = -1;
+                x._p.push_back( s );
+            }
+            return x;
+        }
+
+        /// Pointwise absolute value
+        TProb<T> abs() const {
+            TProb<T> x;
+            x._p.reserve( size() );
+            for( size_t i = 0; i < size(); i++ )
+                x._p.push_back( _p[i] < 0 ? (-p[i]) : p[i] );
+            return x;
+        }
+
         /// Pointwise exp
         const TProb<T>& takeExp() {
             std::transform( _p.begin(), _p.end(), _p.begin(),  std::ptr_fun<T, T>(std::exp) );
@@ -396,8 +450,14 @@ template <typename T> class TProb {
             return Z;
         }
 
+        /// Returns minimum value
+        T minVal() const {
+            T Z = *std::min_element( _p.begin(), _p.end() );
+            return Z;
+        }
+
         /// Normalize, using the specified norm
-        T normalize( NormType norm ) {
+        T normalize( NormType norm = NORMPROB ) {
             T Z = 0.0;
             if( norm == NORMPROB )
                 Z = totalSum();
@@ -411,7 +471,7 @@ template <typename T> class TProb {
         }
 
         /// Return normalized copy of *this, using the specified norm
-        TProb<T> normalized( NormType norm ) const {
+        TProb<T> normalized( NormType norm = NORMPROB ) const {
             TProb<T> result(*this);
             result.normalize( norm );
             return result;
@@ -440,12 +500,43 @@ template <typename T> class TProb {
             return S;
         }
 
+        /// Returns TProb<T> containing the pointwise minimum of a and b (which should have equal size)
+        friend TProb<T> min <> ( const TProb<T> &a, const TProb<T> &b );
+
+        /// Returns TProb<T> containing the pointwise maximum of a and b (which should have equal size)
+        friend TProb<T> max <> ( const TProb<T> &a, const TProb<T> &b );
+
         friend std::ostream& operator<< (std::ostream& os, const TProb<T>& P) {
+            os << "[";
             std::copy( P._p.begin(), P._p.end(), std::ostream_iterator<T>(os, " ") );
-            os << std::endl;
+            os << "]";
             return os;
         }
 };
+
+
+template<typename T> TProb<T> min( const TProb<T> &a, const TProb<T> &b ) {
+    assert( a.size() == b.size() );
+    TProb<T> result( a.size() );
+    for( size_t i = 0; i < a.size(); i++ )
+        if( a[i] < b[i] )
+            result[i] = a[i];
+        else
+            result[i] = b[i];
+    return result;
+}
+
+
+template<typename T> TProb<T> max( const TProb<T> &a, const TProb<T> &b ) {
+    assert( a.size() == b.size() );
+    TProb<T> result( a.size() );
+    for( size_t i = 0; i < a.size(); i++ )
+        if( a[i] > b[i] )
+            result[i] = a[i];
+        else
+            result[i] = b[i];
+    return result;
+}
 
 
 } // end of namespace dai

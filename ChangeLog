@@ -84,6 +84,11 @@ libDAI-0.2.2 (2008-??-??)
       moved isConnected() to BipartiteGraph
       removed updatedFactor(size_t)
       removed _normtype and NormType()
+      WriteToDotFile(const char *filename) -> display( std::ostream& os )
+      undoProb(size_t) -> restoreFactor(size_t)
+      saveProb(size_t) -> backupFactor(size_t)
+      undoProbs(const VarSet &) -> restoreFactors(const VarSet &)
+      saveProbs(const VarSet &) -> backupFactors(const VarSet &)
   - RegionGraph::
       nr_ORs() -> nrORs()
       nr_IRs() -> nrIRs()

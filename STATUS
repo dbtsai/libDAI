@@ -53,19 +53,19 @@ alldai.cpp
 properties.h
 properties.cpp
 factor.h
+prob.h
+factorgraph.h
+factorgraph.cpp
 
 FILES IN SVN HEAD THAT ARE STILL RELEVANT:
 ChangeLog
 README
 TODO
-prob.h
-factorgraph.h
-factorgraph.cpp
 regiongraph.h
 regiongraph.cpp
-
 daialg.h
 daialg.cpp
+
 bp.h
 bp.cpp
 hak.h

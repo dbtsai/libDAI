@@ -184,10 +184,10 @@ class RegionGraph : public FactorGraph {
         void makeCavity( size_t i ) { FactorGraph::makeCavity( i ); RecomputeORs( var(i) ); }
 
         /// We have to overload FactorGraph::undoProbs because the corresponding outer regions have to be recomputed
-        void undoProbs( const VarSet &ns ) { FactorGraph::undoProbs( ns ); RecomputeORs( ns ); }
+        void undoProbs( const VarSet &ns ) { FactorGraph::restoreFactors( ns ); RecomputeORs( ns ); }
 
         /// We have to overload FactorGraph::undoProb because the corresponding outer regions have to be recomputed
-        void undoProb( size_t I ) { FactorGraph::undoProb( I ); RecomputeOR( I ); }
+        void undoProb( size_t I ) { FactorGraph::restoreFactor( I ); RecomputeOR( I ); }
 
         /// Send RegionGraph to output stream
         friend std::ostream & operator << ( std::ostream & os, const RegionGraph & rg );
