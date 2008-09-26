@@ -33,8 +33,9 @@ using namespace std;
 int main( int argc, char *argv[] ) {
     if( argc != 3 ) {
         cout << "Usage: " << argv[0] << " <in.fg> <out.dot>" << endl << endl;
-        cout << "Converts a .fg (FactorGraph) file to a .dot (GraphViz) file for visualization." << endl;
-        cout << "The .dot file can be converted to .ps (PostScript by 'neato -T ps out.dot > out.ps'" << endl;
+        cout << "Converts a .fg (FactorGraph) file to a .dot (GraphViz) file for" << endl;
+        cout << "visualization. The .dot file can be converted to .ps (PostScript) by" << endl;
+        cout << "'neato -T ps out.dot > out.ps' or by 'dot -T ps out.dot > out.ps'" << endl << endl;
         return 1;
     } else {
         // Read factorgraph
@@ -59,4 +60,3 @@ int main( int argc, char *argv[] ) {
         return 0;
     }
 }
-

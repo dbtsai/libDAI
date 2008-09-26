@@ -518,4 +518,33 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
 }
 
 
+// first return value is treewidth
+// second return value is number of states in largest clique
+pair<size_t,size_t> treewidth( const FactorGraph & fg ) {
+    ClusterGraph _cg;
+
+    // Copy factors
+    for( size_t I = 0; I < fg.nrFactors(); I++ )
+        _cg.insert( fg.factor(I).vars() );
+
+    // Retain only maximal clusters
+    _cg.eraseNonMaximal();
+
+    // Obtain elimination sequence
+    vector<VarSet> ElimVec = _cg.VarElim_MinFill().eraseNonMaximal().toVector();
+
+    // Calculate treewidth
+    size_t treewidth = 0;
+    size_t nrstates = 0;
+    for( size_t i = 0; i < ElimVec.size(); i++ ) {
+        if( ElimVec[i].size() > treewidth )
+            treewidth = ElimVec[i].size();
+        if( ElimVec[i].states() > nrstates )
+            nrstates = ElimVec[i].states();
+    }
+
+    return pair<size_t,size_t>(treewidth, nrstates);
+}
+
+
 } // end of namespace dai

@@ -49,7 +49,7 @@ class LC : public DAIAlgFG {
             size_t verbose;
             size_t maxiter;
             double tol;
-            DAI_ENUM(CavityType,FULL,PAIR,PAIR2,PAIRINT,PAIRCUM,UNIFORM)
+            DAI_ENUM(CavityType,FULL,PAIR,PAIR2,UNIFORM)
             CavityType cavity;
             DAI_ENUM(UpdateType,SEQFIX,SEQRND,NONE)
             UpdateType updates;

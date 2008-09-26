@@ -101,6 +101,9 @@ class JTree : public DAIAlgRG {
 };
 
 
+std::pair<size_t,size_t> treewidth( const FactorGraph & fg );
+
+
 } // end of namespace dai
 
 

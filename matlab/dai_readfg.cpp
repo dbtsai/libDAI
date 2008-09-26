@@ -30,11 +30,12 @@
 
 #include <iostream>
 #include "mex.h"
-#include "matlab.h"
-#include "factorgraph.h"
+#include <dai/matlab/matlab.h>
+#include <dai/factorgraph.h>
 
 
 using namespace std;
+using namespace dai;
 
 
 /* Input Arguments */
@@ -74,8 +75,10 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
 
     // Read factorgraph
     FactorGraph fg;
-    if( fg.ReadFromFile( filename ) ) {
-        mexErrMsgTxt("dai_readfg: error reading file\n");
+    try {
+        fg.ReadFromFile( filename );
+    } catch( std::exception &e ) {
+        mexErrMsgTxt( e.what() );
     }
 
 

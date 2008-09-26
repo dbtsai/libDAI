@@ -19,15 +19,34 @@
 */
 
 
+#ifndef __defined_libdai_matlab_h
+#define __defined_libdai_matlab_h
+
+
 #include "mex.h"
-#include "../factor.h"
+#include <dai/factor.h>
 
 
-/* Convert vector<Factor> structure to a cell vector of CPTAB-like structs */
+namespace dai {
+
+
+#ifdef SMALLMEM
+    typedef int mwSize;
+    typedef int mwIndex;
+#endif
+
+
+/// Convert vector<Factor> structure to a cell vector of CPTAB-like structs
 mxArray *Factors2mx(const std::vector<Factor> &Ps);
 
-/* Convert cell vector of CPTAB-like structs to vector<Factor> */
+/// Convert cell vector of CPTAB-like structs to vector<Factor>
 std::vector<Factor> mx2Factors(const mxArray *psi, long verbose);
 
-/* Convert CPTAB-like struct to Factor */
+/// Convert CPTAB-like struct to Factor
 Factor mx2Factor(const mxArray *psi);
+
+
+} // end of namespace dai
+
+
+#endif

@@ -36,7 +36,7 @@ using namespace dai;
 namespace po = boost::program_options;
 
 
-class TestAI {
+class TestDAI {
     protected:
         InfAlg          *obj;
         string          name;
@@ -47,16 +47,27 @@ class TestAI {
         double          logZ;
         double          maxdiff;
         double          time;
+        size_t          iters;
         bool            has_logZ;
         bool            has_maxdiff;
+        bool            has_iters;
 
-        TestAI( const FactorGraph &fg, const string &_name, const PropertySet &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0), has_logZ(true) {
+        TestDAI( const FactorGraph &fg, const string &_name, const PropertySet &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0), iters(0U), has_logZ(false), has_maxdiff(false), has_iters(false) {
             double tic = toc();
-            obj = newInfAlg( name, fg, opts );
+            if( name == "LDPC" ) {
+                double zero[2] = {1.0, 0.0};
+                q.clear();
+                for( size_t i = 0; i < fg.nrVars(); i++ )
+                    q.push_back( Factor(Var(i,2), zero) );
+                logZ = NAN;
+                maxdiff = 0.0;
+                iters = 1;
+            } else
+                obj = newInfAlg( name, fg, opts );
             time += toc() - tic;
         }
 
-        ~TestAI() { 
+        ~TestDAI() { 
             if( obj != NULL )
                 delete obj;
         }
@@ -75,7 +86,7 @@ class TestAI {
             return result;
         }
 
-        void doAI() {
+        void doDAI() {
             double tic = toc();
             if( obj != NULL ) {
                 obj->init();
@@ -93,11 +104,13 @@ class TestAI {
                 } catch( Exception &e ) {
                     has_maxdiff = false;
                 }
+                has_iters = false;
+                iters = 0;
                 q = allBeliefs();
             };
         }
 
-        void calcErrs( const TestAI &x ) {
+        void calcErrs( const TestDAI &x ) {
             err.clear();
             err.reserve( q.size() );
             for( size_t i = 0; i < q.size(); i++ )
@@ -122,24 +135,40 @@ class TestAI {
 
 
 pair<string, PropertySet> parseMethod( const string &_s, const map<string,string> & aliases ) {
-    string s = _s;
-    if( aliases.find(_s) != aliases.end() )
-        s = aliases.find(_s)->second;
+    // s = first part of _s, until '['
+    string::size_type pos = _s.find_first_of('[');
+    string s;
+    if( pos == string::npos )
+        s = _s;
+    else
+        s = _s.substr(0,pos);
+
+    // if the first part is an alias, substitute
+    if( aliases.find(s) != aliases.end() )
+        s = aliases.find(s)->second;
+
+    // attach second part, merging properties if necessary
+    if( pos != string::npos ) {
+        if( s.at(s.length()-1) == ']' ) {
+            s = s.erase(s.length()-1,1) + ',' + _s.substr(pos+1);
+        } else
+            s = s + _s.substr(pos);
+    }
 
     pair<string, PropertySet> result;
     string & name = result.first;
     PropertySet & opts = result.second;
 
-    string::size_type pos = s.find_first_of('[');
-    name = s.substr( 0, pos );
+    pos = s.find_first_of('[');
     if( pos == string::npos )
         throw "Malformed method";
+    name = s.substr( 0, pos );
     size_t n = 0;
     for( ; strlen( DAINames[n] ) != 0; n++ )
         if( name == DAINames[n] )
             break;
-    if( strlen( DAINames[n] ) == 0 )
-        throw "Unknown inference algorithm";
+    if( strlen( DAINames[n] ) == 0 && (name != "LDPC") )
+        DAI_THROW(UNKNOWN_DAI_ALGORITHM);
 
     stringstream ss;
     ss << s.substr(pos,s.length());
@@ -171,7 +200,7 @@ int main( int argc, char *argv[] ) {
         po::options_description opts_required("Required options");
         opts_required.add_options()
             ("filename", po::value< string >(&filename), "Filename of FactorGraph")
-            ("methods", po::value< vector<string> >(&methods)->multitoken(), "AI methods to test")
+            ("methods", po::value< vector<string> >(&methods)->multitoken(), "DAI methods to test")
         ;
 
         po::options_description opts_optional("Allowed options");
@@ -231,7 +260,7 @@ int main( int argc, char *argv[] ) {
         }
 
         FactorGraph fg;
-        fg.ReadFromFile(filename.c_str());
+        fg.ReadFromFile( filename.c_str() );
 
         vector<Factor> q0;
         double logZ0 = 0.0;
@@ -250,7 +279,9 @@ int main( int argc, char *argv[] ) {
         cout.width( 10 );
         cout << "LOGZ ERROR" << "  ";
         cout.width( 10 );
-        cout << "MAXDIFF" << endl;
+        cout << "MAXDIFF" << "  ";
+        cout.width( 10 );
+        cout << "ITERS" << endl;
 
         for( size_t m = 0; m < methods.size(); m++ ) {
             pair<string, PropertySet> meth = parseMethod( methods[m], Aliases );
@@ -261,8 +292,8 @@ int main( int argc, char *argv[] ) {
                 meth.second.Set("maxiter",maxiter);
             if( vm.count("verbose") )
                 meth.second.Set("verbose",verbose);
-            TestAI piet(fg, meth.first, meth.second );
-            piet.doAI();
+            TestDAI piet(fg, meth.first, meth.second );
+            piet.doDAI();
             if( m == 0 ) {
                 q0 = piet.q;
                 logZ0 = piet.logZ;
@@ -300,12 +331,18 @@ int main( int argc, char *argv[] ) {
                         md = me;
                     if( isnan( ae ) )
                         md = ae;
-                    cout << md << endl;
+                    cout << md << "  ";
                 } else {
-                    cout << "N/A       ";
+                    cout << "N/A         ";
                 }
-            } else
-                cout << endl;
+                cout.width( 10 );
+                if( piet.has_iters ) {
+                    cout << piet.iters << "  " << endl;
+                } else {
+                    cout << "N/A         ";
+                }
+            }
+            cout << endl;
 
             if( marginals ) {
                 for( size_t i = 0; i < piet.q.size(); i++ )

@@ -30,11 +30,12 @@
 
 #include <iostream>
 #include "mex.h"
-#include "matlab.h"
-#include "../factor.h"
+#include <dai/matlab/matlab.h>
+#include <dai/factor.h>
 
 
 using namespace std;
+using namespace dai;
 
 
 /* Input Arguments */
@@ -95,7 +96,6 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     // Hand over result to MATLAB
     N_OUT = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(N_OUT)) = N;
-    
     
     return;
 }

@@ -145,29 +145,6 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet 
             vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->fg().delta(i), props.reinit );
             for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
                 Bi *= pairbeliefs[ij];
-        } else if( props.cavity == Properties::CavityType::PAIRINT ) {
-            Bi = calcMarginal( *cav, cav->fg().delta(i), props.reinit );
-            
-            // Set interactions of order > 2 to zero
-            size_t N = delta(i).size();
-            Real *p = &(*Bi.p().p().begin());
-            x2x::p2logp (N, p);
-            x2x::logp2w (N, p);
-            x2x::fill (N, p, 2, 0.0);
-            x2x::w2logp (N, p);
-//            x2x::logpnorm (N, p);
-            x2x::logp2p (N, p);
-        } else if( props.cavity == Properties::CavityType::PAIRCUM ) {
-            Bi = calcMarginal( *cav, cav->fg().delta(i), props.reinit );
-            
-            // Set cumulants of order > 2 to zero
-            size_t N = delta(i).size();
-            Real *p = &(*Bi.p().p().begin());
-            x2x::p2m (N, p);
-            x2x::m2c (N, p, N);
-            x2x::fill (N, p, 2, 0.0);
-            x2x::c2m (N, p, N);
-            x2x::m2p (N, p);
         }
         maxdiff = cav->maxDiff();
         delete cav;

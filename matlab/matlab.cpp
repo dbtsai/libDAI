@@ -20,7 +20,10 @@
 
 
 #include <iostream>
-#include "matlab.h"
+#include <dai/matlab/matlab.h>
+
+
+namespace dai {
 
 
 using namespace std;
@@ -44,12 +47,11 @@ mxArray *Factors2mx(const vector<Factor> &Ps) {
         double *BiMember_data = mxGetPr(BiMember);
         size_t i = 0;
         vector<mwSize> dims;
-        for( VarSet::iterator j = I->vars().begin(); j != I->vars().end(); j++,i++ ) {
+        for( VarSet::const_iterator j = I->vars().begin(); j != I->vars().end(); j++,i++ ) {
             BiMember_data[i] = j->label();
             dims.push_back( j->states() );
         }
 
-        //      mxArray *BiP = mxCreateDoubleMatrix(I->states(),1,mxREAL);
         mxArray *BiP = mxCreateNumericArray(I->vars().size(), &(*(dims.begin())), mxDOUBLE_CLASS, mxREAL);
         double *BiP_data = mxGetPr(BiP);
         for( size_t j = 0; j < I->states(); j++ )
@@ -98,7 +100,7 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
             if( verbose >= 3 )
                 cout << labels[mi] << "(" << dims[mi] << ") ";
             vars.insert( Var(labels[mi], dims[mi]) );
-            factorvars.insert( Var(labels[mi], dims[mi]) );
+            factorvars |= Var(labels[mi], dims[mi]);
         }
         factors.push_back(Factor(factorvars));
 
@@ -152,7 +154,7 @@ Factor mx2Factor(const mxArray *psi) {
     vector<long> labels(nr_mem,0);
     for( size_t mi = 0; mi < nr_mem; mi++ ) {
         labels[mi] = (long)members[mi];
-        vars.insert( Var(labels[mi], dims[mi]) );
+        vars |= Var(labels[mi], dims[mi]);
     }
     Factor factor(vars);
 
@@ -177,4 +179,7 @@ Factor mx2Factor(const mxArray *psi) {
         factor[permindex.convert_linear_index(li)] = factordata[li];
 
     return( factor );
+}
+
+
 }

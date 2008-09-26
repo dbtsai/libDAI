@@ -29,12 +29,13 @@
 
 
 #include <iostream>
-#include "matlab.h"
+#include <dai/matlab/matlab.h>
 #include "mex.h"
-#include "alldai.h"
+#include <dai/alldai.h>
 
 
 using namespace std;
+using namespace dai;
 
 
 /* Input Arguments */
