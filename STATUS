@@ -79,7 +79,6 @@ matlab/
 	dai_writefg.m
 	matlab.cpp
 	matlab.h
-
 utils/
 	fg2dot.cpp
 	fginfo.cpp
@@ -96,6 +95,8 @@ tests/
 	testall
 	testregression
 	test.cpp
+mf.h
+mf.cpp
 
 FILES IN SVN HEAD THAT ARE STILL RELEVANT:
 ChangeLog
@@ -110,8 +111,6 @@ jtree.h
 jtree.cpp
 lc.h
 lc.cpp
-mf.h
-mf.cpp
 mr.h
 mr.cpp
 treeep.h

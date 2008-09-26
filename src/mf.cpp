@@ -40,11 +40,17 @@ const char *MF::Name = "MF";
 void MF::setProperties( const PropertySet &opts ) {
     assert( opts.hasKey("tol") );
     assert( opts.hasKey("maxiter") );
-    assert( opts.hasKey("verbose") );
 
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
-    props.verbose = opts.getStringAs<size_t>("verbose");
+    if( opts.hasKey("verbose") )
+        props.verbose = opts.getStringAs<size_t>("verbose");
+    else
+        props.verbose = 0U;
+    if( opts.hasKey("damping") )
+        props.damping = opts.getStringAs<double>("damping");
+    else
+        props.damping = 0.0;
 }
 
 
@@ -53,6 +59,7 @@ PropertySet MF::getProperties() const {
     opts.Set( "tol", props.tol );
     opts.Set( "maxiter", props.maxiter );
     opts.Set( "verbose", props.verbose );
+    opts.Set( "damping", props.damping );
     return opts;
 }
 
@@ -62,19 +69,18 @@ string MF::printProperties() const {
     s << "[";
     s << "tol=" << props.tol << ",";
     s << "maxiter=" << props.maxiter << ",";
-    s << "verbose=" << props.verbose << "]";
+    s << "verbose=" << props.verbose << ",";
+    s << "damping=" << props.damping << "]";
     return s.str();
 }
 
 
-void MF::create() {
-    // clear beliefs
+void MF::construct() {
+    // create beliefs
     _beliefs.clear();
     _beliefs.reserve( nrVars() );
-
-    // create beliefs
     for( size_t i = 0; i < nrVars(); ++i )
-        _beliefs.push_back(Factor(var(i)));
+        _beliefs.push_back( Factor( var(i) ) );
 }
 
 
@@ -117,20 +123,23 @@ double MF::run() {
             jan *= piet; 
         }
 
-        jan.normalize( Prob::NORMPROB );
+        jan.normalize();
 
         if( jan.hasNaNs() ) {
             cout << "MF::run():  ERROR: jan has NaNs!" << endl;
             return 1.0;
         }
 
+        if( props.damping != 0.0 )
+            jan = (jan^(1.0 - props.damping)) * (_beliefs[i]^props.damping);
         diffs.push( dist( jan, _beliefs[i], Prob::DISTLINF ) );
 
         _beliefs[i] = jan;
     }
 
-    if( diffs.maxDiff() > maxdiff )
-        maxdiff = diffs.maxDiff();
+    _iters = t / pass_size;
+    if( diffs.maxDiff() > _maxdiff )
+        _maxdiff = diffs.maxDiff();
 
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
@@ -148,10 +157,10 @@ double MF::run() {
 }
 
 
-Factor MF::beliefV (size_t i) const {
+Factor MF::beliefV( size_t i ) const {
     Factor piet;
     piet = _beliefs[i];
-    piet.normalize( Prob::NORMPROB );
+    piet.normalize();
     return(piet);
 }
 
@@ -188,7 +197,7 @@ Real MF::logZ() const {
         Factor henk;
         foreach( const Neighbor &j, nbF(I) )  // for all j in I
             henk *= _beliefs[j];
-        henk.normalize( Prob::NORMPROB );
+        henk.normalize();
         Factor piet;
         piet = factor(I).log0();
         piet *= henk;

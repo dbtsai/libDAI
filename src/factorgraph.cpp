@@ -55,12 +55,12 @@ FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _backup() {
         vars.push_back( *p1 );
 
     // create graph structure
-    createGraph( nrEdges );
+    constructGraph( nrEdges );
 }
 
 
 /// Part of constructors (creates edges, neighbours and adjacency matrix)
-void FactorGraph::createGraph( size_t nrEdges ) {
+void FactorGraph::constructGraph( size_t nrEdges ) {
     // create a mapping for indices
     hash_map<size_t, size_t> hashmap;
     
@@ -77,7 +77,7 @@ void FactorGraph::createGraph( size_t nrEdges ) {
     }
 
     // create bipartite graph
-    G.create( nrVars(), nrFactors(), edges.begin(), edges.end() );
+    G.construct( nrVars(), nrFactors(), edges.begin(), edges.end() );
 }
 
 

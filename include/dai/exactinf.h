@@ -58,7 +58,7 @@ class ExactInf : public DAIAlgFG {
         /// Construct from FactorGraph fg and PropertySet opts
         ExactInf( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), props(), _beliefsV(), _beliefsF(), _logZ() {
             setProperties( opts );
-            create();
+            construct();
         }
         
         /// Assignment operator
@@ -74,9 +74,7 @@ class ExactInf : public DAIAlgFG {
         }
 
         /// Create (virtual constructor)
-        virtual ExactInf* create() const {
-            return new ExactInf();
-        }
+        virtual ExactInf* create() const { return new ExactInf(); }
 
         /// Return maximum difference between single node 
         /// beliefs for two consecutive iterations
@@ -118,7 +116,7 @@ class ExactInf : public DAIAlgFG {
         /// Name of this inference method
         static const char *Name;
 
-        void create();
+        void construct();
         void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors(ns); init(ns); }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;

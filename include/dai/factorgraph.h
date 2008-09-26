@@ -68,14 +68,10 @@ class FactorGraph {
         virtual ~FactorGraph() {}
 
         /// Create (virtual default constructor)
-        virtual FactorGraph* create() const {
-            return new FactorGraph(*this);
-        }
+        virtual FactorGraph* create() const { return new FactorGraph(*this); }
 
         /// Clone (virtual copy constructor)
-        virtual FactorGraph* clone() const {
-            return new FactorGraph();
-        }
+        virtual FactorGraph* clone() const { return new FactorGraph(); }
 
         // aliases
         Var & var(size_t i) { return vars[i]; }
@@ -207,7 +203,7 @@ class FactorGraph {
         void restoreFactors( const VarSet &ns );
         void backupFactors( const VarSet &ns );
         /// Part of constructors (creates edges, neighbors and adjacency matrix)
-        void createGraph( size_t nrEdges );
+        void constructGraph( size_t nrEdges );
 };
 
 
@@ -228,7 +224,7 @@ FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fac
         vars.push_back( *p1 );
 
     // create graph structure
-    createGraph( nrEdges );
+    constructGraph( nrEdges );
 }
 
 

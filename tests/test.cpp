@@ -59,9 +59,12 @@ class TestDAI {
                 q.clear();
                 for( size_t i = 0; i < fg.nrVars(); i++ )
                     q.push_back( Factor(Var(i,2), zero) );
-                logZ = NAN;
+                logZ = 0.0;
                 maxdiff = 0.0;
                 iters = 1;
+                has_logZ = false;
+                has_maxdiff = false;
+                has_iters = false;
             } else
                 obj = newInfAlg( name, fg, opts );
             time += toc() - tic;

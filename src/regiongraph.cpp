@@ -54,7 +54,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors,
     RecomputeORs();
     
     // create bipartite graph
-    G.create( nrORs(), nrIRs(), edges.begin(), edges.end() );
+    G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Check counting numbers
 #ifdef DAI_DEBUG
@@ -125,7 +125,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
     }
     
     // create bipartite graph
-    G.create( nrORs(), nrIRs(), edges.begin(), edges.end() );
+    G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Calculate counting numbers
     Calc_Counting_Numbers();

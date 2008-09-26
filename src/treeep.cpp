@@ -322,7 +322,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     }
 
     // create bipartite graph
-    G.create( nrORs(), nrIRs(), edges.begin(), edges.end() );
+    G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Check counting numbers
     Check_Counting_Numbers();

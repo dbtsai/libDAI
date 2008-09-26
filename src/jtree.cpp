@@ -133,7 +133,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
     }
 
     // create bipartite graph
-    G.create( nrORs(), nrIRs(), edges.begin(), edges.end() );
+    G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Create messages and beliefs
     _Qa.clear();

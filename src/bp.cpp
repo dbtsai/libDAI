@@ -77,7 +77,7 @@ string BP::printProperties() const {
 }
 
 
-void BP::create() {
+void BP::construct() {
     // create edge properties
     edges.clear();
     edges.reserve( nrVars() );

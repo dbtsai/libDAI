@@ -307,7 +307,7 @@ BipartiteGraph CreateRandomBipartiteGraph( size_t N, size_t K, size_t n, size_t 
         edges.push_back( BipartiteGraph::Edge(stubs1[e], stubs2[e]) );
 
     // finish construction
-    G.create( N, K, edges.begin(), edges.end() );
+    G.construct( N, K, edges.begin(), edges.end() );
 
     return G;
 }
@@ -360,7 +360,7 @@ BipartiteGraph CreateSmallLDPCGraph() {
     edges.push_back( Edge(1,3) ); edges.push_back( Edge(2,3) ); edges.push_back( Edge(3,3) );
 
     // finish construction
-    G.create( N, K, edges.begin(), edges.end() );
+    G.construct( N, K, edges.begin(), edges.end() );
 
     return G;
 }
@@ -405,7 +405,7 @@ BipartiteGraph CreateGroupStructuredLDPCGraph( size_t p, size_t j, size_t k ) {
         }
 
     // finish construction
-    G.create( N, K, edges.begin(), edges.end() );
+    G.construct( N, K, edges.begin(), edges.end() );
 
     return G;
 }

@@ -97,7 +97,7 @@ libDAI-0.2.2 (2008-??-??)
       nr_IRs() -> nrIRs()
       ORs() -> ORs
       IRs() -> IRs
-  - *::Regenerate() -> *::create()
+  - *::Regenerate() -> *::construct()
   - Renamed Index -> IndexFor
   - Diffs:
       max() -> maxDiff()

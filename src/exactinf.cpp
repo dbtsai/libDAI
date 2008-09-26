@@ -54,7 +54,7 @@ string ExactInf::printProperties() const {
 }
 
 
-void ExactInf::create() {
+void ExactInf::construct() {
     // clear variable beliefs and reserve space
     _beliefsV.clear();
     _beliefsV.reserve( nrVars() );

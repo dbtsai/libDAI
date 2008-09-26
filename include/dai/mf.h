@@ -35,57 +35,87 @@ namespace dai {
 class MF : public DAIAlgFG {
     protected:
         std::vector<Factor>  _beliefs;
+        /// Maximum difference encountered so far
+        double _maxdiff;
+        /// Number of iterations needed
+        size_t _iters;
 
     public:
         struct Properties {
             size_t verbose;
             size_t maxiter;
             double tol;
+            double damping;
         } props;
-        double maxdiff;
-        
+        static const char *Name;
+
     public:
-        // default constructor
-        MF() : DAIAlgFG(), _beliefs(), props(), maxdiff(0.0) {}
-        // copy constructor
-        MF( const MF& x ) : DAIAlgFG(x), _beliefs(x._beliefs), props(x.props), maxdiff(x.maxdiff) {}
-        MF* clone() const { return new MF(*this); }
-        /// Create (virtual constructor)
-        virtual MF* create() const { return new MF(); }
+        /// Default constructor
+        MF() : DAIAlgFG(), _beliefs(), _maxdiff(0.0), _iters(0U), props() {}
+
         // construct MF object from FactorGraph
-        MF( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), props(), maxdiff(0.0) {
+        MF( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), _maxdiff(0.0), _iters(0U), props() {
             setProperties( opts );
-            create();
+            construct();
         }
-        // assignment operator
-        MF& operator=( const MF &x ) {
+
+        /// Copy constructor
+        MF( const MF &x ) : DAIAlgFG(x), _beliefs(x._beliefs), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
+
+        /// Assignment operator
+        MF & operator=( const MF &x ) {
             if( this != &x ) {
                 DAIAlgFG::operator=( x );
                 _beliefs = x._beliefs;
-                props = x.props;
-                maxdiff = x.maxdiff;
+                _maxdiff = x._maxdiff;
+                _iters   = x._iters;
+                props    = x.props;
             }
             return *this;
         }
 
-        static const char *Name;
+        /// Clone *this (virtual copy constructor)
+        virtual MF* clone() const { return new MF(*this); }
+
+        /// Create (virtual constructor)
+        virtual MF* create() const { return new MF(); }
+
+        /// Return number of passes over the factorgraph needed
+        virtual size_t Iterations() const { return _iters; }
+
+        /// Return maximum difference between single node beliefs for two consecutive iterations
+        double maxDiff() const { return _maxdiff; }
+
+        /// Identify *this for logging purposes
         std::string identify() const;
-        void create();
-        void init();
-        /// Clear messages and beliefs corresponding to the nodes in ns
-        virtual void init( const VarSet &ns );
-        double run();
-        Factor beliefV (size_t i) const;
-        Factor belief (const Var &n) const;
-        Factor belief (const VarSet &ns) const;
+
+        /// Get single node belief
+        Factor belief( const Var &n ) const;
+
+        /// Get general belief
+        Factor belief( const VarSet &ns ) const;
+
+        /// Get all beliefs
         std::vector<Factor> beliefs() const;
+
+        /// Get log partition sum
         Real logZ() const;
 
-        void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors(ns); init(ns); }
+        void construct();
+
+        void init();
+
+        /// Clear messages and beliefs corresponding to the nodes in ns
+        virtual void init( const VarSet &ns );
+
+        /// The actual approximate inference algorithm
+        double run();
+
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;
-        double maxDiff() const { return maxdiff; }
+
+        Factor beliefV( size_t i ) const;
 };
 
 

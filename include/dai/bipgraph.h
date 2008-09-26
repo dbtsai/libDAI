@@ -108,7 +108,7 @@ class BipartiteGraph {
          *  The value_type of an EdgeInputIterator should be Edge.
          */
         template<typename EdgeInputIterator>
-        void create( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end );
+        void construct( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end );
 
         /// Construct bipartite graph from a range of edges. 
         /** nr1 is the number of nodes of type 1, nr2 the number of nodes of type 2. 
@@ -116,7 +116,7 @@ class BipartiteGraph {
          */
         template<typename EdgeInputIterator>
         BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ) {
-            create( nr1, nr2, begin, end );
+            construct( nr1, nr2, begin, end );
         }
 
         /// Returns constant reference to the _i2'th neighbor of node i1 of type 1
@@ -299,7 +299,7 @@ class BipartiteGraph {
 
 
 template<typename EdgeInputIterator>
-void BipartiteGraph::create( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) {
+void BipartiteGraph::construct( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) {
     _nb1.clear();
     _nb1.resize( nr1 );
     _nb2.clear();

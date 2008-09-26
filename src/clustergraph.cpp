@@ -51,7 +51,7 @@ ClusterGraph::ClusterGraph( const std::vector<VarSet> & cls ) : G(), vars(), clu
     }
 
     // Create bipartite graph
-    G.create( vars.size(), clusters.size(), edges.begin(), edges.end() );
+    G.construct( vars.size(), clusters.size(), edges.begin(), edges.end() );
 }
 
 

@@ -137,14 +137,10 @@ class RegionGraph : public FactorGraph {
         }
 
         /// Create (virtual default constructor)
-        virtual RegionGraph* create() const {
-            return new RegionGraph();
-        }
+        virtual RegionGraph* create() const { return new RegionGraph(); }
 
         /// Clone (virtual copy constructor)
-        virtual RegionGraph* clone() const {
-            return new RegionGraph(*this);
-        }
+        virtual RegionGraph* clone() const { return new RegionGraph(*this); }
 
         /// Set the content of the I'th factor and make a backup of its old content if backup == true
         virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {

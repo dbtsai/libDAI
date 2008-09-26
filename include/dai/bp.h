@@ -67,7 +67,7 @@ class BP : public DAIAlgFG {
         /// Construct from FactorGraph fg and PropertySet opts
         BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), edges(), props(), maxdiff(0.0) {
             setProperties( opts );
-            create();
+            construct();
         }
         /// Assignment operator
         BP& operator=( const BP & x ) {
@@ -92,7 +92,7 @@ class BP : public DAIAlgFG {
         const double & residual(size_t i, size_t _I) const { return edges[i][_I].residual; }
 
         std::string identify() const;
-        void create();
+        void construct();
         void init();
         /// Clear messages and beliefs corresponding to the nodes in ns
         virtual void init( const VarSet &ns );
