@@ -61,8 +61,11 @@ string JTree::printProperties() const {
 JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) : DAIAlgRG(fg), _RTree(), _Qa(), _Qb(), _mes(), _logZ(), props() {
     setProperties( opts );
 
+    if( !isConnected() ) 
+       DAI_THROW(FACTORGRAPH_NOT_CONNECTED); 
+
     if( automatic ) {
-        // Copy VarSets of factors
+        // Create ClusterGraph which contains factors as clusters
         vector<VarSet> cl;
         cl.reserve( fg.nrFactors() );
         for( size_t I = 0; I < nrFactors(); I++ )
@@ -94,7 +97,8 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
     for( size_t i = 0; i < Cliques.size(); i++ )
         for( size_t j = i+1; j < Cliques.size(); j++ ) {
             size_t w = (Cliques[i] & Cliques[j]).size();
-            JuncGraph[UEdge(i,j)] = w;
+            if( w ) 
+                JuncGraph[UEdge(i,j)] = w;
         }
     
     // Construct maximal spanning tree using Prim's algorithm
@@ -113,7 +117,6 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
         size_t alpha;
         for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
-//              OR(alpha) *= factor(I);
                 fac2OR.push_back( alpha );
                 break;
             }
@@ -216,14 +219,14 @@ void JTree::runHUGIN() {
 //      Make outer region _RTree[i].n1 consistent with outer region _RTree[i].n2
 //      IR(i) = seperator OR(_RTree[i].n1) && OR(_RTree[i].n2)
         Factor new_Qb = _Qa[_RTree[i].n2].partSum( IR( i ) );
-        _logZ += log(new_Qb.normalize( Prob::NORMPROB ));
+        _logZ += log(new_Qb.normalize());
         _Qa[_RTree[i].n1] *= new_Qb.divided_by( _Qb[i] ); 
         _Qb[i] = new_Qb;
     }
     if( _RTree.empty() )
-        _logZ += log(_Qa[0].normalize( Prob::NORMPROB ) );
+        _logZ += log(_Qa[0].normalize() );
     else
-        _logZ += log(_Qa[_RTree[0].n1].normalize( Prob::NORMPROB ));
+        _logZ += log(_Qa[_RTree[0].n1].normalize());
 
     // DistributeEvidence
     for( size_t i = 0; i < _RTree.size(); i++ ) {
@@ -236,7 +239,7 @@ void JTree::runHUGIN() {
 
     // Normalize
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        _Qa[alpha].normalize( Prob::NORMPROB );
+        _Qa[alpha].normalize();
 }
 
 
@@ -257,7 +260,7 @@ void JTree::runShaferShenoy() {
             if( k != e ) 
                 piet *= message( i, k.iter );
         message( j, _e ) = piet.partSum( IR(e) );
-        _logZ += log( message(j,_e).normalize( Prob::NORMPROB ) );
+        _logZ += log( message(j,_e).normalize() );
     }
 
     // Second pass
@@ -268,7 +271,7 @@ void JTree::runShaferShenoy() {
         
         Factor piet = OR(i);
         foreach( const Neighbor &k, nbOR(i) )
-            if(  k != e )
+            if( k != e )
                 piet *= message( i, k.iter );
         message( j, _e ) = piet.marginal( IR(e) );
     }
@@ -279,13 +282,13 @@ void JTree::runShaferShenoy() {
         foreach( const Neighbor &k, nbOR(alpha) )
             piet *= message( alpha, k.iter );
         if( nrIRs() == 0 ) {
-            _logZ += log( piet.normalize( Prob::NORMPROB ) );
+            _logZ += log( piet.normalize() );
             _Qa[alpha] = piet;
         } else if( alpha == nbIR(0)[0].node /*_RTree[0].n1*/ ) {
-            _logZ += log( piet.normalize( Prob::NORMPROB ) );
+            _logZ += log( piet.normalize() );
             _Qa[alpha] = piet;
         } else
-            _Qa[alpha] = piet.normalized( Prob::NORMPROB );
+            _Qa[alpha] = piet.normalized();
     }
 
     // Only for logZ (and for belief)...
@@ -480,7 +483,6 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                 
             // For all states of nsrem
             for( State s(nsrem); s.valid(); s++ ) {
-                
                 // CollectEvidence
                 double logZ = 0.0;
                 for( size_t i = Tsize; (i--) != 0; ) {
@@ -495,11 +497,11 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                         }
 
                     Factor new_Qb = _Qa[T[i].n2].partSum( IR( b[i] ) );
-                    logZ += log(new_Qb.normalize( Prob::NORMPROB ));
+                    logZ += log(new_Qb.normalize());
                     _Qa[T[i].n1] *= new_Qb.divided_by( _Qb[b[i]] ); 
                     _Qb[b[i]] = new_Qb;
                 }
-                logZ += log(_Qa[T[0].n1].normalize( Prob::NORMPROB ));
+                logZ += log(_Qa[T[0].n1].normalize());
 
                 Factor piet( nsrem, 0.0 );
                 piet[s] = exp(logZ);
@@ -512,7 +514,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                     _Qb[beta->first] = beta->second;
             }
 
-            return( Pns.normalized(Prob::NORMPROB) );
+            return( Pns.normalized() );
         }
     }
 }

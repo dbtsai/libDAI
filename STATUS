@@ -99,6 +99,8 @@ mf.h
 mf.cpp
 bp.h
 bp.cpp
+jtree.h
+jtree.cpp
 
 FILES IN SVN HEAD THAT ARE STILL RELEVANT:
 ChangeLog
@@ -107,8 +109,6 @@ TODO
 
 hak.h
 hak.cpp
-jtree.h
-jtree.cpp
 lc.h
 lc.cpp
 mr.h

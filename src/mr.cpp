@@ -519,7 +519,7 @@ void MR::init_cor() {
             VarSet::const_iterator kit = pairq[jk].vars().begin();
             size_t j = findVar( *(kit) );
             size_t k = findVar( *(++kit) );
-            pairq[jk].normalize(Prob::NORMPROB);
+            pairq[jk].normalize();
             double cor = (pairq[jk][3] - pairq[jk][2] - pairq[jk][1] + pairq[jk][0]) - (pairq[jk][3] + pairq[jk][2] - pairq[jk][1] - pairq[jk][0]) * (pairq[jk][3] - pairq[jk][2] + pairq[jk][1] - pairq[jk][0]);
             for( size_t _j = 0; _j < con[i]; _j++ ) if( nb[i][_j] == j )
                 for( size_t _k = 0; _k < con[i]; _k++ ) if( nb[i][_k] == k ) {

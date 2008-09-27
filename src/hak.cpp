@@ -241,7 +241,7 @@ double HAK::doGBP() {
                 Qb_new *= muab(alpha,_beta) ^ (1 / (nbIR(beta).size() + IR(beta).c()));
             }
 
-            Qb_new.normalize( Prob::NORMPROB );
+            Qb_new.normalize();
             if( Qb_new.hasNaNs() ) {
                 cout << "HAK::doGBP:  Qb_new has NaNs!" << endl;
                 return 1.0;
@@ -258,7 +258,7 @@ double HAK::doGBP() {
                 foreach( const Neighbor &gamma, nbOR(alpha) )
                     Qa_new *= muba(alpha,gamma.iter);
                 Qa_new ^= (1.0 / OR(alpha).c());
-                Qa_new.normalize( Prob::NORMPROB );
+                Qa_new.normalize();
                 if( Qa_new.hasNaNs() ) {
                     cout << "HAK::doGBP:  Qa_new has NaNs!" << endl;
                     return 1.0;

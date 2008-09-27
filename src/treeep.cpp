@@ -178,11 +178,11 @@ void TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &
     _logZ = 0.0;
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ ) {
         _logZ += log(Qa[_a[alpha]].totalSum());
-        Qa[_a[alpha]].normalize( Prob::NORMPROB );
+        Qa[_a[alpha]].normalize();
     }
     for( size_t beta = 0; beta < _Qb.size(); beta++ ) {
         _logZ -= log(Qb[_b[beta]].totalSum());
-        Qb[_b[beta]].normalize( Prob::NORMPROB );
+        Qb[_b[beta]].normalize();
     }
 }
 
