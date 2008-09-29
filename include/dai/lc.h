@@ -35,7 +35,7 @@ namespace dai {
 
 
 class LC : public DAIAlgFG {
-    protected:
+    private:
         std::vector<Factor>      _pancakes;      // used by all LC types (psi_I is stored in the pancake)
         std::vector<Factor>      _cavitydists;   // used by all LC types to store the approximate cavity distribution
         /// _phis[i][_I] corresponds to \f$ \phi^{\setminus i}_I(x_{I \setminus i}) \f$

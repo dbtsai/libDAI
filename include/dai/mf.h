@@ -33,7 +33,7 @@ namespace dai {
 
 
 class MF : public DAIAlgFG {
-    protected:
+    private:
         std::vector<Factor>  _beliefs;
         /// Maximum difference encountered so far
         double _maxdiff;

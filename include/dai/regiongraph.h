@@ -34,7 +34,7 @@ namespace dai {
 
 /// A Region is a set of variables with a counting number
 class Region : public VarSet {
-    protected:
+    private:
         /// Counting number
         double          _c;
 
@@ -66,7 +66,7 @@ class Region : public VarSet {
 
 /// A FRegion is a factor with a counting number
 class FRegion : public Factor {
-    protected:
+    private:
         /// Counting number
         double _c;
 
@@ -103,7 +103,6 @@ class RegionGraph : public FactorGraph {
         std::vector<FRegion>    ORs;
         std::vector<Region>     IRs;
 
-    protected:
         /// Give back the OR index that corresponds to a factor index
         std::vector<size_t>     fac2OR;
 

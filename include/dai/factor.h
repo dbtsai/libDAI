@@ -49,7 +49,7 @@ template<typename T> std::ostream&  operator<< (std::ostream& os, const TFactor<
         
 // T should be castable from and to double
 template <typename T> class TFactor {
-    protected:
+    private:
         VarSet      _vs;
         TProb<T>    _p;
 

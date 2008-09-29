@@ -39,14 +39,14 @@ namespace dai {
 
 
 class JTree : public DAIAlgRG {
-    protected:
-        DEdgeVec             _RTree;     // rooted tree
-        std::vector<Factor>  _Qa;
-        std::vector<Factor>  _Qb;
+    private:
         std::vector<std::vector<Factor> >  _mes;
         double               _logZ;
 
     public:
+        DEdgeVec             RTree;     // rooted tree
+        std::vector<Factor>  Qa;
+        std::vector<Factor>  Qb;
         struct Properties {
             size_t verbose;
             DAI_ENUM(UpdateType,HUGIN,SHSH)
@@ -57,13 +57,13 @@ class JTree : public DAIAlgRG {
 
     public:
         /// Default constructor
-        JTree() : DAIAlgRG(), _RTree(), _Qa(), _Qb(), _mes(), _logZ(), props() {}
+        JTree() : DAIAlgRG(), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {}
 
         /// Construct from FactorGraph fg and PropertySet opts
         JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic=true );
 
         /// Copy constructor
-        JTree( const JTree &x ) : DAIAlgRG(x), _RTree(x._RTree), _Qa(x._Qa), _Qb(x._Qb), _mes(x._mes), _logZ(x._logZ), props(x.props) {}
+        JTree( const JTree &x ) : DAIAlgRG(x), _mes(x._mes), _logZ(x._logZ), RTree(x.RTree), Qa(x.Qa), Qb(x.Qb), props(x.props) {}
 
         /// Clone *this (virtual copy constructor)
         virtual JTree* clone() const { return new JTree(*this); }
@@ -75,11 +75,11 @@ class JTree : public DAIAlgRG {
         JTree& operator=( const JTree &x ) {
             if( this != &x ) {
                 DAIAlgRG::operator=( x );
-                _RTree  = x._RTree;
-                _Qa     = x._Qa;
-                _Qb     = x._Qb;
                 _mes    = x._mes;
                 _logZ   = x._logZ;
+                RTree   = x.RTree;
+                Qa      = x.Qa;
+                Qb      = x.Qb;
                 props   = x.props;
             }
             return *this;

@@ -35,7 +35,7 @@ namespace dai {
 
 /// HAK provides an implementation of the single and double-loop algorithms by Heskes, Albers and Kappen
 class HAK : public DAIAlgRG {
-    protected:
+    private:
         std::vector<Factor>                _Qa;
         std::vector<Factor>                _Qb;
         std::vector<std::vector<Factor> >  _muab;

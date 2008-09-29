@@ -40,7 +40,7 @@ namespace dai {
 
 
 class TreeEP : public JTree {
-    protected:
+    private:
         /// Maximum difference encountered so far
         double                  _maxdiff;
         /// Number of iterations needed
@@ -57,14 +57,14 @@ class TreeEP : public JTree {
         /// Name of this inference method
         static const char *Name;
 
-    protected:
+    private:
         class TreeEPSubTree {
-            protected:
+            private:
                 std::vector<Factor>  _Qa;
                 std::vector<Factor>  _Qb;
                 DEdgeVec             _RTree;
-                std::vector<size_t>  _a;        // _Qa[alpha]  <->  superTree._Qa[_a[alpha]]
-                std::vector<size_t>  _b;        // _Qb[beta]   <->  superTree._Qb[_b[beta]]
+                std::vector<size_t>  _a;        // _Qa[alpha]  <->  superTree.Qa[_a[alpha]]
+                std::vector<size_t>  _b;        // _Qb[beta]   <->  superTree.Qb[_b[beta]]
                                                 // _Qb[beta]   <->  _RTree[beta]    
                 const Factor *       _I;
                 VarSet               _ns;

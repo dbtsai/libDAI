@@ -269,7 +269,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
         }
     
     // Construct maximal spanning tree using Prim's algorithm
-    _RTree = MaxSpanningTreePrims( JuncGraph );
+    RTree = MaxSpanningTreePrims( JuncGraph );
 
     // Construct corresponding region graph
 
@@ -296,14 +296,14 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     RecomputeORs();
 
     // Create inner regions and edges
-    IRs.reserve( _RTree.size() );
+    IRs.reserve( RTree.size() );
     vector<Edge> edges;
-    edges.reserve( 2 * _RTree.size() );
-    for( size_t i = 0; i < _RTree.size(); i++ ) {
-        edges.push_back( Edge( _RTree[i].n1, IRs.size() ) );
-        edges.push_back( Edge( _RTree[i].n2, IRs.size() ) );
+    edges.reserve( 2 * RTree.size() );
+    for( size_t i = 0; i < RTree.size(); i++ ) {
+        edges.push_back( Edge( RTree[i].n1, IRs.size() ) );
+        edges.push_back( Edge( RTree[i].n2, IRs.size() ) );
         // inner clusters have counting number -1
-        IRs.push_back( Region( Cliques[_RTree[i].n1] & Cliques[_RTree[i].n2], -1.0 ) );
+        IRs.push_back( Region( Cliques[RTree[i].n1] & Cliques[RTree[i].n2], -1.0 ) );
     }
 
     // create bipartite graph
@@ -313,15 +313,15 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     Check_Counting_Numbers();
     
     // Create messages and beliefs
-    _Qa.clear();
-    _Qa.reserve( nrORs() );
+    Qa.clear();
+    Qa.reserve( nrORs() );
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        _Qa.push_back( OR(alpha) );
+        Qa.push_back( OR(alpha) );
 
-    _Qb.clear();
-    _Qb.reserve( nrIRs() );
+    Qb.clear();
+    Qb.reserve( nrIRs() );
     for( size_t beta = 0; beta < nrIRs(); beta++ ) 
-        _Qb.push_back( Factor( IR(beta), 1.0 ) );
+        Qb.push_back( Factor( IR(beta), 1.0 ) );
 
     // DIFF with JTree::GenerateJT:  no messages
     
@@ -338,7 +338,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
             //subTree.resize( subTreeSize );  // FIXME
 //          cout << "subtree " << I << " has size " << subTreeSize << endl;
 
-            TreeEPSubTree QI( subTree, _RTree, _Qa, _Qb, &factor(I) );
+            TreeEPSubTree QI( subTree, RTree, Qa, Qb, &factor(I) );
             _Q[I] = QI;
         }
     // Previous root of first off-tree factor should be the root of the last off-tree factor
@@ -350,7 +350,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
             //subTree.resize( subTreeSize ); // FIXME
 //          cout << "subtree " << I << " has size " << subTreeSize << endl;
 
-            TreeEPSubTree QI( subTree, _RTree, _Qa, _Qb, &factor(I) );
+            TreeEPSubTree QI( subTree, RTree, Qa, Qb, &factor(I) );
             _Q[I] = QI;
             break;
         }
@@ -395,9 +395,9 @@ double TreeEP::run() {
     for( _iters=0; _iters < props.maxiter && diffs.maxDiff() > props.tol; _iters++ ) {
         for( size_t I = 0; I < nrFactors(); I++ )
             if( offtree(I) ) {  
-                _Q[I].InvertAndMultiply( _Qa, _Qb );
-                _Q[I].HUGIN_with_I( _Qa, _Qb );
-                _Q[I].InvertAndMultiply( _Qa, _Qb );
+                _Q[I].InvertAndMultiply( Qa, Qb );
+                _Q[I].HUGIN_with_I( Qa, Qb );
+                _Q[I].InvertAndMultiply( Qa, Qb );
             }
 
         // calculate new beliefs and compare with old ones
@@ -435,18 +435,18 @@ Real TreeEP::logZ() const {
 
     // entropy of the tree
     for( size_t beta = 0; beta < nrIRs(); beta++ )
-        sum -= _Qb[beta].entropy();
+        sum -= Qb[beta].entropy();
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        sum += _Qa[alpha].entropy();
+        sum += Qa[alpha].entropy();
 
     // energy of the on-tree factors
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        sum += (OR(alpha).log0() * _Qa[alpha]).totalSum();
+        sum += (OR(alpha).log0() * Qa[alpha]).totalSum();
 
     // energy of the off-tree factors
     for( size_t I = 0; I < nrFactors(); I++ )
         if( offtree(I) )
-            sum += (_Q.find(I))->second.logZ( _Qa, _Qb );
+            sum += (_Q.find(I))->second.logZ( Qa, Qb );
     
     return sum;
 }

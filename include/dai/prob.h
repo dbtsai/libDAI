@@ -50,7 +50,7 @@ template<typename T> TProb<T> max( const TProb<T> &a, const TProb<T> &b );
 /// TProb<T> implements a probability vector of type T.
 /// T should be castable from and to double.
 template <typename T> class TProb {
-    protected:
+    private:
         /// The entries
         std::vector<T> _p;
 
