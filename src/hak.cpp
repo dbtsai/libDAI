@@ -187,8 +187,8 @@ void HAK::init( const VarSet &ns ) {
             _Qb[beta].fill( 1.0 );
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
-                muab( alpha, _beta ).fill( 1.0 / IR(beta).states() );
-                muba( alpha, _beta ).fill( 1.0 / IR(beta).states() );
+                muab( alpha, _beta ).fill( 1.0 );
+                muba( alpha, _beta ).fill( 1.0 );
             }
         }
 }

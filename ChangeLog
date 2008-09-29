@@ -66,7 +66,7 @@ libDAI-0.2.2 (2008-??-??)
 * Improved documetation
 * Interface changes:
   - VarSet::
-      stateSpace() -> states()
+      VarSet::stateSpace() -> nrStates(const VarSet &)
       VarSet( const std::set<Var> ) -> VarSet( begin, end, sizeHint=0 )
       VarSet( const std::vector<Var> ) -> VarSet( begin, end, sizeHint=0 )
       removed bool operator||

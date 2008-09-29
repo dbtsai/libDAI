@@ -123,8 +123,8 @@ all : $(TARGETS)
 
 matlabs : matlab/dai.$(ME) matlab/dai_readfg.$(ME) matlab/dai_writefg.$(ME) matlab/dai_potstrength.$(ME)
 
-$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
-	lib /out:$(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
+$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) varset$(OE) $(OBJECTS)
+	lib /out:$(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) varset$(OE) $(OBJECTS)
 
 tests : tests/test$(EE)
 
@@ -195,6 +195,9 @@ exceptions$(OE) : $(SRC)/exceptions.cpp $(HEADERS)
 alldai$(OE) : $(SRC)/alldai.cpp $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/alldai.cpp
 
+varset$(OE) : $(SRC)/varset.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/varset.cpp
+
 
 # EXAMPLE
 ##########
@@ -216,14 +219,14 @@ tests/test$(EE) : tests/test.cpp $(HEADERS) $(LIB)/libdai$(LE)
 matlab/dai.$(ME) : matlab/dai.cpp $(HEADERS) matlab/matlab$(OE) $(LIB)/libdai$(LE)
 	$(MEX) $(MEXFLAGS) -o matlab/dai matlab/dai.cpp matlab/matlab$(OE) $(LIB)/libdai$(LE)
 
-matlab/dai_readfg.$(ME) : matlab/dai_readfg.cpp $(HEADERS) factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE)
-	$(MEX) $(MEXFLAGS) -o matlab/dai_readfg matlab/dai_readfg.cpp factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE)
+matlab/dai_readfg.$(ME) : matlab/dai_readfg.cpp $(HEADERS) factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
+	$(MEX) $(MEXFLAGS) -o matlab/dai_readfg matlab/dai_readfg.cpp factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
 
-matlab/dai_writefg.$(ME) : matlab/dai_writefg.cpp $(HEADERS) factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE)
-	$(MEX) $(MEXFLAGS) -o matlab/dai_writefg matlab/dai_writefg.cpp factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE)
+matlab/dai_writefg.$(ME) : matlab/dai_writefg.cpp $(HEADERS) factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
+	$(MEX) $(MEXFLAGS) -o matlab/dai_writefg matlab/dai_writefg.cpp factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
 
-matlab/dai_potstrength.$(ME) : matlab/dai_potstrength.cpp $(HEADERS) matlab/matlab$(OE) exceptions$(OE)
-	$(MEX) $(MEXFLAGS) -o matlab/dai_potstrength matlab/dai_potstrength.cpp matlab/matlab$(OE) exceptions$(OE)
+matlab/dai_potstrength.$(ME) : matlab/dai_potstrength.cpp $(HEADERS) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
+	$(MEX) $(MEXFLAGS) -o matlab/dai_potstrength matlab/dai_potstrength.cpp matlab/matlab$(OE) exceptions$(OE) varset$(OE)
 
 matlab/matlab$(OE) : matlab/matlab.cpp matlab/matlab.h $(HEADERS)
 	$(MEX) $(MEXFLAGS) -outdir matlab -c matlab/matlab.cpp

@@ -36,248 +36,215 @@
 namespace dai {
 
 
+/// A small_set<T> represents a set, optimized for a small number of elements.
+/** For sets consisting of a small number of elements, an implementation using
+ *  an ordered std::vector<T> is faster than an implementation using std::set<T>.
+ *  The elements should be less-than-comparable.
+ */
+template <typename T>
+class small_set {
+    private:
+        /// The elements in this set
+        std::vector<T> _elements;
+
+    public:
+        /// Default constructor
+        small_set() : _elements() {}
+
+        /// Construct a small_set with one element
+        small_set( const T &n ) : _elements() { 
+            _elements.push_back( n );
+        }
+
+        /// Construct a small_set with two elements
+        small_set( const T &n1, const T &n2 ) { 
+            if( n1 < n2 ) {
+                _elements.push_back( n1 );
+                _elements.push_back( n2 );
+            } else if( n2 < n1 ) {
+                _elements.push_back( n2 );
+                _elements.push_back( n1 );
+            } else
+                _elements.push_back( n1 );
+        }
+
+        /// Construct a small_set from a range of iterators.
+        /** The value_type of the Iterator should be T.
+         *  For efficiency, the number of elements can be
+         *  speficied by sizeHint.
+         */
+        template <typename Iterator>
+        small_set( Iterator begin, Iterator end, size_t sizeHint=0 ) {
+            _elements.reserve( sizeHint );
+            _elements.insert( _elements.begin(), begin, end );
+            std::sort( _elements.begin(), _elements.end() );
+            typename std::vector<T>::iterator new_end = std::unique( _elements.begin(), _elements.end() );
+            _elements.erase( new_end, _elements.end() );
+        }
+
+        /// Copy constructor
+        small_set( const small_set &x ) : _elements( x._elements ) {}
+
+        /// Assignment operator
+        small_set & operator=( const small_set &x ) {
+            if( this != &x ) {
+                _elements = x._elements;
+            }
+            return *this;
+        }
+        
+        /// Setminus operator (result contains all elements in *this, except those in ns)
+        small_set operator/ ( const small_set& ns ) const {
+            small_set res;
+            std::set_difference( _elements.begin(), _elements.end(), ns._elements.begin(), ns._elements.end(), inserter( res._elements, res._elements.begin() ) );
+            return res;
+        }
+
+        /// Set-union operator (result contains all elements in *this, plus those in ns)
+        small_set operator| ( const small_set& ns ) const {
+            small_set res;
+            std::set_union( _elements.begin(), _elements.end(), ns._elements.begin(), ns._elements.end(), inserter( res._elements, res._elements.begin() ) );
+            return res;
+        }
+
+        /// Set-intersection operator (result contains all elements in *this that are also contained in ns)
+        small_set operator& ( const small_set& ns ) const {
+            small_set res;
+            std::set_intersection( _elements.begin(), _elements.end(), ns._elements.begin(), ns._elements.end(), inserter( res._elements, res._elements.begin() ) );
+            return res;
+        }
+        
+        /// Erases from *this all elements in ns
+        small_set& operator/= ( const small_set& ns ) {
+            return (*this = (*this / ns));
+        }
+
+        /// Erase one element
+        small_set& operator/= ( const T& n ) { 
+            typename std::vector<T>::iterator pos = lower_bound( _elements.begin(), _elements.end(), n );
+            if( pos != _elements.end() )
+                if( *pos == n ) // found element, delete it
+                    _elements.erase( pos ); 
+            return *this; 
+        }
+
+        /// Adds to *this all elements in ns
+        small_set& operator|= ( const small_set& ns ) {
+            return( *this = (*this | ns) );
+        }
+
+        /// Add one element
+        small_set& operator|= ( const T& n ) {
+            typename std::vector<T>::iterator pos = lower_bound( _elements.begin(), _elements.end(), n );
+            if( pos == _elements.end() || *pos != n ) // insert it
+                _elements.insert( pos, n );
+            return *this;
+        }
+
+        /// Erases from *this all elements not in ns
+        small_set& operator&= ( const small_set& ns ) { 
+            return (*this = (*this & ns));
+        }
+
+        /// Returns true if *this is a subset of ns
+        bool operator<< ( const small_set& ns ) const { 
+            return std::includes( ns._elements.begin(), ns._elements.end(), _elements.begin(), _elements.end() );
+        }
+
+        /// Returns true if ns is a subset of *this
+        bool operator>> ( const small_set& ns ) const { 
+            return std::includes( _elements.begin(), _elements.end(), ns._elements.begin(), ns._elements.end() );
+        }
+
+        /// Returns true if *this and ns contain common elements
+        bool intersects( const small_set& ns ) const { 
+            return( (*this & ns).size() > 0 ); 
+        }
+
+        /// Returns true if *this contains the element n
+        bool contains( const T& n ) const { 
+            return std::binary_search( _elements.begin(), _elements.end(), n );
+        }
+
+        /// Constant iterator over the elements
+        typedef typename std::vector<T>::const_iterator const_iterator;
+        /// Iterator over the elements
+        typedef typename std::vector<T>::iterator iterator;
+        /// Constant reverse iterator over the elements
+        typedef typename std::vector<T>::const_reverse_iterator const_reverse_iterator;
+        /// Reverse iterator over the elements
+        typedef typename std::vector<T>::reverse_iterator reverse_iterator;
+        
+        /// Returns iterator that points to the first element
+        iterator begin() { return _elements.begin(); }
+        /// Returns constant iterator that points to the first element
+        const_iterator begin() const { return _elements.begin(); }
+
+        /// Returns iterator that points beyond the last element
+        iterator end() { return _elements.end(); }
+        /// Returns constant iterator that points beyond the last element
+        const_iterator end() const { return _elements.end(); }
+
+        /// Returns reverse iterator that points to the last element
+        reverse_iterator rbegin() { return _elements.rbegin(); }
+        /// Returns constant reverse iterator that points to the last element
+        const_reverse_iterator rbegin() const { return _elements.rbegin(); }
+
+        /// Returns reverse iterator that points beyond the first element
+        reverse_iterator rend() { return _elements.rend(); }
+        /// Returns constant reverse iterator that points beyond the first element
+        const_reverse_iterator rend() const { return _elements.rend(); }
+
+        /// Returns number of elements
+        typename std::vector<T>::size_type size() const { return _elements.size(); }
+
+        /// Returns whether the small_set is empty
+        bool empty() const { return _elements.size() == 0; }
+
+        /// Test for equality of element labels
+        friend bool operator==( const small_set &a, const small_set &b ) {
+            return (a._elements == b._elements);
+        }
+
+        /// Test for inequality of element labels
+        friend bool operator!=( const small_set &a, const small_set &b ) {
+            return !(a._elements == b._elements);
+        }
+
+        /// Lexicographical comparison of element labels
+        friend bool operator<( const small_set &a, const small_set &b ) {
+            return a._elements < b._elements;
+        }
+};
+
+
 /// A VarSet represents a set of variables.
 /**
  *  It is implemented as an ordered std::vector<Var> for efficiency reasons
  *  (indeed, it was found that a std::set<Var> usually has more overhead). 
  *  In addition, it provides an interface for common set-theoretic operations.
  */
-class VarSet {
-    private:
-        /// The variables in this set
-        std::vector<Var> _vars;
-
-        /// Product of number of states of all contained variables
-        size_t _states;
-
-    public:
-        /// Default constructor
-        VarSet() : _vars(), _states(1) {};
-
-        /// Construct a VarSet from one variable
-        VarSet( const Var &n ) : _vars(), _states( n.states() ) { 
-            _vars.push_back( n );
-        }
-
-        /// Construct a VarSet from two variables
-        VarSet( const Var &n1, const Var &n2 ) { 
-            if( n1 < n2 ) {
-                _vars.push_back( n1 );
-                _vars.push_back( n2 );
-            } else if( n1 > n2 ) {
-                _vars.push_back( n2 );
-                _vars.push_back( n1 );
-            } else
-                _vars.push_back( n1 );
-            calcStates();
-        }
-
-        /// Construct from a range of iterators
-        /** The value_type of the VarIterator should be Var.
-         *  For efficiency, the number of variables can be
-         *  speficied by sizeHint.
-         */
-        template <typename VarIterator>
-        VarSet( VarIterator begin, VarIterator end, size_t sizeHint=0 ) {
-            _vars.reserve( sizeHint );
-            _vars.insert( _vars.begin(), begin, end );
-            std::sort( _vars.begin(), _vars.end() );
-            std::vector<Var>::iterator new_end = std::unique( _vars.begin(), _vars.end() );
-            _vars.erase( new_end, _vars.end() );
-            calcStates();
-        }
-
-        /// Copy constructor
-        VarSet( const VarSet &x ) : _vars( x._vars ), _states( x._states ) {}
-
-        /// Assignment operator
-        VarSet & operator=( const VarSet &x ) {
-            if( this != &x ) {
-                _vars = x._vars;
-                _states = x._states;
-            }
-            return *this;
-        }
-        
-
-        /// Returns the product of the number of states of each variable in this set
-        size_t states() const { 
-            return _states; 
-        }
-        
-
-        /// Setminus operator (result contains all variables in *this, except those in ns)
-        VarSet operator/ ( const VarSet& ns ) const {
-            VarSet res;
-            std::set_difference( _vars.begin(), _vars.end(), ns._vars.begin(), ns._vars.end(), inserter( res._vars, res._vars.begin() ) );
-            res.calcStates();
-            return res;
-        }
-
-        /// Set-union operator (result contains all variables in *this, plus those in ns)
-        VarSet operator| ( const VarSet& ns ) const {
-            VarSet res;
-            std::set_union( _vars.begin(), _vars.end(), ns._vars.begin(), ns._vars.end(), inserter( res._vars, res._vars.begin() ) );
-            res.calcStates();
-            return res;
-        }
-
-        /// Set-intersection operator (result contains all variables in *this that are also contained in ns)
-        VarSet operator& ( const VarSet& ns ) const {
-            VarSet res;
-            std::set_intersection( _vars.begin(), _vars.end(), ns._vars.begin(), ns._vars.end(), inserter( res._vars, res._vars.begin() ) );
-            res.calcStates();
-            return res;
-        }
-        
-        /// Erases from *this all variables in ns
-        VarSet& operator/= ( const VarSet& ns ) {
-            return (*this = (*this / ns));
-        }
-
-        /// Erase one variable
-        VarSet& operator/= ( const Var& n ) { 
-            std::vector<Var>::iterator pos = lower_bound( _vars.begin(), _vars.end(), n );
-            if( pos != _vars.end() )
-                if( *pos == n ) { // found variable, delete it
-                    _vars.erase( pos ); 
-                    _states /= n.states();
-                }
-            return *this; 
-        }
-
-        /// Adds to *this all variables in ns
-        VarSet& operator|= ( const VarSet& ns ) {
-            return( *this = (*this | ns) );
-        }
-
-        /// Add one variable
-        VarSet& operator|= ( const Var& n ) {
-            std::vector<Var>::iterator pos = lower_bound( _vars.begin(), _vars.end(), n );
-            if( pos == _vars.end() || *pos != n ) { // insert it
-                _vars.insert( pos, n );
-                _states *= n.states();
-            }
-            return *this;
-        }
-
-
-        /// Erases from *this all variables not in ns
-        VarSet& operator&= ( const VarSet& ns ) { 
-            return (*this = (*this & ns));
-        }
-
-
-        /// Returns true if *this is a subset of ns
-        bool operator<< ( const VarSet& ns ) const { 
-            return std::includes( ns._vars.begin(), ns._vars.end(), _vars.begin(), _vars.end() );
-        }
-
-        /// Returns true if ns is a subset of *this
-        bool operator>> ( const VarSet& ns ) const { 
-            return std::includes( _vars.begin(), _vars.end(), ns._vars.begin(), ns._vars.end() );
-        }
-
-        /// Returns true if *this and ns contain common variables
-        bool intersects( const VarSet& ns ) const { 
-            return( (*this & ns).size() > 0 ); 
-        }
-
-        /// Returns true if *this contains the variable n
-        bool contains( const Var& n ) const { 
-            return std::binary_search( _vars.begin(), _vars.end(), n );
-        }
-
-        /// Sends a VarSet to an output stream
-        friend std::ostream& operator<< (std::ostream & os, const VarSet& ns) {
-            foreach( const Var &n, ns._vars )
-                os << n;
-            return( os );
-        }
-
-        /// Constant iterator over Vars
-        typedef std::vector<Var>::const_iterator const_iterator;
-        /// Iterator over Vars
-        typedef std::vector<Var>::iterator iterator;
-        /// Constant reverse iterator over Vars
-        typedef std::vector<Var>::const_reverse_iterator const_reverse_iterator;
-        /// Reverse iterator over Vars
-        typedef std::vector<Var>::reverse_iterator reverse_iterator;
-        
-        /// Returns iterator that points to the first variable
-        iterator begin() { return _vars.begin(); }
-        /// Returns constant iterator that points to the first variable
-        const_iterator begin() const { return _vars.begin(); }
-
-        /// Returns iterator that points beyond the last variable
-        iterator end() { return _vars.end(); }
-        /// Returns constant iterator that points beyond the last variable
-        const_iterator end() const { return _vars.end(); }
-
-        /// Returns reverse iterator that points to the last variable
-        reverse_iterator rbegin() { return _vars.rbegin(); }
-        /// Returns constant reverse iterator that points to the last variable
-        const_reverse_iterator rbegin() const { return _vars.rbegin(); }
-
-        /// Returns reverse iterator that points beyond the first variable
-        reverse_iterator rend() { return _vars.rend(); }
-        /// Returns constant reverse iterator that points beyond the first variable
-        const_reverse_iterator rend() const { return _vars.rend(); }
-
-
-        /// Returns number of variables
-        std::vector<Var>::size_type size() const { return _vars.size(); }
-
-
-        /// Returns whether the VarSet is empty
-        bool empty() const { return _vars.size() == 0; }
-
-
-        /// Test for equality of variable labels
-        friend bool operator==( const VarSet &a, const VarSet &b ) {
-            return (a._vars == b._vars);
-        }
-
-        /// Test for inequality of variable labels
-        friend bool operator!=( const VarSet &a, const VarSet &b ) {
-            return !(a._vars == b._vars);
-        }
-
-        /// Lexicographical comparison of variable labels
-        friend bool operator<( const VarSet &a, const VarSet &b ) {
-            return a._vars < b._vars;
-        }
-
-        /// calcState calculates the linear index of this VarSet that corresponds
-        /// to the states of the variables given in states, implicitly assuming
-        /// states[m] = 0 for all m in this VarSet which are not in states.
-        size_t calcState( const std::map<Var, size_t> &states ) const {
-            size_t prod = 1;
-            size_t state = 0;
-            foreach( const Var &n, *this ) {
-                std::map<Var, size_t>::const_iterator m = states.find( n );
-                if( m != states.end() )
-                    state += prod * m->second;
-                prod *= n.states();
-            }
-            return state;
-        }
-
-    private:
-        /// Calculates the number of states
-        size_t calcStates() {
-            _states = 1;
-            foreach( Var &i, _vars )
-                _states *= i.states();
-            return _states;
-        }
-};
+typedef small_set<Var> VarSet;
 
 
 /// For two Vars n1 and n2, the expression n1 | n2 gives the Varset containing n1 and n2
 inline VarSet operator| (const Var& n1, const Var& n2) {
     return( VarSet(n1, n2) );
 }
+
+
+/// Calculates the product of number of states of all variables in vars
+size_t nrStates( const VarSet &vars );
+
+
+/// calcState calculates the linear index of vars that corresponds
+/// to the states of the variables given in states, implicitly assuming
+/// states[m] = 0 for all m in this VarSet which are not in states.
+size_t calcState( const VarSet &vars, const std::map<Var, size_t> &states );
+
+
+/// Sends a VarSet to an output stream
+std::ostream& operator<< (std::ostream &os, const VarSet& ns);
 
 
 } // end of namespace dai

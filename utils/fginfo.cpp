@@ -122,10 +122,10 @@ int main( int argc, char *argv[] ) {
                 cavsizes[di.size()]++;
             else
                 cavsizes[di.size()] = 1;
-            size_t Ds = fg.Delta(i).states();
+            size_t Ds = nrStates( fg.Delta(i) );
             if( Ds > max_Delta_size )
                 max_Delta_size = Ds;
-            cavsum_lcbp += di.states();
+            cavsum_lcbp += nrStates( di );
             for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
                 cavsum_lcbp2 += j->states();
         }

@@ -2,11 +2,8 @@ OPTIMIZATION:
 - BipartiteGraph::isConnected should be optimized using boost::graph
 - Can the FactorGraph constructors be optimized further?
 - Cache second-order neighborhoods (delta's) in BipGraph?
-- Would it be a good idea to remove the states() caching from VarSet? 
-  Then, we could turn a VarSet into an IndexSet (set of integers).
-  This may restrict the use of findVar().
+- Replace VarSets by small_set<size_t> if appropriate, in order to minimize the use of findVar().
 
-- Idea: use a PropertySet as output of a DAIAlg, instead of functions like maxDiff and Iterations().
 - A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a reference to it
 
 TODO FOR RELEASE:

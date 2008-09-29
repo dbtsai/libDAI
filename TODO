@@ -1,4 +1,5 @@
-IMPORTANT
+- Idea: use a PropertySet as output of a DAIAlg, instead of functions like
+  maxDiff and Iterations().
 
 - Idea: a FactorGraph and a RegionGraph are often equipped with
 extra properties for nodes and edges. The code to initialize those
@@ -49,8 +50,6 @@ HasA relations are better than IsA relations...
 Also, the current setup is stupid: I wrote a new function that works
 on FactorGraphs, and I had to write boiler plate code for it in graphicalmodel.h
 and in regiongraph.h (which is stupid).
-
-- Clean up 
 
 - Use Boost::uBLAS framework to deal with matrices, especially, with
 2D sparse matrices. See http://www.boost.org/libs/numeric/ublas/doc/matrix_sparse.htm
