@@ -57,6 +57,8 @@ class BP : public DAIAlgFG {
             double damping;
             DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
             UpdateType updates;
+            DAI_ENUM(InfType,SUMPROD,MAXPROD)
+            InfType inference;
         } props;
         static const char *Name;
 

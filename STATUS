@@ -8,7 +8,6 @@ OPTIMIZATION:
 
 - Idea: use a PropertySet as output of a DAIAlg, instead of functions like maxDiff and Iterations().
 - A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a reference to it
-- Add max-product to BP
 
 TODO FOR RELEASE:
 - http://www.boost.org/development/requirements.html#Design_and_Programming
