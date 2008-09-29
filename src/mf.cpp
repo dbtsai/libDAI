@@ -126,7 +126,7 @@ double MF::run() {
         jan.normalize();
 
         if( jan.hasNaNs() ) {
-            cout << "MF::run():  ERROR: jan has NaNs!" << endl;
+            cout << Name << "::run():  ERROR: jan has NaNs!" << endl;
             return 1.0;
         }
 
@@ -145,11 +145,11 @@ double MF::run() {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
                 cout << endl;
-            cout << "MF::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+            cout << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 2 )
-                cout << "MF::run:  ";
-            cout << "converged in " << t / pass_size << " passes (" << toc() - tic << " clocks)." << endl;
+                cout << Name << "::run:  ";
+            cout << "converged in " << t / pass_size << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 

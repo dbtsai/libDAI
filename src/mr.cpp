@@ -466,8 +466,9 @@ void MR::solvemcav() {
         }
     } while((maxdev>props.tol)&&(run<maxruns));
 
-    if( maxdev > maxdiff )
-        maxdiff = maxdev;
+    _iters = run;
+    if( maxdev > _maxdiff )
+        _maxdiff = maxdev;
 
     if(run==maxruns){
         if( props.verbose >= 1 )
@@ -507,7 +508,7 @@ void MR::init_cor() {
     for( size_t i = 0; i < nrVars(); i++ ) {
         vector<Factor> pairq;
         if( props.inits == Properties::InitType::CLAMPING ) {
-            BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", string("1e-9"))("maxiter", string("1000UL"))("verbose", string("0UL"))("logdomain", string("0")));
+            BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", string("1e-9"))("maxiter", string("10000UL"))("verbose", string("0UL"))("logdomain", string("0")));
             bpcav.makeCavity( i );
             pairq = calcPairBeliefs( bpcav, delta(i), false );
         } else if( props.inits == Properties::InitType::EXACT ) {
@@ -561,8 +562,8 @@ double MR::run() {
 
         if( props.inits == Properties::InitType::RESPPROP ) {
             double md = init_cor_resp();
-            if( md > maxdiff )
-                maxdiff = md;
+            if( md > _maxdiff )
+                _maxdiff = md;
         } else if( props.inits == Properties::InitType::EXACT )
             init_cor(); // FIXME no MaxDiff() calculation
         else if( props.inits == Properties::InitType::CLAMPING )
@@ -574,11 +575,11 @@ double MR::run() {
         solveM();
 
         if( props.verbose >= 1 )
-            cout << "MR needed " << toc() - tic << " clocks." << endl;
+            cout << Name << " needed " << toc() - tic << " seconds." << endl;
 
         return 0.0;
     } else
-        return -1.0;
+        return 1.0;
 }
 
 
@@ -617,7 +618,7 @@ vector<Factor> MR::beliefs() const {
 
 
 
-MR::MR( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), supported(true), maxdiff(0.0) {
+MR::MR( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), supported(true), _maxdiff(0.0), _iters(0) {
     setProperties( opts );
 
     // check whether all vars in fg are binary

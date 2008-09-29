@@ -330,22 +330,14 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
         }
     }
 
-//  for( size_t e = 0; e < _RTree.size(); e++ )
-//      cout << OR(_RTree[e].n1).vars() << "->" << OR(_RTree[e].n2).vars() << ",  ";
-//  cout << endl;
     // grow new tree
     Graph oldTree;
     for( DEdgeVec::const_iterator e = _RTree.begin(); e != _RTree.end(); e++ )
         oldTree.insert( UEdge(e->n1, e->n2) );
     DEdgeVec newTree = GrowRootedTree( oldTree, maxalpha );
-//  cout << ns << ": ";
-//  for( size_t e = 0; e < newTree.size(); e++ )
-//      cout << OR(newTree[e].n1).vars() << "->" << OR(newTree[e].n2).vars() << ",  ";
-//  cout << endl;
     
     // identify subtree that contains variables of ns which are not in the new root
     VarSet nsrem = ns / OR(maxalpha).vars();
-//  cout << "nsrem:" << nsrem << endl;
     set<DEdge> subTree;
     // for each variable in ns that is not in the root clique
     for( VarSet::const_iterator n = nsrem.begin(); n != nsrem.end(); n++ ) {
@@ -384,10 +376,6 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
                 pos = newTree[e-1].n1;
             }
     }
-//  cout << "subTree: " << endl;
-//  for( set<DEdge>::const_iterator sTi = subTree.begin(); sTi != subTree.end(); sTi++ )
-//      cout << OR(sTi->n1).vars() << "->" << OR(sTi->n2).vars() << ",  ";
-//  cout << endl;
 
     // Resulting Tree is a reordered copy of newTree
     // First add edges in subTree to Tree
@@ -395,9 +383,7 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
     for( DEdgeVec::const_iterator e = newTree.begin(); e != newTree.end(); e++ )
         if( subTree.count( *e ) ) {
             Tree.push_back( *e );
-//          cout << OR(e->n1).vars() << "->" << OR(e->n2).vars() << ",  ";
         }
-//  cout << endl;
     // Then add edges pointing away from nsrem
     // FIXME
 /*  for( DEdgeVec::const_iterator e = newTree.begin(); e != newTree.end(); e++ )
@@ -406,7 +392,6 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
                 if( e->n1 == sTi->n1 || e->n1 == sTi->n2 ||
                     e->n2 == sTi->n1 || e->n2 == sTi->n2 ) {
                     Tree.push_back( *e );
-//                  cout << OR(e->n1).vars() << "->" << OR(e->n2).vars() << ",  ";
                 }
             }*/
     // FIXME
@@ -420,10 +405,8 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
                 }
             if( found ) {
                 Tree.push_back( *e );
-                cout << OR(e->n1).vars() << "->" << OR(e->n2).vars() << ",  ";
             }
-        }
-    cout << endl;*/
+        }*/
     size_t subTreeSize = Tree.size();
     // Then add remaining edges
     for( DEdgeVec::const_iterator e = newTree.begin(); e != newTree.end(); e++ )

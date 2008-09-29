@@ -38,14 +38,13 @@ namespace dai {
 /// together with an inference algorithm.
 class InfAlg {
     public:
-        /// Clone (virtual copy constructor)
+        /// Clone *this (virtual copy constructor)
         virtual InfAlg* clone() const = 0;
 
-        /// Create (virtual constructor)
+        /// Create (virtual default constructor)
         virtual InfAlg* create() const = 0;
         
-        /// Virtual desctructor
-        // (this is needed because this class contains virtual functions)
+        /// Virtual desctructor (needed because this class contains virtual functions)
         virtual ~InfAlg() {}
         
         /// Identifies itself for logging purposes
@@ -94,8 +93,11 @@ class InfAlg {
         /// Get const reference to underlying FactorGraph
         virtual const FactorGraph &fg() const = 0;
 
-        /// Return maximum difference between beliefs in the last pass
+        /// Return maximum difference between single node beliefs in the last pass
         virtual double maxDiff() const = 0;
+
+        /// Return number of passes over the factorgraph
+        virtual size_t Iterations() const = 0;
 };
 
 

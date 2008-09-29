@@ -52,6 +52,10 @@ void HAK::setProperties( const PropertySet &opts ) {
         props.loopdepth = opts.getStringAs<size_t>("loopdepth");
     else
         assert( props.clusters != Properties::ClustersType::LOOP );
+    if( opts.hasKey("damping") )
+        props.damping = opts.getStringAs<double>("damping");
+    else
+        props.damping = 0.0;
 }
 
 
@@ -63,6 +67,7 @@ PropertySet HAK::getProperties() const {
     opts.Set( "doubleloop", props.doubleloop );
     opts.Set( "clusters", props.clusters );
     opts.Set( "loopdepth", props.loopdepth );
+    opts.Set( "damping", props.damping );
     return opts;
 }
 
@@ -75,7 +80,8 @@ string HAK::printProperties() const {
     s << "verbose=" << props.verbose << ",";
     s << "doubleloop=" << props.doubleloop << ",";
     s << "clusters=" << props.clusters << ",";
-    s << "loopdepth=" << props.loopdepth << "]";
+    s << "loopdepth=" << props.loopdepth << ",";
+    s << "damping=" << props.damping << "]";
     return s.str();
 }
 
@@ -111,7 +117,7 @@ void HAK::constructMessages() {
 }
 
 
-HAK::HAK(const RegionGraph & rg, const PropertySet &opts ) : DAIAlgRG(rg) {
+HAK::HAK( const RegionGraph &rg, const PropertySet &opts ) : DAIAlgRG(rg), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {
     setProperties( opts );
 
     constructMessages();
@@ -121,7 +127,7 @@ HAK::HAK(const RegionGraph & rg, const PropertySet &opts ) : DAIAlgRG(rg) {
 void HAK::findLoopClusters( const FactorGraph & fg, std::set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars ) {
     for( VarSet::const_iterator in = vars.begin(); in != vars.end(); in++ ) {
         VarSet ind = fg.delta( fg.findVar( *in ) );
-        if( (newcl.size()) >= 2 && (ind >> root) ) {
+        if( (newcl.size()) >= 2 && ind.contains( root ) ) {
             allcl.insert( newcl | *in );
         }
         else if( length > 1 )
@@ -130,7 +136,7 @@ void HAK::findLoopClusters( const FactorGraph & fg, std::set<VarSet> &allcl, Var
 }
 
 
-HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), props(), maxdiff(0.0) {
+HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {
     setProperties( opts );
 
     vector<VarSet> cl;
@@ -150,7 +156,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), props(),
         for( set<VarSet>::const_iterator c = scl.begin(); c != scl.end(); c++ )
             cl.push_back(*c);
         if( props.verbose >= 3 ) {
-            cout << "HAK uses the following clusters: " << endl;
+            cout << Name << " uses the following clusters: " << endl;
             for( vector<VarSet>::const_iterator cli = cl.begin(); cli != cl.end(); cli++ )
                 cout << *cli << endl;
         }
@@ -162,7 +168,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), props(),
     constructMessages();
 
     if( props.verbose >= 3 )
-        cout << "HAK regiongraph: " << *this << endl;
+        cout << Name << " regiongraph: " << *this << endl;
 }
 
 
@@ -225,14 +231,24 @@ double HAK::doGBP() {
     // Differences in single node beliefs
     Diffs diffs(nrVars(), 1.0);
 
-    size_t iter = 0;
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter = 0; iter < props.maxiter && diffs.maxDiff() > props.tol; iter++ ) {
+    for( _iters = 0; _iters < props.maxiter && diffs.maxDiff() > props.tol; _iters++ ) {
         for( size_t beta = 0; beta < nrIRs(); beta++ ) {
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
                 muab( alpha, _beta ) = _Qa[alpha].marginal(IR(beta)).divided_by( muba(alpha,_beta) );
+                /* TODO: INVESTIGATE THIS PROBLEM
+                 *
+                 * In some cases, the muab's can have very large entries because the muba's have very
+                 * small entries. This may cause NANs later on (e.g., multiplying large quantities may
+                 * result in +inf; normalization then tries to calculate inf / inf which is NAN). 
+                 * A fix of this problem would consist in normalizing the messages muab.
+                 * However, it is not obvious whether this is a real solution, because it has a
+                 * negative performance impact and the NAN's seem to be a symptom of a fundamental
+                 * numerical unstability.
+                 */
+                 muab(alpha,_beta).normalize(); 
             }
 
             Factor Qb_new;
@@ -243,16 +259,29 @@ double HAK::doGBP() {
 
             Qb_new.normalize();
             if( Qb_new.hasNaNs() ) {
-                cout << "HAK::doGBP:  Qb_new has NaNs!" << endl;
+                // TODO: WHAT TO DO IN THIS CASE?
+                cout << Name << "::doGBP:  Qb_new has NaNs!" << endl;
                 return 1.0;
             }
-//          _Qb[beta] = Qb_new.makeZero(1e-100);    // damping?
-            _Qb[beta] = Qb_new;
+            /* TODO: WHAT IS THE PURPOSE OF THE FOLLOWING CODE?
+             *
+             *   _Qb[beta] = Qb_new.makeZero(1e-100);
+             */
+
+            if( props.doubleloop || props.damping == 0.0 )
+                _Qb[beta] = Qb_new; // no damping for double loop
+            else
+                _Qb[beta] = (Qb_new^(1.0 - props.damping)) * (_Qb[beta]^props.damping);
 
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
-
                 muba(alpha,_beta) = _Qb[beta].divided_by( muab(alpha,_beta) );
+
+                /* TODO: INVESTIGATE WHETHER THIS HACK (INVENTED BY KEES) TO PREVENT NANS MAKES SENSE 
+                 *
+                 *   muba(beta,*alpha).makePositive(1e-100);
+                 *
+                 */
 
                 Factor Qa_new = OR(alpha);
                 foreach( const Neighbor &gamma, nbOR(alpha) )
@@ -260,11 +289,19 @@ double HAK::doGBP() {
                 Qa_new ^= (1.0 / OR(alpha).c());
                 Qa_new.normalize();
                 if( Qa_new.hasNaNs() ) {
-                    cout << "HAK::doGBP:  Qa_new has NaNs!" << endl;
+                    cout << Name << "::doGBP:  Qa_new has NaNs!" << endl;
                     return 1.0;
                 }
-//              _Qa[alpha] = Qa_new.makeZero(1e-100); // damping?
-                _Qa[alpha] = Qa_new;
+                /* TODO: WHAT IS THE PURPOSE OF THE FOLLOWING CODE?
+                 *
+                 *   _Qb[beta] = Qb_new.makeZero(1e-100);
+                 */
+
+                if( props.doubleloop || props.damping == 0.0 )
+                    _Qa[alpha] = Qa_new; // no damping for double loop
+                else
+                    // FIXME: GEOMETRIC DAMPING IS SLOW!
+                _Qa[alpha] = (Qa_new^(1.0 - props.damping)) * (_Qa[alpha]^props.damping);
             }
         }
 
@@ -276,21 +313,21 @@ double HAK::doGBP() {
         }
 
         if( props.verbose >= 3 )
-            cout << "HAK::doGBP:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
+            cout << Name << "::doGBP:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
     }
 
-    if( diffs.maxDiff() > maxdiff )
-        maxdiff = diffs.maxDiff();
+    if( diffs.maxDiff() > _maxdiff )
+        _maxdiff = diffs.maxDiff();
 
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
                 cout << endl;
-            cout << "HAK::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+            cout << Name << "::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 2 )
-                cout << "HAK::doGBP:  ";
-            cout << "converged in " << iter << " passes (" << toc() - tic << " clocks)." << endl;
+                cout << Name << "::doGBP:  ";
+            cout << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 
@@ -326,16 +363,17 @@ double HAK::doDoubleLoop() {
     // Differences in single node beliefs
     Diffs diffs(nrVars(), 1.0);
 
-    size_t  outer_maxiter   = props.maxiter;
-    double  outer_tol       = props.tol;
-    size_t  outer_verbose   = props.verbose;
-    double  org_maxdiff     = maxdiff;
+    size_t outer_maxiter   = props.maxiter;
+    double outer_tol       = props.tol;
+    size_t outer_verbose   = props.verbose;
+    double org_maxdiff     = _maxdiff;
 
     // Set parameters for inner loop
     props.maxiter = 5;
     props.verbose = outer_verbose ? outer_verbose - 1 : 0;
 
     size_t outer_iter = 0;
+    size_t total_iter = 0;
     for( outer_iter = 0; outer_iter < outer_maxiter && diffs.maxDiff() > outer_tol; outer_iter++ ) {
         // Calculate new outer regions
         for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
@@ -355,17 +393,20 @@ double HAK::doDoubleLoop() {
             old_beliefs[i] = new_belief;
         }
 
+        total_iter += Iterations();
+
         if( props.verbose >= 3 )
-            cout << "HAK::doDoubleLoop:  maxdiff " << diffs.maxDiff() << " after " << outer_iter+1 << " passes" << endl;
+            cout << Name << "::doDoubleLoop:  maxdiff " << diffs.maxDiff() << " after " << total_iter << " passes" << endl;
     }
 
     // restore _maxiter, _verbose and _maxdiff
     props.maxiter = outer_maxiter;
     props.verbose = outer_verbose;
-    maxdiff = org_maxdiff;
+    _maxdiff = org_maxdiff;
 
-    if( diffs.maxDiff() > maxdiff )
-        maxdiff = diffs.maxDiff();
+    _iters = total_iter;
+    if( diffs.maxDiff() > _maxdiff )
+        _maxdiff = diffs.maxDiff();
 
     // Restore original outer regions
     ORs = org_ORs;
@@ -378,11 +419,11 @@ double HAK::doDoubleLoop() {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
                 cout << endl;
-                cout << "HAK::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+                cout << Name << "::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
             } else {
                 if( props.verbose >= 3 )
-                    cout << "HAK::doDoubleLoop:  ";
-                cout << "converged in " << outer_iter << " passes (" << toc() - tic << " clocks)." << endl;
+                    cout << Name << "::doDoubleLoop:  ";
+                cout << "converged in " << total_iter << " passes (" << toc() - tic << " seconds)." << endl;
             }
         }
 

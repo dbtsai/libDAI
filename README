@@ -27,6 +27,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ----------------------------------------------------------------------------------
 
 
+SCIENTISTS: please be aware that the fact that this program is released as Free
+Software does not excuse you from scientific propriety, which obligates you to
+give appropriate credit! If you write a scientific paper describing research
+that made substantive use of this program, it is your moral obligation as a
+scientist to (a) mention the fashion in which this software was used, including
+the version number, with a citation to the literature, to allow replication;
+(b) mention this software in the Acknowledgements section.  The appropriate
+citation is: J. M. Mooij (2008) libDAI: A free/open source C++ library for
+Discrete Approximate Inference methods, http://mloss.org/software/view/77/.
+Moreover, as a personal note, I would appreciate it if you would email me with
+citations of papers referencing this work so I can mention them to my funding
+agent and tenure committee.
 
 What is libDAI?
 ---------------

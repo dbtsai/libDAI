@@ -1,6 +1,6 @@
 /*  Copyright (C) 2006-2008  Joris Mooij  [j dot mooij at science dot ru dot nl]
     Radboud University Nijmegen, The Netherlands
-    
+
     This file is part of libDAI.
 
     libDAI is free software; you can redistribute it and/or modify
@@ -71,16 +71,16 @@ class BP : public DAIAlgFG {
         }
 
         /// Copy constructor
-        BP( const BP & x ) : DAIAlgFG(x), _edges(x._edges), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
+        BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
 
         /// Clone *this (virtual copy constructor)
         virtual BP* clone() const { return new BP(*this); }
 
-        /// Create (virtual constructor)
+        /// Create (virtual default constructor)
         virtual BP* create() const { return new BP(); }
 
         /// Assignment operator
-        BP& operator=( const BP & x ) {
+        BP& operator=( const BP &x ) {
             if( this != &x ) {
                 DAIAlgFG::operator=( x );
                 _edges = x._edges;
@@ -91,35 +91,36 @@ class BP : public DAIAlgFG {
             return *this;
         }
 
-        /// Return number of passes over the factorgraph
-        size_t Iterations() const { return _iters; }
-
-        /// Return maximum difference between single node beliefs for two consecutive iterations
-        double maxDiff() const { return _maxdiff; }
-
         /// Identifies itself for logging purposes
-        std::string identify() const;
+        virtual std::string identify() const;
 
         /// Get single node belief
-        Factor belief( const Var &n ) const;
+        virtual Factor belief( const Var &n ) const;
 
         /// Get general belief
-        Factor belief( const VarSet &n ) const;
+        virtual Factor belief( const VarSet &ns ) const;
 
         /// Get all beliefs
-        std::vector<Factor> beliefs() const;
+        virtual std::vector<Factor> beliefs() const;
 
         /// Get log partition sum
-        Real logZ() const;
+        virtual Real logZ() const;
 
         /// Clear messages and beliefs
-        void init();
+        virtual void init();
 
         /// Clear messages and beliefs corresponding to the nodes in ns
         virtual void init( const VarSet &ns );
 
         /// The actual approximate inference algorithm
-        double run();
+        virtual double run();
+
+        /// Return maximum difference between single node beliefs in the last pass
+        virtual double maxDiff() const { return _maxdiff; }
+
+        /// Return number of passes over the factorgraph
+        virtual size_t Iterations() const { return _iters; }
+
 
         Factor beliefV( size_t i ) const;
         Factor beliefF( size_t I ) const;
@@ -136,15 +137,18 @@ class BP : public DAIAlgFG {
 
         void calcNewMessage( size_t i, size_t _I );
         void updateMessage( size_t i, size_t _I ) {
-            if( props.damping == 0.0 )
+            if( props.damping == 0.0 ) {
                 message(i,_I) = newMessage(i,_I);
-            else
+                residual(i,_I) = 0.0;
+            } else {
                 message(i,_I) = (message(i,_I) ^ props.damping) * (newMessage(i,_I) ^ (1.0 - props.damping));
+                residual(i,_I) = dist( newMessage(i,_I), message(i,_I), Prob::DISTLINF );
+            }
         }
         void findMaxResidual( size_t &i, size_t &_I );
 
-        /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member
         void construct();
+        /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;

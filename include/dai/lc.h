@@ -44,91 +44,109 @@ class LC : public DAIAlgFG {
         /// Single variable beliefs
         std::vector<Factor>      _beliefs;
 
+        /// Maximum difference encountered so far
+        double                  _maxdiff;
+        /// Number of iterations needed
+        size_t                  _iters;
+
     public:
         struct Properties {
             size_t verbose;
             size_t maxiter;
             double tol;
+            bool reinit;
+            double damping;
             DAI_ENUM(CavityType,FULL,PAIR,PAIR2,UNIFORM)
             CavityType cavity;
             DAI_ENUM(UpdateType,SEQFIX,SEQRND,NONE)
             UpdateType updates;
-            std::string cavainame;
-            PropertySet cavaiopts;
-            bool reinit;
+            std::string cavainame;      // FIXME: needs assignment operator?
+            PropertySet cavaiopts;      // FIXME: needs assignment operator?
         } props;
-        double maxdiff;
+        /// Name of this inference method
+        static const char *Name;
 
     public:
         /// Default constructor
-        LC() : DAIAlgFG(), _pancakes(), _cavitydists(), _phis(), _beliefs(), props(), maxdiff() {}
+        LC() : DAIAlgFG(), _pancakes(), _cavitydists(), _phis(), _beliefs(), _maxdiff(), _iters(), props() {}
+
+        /// Construct from FactorGraph fg and PropertySet opts
+        LC( const FactorGraph &fg, const PropertySet &opts );
+
         /// Copy constructor
-        LC(const LC & x) : DAIAlgFG(x), _pancakes(x._pancakes), _cavitydists(x._cavitydists), _phis(x._phis), _beliefs(x._beliefs), props(x.props), maxdiff(x.maxdiff) {}
-        /// Clone function
-        LC* clone() const { return new LC(*this); }
-        /// Create (virtual constructor)
+        LC( const LC &x ) : DAIAlgFG(x), _pancakes(x._pancakes), _cavitydists(x._cavitydists), _phis(x._phis), _beliefs(x._beliefs), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
+
+        /// Clone *this (virtual copy constructor)
+        virtual LC* clone() const { return new LC(*this); }
+
+        /// Create (virtual default constructor)
         virtual LC* create() const { return new LC(); }
-        /// Construct LC object from a FactorGraph and parameters
-        LC( const FactorGraph & fg, const PropertySet &opts );
+
         /// Assignment operator
-        LC& operator=(const LC & x) {
+        LC& operator=( const LC &x ) {
             if( this != &x ) {
-                DAIAlgFG::operator=(x);
-                _pancakes       = x._pancakes;
-                _cavitydists    = x._cavitydists;
-                _phis           = x._phis;
-                _beliefs        = x._beliefs;
-                props           = x.props;
-                maxdiff         = x.maxdiff;
+                DAIAlgFG::operator=( x );
+                _pancakes     = x._pancakes;
+                _cavitydists  = x._cavitydists;
+                _phis         = x._phis;
+                _beliefs      = x._beliefs;
+                _maxdiff      = x._maxdiff;
+                _iters        = x._iters;
+                props         = x.props;
             }
             return *this;
         }
 
-        static const char *Name;
+        /// Identifies itself for logging purposes
+        virtual std::string identify() const;
+
+        /// Get single node belief
+        virtual Factor belief( const Var &n ) const { return( _beliefs[findVar(n)] ); }
+
+        /// Get general belief
+        virtual Factor belief( const VarSet &/*ns*/ ) const {
+            DAI_THROW(NOT_IMPLEMENTED);
+            return Factor(); 
+        }
+
+        /// Get all beliefs
+        virtual std::vector<Factor> beliefs() const { return _beliefs; }
+
+        /// Get log partition sum
+        virtual Real logZ() const { 
+            DAI_THROW(NOT_IMPLEMENTED);
+            return 0.0; 
+        }
+
+        /// Clear messages and beliefs
+        virtual void init();
+
+        /// Clear messages and beliefs corresponding to the nodes in ns
+        virtual void init( const VarSet &/*ns*/ ) { init(); }
+
+        /// The actual approximate inference algorithm
+        virtual double run();
+
+        /// Return maximum difference between single node beliefs in the last pass
+        virtual double maxDiff() const { return _maxdiff; }
+
+        /// Return number of passes over the factorgraph
+        virtual size_t Iterations() const { return _iters; }
+
         double CalcCavityDist( size_t i, const std::string &name, const PropertySet &opts );
         double InitCavityDists( const std::string &name, const PropertySet &opts );
         long SetCavityDists( std::vector<Factor> &Q );
 
-        void init();
-        /// Clear messages and beliefs corresponding to the nodes in ns
-        virtual void init( const VarSet &/*ns*/ ) {
-            DAI_THROW(NOT_IMPLEMENTED);
-        }
         Factor NewPancake (size_t i, size_t _I, bool & hasNaNs);
-        double run();
 
-        std::string identify() const;
-        Factor belief (const Var &n) const { return( _beliefs[findVar(n)] ); }
-        Factor belief (const VarSet &/*ns*/) const { 
-            DAI_THROW(NOT_IMPLEMENTED);
-            return Factor(); 
-        }
-        std::vector<Factor> beliefs() const { return _beliefs; }
-        Real logZ() const { 
-            DAI_THROW(NOT_IMPLEMENTED);
-            return 0.0; 
-        }
         void CalcBelief (size_t i);
         const Factor &belief (size_t i) const { return _beliefs[i]; };
         const Factor &pancake (size_t i) const { return _pancakes[i]; };
         const Factor &cavitydist (size_t i) const { return _cavitydists[i]; };
 
-        void clamp( const Var &/*n*/, size_t /*i*/ ) { 
-            DAI_THROW(NOT_IMPLEMENTED);
-        }
-        void restoreFactors( const VarSet &/*ns*/ ) { 
-            DAI_THROW(NOT_IMPLEMENTED);
-        }
-        void backupFactors( const VarSet &/*ns*/ ) { 
-            DAI_THROW(NOT_IMPLEMENTED);
-        }
-        virtual void makeCavity(const Var & /*n*/) { 
-            DAI_THROW(NOT_IMPLEMENTED);
-        }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;
-        double maxDiff() const { return maxdiff; }
 };
 
 

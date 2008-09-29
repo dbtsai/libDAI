@@ -247,7 +247,6 @@ double BP::run() {
                 size_t i, _I;
                 findMaxResidual( i, _I );
                 updateMessage( i, _I );
-                residual( i, _I ) = 0.0;
 
                 // I->i has been updated, which means that residuals for all
                 // J->j with J in nb[i]\I and j in nb[J]\i have to be updated
@@ -291,7 +290,7 @@ double BP::run() {
         }
 
         if( props.verbose >= 3 )
-            cout << "BP::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cout << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
     }
 
     if( diffs.maxDiff() > _maxdiff )
@@ -301,11 +300,11 @@ double BP::run() {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
                 cout << endl;
-                cout << "BP::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+                cout << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 3 )
-                cout << "BP::run:  ";
-                cout << "converged in " << _iters << " passes (" << toc() - tic << " clocks)." << endl;
+                cout << Name << "::run:  ";
+                cout << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 

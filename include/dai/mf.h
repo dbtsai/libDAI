@@ -1,6 +1,6 @@
 /*  Copyright (C) 2006-2008  Joris Mooij  [j dot mooij at science dot ru dot nl]
     Radboud University Nijmegen, The Netherlands
-    
+
     This file is part of libDAI.
 
     libDAI is free software; you can redistribute it and/or modify
@@ -53,7 +53,7 @@ class MF : public DAIAlgFG {
         /// Default constructor
         MF() : DAIAlgFG(), _beliefs(), _maxdiff(0.0), _iters(0U), props() {}
 
-        // construct MF object from FactorGraph
+        /// Construct from FactorGraph fg and PropertySet opts
         MF( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), _maxdiff(0.0), _iters(0U), props() {
             setProperties( opts );
             construct();
@@ -62,8 +62,14 @@ class MF : public DAIAlgFG {
         /// Copy constructor
         MF( const MF &x ) : DAIAlgFG(x), _beliefs(x._beliefs), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
 
+        /// Clone *this (virtual copy constructor)
+        virtual MF* clone() const { return new MF(*this); }
+
+        /// Create (virtual default constructor)
+        virtual MF* create() const { return new MF(); }
+
         /// Assignment operator
-        MF & operator=( const MF &x ) {
+        MF& operator=( const MF &x ) {
             if( this != &x ) {
                 DAIAlgFG::operator=( x );
                 _beliefs = x._beliefs;
@@ -74,42 +80,38 @@ class MF : public DAIAlgFG {
             return *this;
         }
 
-        /// Clone *this (virtual copy constructor)
-        virtual MF* clone() const { return new MF(*this); }
-
-        /// Create (virtual constructor)
-        virtual MF* create() const { return new MF(); }
-
-        /// Return number of passes over the factorgraph needed
-        virtual size_t Iterations() const { return _iters; }
-
-        /// Return maximum difference between single node beliefs for two consecutive iterations
-        double maxDiff() const { return _maxdiff; }
-
-        /// Identify *this for logging purposes
-        std::string identify() const;
+        /// Identifies itself for logging purposes
+        virtual std::string identify() const;
 
         /// Get single node belief
-        Factor belief( const Var &n ) const;
+        virtual Factor belief( const Var &n ) const;
 
         /// Get general belief
-        Factor belief( const VarSet &ns ) const;
+        virtual Factor belief( const VarSet &ns ) const;
 
         /// Get all beliefs
-        std::vector<Factor> beliefs() const;
+        virtual std::vector<Factor> beliefs() const;
 
         /// Get log partition sum
-        Real logZ() const;
+        virtual Real logZ() const;
 
-        void construct();
-
-        void init();
+        /// Clear messages and beliefs
+        virtual void init();
 
         /// Clear messages and beliefs corresponding to the nodes in ns
         virtual void init( const VarSet &ns );
 
         /// The actual approximate inference algorithm
-        double run();
+        virtual double run();
+
+        /// Return maximum difference between single node beliefs in the last pass
+        virtual double maxDiff() const { return _maxdiff; }
+
+        /// Return number of passes over the factorgraph
+        virtual size_t Iterations() const { return _iters; }
+
+
+        void construct();
 
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;

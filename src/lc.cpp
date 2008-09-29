@@ -27,7 +27,6 @@
 #include <dai/diffs.h>
 #include <dai/util.h>
 #include <dai/alldai.h>
-#include <dai/x2x.h>
 
 
 namespace dai {
@@ -57,6 +56,10 @@ void LC::setProperties( const PropertySet &opts ) {
         props.cavaiopts = opts.getStringAs<PropertySet>("cavaiopts");
     if( opts.hasKey("reinit") )
         props.reinit = opts.getStringAs<bool>("reinit");
+    if( opts.hasKey("damping") )
+        props.damping = opts.getStringAs<double>("damping");
+    else
+        props.damping = 0.0;
 }
 
 
@@ -70,6 +73,7 @@ PropertySet LC::getProperties() const {
     opts.Set( "cavainame", props.cavainame );
     opts.Set( "cavaiopts", props.cavaiopts );
     opts.Set( "reinit", props.reinit );
+    opts.Set( "damping", props.damping );
     return opts;
 }
 
@@ -84,20 +88,21 @@ string LC::printProperties() const {
     s << "updates=" << props.updates << ",";
     s << "cavainame=" << props.cavainame << ",";
     s << "cavaiopts=" << props.cavaiopts << ",";
-    s << "reinit=" << props.reinit << "]";
+    s << "reinit=" << props.reinit << ",";
+    s << "damping=" << props.damping << "]";
     return s.str();
 }
 
 
-LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _pancakes(), _cavitydists(), _phis(), _beliefs(), props(), maxdiff(0.0) {
+LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _pancakes(), _cavitydists(), _phis(), _beliefs(), _maxdiff(0.0), _iters(0), props() {
     setProperties( opts );
 
     // create pancakes
-    _pancakes.resize(nrVars());
+    _pancakes.resize( nrVars() );
    
     // create cavitydists
     for( size_t i=0; i < nrVars(); i++ )
-        _cavitydists.push_back(Factor(delta(i)));
+        _cavitydists.push_back(Factor( delta(i) ));
 
     // create phis
     _phis.reserve( nrVars() );
@@ -109,6 +114,7 @@ LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _panca
     }
 
     // create beliefs
+    _beliefs.reserve( nrVars() );
     for( size_t i=0; i < nrVars(); i++ )
         _beliefs.push_back(Factor(var(i)));
 }
@@ -160,7 +166,7 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
     double tic = toc();
 
     if( props.verbose >= 1 ) {
-        cout << "LC::InitCavityDists:  ";
+        cout << Name << "::InitCavityDists:  ";
         if( props.cavity == Properties::CavityType::UNIFORM )
             cout << "Using uniform initial cavity distributions" << endl;
         else if( props.cavity == Properties::CavityType::FULL )
@@ -180,7 +186,7 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
     init();
 
     if( props.verbose >= 1 ) {
-        cout << "used " << toc() - tic << " clocks." << endl;
+        cout << Name << "::InitCavityDists used " << toc() - tic << " seconds." << endl;
     }
 
     return maxdiff;
@@ -189,7 +195,7 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
 
 long LC::SetCavityDists( std::vector<Factor> &Q ) {
     if( props.verbose >= 1 ) 
-        cout << "LC::SetCavityDists:  Setting initial cavity distributions" << endl;
+        cout << Name << "::SetCavityDists:  Setting initial cavity distributions" << endl;
     if( Q.size() != nrVars() )
         return -1;
     for( size_t i = 0; i < nrVars(); i++ ) {
@@ -240,6 +246,8 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
         A_I ^= (1.0 / (Ivars.size() - 1));
     Factor A_Ii = (_pancakes[i] * factor(I).inverse() * _phis[i][_I].inverse()).partSum( Ivars / var(i) );
     Factor quot = A_I.divided_by(A_Ii);
+    if( props.damping != 0.0 )
+        quot = (quot^(1.0 - props.damping)) * (_phis[i][_I]^props.damping);
 
     piet *= quot.divided_by( _phis[i][_I] ).normalized();
     _phis[i][_I] = quot.normalized();
@@ -247,7 +255,7 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
     piet.normalize();
 
     if( piet.hasNaNs() ) {
-        cout << "LC::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;
+        cout << Name << "::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;
         hasNaNs = true;
     }
 
@@ -265,8 +273,8 @@ double LC::run() {
     Diffs diffs(nrVars(), 1.0);
 
     double md = InitCavityDists( props.cavainame, props.cavaiopts );
-    if( md > maxdiff )
-        maxdiff = md;
+    if( md > _maxdiff )
+        _maxdiff = md;
 
     vector<Factor> old_beliefs;
     for(size_t i=0; i < nrVars(); i++ )
@@ -279,8 +287,8 @@ double LC::run() {
             break;
         }
     if( hasNaNs ) {
-        cout << "LC::run:  initial _pancakes has NaNs!" << endl;
-        return -1.0;
+        cout << Name << "::run:  initial _pancakes has NaNs!" << endl;
+        return 1.0;
     }
 
     size_t nredges = nrEdges();
@@ -290,11 +298,9 @@ double LC::run() {
         foreach( const Neighbor &I, nbV(i) )
             update_seq.push_back( Edge( i, I.iter ) );
 
-    size_t iter = 0;
-
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter=0; iter < props.maxiter && diffs.maxDiff() > props.tol; iter++ ) {
+    for( _iters=0; _iters < props.maxiter && diffs.maxDiff() > props.tol; _iters++ ) {
         // Sequential updates
         if( props.updates == Properties::UpdateType::SEQRND )
             random_shuffle( update_seq.begin(), update_seq.end() );
@@ -304,7 +310,7 @@ double LC::run() {
             size_t _I = update_seq[t].second;
             _pancakes[i] = NewPancake( i, _I, hasNaNs);
             if( hasNaNs )
-                return -1.0;
+                return 1.0;
             CalcBelief( i );
         }
 
@@ -315,21 +321,21 @@ double LC::run() {
         }
 
         if( props.verbose >= 3 )
-            cout << "LC::run:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
+            cout << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
     }
 
-    if( diffs.maxDiff() > maxdiff )
-        maxdiff = diffs.maxDiff();
+    if( diffs.maxDiff() > _maxdiff )
+        _maxdiff = diffs.maxDiff();
 
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
                 cout << endl;
-                cout << "LC::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+                cout << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 2 )
-                cout << "LC::run:  ";
-                cout << "converged in " << iter << " passes (" << toc() - tic << " clocks)." << endl;
+                cout << Name << "::run:  ";
+                cout << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 

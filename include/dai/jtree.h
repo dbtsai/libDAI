@@ -1,6 +1,6 @@
 /*  Copyright (C) 2006-2008  Joris Mooij  [j dot mooij at science dot ru dot nl]
     Radboud University Nijmegen, The Netherlands
-    
+
     This file is part of libDAI.
 
     libDAI is free software; you can redistribute it and/or modify
@@ -59,14 +59,20 @@ class JTree : public DAIAlgRG {
         /// Default constructor
         JTree() : DAIAlgRG(), _RTree(), _Qa(), _Qb(), _mes(), _logZ(), props() {}
 
-        /// Construct JTree object using the specified properties
+        /// Construct from FactorGraph fg and PropertySet opts
         JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic=true );
 
         /// Copy constructor
         JTree( const JTree &x ) : DAIAlgRG(x), _RTree(x._RTree), _Qa(x._Qa), _Qb(x._Qb), _mes(x._mes), _logZ(x._logZ), props(x.props) {}
 
+        /// Clone *this (virtual copy constructor)
+        virtual JTree* clone() const { return new JTree(*this); }
+
+        /// Create (virtual default constructor)
+        virtual JTree* create() const { return new JTree(); }
+
         /// Assignment operator
-        JTree & operator=( const JTree &x ) {
+        JTree& operator=( const JTree &x ) {
             if( this != &x ) {
                 DAIAlgRG::operator=( x );
                 _RTree  = x._RTree;
@@ -79,41 +85,35 @@ class JTree : public DAIAlgRG {
             return *this;
         }
 
-        /// Clone (virtual copy constructor)
-        virtual JTree* clone() const { return new JTree(*this); }
-
-        /// Create (virtual constructor)
-        virtual JTree* create() const { return new JTree(); }
-
-        /// Return number of passes over the factorgraph
-        virtual size_t Iterations() const { return 1UL; }
-
-        /// Return maximum difference between single node beliefs for two consecutive iterations
-        virtual double maxDiff() const { return 0.0; }
-
         /// Identifies itself for logging purposes
-        std::string identify() const;
+        virtual std::string identify() const;
 
         /// Get single node belief
-        Factor belief( const Var &n ) const;
+        virtual Factor belief( const Var &n ) const;
 
         /// Get general belief
-        Factor belief( const VarSet &ns ) const;
+        virtual Factor belief( const VarSet &ns ) const;
 
         /// Get all beliefs
-        std::vector<Factor> beliefs() const;
+        virtual std::vector<Factor> beliefs() const;
 
         /// Get log partition sum
-        Real logZ() const;
+        virtual Real logZ() const;
 
         /// Clear messages and beliefs
-        void init() {}
+        virtual void init() {}
 
         /// Clear messages and beliefs corresponding to the nodes in ns
         virtual void init( const VarSet &/*ns*/ ) {}
 
         /// The actual approximate inference algorithm
-        double run();
+        virtual double run();
+
+        /// Return maximum difference between single node beliefs in the last pass
+        virtual double maxDiff() const { return 0.0; }
+
+        /// Return number of passes over the factorgraph
+        virtual size_t Iterations() const { return 1UL; }
 
 
         void GenerateJT( const std::vector<VarSet> &Cliques );

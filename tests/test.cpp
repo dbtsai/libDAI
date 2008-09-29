@@ -107,8 +107,12 @@ class TestDAI {
                 } catch( Exception &e ) {
                     has_maxdiff = false;
                 }
-                has_iters = false;
-                iters = 0;
+                try {
+                    iters = obj->Iterations();
+                    has_iters = true;
+                } catch( Exception &e ) {
+                    has_iters = false;
+                }
                 q = allBeliefs();
             };
         }
@@ -340,7 +344,7 @@ int main( int argc, char *argv[] ) {
                 }
                 cout.width( 10 );
                 if( piet.has_iters ) {
-                    cout << piet.iters << "  " << endl;
+                    cout << piet.iters << "  ";
                 } else {
                     cout << "N/A         ";
                 }

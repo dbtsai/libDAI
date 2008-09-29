@@ -1,34 +1,20 @@
-- Idea: a FactorGraph and a RegionGraph are often equipped with
-extra properties for nodes and edges. The code to initialize those
-is often quite similar; maybe this can be abstracted to classes
-like ExtFactorGraph and ExtRegionGraph (Ext stands for Extended), e.g.
-template <typename NodeProperties, typename EdgeProperties>
-class ExtFactorGraph : public FactorGraph {
-	public:
-		std::vector<NodeProperties>               nodeProps;
-		std::vector<std::vector<EdgeProperties> > edgeProps;
-	// blabla
-}
-A disadvantage of this approach may be worse cachability.
-A problem is if there are nog properties for nodes (type 1), nodes (type 2)
-or edges. Maybe this can be solved using specializations, or using variadac
-template arguments or something similar?
-- BipartiteGraph::isConnected should be optimized.
+- BipartiteGraph::isConnected should be optimized using boost::graph
 - http://www.boost.org/development/requirements.html#Design_and_Programming
 - Would it be a good idea to cache second-order neighborhoods (delta's) in BipGraph?
 - Would it be a good idea to add the variable label -> index hashmap in FactorGraph,
   to replace the linear searches that are performed every time for findVar()?
   No, a better idea is to avoid calls to findVar() as much as possible.
+- Would it be a good idea to remove the states() caching from VarSet? 
+  Then, we could turn a VarSet into an IndexSet (set of integers).
 - Can the FactorGraph constructors be optimized further?
+- Idea: use a PropertySet as output of a DAIAlg, instead of functions like maxDiff and Iterations().
+- A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a reference to it
+- Add max-product to BP
 - Remove x2x?
-- Add iterations (like maxdiff, but counts iterations) to some algorithms
-  Idea: use a PropertySet as output of a DAIAlg
-- A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a
-reference to it
-- limit???
+- Remove MR?
 
 TODO FOR RELEASE:
-- Test Visual C++ compatibility
+- Test {Visual C++, cygwin, gcc various version} compatibility; state tested compilers/build environments in README
 - Figure out which libraries are required and document in README
   boost headers, boost::program_options library, boost::graph library,
   boost::math library (under Windows)
@@ -101,21 +87,17 @@ bp.h
 bp.cpp
 jtree.h
 jtree.cpp
-
-FILES IN SVN HEAD THAT ARE STILL RELEVANT:
-ChangeLog
-README
-TODO
-
 hak.h
 hak.cpp
 lc.h
 lc.cpp
-mr.h
-mr.cpp
 treeep.h
 treeep.cpp
-
+mr.h
+mr.cpp
+TODO
+ChangeLog
+README
 
 FILES IN SVN HEAD RELEVANT FOR A LATER RELEASE:
 	matlab/dai_potstrength.*
@@ -124,6 +106,9 @@ FILES IN SVN HEAD RELEVANT FOR A LATER RELEASE:
 	utils/viewfg
 	tests/aliases.conf
 	tests/testall
+	tests/test.cpp ("limit")
+	all subdirs not included in git:
+		bugs, experimental, tests/errorbounds, tests/kees, tests/large, tests/ldpc, tests/uai
 
 DOCUMENTATION READY:
 - bipgraph.h, bipgraph.cpp

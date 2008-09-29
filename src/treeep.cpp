@@ -71,7 +71,7 @@ string TreeEP::printProperties() const {
 }
 
 
-TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I ) : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(I), _ns(), _nsrem(), _logZ(0.0) {
+TreeEP::TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I ) : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(I), _ns(), _nsrem(), _logZ(0.0) {
     _ns = _I->vars();
 
     // Make _Qa, _Qb, _a and _b corresponding to the subtree
@@ -106,10 +106,10 @@ TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &jt_RTree
 
     // Find remaining variables (which are not in the new root)
     _nsrem = _ns / _Qa[0].vars();
-};
+}
 
 
-void TreeEPSubTree::init() { 
+void TreeEP::TreeEPSubTree::init() { 
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
         _Qa[alpha].fill( 1.0 );
     for( size_t beta = 0; beta < _Qb.size(); beta++ )
@@ -117,7 +117,7 @@ void TreeEPSubTree::init() {
 }
 
 
-void TreeEPSubTree::InvertAndMultiply( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) {
+void TreeEP::TreeEPSubTree::InvertAndMultiply( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) {
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
         _Qa[alpha] = Qa[_a[alpha]].divided_by( _Qa[alpha] );
 
@@ -126,7 +126,7 @@ void TreeEPSubTree::InvertAndMultiply( const std::vector<Factor> &Qa, const std:
 }
 
 
-void TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &Qb ) {
+void TreeEP::TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &Qb ) {
     // Backup _Qa and _Qb
     vector<Factor> _Qa_old(_Qa);
     vector<Factor> _Qb_old(_Qb);
@@ -187,7 +187,7 @@ void TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &
 }
 
 
-double TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const {
+double TreeEP::TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const {
     double sum = 0.0;
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
         sum += (Qa[_a[alpha]] * _Qa[alpha].log0()).totalSum();
@@ -197,7 +197,7 @@ double TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Fac
 }
 
 
-TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opts("updates",string("HUGIN")), false), props(), maxdiff(0.0) {
+TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opts("updates",string("HUGIN")), false), _maxdiff(0.0), _iters(0), props(), _Q() {
     setProperties( opts );
 
     assert( fg.isConnected() );
@@ -205,65 +205,49 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
     if( opts.hasKey("tree") ) {
         ConstructRG( opts.GetAs<DEdgeVec>("tree") );
     } else {
-        if( props.type == Properties::TypeType::ORG ) {
-            // construct weighted graph with as weights a crude estimate of the
+        if( props.type == Properties::TypeType::ORG || props.type == Properties::TypeType::ALT ) {
+            // ORG: construct weighted graph with as weights a crude estimate of the
             // mutual information between the nodes
-            WeightedGraph<double> wg;
-            for( size_t i = 0; i < nrVars(); ++i ) {
-                Var v_i = var(i);
-                VarSet di = delta(i);
-                for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
-                    if( v_i < *j ) {
-                        Factor piet;
-                        for( size_t I = 0; I < nrFactors(); I++ ) {
-                            VarSet Ivars = factor(I).vars();
-                            if( (Ivars == v_i) || (Ivars == *j) )
-                                piet *= factor(I);
-                            else if( Ivars >> (v_i | *j) )
-                                piet *= factor(I).marginal( v_i | *j );
-                        }
-                        if( piet.vars() >> (v_i | *j) ) {
-                            piet = piet.marginal( v_i | *j );
-                            Factor pietf = piet.marginal(v_i) * piet.marginal(*j);
-                            wg[UEdge(i,findVar(*j))] = KL_dist( piet, pietf );
-                        } else
-                            wg[UEdge(i,findVar(*j))] = 0;
-                    }
-            }
-
-            // find maximal spanning tree
-            ConstructRG( MaxSpanningTreePrims( wg ) );
-
-//            cout << "Constructing maximum spanning tree..." << endl;
-//            DEdgeVec MST = MaxSpanningTreePrims( wg );
-//            cout << "Maximum spanning tree:" << endl;
-//            for( DEdgeVec::const_iterator e = MST.begin(); e != MST.end(); e++ )
-//                cout << *e << endl; 
-//            ConstructRG( MST );
-        } else if( props.type == Properties::TypeType::ALT ) {
-            // construct weighted graph with as weights an upper bound on the
+            // ALT: construct weighted graph with as weights an upper bound on the
             // effective interaction strength between pairs of nodes
+            
             WeightedGraph<double> wg;
             for( size_t i = 0; i < nrVars(); ++i ) {
                 Var v_i = var(i);
                 VarSet di = delta(i);
                 for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
                     if( v_i < *j ) {
+                        VarSet ij(v_i,*j);
                         Factor piet;
                         for( size_t I = 0; I < nrFactors(); I++ ) {
                             VarSet Ivars = factor(I).vars();
-                            if( Ivars >> (v_i | *j) )
-                                piet *= factor(I);
+                            if( props.type == Properties::TypeType::ORG ) {
+                                if( (Ivars == v_i) || (Ivars == *j) )
+                                    piet *= factor(I);
+                                else if( Ivars >> ij )
+                                    piet *= factor(I).marginal( ij );
+                            } else {
+                                if( Ivars >> ij )
+                                    piet *= factor(I);
+                            }
                         }
-                        wg[UEdge(i,findVar(*j))] = piet.strength(v_i, *j);
+                        if( props.type == Properties::TypeType::ORG ) {
+                            if( piet.vars() >> ij ) {
+                                piet = piet.marginal( ij );
+                                Factor pietf = piet.marginal(v_i) * piet.marginal(*j);
+                                wg[UEdge(i,findVar(*j))] = KL_dist( piet, pietf );
+                            } else
+                                wg[UEdge(i,findVar(*j))] = 0;
+                        } else {
+                            wg[UEdge(i,findVar(*j))] = piet.strength(v_i, *j);
+                        }
                     }
             }
 
             // find maximal spanning tree
             ConstructRG( MaxSpanningTreePrims( wg ) );
-        } else {
+        } else
             DAI_THROW(INTERNAL_ERROR);
-        }
     }
 }
 
@@ -280,7 +264,8 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     for( size_t i = 0; i < Cliques.size(); i++ )
         for( size_t j = i+1; j < Cliques.size(); j++ ) {
             size_t w = (Cliques[i] & Cliques[j]).size();
-            JuncGraph[UEdge(i,j)] = w;
+            if( w )
+                JuncGraph[UEdge(i,j)] = w;
         }
     
     // Construct maximal spanning tree using Prim's algorithm
@@ -353,26 +338,6 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
             //subTree.resize( subTreeSize );  // FIXME
 //          cout << "subtree " << I << " has size " << subTreeSize << endl;
 
-/*
-            char fn[30];
-            sprintf( fn, "/tmp/subtree_%d.dot", I );
-            std::ofstream dots(fn);
-            dots << "graph G {" << endl;
-            dots << "graph[size=\"9,9\"];" << endl;
-            dots << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
-            for( size_t i = 0; i < nrVars(); i++ )
-                dots << "\tx" << var(i).label() << ((factor(I).vars() >> var(i)) ? "[color=blue];" : ";") << endl;
-            dots << "node[shape=box,style=filled,color=lightgrey,width=0.3,height=0.3,fixedsize=true];" << endl;
-            for( size_t J = 0; J < nrFactors(); J++ )
-                dots << "\tp" << J << ";" << endl;
-            for( size_t iI = 0; iI < FactorGraph::nr_edges(); iI++ )
-                dots << "\tx" << var(FactorGraph::edge(iI).first).label() << " -- p" << FactorGraph::edge(iI).second << ";" << endl;
-            for( size_t a = 0; a < tree.size(); a++ )
-                dots << "\tx" << var(tree[a].n1).label() << " -- x" << var(tree[a].n2).label() << " [color=red];" << endl;
-            dots << "}" << endl;
-            dots.close();
-*/
-            
             TreeEPSubTree QI( subTree, _RTree, _Qa, _Qb, &factor(I) );
             _Q[I] = QI;
         }
@@ -425,11 +390,9 @@ double TreeEP::run() {
     for( size_t i = 0; i < nrVars(); i++ )
         old_beliefs.push_back(belief(var(i)));
 
-    size_t iter = 0;
-    
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( iter=0; iter < props.maxiter && diffs.maxDiff() > props.tol; iter++ ) {
+    for( _iters=0; _iters < props.maxiter && diffs.maxDiff() > props.tol; _iters++ ) {
         for( size_t I = 0; I < nrFactors(); I++ )
             if( offtree(I) ) {  
                 _Q[I].InvertAndMultiply( _Qa, _Qb );
@@ -445,21 +408,21 @@ double TreeEP::run() {
         }
 
         if( props.verbose >= 3 )
-            cout << "TreeEP::run:  maxdiff " << diffs.maxDiff() << " after " << iter+1 << " passes" << endl;
+            cout << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
     }
 
-    if( diffs.maxDiff() > maxdiff )
-        maxdiff = diffs.maxDiff();
+    if( diffs.maxDiff() > _maxdiff )
+        _maxdiff = diffs.maxDiff();
 
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
                 cout << endl;
-            cout << "TreeEP::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << diffs.maxDiff() << endl;
+            cout << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 3 )
-                cout << "TreeEP::run:  ";
-            cout << "converged in " << iter << " passes (" << toc() - tic << " clocks)." << endl;
+                cout << Name << "::run:  ";
+            cout << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 

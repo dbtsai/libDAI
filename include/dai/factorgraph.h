@@ -67,11 +67,11 @@ class FactorGraph {
         }
         virtual ~FactorGraph() {}
 
+        /// Clone *this (virtual copy constructor)
+        virtual FactorGraph* clone() const { return new FactorGraph(); }
+
         /// Create (virtual default constructor)
         virtual FactorGraph* create() const { return new FactorGraph(*this); }
-
-        /// Clone (virtual copy constructor)
-        virtual FactorGraph* clone() const { return new FactorGraph(); }
 
         // aliases
         Var & var(size_t i) { return vars[i]; }

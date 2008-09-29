@@ -1,6 +1,6 @@
 /*  Copyright (C) 2006-2008  Joris Mooij  [j dot mooij at science dot ru dot nl]
     Radboud University Nijmegen, The Netherlands
-    
+
     This file is part of libDAI.
 
     libDAI is free software; you can redistribute it and/or modify
@@ -37,6 +37,8 @@ class ExactInf : public DAIAlgFG {
         struct Properties {
             size_t verbose;
         } props;
+        /// Name of this inference method
+        static const char *Name;
 
     private:
         std::vector<Factor> _beliefsV;
@@ -46,14 +48,6 @@ class ExactInf : public DAIAlgFG {
     public:
         /// Default constructor
         ExactInf() : DAIAlgFG(), props(), _beliefsV(), _beliefsF(), _logZ(0) {}
-        
-        /// Copy constructor
-        ExactInf( const ExactInf &x ) : DAIAlgFG(x), props(x.props), _beliefsV(x._beliefsV), _beliefsF(x._beliefsF), _logZ(x._logZ) {}
-
-        /// Clone (virtual copy constructor)
-        virtual ExactInf* clone() const {
-            return new ExactInf(*this);
-        }
 
         /// Construct from FactorGraph fg and PropertySet opts
         ExactInf( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), props(), _beliefsV(), _beliefsF(), _logZ() {
@@ -61,6 +55,15 @@ class ExactInf : public DAIAlgFG {
             construct();
         }
         
+        /// Copy constructor
+        ExactInf( const ExactInf &x ) : DAIAlgFG(x), props(x.props), _beliefsV(x._beliefsV), _beliefsF(x._beliefsF), _logZ(x._logZ) {}
+
+        /// Clone *this (virtual copy constructor)
+        virtual ExactInf* clone() const { return new ExactInf(*this); }
+
+        /// Create (virtual default constructor)
+        virtual ExactInf* create() const { return new ExactInf(); }
+
         /// Assignment operator
         ExactInf& operator=( const ExactInf &x ) {
             if( this != &x ) {
@@ -73,34 +76,20 @@ class ExactInf : public DAIAlgFG {
             return *this;
         }
 
-        /// Create (virtual constructor)
-        virtual ExactInf* create() const { return new ExactInf(); }
-
-        /// Return maximum difference between single node 
-        /// beliefs for two consecutive iterations
-        virtual double maxDiff() const {
-            DAI_THROW(NOT_IMPLEMENTED);
-            return 0.0;
-        }
-        
         /// Identifies itself for logging purposes
         virtual std::string identify() const;
 
         /// Get single node belief
-        virtual Factor belief( const Var &n ) const {
-            return beliefV( findVar( n ) ); 
-        }
+        virtual Factor belief( const Var &n ) const { return beliefV( findVar( n ) ); }
 
         /// Get general belief
-        virtual Factor belief( const VarSet &n ) const;
+        virtual Factor belief( const VarSet &ns ) const;
 
         /// Get all beliefs
         virtual std::vector<Factor> beliefs() const;
 
         /// Get log partition sum
-        virtual Real logZ() const {
-            return _logZ;
-        }
+        virtual Real logZ() const { return _logZ; }
 
         /// Clear messages and beliefs
         virtual void init();
@@ -113,22 +102,25 @@ class ExactInf : public DAIAlgFG {
         /// The actual approximate inference algorithm
         virtual double run();
 
-        /// Name of this inference method
-        static const char *Name;
+        /// Return maximum difference between single node beliefs in the last pass
+        virtual double maxDiff() const {
+            DAI_THROW(NOT_IMPLEMENTED);
+            return 0.0;
+        }
 
+        /// Return number of passes over the factorgraph
+        virtual size_t Iterations() const { 
+            DAI_THROW(NOT_IMPLEMENTED);
+            return 0; 
+        }
+        
         void construct();
-        void restoreFactors( const VarSet &ns ) { FactorGraph::restoreFactors(ns); init(ns); }
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;
 
-        Factor beliefV( size_t i ) const { 
-            return _beliefsV[i]; 
-        }
-
-        Factor beliefF( size_t I ) const { 
-            return _beliefsF[I]; 
-        }
+        Factor beliefV( size_t i ) const { return _beliefsV[i]; }
+        Factor beliefF( size_t I ) const { return _beliefsF[I]; }
 };
 
 
