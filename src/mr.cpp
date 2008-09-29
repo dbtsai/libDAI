@@ -265,31 +265,28 @@ double MR::T(size_t i, sub_nb A) {
     // calculate T{(i)}_A as defined in Rizzo&Montanari e-print (2.17)
     
     sub_nb _nbi_min_A(con[i]);
-    for( size_t __j = 0; __j < A.size(); __j++ )
-        _nbi_min_A -= A[__j];
+    _nbi_min_A.set();
+    _nbi_min_A &= ~A;
 
     double res = theta[i];
-    for( size_t __j = 0; __j < _nbi_min_A.size(); __j++ ) {
-        size_t _j = _nbi_min_A[__j];
-        res += atanh(tJ[i][_j] * M[i][_j]);
-    }
+    for( size_t _j = 0; _j < _nbi_min_A.size(); _j++ )
+        if( _nbi_min_A.test(_j) )
+            res += atanh(tJ[i][_j] * M[i][_j]);
     return tanh(res);
 }
 
 
 double MR::T(size_t i, size_t _j) {
     sub_nb j(con[i]);
-    j.clear();
-    j += _j;
+    j.set(_j);
     return T(i,j);
 }
 
 
 double MR::Omega(size_t i, size_t _j, size_t _l) {
     sub_nb jl(con[i]);
-    jl.clear();
-    jl += _j;
-    jl += _l;
+    jl.set(_j);
+    jl.set(_l);
     double Tijl = T(i,jl);
     return Tijl / (1.0 + tJ[i][_l] * M[i][_l] * Tijl);
 }
@@ -297,11 +294,10 @@ double MR::Omega(size_t i, size_t _j, size_t _l) {
 
 double MR::Gamma(size_t i, size_t _j, size_t _l1, size_t _l2) {
     sub_nb jll(con[i]);
-    jll.clear();
-    jll += _j;
+    jll.set(_j);
     double Tij = T(i,jll);
-    jll += _l1;
-    jll += _l2;
+    jll.set(_l1);
+    jll.set(_l2);
     double Tijll = T(i,jll);
 
     return (Tijll - Tij) / (1.0 + tJ[i][_l1] * tJ[i][_l2] * M[i][_l1] * M[i][_l2] + tJ[i][_l1] * M[i][_l1] * Tijll + tJ[i][_l2] * M[i][_l2] * Tijll);
@@ -310,10 +306,9 @@ double MR::Gamma(size_t i, size_t _j, size_t _l1, size_t _l2) {
 
 double MR::Gamma(size_t i, size_t _l1, size_t _l2) {
     sub_nb ll(con[i]);
-    ll.clear();
     double Ti = T(i,ll);
-    ll += _l1;
-    ll += _l2;
+    ll.set(_l1);
+    ll.set(_l2);
     double Till = T(i,ll);
 
     return (Till - Ti) / (1.0 + tJ[i][_l1] * tJ[i][_l2] * M[i][_l1] * M[i][_l2] + tJ[i][_l1] * M[i][_l1] * Till + tJ[i][_l2] * M[i][_l2] * Till);
@@ -326,19 +321,11 @@ double MR::_tJ(size_t i, sub_nb A) {
     //
     // calculate the product of all tJ[i][_j] for _j in A
     
-    size_t Asize = A.size();
-    switch( Asize ) {
-        case 0: return 1.0;
-//      case 1: return tJ[i][A[0]];
-//      case 2: return tJ[i][A[0]] * tJ[i][A[1]];
-//      case 3: return tJ[i][A[0]] * tJ[i][A[1]] * tJ[i][A[2]];
-        default:
-            size_t __j = Asize - 1;
-            size_t _j = A[__j];
-            sub_nb A_j = A - _j;
-            return tJ[i][_j] * _tJ(i, A_j);
-    }
-
+    sub_nb::size_type _j = A.find_first();
+    if( _j == sub_nb::npos )
+        return 1.0;
+    else
+        return tJ[i][_j] * _tJ(i, A.reset(_j));
 }
 
 
@@ -351,24 +338,20 @@ double MR::appM(size_t i, sub_nb A) {
     // product of the cumulants (either first order, i.e. M, or second order, i.e. cors) of the 
     // entries of the partitions
     
-    size_t Asize = A.size();
-    switch( Asize ) {
-        case 0: return 1.0;
-//      case 1: return M[i][A[0]];
-//      case 2: return M[i][A[0]] * M[i][A[1]] + cors[i][A[0]][A[1]];
-//      case 3: return M[i][A[0]] * M[i][A[1]] * M[i][A[2]] + M[i][A[0]] * cors[i][A[1]][A[2]] + M[i][A[1]] * cors[i][A[0]][A[2]] + M[i][A[2]] * cors[i][A[0]][A[1]];
-        default:
-            size_t __j = Asize - 1;
-            size_t _j = A[__j];
-            sub_nb A_j = A - _j;
+    sub_nb::size_type _j = A.find_first();
+    if( _j == sub_nb::npos )
+        return 1.0;
+    else {
+        sub_nb A_j(A); A_j.reset(_j);
 
-            double result = M[i][_j] * appM(i, A_j);
-            for( size_t __k = 0; __k < __j; __k++ ) {
-                size_t _k = A[__k];
-                result += cors[i][_j][_k] * appM(i,A_j - _k);
+        double result = M[i][_j] * appM(i, A_j);
+        for( size_t _k = 0; _k < A_j.size(); _k++ )
+            if( A_j.test(_k) ) {
+                sub_nb A_jk(A_j); A_jk.reset(_k);
+                result += cors[i][_j][_k] * appM(i,A_jk);
             }
 
-            return result;
+        return result;
     }
 }
 
@@ -382,24 +365,25 @@ void MR::sum_subs(size_t j, sub_nb A, double *sum_even, double *sum_odd) {
     *sum_even = 0.0;
     *sum_odd = 0.0;
 
-    sub_nb S(A.size());
-    S.clear();
-    do { // for all subsets of A
-
-        // construct subset B of A corresponding to S
-        sub_nb B = A;
-        B.clear();
-        size_t Ssize = S.size();
-        for( size_t bit = 0; bit < Ssize; bit++ )
-            B += A[S[bit]];
-        
-        if( S.size() % 2 )
+    sub_nb B(A.size());
+    do {
+        if( B.count() % 2 )
             *sum_odd += _tJ(j,B) * appM(j,B);
         else
             *sum_even += _tJ(j,B) * appM(j,B);
 
-        ++S;
-    } while( !S.empty() );
+        // calc next subset B
+        size_t bit = 0;
+        for( ; bit < A.size(); bit++ )
+            if( A.test(bit) ) {
+                if( B.test(bit) )
+                    B.reset(bit);
+                else {
+                    B.set(bit);
+                    break;
+                }
+            }
+    } while (!B.none());
 }
             
 
@@ -427,11 +411,13 @@ void MR::solvemcav() {
                 if( props.updates == Properties::UpdateType::FULL ) {
                     // find indices in nb[j] that do not correspond with i
                     sub_nb _nbj_min_i(con[j]);
-                    _nbj_min_i -= kindex[i][_j];
+                    _nbj_min_i.set();
+                    _nbj_min_i.reset(kindex[i][_j]);
 
                     // find indices in nb[i] that do not correspond with j
                     sub_nb _nbi_min_j(con[i]);
-                    _nbi_min_j -= _j;
+                    _nbi_min_j.set();
+                    _nbi_min_j.reset(_j);
 
                     sum_subs(j, _nbj_min_i, &sum_even, &sum_odd);
                     newM = (tanh(theta[j]) * sum_even + sum_odd) / (sum_even + tanh(theta[j]) * sum_odd);
@@ -440,7 +426,9 @@ void MR::solvemcav() {
                     double denom = sum_even + tanh(theta[i]) * sum_odd;
                     double numer = 0.0;
                     for(size_t _k=0; _k<con[i]; _k++) if(_k != _j) {
-                        sum_subs(i, _nbi_min_j - _k, &sum_even, &sum_odd);
+                        sub_nb _nbi_min_jk(_nbi_min_j);
+                        _nbi_min_jk.reset(_k);
+                        sum_subs(i, _nbi_min_jk, &sum_even, &sum_odd);
                         numer += tJ[i][_k] * cors[i][_j][_k] * (tanh(theta[i]) * sum_even + sum_odd);
                     }
                     newM -= numer / denom;
@@ -482,6 +470,7 @@ void MR::solveM() {
         if( props.updates == Properties::UpdateType::FULL ) {
             // find indices in nb[i]
             sub_nb _nbi(con[i]);
+            _nbi.set();
 
             // calc numerator1 and denominator1
             double sum_even, sum_odd;
@@ -491,7 +480,6 @@ void MR::solveM() {
 
         } else if( props.updates == Properties::UpdateType::LINEAR ) {
             sub_nb empty(con[i]);
-            empty.clear();
             Mag[i] = T(i,empty);
 
             for(size_t _l1=0; _l1<con[i]; _l1++)

@@ -30,12 +30,10 @@
 #include <dai/enum.h>
 #include <dai/properties.h>
 #include <dai/exceptions.h>
+#include <boost/dynamic_bitset.hpp>
 
 
 namespace dai {
-
-
-class sub_nb;
 
 
 class MR : public DAIAlgFG {
@@ -51,6 +49,7 @@ class MR : public DAIAlgFG {
         std::vector<std::vector<std::vector<double> > > cors;
     
         static const size_t kmax = 31;
+        typedef boost::dynamic_bitset<> sub_nb;
         
         size_t N;
 
@@ -148,7 +147,6 @@ class MR : public DAIAlgFG {
 
         void init(size_t Nin, double *_w, double *_th);
         void makekindex();
-        void read_files();
         void init_cor();
         double init_cor_resp();
         void solvemcav();
@@ -171,121 +169,6 @@ class MR : public DAIAlgFG {
         PropertySet getProperties() const;
         std::string printProperties() const;
 }; 
-
-
-// represents a subset of nb[i] as a binary number
-// the elements of a subset should be thought of as indices in nb[i]
-class sub_nb {
-    private:
-        size_t s;
-        size_t bits;
-    
-    public:
-        // construct full subset containing nr_elmt elements
-        sub_nb(size_t nr_elmt) {
-#ifdef DAI_DEBUG
-            assert( nr_elmt < sizeof(size_t) / sizeof(char) * 8 );
-#endif
-            bits = nr_elmt;
-            s = (1U << bits) - 1;
-        }
-
-        // copy constructor
-        sub_nb( const sub_nb & x ) : s(x.s), bits(x.bits) {}
-
-        // assignment operator 
-        sub_nb & operator=( const sub_nb &x ) {
-            if( this != &x ) {
-                s = x.s;
-                bits = x.bits;
-            }
-            return *this;
-        }
-
-        // returns number of elements
-        size_t size() {
-            size_t size = 0;
-            for(size_t bit = 0; bit < bits; bit++)
-                if( s & (1U << bit) )
-                    size++;
-            return size;
-        }
-
-        // increases s by one (for enumeration in lexicographical order)
-        sub_nb operator++() { 
-            s++; 
-            if( s >= (1U << bits) )
-                s = 0;
-            return *this; 
-        }
-        
-        // return i'th element of this subset
-        size_t operator[](size_t i) { 
-            size_t bit;
-            for(bit = 0; bit < bits; bit++ )
-                if( s & (1U << bit) ) {
-                    if( i == 0 )
-                        break;
-                    else
-                        i--;
-                }
-#ifdef DAI_DEBUG
-            assert( bit < bits );
-#endif
-            return bit;
-        }
-
-        // add index _j to this subset
-        sub_nb &operator +=(size_t _j) {
-            s |= (1U << _j); 
-            return *this;
-        }
-
-        // return copy with index _j
-        sub_nb operator+(size_t _j) {
-            sub_nb x = *this;
-            x += _j;
-            return x;
-        }
-
-        // delete index _j from this subset
-        sub_nb &operator -=(size_t _j) {
-            s &= ~(1U << _j); 
-            return *this;
-        }
-
-        // return copy without index _j
-        sub_nb operator-(size_t _j) {
-            sub_nb x = *this;
-            x -= _j;
-            return x;
-        }
-
-        // empty this subset
-        sub_nb & clear() {
-            s = 0;
-            return *this;
-        }
-
-        // returns true if subset is empty
-        bool empty() { return (s == 0); }
-
-        // return 1 if _j is contained, 0 otherwise ("is element of")
-        size_t operator&(size_t _j) { return s & (1U << _j); }
-
-        friend std::ostream& operator<< (std::ostream& os, const sub_nb x) {
-            if( x.bits == 0 )
-                os << "empty";
-            else {
-                for(size_t bit = x.bits; bit > 0; bit-- )
-                    if( x.s & (1U << (bit-1)) )
-                        os << "1";
-                    else
-                        os << "0";
-            }
-            return os;
-        }
-};
 
 
 } // end of namespace dai
