@@ -111,7 +111,7 @@ MEXFLAGS:=$(MEXFLAGS) -DSMALLMEM
 endif
 endif
 
-HEADERS=$(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/x2x.h $(INC)/exceptions.h
+HEADERS=$(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
 
 TARGETS=tests utils $(LIB)/libdai$(LE) example$(EE) testregression doc
 ifdef WITH_MATLAB
@@ -122,8 +122,8 @@ all : $(TARGETS)
 
 matlabs : matlab/dai.$(ME) matlab/dai_readfg.$(ME) matlab/dai_writefg.$(ME) matlab/dai_potstrength.$(ME)
 
-$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) x2x$(OE) exceptions$(OE) $(OBJECTS)
-	ar rcus $(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) x2x$(OE) exceptions$(OE) $(OBJECTS)
+$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
+	ar rcus $(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 
 tests : tests/test$(EE)
 
@@ -193,9 +193,6 @@ exceptions$(OE) : $(SRC)/exceptions.cpp $(HEADERS)
 
 alldai$(OE) : $(SRC)/alldai.cpp $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/alldai.cpp
-
-x2x$(OE) : $(SRC)/x2x.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/x2x.cpp
 
 
 # EXAMPLE

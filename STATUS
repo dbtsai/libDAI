@@ -1,103 +1,22 @@
+OPTIMIZATION:
 - BipartiteGraph::isConnected should be optimized using boost::graph
-- http://www.boost.org/development/requirements.html#Design_and_Programming
-- Would it be a good idea to cache second-order neighborhoods (delta's) in BipGraph?
-- Would it be a good idea to add the variable label -> index hashmap in FactorGraph,
-  to replace the linear searches that are performed every time for findVar()?
-  No, a better idea is to avoid calls to findVar() as much as possible.
+- Can the FactorGraph constructors be optimized further?
+- Cache second-order neighborhoods (delta's) in BipGraph?
 - Would it be a good idea to remove the states() caching from VarSet? 
   Then, we could turn a VarSet into an IndexSet (set of integers).
-- Can the FactorGraph constructors be optimized further?
+  This may restrict the use of findVar().
+
 - Idea: use a PropertySet as output of a DAIAlg, instead of functions like maxDiff and Iterations().
 - A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a reference to it
 - Add max-product to BP
-- Remove x2x?
-- Remove MR?
 
 TODO FOR RELEASE:
+- http://www.boost.org/development/requirements.html#Design_and_Programming
 - Test {Visual C++, cygwin, gcc various version} compatibility; state tested compilers/build environments in README
 - Figure out which libraries are required and document in README
   boost headers, boost::program_options library, boost::graph library,
   boost::math library (under Windows)
 - Change email address
-
-FILES IN SVN HEAD THAT ARE NO LONGER RELEVANT FOR GIT MASTER:
-diffs.h
-index.h
-util.h
-util.cpp
-bipgraph.h
-weightedgraph.h
-weightedgraph.cpp
-clustergraph.h
-clustergraph.cpp
-varset.h
-var.h
-utils/createfg.cpp
-exceptions.h
-exceptions.cpp
-enum.h
-doxygen.conf
-example.cpp
-FILEFORMAT
-Makefile
-exact.h
-exact.cpp
-alldai.h
-alldai.cpp
-properties.h
-properties.cpp
-factor.h
-prob.h
-factorgraph.h
-factorgraph.cpp
-regiongraph.h
-regiongraph.cpp
-daialg.h
-daialg.cpp
-matlab/
-	dai.cpp
-	dai.m
-	dai_potstrength.cpp
-	dai_potstrength.m
-	dai_readfg.cpp
-	dai_readfg.m
-	dai_writefg.cpp
-	dai_writefg.m
-	matlab.cpp
-	matlab.h
-utils/
-	fg2dot.cpp
-	fginfo.cpp
-	createfg.cpp
-	viewfg
-tests/
-	alarm.fg
-	hoi1.fg
-	hoi2.fg
-	hoi3.fg
-	hoi4.fg
-	testfast.fg
-	aliases.conf
-	testall
-	testregression
-	test.cpp
-mf.h
-mf.cpp
-bp.h
-bp.cpp
-jtree.h
-jtree.cpp
-hak.h
-hak.cpp
-lc.h
-lc.cpp
-treeep.h
-treeep.cpp
-mr.h
-mr.cpp
-TODO
-ChangeLog
-README
 
 FILES IN SVN HEAD RELEVANT FOR A LATER RELEASE:
 	matlab/dai_potstrength.*
