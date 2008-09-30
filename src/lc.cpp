@@ -184,7 +184,6 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
         if( md > maxdiff )
             maxdiff = md;
     }
-    init();
 
     if( props.verbose >= 1 ) {
         cout << Name << "::InitCavityDists used " << toc() - tic << " seconds." << endl;
@@ -205,7 +204,6 @@ long LC::SetCavityDists( std::vector<Factor> &Q ) {
         } else
             _cavitydists[i] = Q[i];
     }
-    init();
     return 0;
 }
 
@@ -217,19 +215,6 @@ void LC::init() {
                 _phis[i][I.iter].randomize();
             else
                 _phis[i][I.iter].fill(1.0);
-    for( size_t i = 0; i < nrVars(); i++ ) {
-        _pancakes[i] = _cavitydists[i];
-        
-        foreach( const Neighbor &I, nbV(i) ) {
-            _pancakes[i] *= factor(I);
-            if( props.updates == Properties::UpdateType::SEQRND )
-              _pancakes[i] *= _phis[i][I.iter];
-        }
-        
-        _pancakes[i].normalize();
-
-        CalcBelief(i);
-    }
 }
 
 
@@ -276,6 +261,20 @@ double LC::run() {
     double md = InitCavityDists( props.cavainame, props.cavaiopts );
     if( md > _maxdiff )
         _maxdiff = md;
+
+    for( size_t i = 0; i < nrVars(); i++ ) {
+        _pancakes[i] = _cavitydists[i];
+        
+        foreach( const Neighbor &I, nbV(i) ) {
+            _pancakes[i] *= factor(I);
+            if( props.updates == Properties::UpdateType::SEQRND )
+              _pancakes[i] *= _phis[i][I.iter];
+        }
+        
+        _pancakes[i].normalize();
+
+        CalcBelief(i);
+    }
 
     vector<Factor> old_beliefs;
     for(size_t i=0; i < nrVars(); i++ )

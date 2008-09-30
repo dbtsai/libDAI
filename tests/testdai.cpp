@@ -203,6 +203,7 @@ int main( int argc, char *argv[] ) {
         size_t maxiter;
         size_t verbose;
         bool marginals = false;
+        bool report_iters = true;
         bool report_time = true;
 
         po::options_description opts_required("Required options");
@@ -220,6 +221,7 @@ int main( int argc, char *argv[] ) {
             ("verbose", po::value< size_t >(&verbose), "Override verbosity")
             ("marginals", po::value< bool >(&marginals), "Output single node marginals?")
             ("report-time", po::value< bool >(&report_time), "Report calculation time")
+            ("report-iters", po::value< bool >(&report_iters), "Report iterations needed")
         ;
 
         po::options_description cmdline_options;
@@ -273,12 +275,19 @@ int main( int argc, char *argv[] ) {
         vector<Factor> q0;
         double logZ0 = 0.0;
 
+        cout.setf( ios_base::scientific );
+        cout.precision( 3 );
+
         cout << "# " << filename << endl;
         cout.width( 40 );
         cout << left << "# METHOD" << "  ";
         if( report_time ) {
             cout.width( 10 );
             cout << right << "SECONDS" << "   ";
+        }
+        if( report_iters ) {
+            cout.width( 10 );
+            cout << "ITERS" << "  ";
         }
         cout.width( 10 );
         cout << "MAX ERROR" << "  ";
@@ -288,8 +297,7 @@ int main( int argc, char *argv[] ) {
         cout << "LOGZ ERROR" << "  ";
         cout.width( 10 );
         cout << "MAXDIFF" << "  ";
-        cout.width( 10 );
-        cout << "ITERS" << endl;
+        cout << endl;
 
         for( size_t m = 0; m < methods.size(); m++ ) {
             pair<string, PropertySet> meth = parseMethod( methods[m], Aliases );
@@ -309,29 +317,39 @@ int main( int argc, char *argv[] ) {
             piet.calcErrs(q0);
 
             cout.width( 40 );
-//                cout << left << piet.identify() << "  ";
             cout << left << methods[m] << "  ";
             if( report_time ) {
                 cout.width( 10 );
                 cout << right << piet.time << "    ";
             }
+            if( report_iters ) {
+                cout.width( 10 );
+                if( piet.has_iters ) {
+                    cout << piet.iters << "  ";
+                } else {
+                    cout << "N/A         ";
+                }
+            }
 
             if( m > 0 ) {
                 cout.setf( ios_base::scientific );
                 cout.precision( 3 );
+                
                 cout.width( 10 ); 
                 double me = clipdouble( piet.maxErr(), 1e-9 );
                 cout << me << "  ";
+                
                 cout.width( 10 );
                 double ae = clipdouble( piet.avgErr(), 1e-9 );
                 cout << ae << "  ";
+                
                 cout.width( 10 );
                 if( piet.has_logZ ) {
                     double le = clipdouble( piet.logZ / logZ0 - 1.0, 1e-9 );
                     cout << le << "  ";
-                } else {
+                } else
                     cout << "N/A         ";
-                }
+
                 cout.width( 10 );
                 if( piet.has_maxdiff ) {
                     double md = clipdouble( piet.maxdiff, 1e-9 );
@@ -340,15 +358,8 @@ int main( int argc, char *argv[] ) {
                     if( isnan( ae ) )
                         md = ae;
                     cout << md << "  ";
-                } else {
+                } else
                     cout << "N/A         ";
-                }
-                cout.width( 10 );
-                if( piet.has_iters ) {
-                    cout << piet.iters << "  ";
-                } else {
-                    cout << "N/A         ";
-                }
             }
             cout << endl;
 

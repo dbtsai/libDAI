@@ -54,9 +54,11 @@ BOOSTLIBS=-lboost_program_options
 
 # Compile using GNU C++ Compiler
 CC=g++
+# Output filename option
+CCO=-o
 
 # Flags for the C++ compiler
-CCFLAGS=-Wno-deprecated -Wall -W -Wextra -fpic -I./include -Llib -O3 #-pg #-static #-DVERBOSE
+CCFLAGS=-Wno-deprecated -Wall -W -Wextra -fpic -I./include -Llib -O3 #-pg
 ifdef DEBUG
 CCFLAGS:=$(CCFLAGS) -g -DDAI_DEBUG
 endif
@@ -124,121 +126,27 @@ all : $(TARGETS)
 matlabs : matlab/dai.$(ME) matlab/dai_readfg.$(ME) matlab/dai_writefg.$(ME) matlab/dai_potstrength.$(ME)
 
 $(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) varset$(OE) $(OBJECTS)
+	-mkdir -p lib
 	ar rcus $(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) varset$(OE) $(OBJECTS)
 
-tests : tests/test$(EE)
+tests : tests/testdai$(EE)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
-testregression : tests/test
-	echo Testing...this can take a while...
+testregression : tests/testdai
+	@echo Starting regression test...this can take a minute or so!
 	cd tests; time ./testregression; cd ..
 
 doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
+	-mkdir -p doc
 	doxygen doxygen.conf
 
+.PHONY : clean
 clean :
-	rm *$(OE) example$(EE) matlab/*.$(ME) matlab/*$(OE) tests/test$(EE) utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE) $(LIB)/libdai$(LE); echo
-	rm -R doc; echo
+	-rm *$(OE) 
+	-rm matlab/*.$(ME) matlab/*$(OE) 
+	-rm example$(EE) tests/testdai$(EE) utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
+	-rm -R doc
+	-rm -R lib
 
-bipgraph$(OE) : $(SRC)/bipgraph.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/bipgraph.cpp
-
-daialg$(OE) : $(SRC)/daialg.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/daialg.cpp
-
-exactinf$(OE) : $(SRC)/exactinf.cpp $(INC)/exactinf.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/exactinf.cpp
-
-bp$(OE) : $(SRC)/bp.cpp $(INC)/bp.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/bp.cpp
-
-lc$(OE) : $(SRC)/lc.cpp $(INC)/lc.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/lc.cpp
-
-mf$(OE) : $(SRC)/mf.cpp $(INC)/mf.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/mf.cpp
-
-factorgraph$(OE) : $(SRC)/factorgraph.cpp $(INC)/factorgraph.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/factorgraph.cpp
-
-util$(OE) : $(SRC)/util.cpp $(INC)/util.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/util.cpp
-
-regiongraph$(OE) : $(SRC)/regiongraph.cpp $(INC)/regiongraph.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/regiongraph.cpp
-
-hak$(OE) : $(SRC)/hak.cpp $(INC)/hak.h $(HEADERS) $(INC)/regiongraph.h
-	$(CC) $(CCFLAGS) -c $(SRC)/hak.cpp
-
-clustergraph$(OE) : $(SRC)/clustergraph.cpp $(INC)/clustergraph.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/clustergraph.cpp
-
-jtree$(OE) : $(SRC)/jtree.cpp $(INC)/jtree.h $(HEADERS) $(INC)/weightedgraph.h $(INC)/clustergraph.h $(INC)/regiongraph.h
-	$(CC) $(CCFLAGS) -c $(SRC)/jtree.cpp
-
-treeep$(OE) : $(SRC)/treeep.cpp $(INC)/treeep.h $(HEADERS) $(INC)/weightedgraph.h $(INC)/clustergraph.h $(INC)/regiongraph.h $(INC)/jtree.h
-	$(CC) $(CCFLAGS) -c $(SRC)/treeep.cpp
-
-weightedgraph$(OE) : $(SRC)/weightedgraph.cpp $(INC)/weightedgraph.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/weightedgraph.cpp
-
-mr$(OE) : $(SRC)/mr.cpp $(INC)/mr.h $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/mr.cpp
-
-properties$(OE) : $(SRC)/properties.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/properties.cpp
-
-exceptions$(OE) : $(SRC)/exceptions.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/exceptions.cpp
-
-alldai$(OE) : $(SRC)/alldai.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/alldai.cpp
-
-varset$(OE) : $(SRC)/varset.cpp $(HEADERS)
-	$(CC) $(CCFLAGS) -c $(SRC)/varset.cpp
-
-
-# EXAMPLE
-##########
-
-example$(EE) : example.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) -o example$(EE) example.cpp $(LIBS)
-
-# TESTS
-########
-
-tests/test$(EE) : tests/test.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) -o tests/test$(EE) tests/test.cpp $(LIBS) $(BOOSTLIBS)
-
-
-# MATLAB INTERFACE
-###################
-
-matlab/dai.$(ME) : matlab/dai.cpp $(HEADERS) matlab/matlab$(OE) $(LIB)/libdai$(LE)
-	$(MEX) $(MEXFLAGS) -o matlab/dai matlab/dai.cpp matlab/matlab$(OE) $(LIB)/libdai$(LE)
-
-matlab/dai_readfg.$(ME) : matlab/dai_readfg.cpp $(HEADERS) factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
-	$(MEX) $(MEXFLAGS) -o matlab/dai_readfg matlab/dai_readfg.cpp factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
-
-matlab/dai_writefg.$(ME) : matlab/dai_writefg.cpp $(HEADERS) factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
-	$(MEX) $(MEXFLAGS) -o matlab/dai_writefg matlab/dai_writefg.cpp factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
-
-matlab/dai_potstrength.$(ME) : matlab/dai_potstrength.cpp $(HEADERS) matlab/matlab$(OE) exceptions$(OE) varset$(OE)
-	$(MEX) $(MEXFLAGS) -o matlab/dai_potstrength matlab/dai_potstrength.cpp matlab/matlab$(OE) exceptions$(OE) varset$(OE)
-
-matlab/matlab$(OE) : matlab/matlab.cpp matlab/matlab.h $(HEADERS)
-	$(MEX) $(MEXFLAGS) -outdir matlab -c matlab/matlab.cpp
-
-
-# UTILS
-########
-
-utils/createfg$(EE) : utils/createfg.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) -o utils/createfg utils/createfg.cpp $(LIBS) $(BOOSTLIBS)
-
-utils/fg2dot$(EE) : utils/fg2dot.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) -o utils/fg2dot utils/fg2dot.cpp $(LIBS)
-
-utils/fginfo$(EE) : utils/fginfo.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) -o utils/fginfo utils/fginfo.cpp $(LIBS)
+include Makefile.shared

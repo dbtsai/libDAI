@@ -11,6 +11,8 @@ OPTIMIZATION:
 - A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a reference to it
 
 IDEAS:
+- Use "gcc -MM" to generate dependencies for targets.
+
 - Use a PropertySet as output of a DAIAlg, instead of functions like maxDiff and Iterations().
 
 - A FactorGraph and a RegionGraph are often equipped with
