@@ -1,29 +1,9 @@
-OPTIMIZATION:
-- BipartiteGraph::isConnected should be optimized using boost::graph
-- Can the FactorGraph constructors be optimized further?
-- Cache second-order neighborhoods (delta's) in BipGraph?
-- Replace VarSets by small_set<size_t> if appropriate, in order to minimize the use of findVar().
-
-- A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a reference to it
-
 TODO FOR RELEASE:
-- http://www.boost.org/development/requirements.html#Design_and_Programming
 - Test {Visual C++, cygwin, gcc various version} compatibility; state tested compilers/build environments in README
 - Figure out which libraries are required and document in README
   boost headers, boost::program_options library, boost::graph library,
   boost::math library (under Windows)
-- Change email address
-
-FILES IN SVN HEAD RELEVANT FOR A LATER RELEASE:
-	matlab/dai_potstrength.*
-	matlab/dai_bpconvbound.*
-	utils/fg2dot.cpp
-	utils/viewfg
-	tests/aliases.conf
-	tests/testall
-	tests/test.cpp ("limit")
-	all subdirs not included in git:
-		bugs, experimental, tests/errorbounds, tests/kees, tests/large, tests/ldpc, tests/uai
+- Complete doxygen documentation
 
 DOCUMENTATION READY:
 - bipgraph.h, bipgraph.cpp

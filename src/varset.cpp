@@ -1,4 +1,7 @@
-/*  Copyright (C) 2006-2008  Joris Mooij  [j dot mooij at science dot ru dot nl]
+/*  Copyright (C) 2006-2008  Joris Mooij  [joris dot mooij at tuebingen dot mpg dot de]
+    Radboud University Nijmegen, The Netherlands /
+    Max Planck Institute for Biological Cybernetics, Germany
+
     Copyright (C) 2002  Martijn Leisink  [martijn@mbfys.kun.nl]
     Radboud University Nijmegen, The Netherlands
 
@@ -20,14 +23,6 @@
 */
 
 
-/*#include <vector>
-#include <map>
-#include <algorithm>
-#include <iostream>
-#include <cassert>
-#include <dai/var.h>
-#include <dai/util.h>
-*/
 #include <dai/varset.h>
 
 

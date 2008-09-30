@@ -1,11 +1,14 @@
 libDAI-0.2.2 (2008-??-??)
 -------------------------
 
-* Now compiles also under Visual C++.
+* Now compiles also under Visual C++ and cygwin.
 * Added Exceptions framework.
+* Approximate inference methods now report the number of iterations needed.
+* Added damping to various algorithms to improve convergence properties.
 * Replaced ENUM2,ENUM3,ENUM4,ENUM5,ENUM6 by single DAI_ENUM macro.
 * Removed utils/remove_short_loops and matlab/remove_short_loops.
 * Added more features to utils/createfg for creating factor graphs.
+* Replaced sub_nb class in mr.h by boost::dynamic_bitset.
 * Pervasive change of BipartiteGraph implementation (based on an idea by
   Giuseppe Passino). BipartiteGraph no longer stores the node properties 
   (former _V1 and _V2), nor does it store a dense adjacency matrix anymore, 
@@ -20,41 +23,46 @@ libDAI-0.2.2 (2008-??-??)
   - Replaced multind by Permute
   - Added MultiFor
   - Added State
-* Improved factor.h (merged from SVN head): mainly new functionality
-* Moved everything into namespace "dai"
-* Added ExactInf class for brute force exact inference
-* Renamed DEBUG to DAI_DEBUG to avoid conflicts
-* Added conditional compilation of inference methods
+* Improved factor.h (merged from SVN head): mainly new functionality.
+* Moved everything into namespace "dai".
+* Added ExactInf class for brute force exact inference.
+* Renamed DEBUG to DAI_DEBUG to avoid conflicts.
+* Added conditional compilation of inference methods.
 * Contributions by Peter Gober:
-  - Renamed variable _N in mr.* for compatibility with g++ under cygwin
+  - Renamed variable _N in mr.* for compatibility with g++ under cygwin.
 * Contributions by Giuseppe Passino:
-  - removed "using namespace std;" from header files - bad practice
-  - moved header files in include/dai and sources in src
-  - changed #ifndefs to GNU style
-  - added extra warning checks (-W -Wextra) and fixed resulting warnings
+  - removed "using namespace std;" from header files - bad practice;
+  - moved header files in include/dai and sources in src;
+  - changed #ifndefs to GNU style;
+  - added extra warning checks (-W -Wextra) and fixed resulting warnings;
   - dai::TProb: 
-    o removed copy constructor and assignment operators (redundant)
-    o implementation of some methods via STL algorithms
-    o added methods takeExp, takeLog, takeLog0 for transformation in-place
-    o explicit constructor (prevents implicit conversion from size_t to TProb)
-    o added operator+,+=,-,-=, with argument T (for calculations in log-scale)
+    o removed copy constructor and assignment operators (redundant);
+    o implementation of some methods via STL algorithms;
+    o added methods takeExp, takeLog, takeLog0 for transformation in-place;
+    o explicit constructor (prevents implicit conversion from size_t to TProb);
+    o added operator+,+=,-,-=, with argument T (for calculations in log-scale);
   - Added "logdomain" property to BP, a boolean that controls whether 
     calculations are done in the log-domain or in the linear domain;
     doing calculations in the log-domain may help if the numerical range
     of a double is too small.
 * Contributions by Christian Wojek:
   - New FactorGraph constructor that constructs from given ranges of factors
-    and variables
+    and variables;
   - Optimization of FactorGraph constructors using tr1::unordered_map.
+* Contributions by Claudio Lima:
+  - Added Max-Product functinoality to BP.
 * FactorGraph constructors no longer check for short loops (huge speed
   increase for large factor graphs), nor for negative entries. Also, the 
   normtype is now Prob::NORMPROB by default.
 * VarSet is now implemented using a std::vector<Var> instead of a
-  std::set<Var>, which yields a significant speed improvement.
-* Improved MaxSpanningTreePrims algorithm (uses boost::graph)
-* Small optimization in Diffs
+  std::set<Var>, which yields a significant speed improvement. Furthermore,
+  the implementation has been generalized, resulting in the small_set<T> class
+  which can be used to represent sets of small cardinality; VarSet is the
+  specialization with T = Var.
+* Improved MaxSpanningTreePrims algorithm (uses boost::graph).
+* Small optimization in Diffs.
 * Replaced Complex with real numbers (negative potentials is just not
-  used enough to warrant the additional "complexity" :))
+  used enough to warrant the additional "complexity" :)).
 * Moved Properties and MaxDiff frameworks from InfAlg to each individual
   inference algorithm, because the Properties framework was not as 
   convenient as I hoped, and not every inference algorithm needs a maxdiff
@@ -63,7 +71,8 @@ libDAI-0.2.2 (2008-??-??)
   entangled) code.
 * Improved ClusterGraph implementation, yielding significant speedups
   for the JunctionTree algorithm on large factorgraphs.
-* Improved documetation
+* Improved documetation.
+* Removed x2x.
 * Interface changes:
   - VarSet::
       VarSet::stateSpace() -> nrStates(const VarSet &)

@@ -1,8 +1,20 @@
-- Idea: use a PropertySet as output of a DAIAlg, instead of functions like
-  maxDiff and Iterations().
+- Add comments in example.cpp, add documentation.
+- Write documentation.
+- Improve error handling.
+- http://www.boost.org/development/requirements.html#Design_and_Programming
 
-- Idea: a FactorGraph and a RegionGraph are often equipped with
-extra properties for nodes and edges. The code to initialize those
+OPTIMIZATION:
+- BipartiteGraph::isConnected should be optimized using boost::graph
+- Can the FactorGraph constructors be optimized further?
+- Cache second-order neighborhoods (delta's) in BipGraph?
+- Replace VarSets by small_set<size_t> if appropriate, in order to minimize the use of findVar().
+- A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a reference to it
+
+IDEAS:
+- Use a PropertySet as output of a DAIAlg, instead of functions like maxDiff and Iterations().
+
+- A FactorGraph and a RegionGraph are often equipped with
+additional properties for nodes and edges. The code to initialize those
 is often quite similar; maybe this can be abstracted to classes
 like ExtFactorGraph and ExtRegionGraph (Ext stands for Extended), e.g.
 template <typename NodeProperties, typename EdgeProperties>
@@ -22,7 +34,7 @@ the typeid, comparing it with Empty, and doing something special in that case
 The main disadvantage of this approach seems to be that it leads to even more
 entanglement.
 
-- THIS SMELLS LIKE A GOOD IDEA: instead of polymorphism by inheritance,
+- Instead of polymorphism by inheritance,
 use polymorphism by template parameterization. For example, the real reason
 you introduced the complicated inheritance scheme was for functions like
     Factor calcMarginal( const InferenceAlgorithm & obj, const VarSet & ns, bool reInit );
@@ -37,6 +49,7 @@ the ability to calculate marginals, the ability to calculate bounds, the ability
 to calculate MAP states, etcetera. Then, use traits classes in order to be able to
 query the capabilities of the model. For example, you would be able to query whether
 the inference algorithm supports calculation of logZ.
+Unfortunately, this is compile-time polymorphism, whereas tests/test needs runtime polymorphism.
 
 - If you ever do a rewrite, make sure that the graphical properties are
 not entangled with the probabilistic properties. E.g., a factor graph
@@ -95,16 +108,11 @@ Each DAIAlg should have its own _properties struct and handle conversion.
   they construct a new object without copying the FactorGraph. Or they can be made
   simply methods of the general InfAlg class.
 
-- Add comments in example.cpp, add documentation.
-
-- Write documentation.
-
-- Improve error handling.
 
 
 DIFFICULT
 
-- Bug: TreeEP sometimes returns NANs.
+- What to do in case of NANs?
 
 - Bug: TreeEP::logZ() seems to be wrong (?).
 
@@ -113,9 +121,9 @@ DIFFICULT
 
 OPTIONAL
 
-- Use Expat XML parser for IO and define a XML based fileformat for .fg files?
+- Define a better fileformat for .fg files (maybe using XML)?
 
-- Port to GNU autotool chain?
+- Find a good multi-platform build system (GNU autotool? Boost JAM?)
 
 - Another design question that needs to be answered: should a BP object own a
   FactorGraph, or only store a reference to a FactorGraph (which can optimize
@@ -137,8 +145,6 @@ could also be implemented in the factor itself, which could maintain its state
 
 - Think about the _fac2ind variable: a better implementation of this feature is
 probably possible.
-
-- Changed() methods?
 
 - Optimize GBP with precalculated indices.
 
