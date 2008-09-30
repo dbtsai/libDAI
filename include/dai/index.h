@@ -23,6 +23,10 @@
 */
 
 
+/// \file
+/// \brief Defines the IndexFor, MultiFor, Permute and State classes
+
+
 #ifndef __defined_libdai_index_h
 #define __defined_libdai_index_h
 
@@ -37,121 +41,121 @@
 namespace dai {
 
 
-    /// Tool for looping over the states of several variables.
-    /** The class IndexFor is an important tool for indexing of Factors.
-     *  Its usage can best be explained by an example.
-     *  Assume indexVars, forVars are two VarSets.
-     *  Then the following code:
-     *  \code
-     *      IndexFor i( indexVars, forVars );
-     *      for( ; i >= 0; ++i ) {
-     *          // use long(i)
-     *      }
-     *  \endcode
-     *  loops over all joint states of the variables in forVars,
-     *  and (long)i is equal to the linear index of the corresponding
-     *  state of indexVars, where the variables in indexVars that are
-     *  not in forVars assume their zero'th value.
-     */
-    class IndexFor {
-        private:
-            /// The current linear index corresponding to the state of indexVars
-            long                _index;
+/// Tool for looping over the states of several variables.
+/** The class IndexFor is an important tool for indexing Factor entries.
+ *  Its usage can best be explained by an example.
+ *  Assume indexVars, forVars are both VarSets.
+ *  Then the following code:
+ *  \code
+ *      IndexFor i( indexVars, forVars );
+ *      for( ; i >= 0; ++i ) {
+ *          // use long(i)
+ *      }
+ *  \endcode
+ *  loops over all joint states of the variables in forVars,
+ *  and (long)i is equal to the linear index of the corresponding
+ *  state of indexVars, where the variables in indexVars that are
+ *  not in forVars assume their zero'th value.
+ */
+class IndexFor {
+    private:
+        /// The current linear index corresponding to the state of indexVars
+        long                _index;
 
-            /// For each variable in forVars, the amount of change in _index
-            std::vector<long>   _sum;
+        /// For each variable in forVars, the amount of change in _index
+        std::vector<long>   _sum;
 
-            /// For each variable in forVars, the current state
-            std::vector<size_t> _count;
-            
-            /// For each variable in forVars, its number of possible values
-            std::vector<size_t> _dims;
+        /// For each variable in forVars, the current state
+        std::vector<size_t> _count;
+        
+        /// For each variable in forVars, its number of possible values
+        std::vector<size_t> _dims;
 
-        public:
-            /// Default constructor
-            IndexFor() { 
-                _index = -1; 
-            }
+    public:
+        /// Default constructor
+        IndexFor() { 
+            _index = -1; 
+        }
 
-            /// Constructor
-            IndexFor( const VarSet& indexVars, const VarSet& forVars ) : _count( forVars.size(), 0 ) {
-                long sum = 1;
+        /// Constructor
+        IndexFor( const VarSet& indexVars, const VarSet& forVars ) : _count( forVars.size(), 0 ) {
+            long sum = 1;
 
-                _dims.reserve( forVars.size() );
-                _sum.reserve( forVars.size() );
+            _dims.reserve( forVars.size() );
+            _sum.reserve( forVars.size() );
 
-                VarSet::const_iterator j = forVars.begin();
-                for( VarSet::const_iterator i = indexVars.begin(); i != indexVars.end(); ++i ) {
-                    for( ; j != forVars.end() && *j <= *i; ++j ) {
-                        _dims.push_back( j->states() );
-                        _sum.push_back( (*i == *j) ? sum : 0 );
-                    }
-                    sum *= i->states();
-                }
-                for( ; j != forVars.end(); ++j ) {
+            VarSet::const_iterator j = forVars.begin();
+            for( VarSet::const_iterator i = indexVars.begin(); i != indexVars.end(); ++i ) {
+                for( ; j != forVars.end() && *j <= *i; ++j ) {
                     _dims.push_back( j->states() );
-                    _sum.push_back( 0 );
+                    _sum.push_back( (*i == *j) ? sum : 0 );
                 }
-                _index = 0;
+                sum *= i->states();
             }
+            for( ; j != forVars.end(); ++j ) {
+                _dims.push_back( j->states() );
+                _sum.push_back( 0 );
+            }
+            _index = 0;
+        }
 
-            /// Copy constructor
-            IndexFor( const IndexFor & ind ) : _index(ind._index), _sum(ind._sum), _count(ind._count), _dims(ind._dims) {}
+        /// Copy constructor
+        IndexFor( const IndexFor & ind ) : _index(ind._index), _sum(ind._sum), _count(ind._count), _dims(ind._dims) {}
 
-            /// Assignment operator
-            IndexFor& operator=( const IndexFor &ind ) {
-                if( this != &ind ) {
-                    _index = ind._index;
-                    _sum = ind._sum;
-                    _count = ind._count;
-                    _dims = ind._dims;
+        /// Assignment operator
+        IndexFor& operator=( const IndexFor &ind ) {
+            if( this != &ind ) {
+                _index = ind._index;
+                _sum = ind._sum;
+                _count = ind._count;
+                _dims = ind._dims;
+            }
+            return *this;
+        }
+
+        /// Sets the index back to zero
+        IndexFor& clear() {
+            fill( _count.begin(), _count.end(), 0 );
+            _index = 0;
+            return( *this );
+        }
+
+        /// Conversion to long
+        operator long () const { 
+            return( _index ); 
+        }
+
+        /// Pre-increment operator
+        IndexFor& operator++ () {
+            if( _index >= 0 ) {
+                size_t i = 0;
+
+                while( i < _count.size() ) {
+                    _index += _sum[i];
+                    if( ++_count[i] < _dims[i] )
+                        break;
+                    _index -= _sum[i] * _dims[i];
+                    _count[i] = 0;
+                    i++;
                 }
-                return *this;
+
+                if( i == _count.size() ) 
+                    _index = -1;
             }
-
-            /// Sets the index back to zero
-            IndexFor& clear() {
-                fill( _count.begin(), _count.end(), 0 );
-                _index = 0;
-                return( *this );
-            }
-
-            /// Conversion to long
-            operator long () const { 
-                return( _index ); 
-            }
-
-            /// Pre-increment operator
-            IndexFor& operator++ () {
-                if( _index >= 0 ) {
-                    size_t i = 0;
-
-                    while( i < _count.size() ) {
-                        _index += _sum[i];
-                        if( ++_count[i] < _dims[i] )
-                            break;
-                        _index -= _sum[i] * _dims[i];
-                        _count[i] = 0;
-                        i++;
-                    }
-
-                    if( i == _count.size() ) 
-                        _index = -1;
-                }
-                return( *this );
-            }
-    };
+            return( *this );
+        }
+};
 
 
 /// MultiFor makes it easy to perform a dynamic number of nested for loops.
 /** An example of the usage is as follows:
  *  \code
- *      std::vector<size_t> dims;
- *      dims.push_back( 3 );
- *      dims.push_back( 4 );
- *      dims.push_back( 5 );
- *      for( MultiFor s(dims); s.valid(); ++s )
- *          cout << "linear index: " << (size_t)s << " corresponds with indices " << s[0] << ", " << s[1] << ", " << s[2] << endl;
+ *  std::vector<size_t> dims;
+ *  dims.push_back( 3 );
+ *  dims.push_back( 4 );
+ *  dims.push_back( 5 );
+ *  for( MultiFor s(dims); s.valid(); ++s )
+ *      cout << "linear index: " << (size_t)s << " corresponds to indices " << s[0] << ", " << s[1] << ", " << s[2] << endl;
  *  \endcode
  *  which would be equivalent to:
  *  \code
@@ -159,7 +163,7 @@ namespace dai {
  *  for( size_t s0 = 0; s0 < 3; s0++ )
  *      for( size_t s1 = 0; s1 < 4; s1++ )
  *          for( size_t s2 = 0; s2 < 5; s++, s2++ )
- *              cout << "linear index: " << (size_t)s << " corresponds with indices " << s0 << ", " << s1 << ", " << s2 << endl;
+ *              cout << "linear index: " << (size_t)s << " corresponds to indices " << s0 << ", " << s1 << ", " << s2 << endl;
  *  \endcode
  */
 class MultiFor {
@@ -287,8 +291,9 @@ class Permute {
 };
 
 
-/// Contains the state of variables within a VarSet and useful things to do with this information.
-/// This is very similar to a MultiFor, but tailored for Vars and Varsets.
+/// Contains the joint state of variables within a VarSet and useful things to do with this information.
+/** This is very similar to a MultiFor, but tailored for Vars and Varsets.
+ */
 class State {
     private:
         typedef std::map<Var, size_t> states_type;

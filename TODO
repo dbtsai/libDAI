@@ -1,158 +1,70 @@
-- Add comments in example.cpp, add documentation.
-- Write documentation.
-- Improve error handling.
-- http://www.boost.org/development/requirements.html#Design_and_Programming
+TODO:
+
+- Improve documentation.
+
+- Adapt http://www.boost.org/development/requirements.html#Design_and_Programming
+
+- Use "gcc -MM" to generate dependencies for targets.
+  Maybe even better: switch to cmake (see http://lwn.net/Articles/188693/)
+  cross-platform build system.
+
 
 OPTIMIZATION:
-- BipartiteGraph::isConnected should be optimized using boost::graph
-- Can the FactorGraph constructors be optimized further?
-- Cache second-order neighborhoods (delta's) in BipGraph?
-- Replace VarSets by small_set<size_t> if appropriate, in order to minimize the use of findVar().
-- A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should store a reference to it
 
-IDEAS:
-- Use "gcc -MM" to generate dependencies for targets.
+- BipartiteGraph::isConnected should be optimized using boost::graph
+
+- Replace VarSets by smallSet<size_t> where appropriate, in order to minimize the use of findVar().
+
+- A DAIAlg<T> should not inherit from a FactorGraph/RegionGraph, but should
+  store a reference to it.  This prevents needless copying of (possibly large)
+  data structures. Disadvantage: the caller must not change the data structure
+  between calls. (Maybe a smart_ptr would help here?)
+  Also, general marginalization functions now copy a complete object. Instead, it
+  would make more sense that they construct a new object without copying the
+  FactorGraph. Or they can simply be made methods of the general InfAlg class.
+
+
+IDEAS WORTH EXPLORING:
 
 - Use a PropertySet as output of a DAIAlg, instead of functions like maxDiff and Iterations().
 
-- A FactorGraph and a RegionGraph are often equipped with
-additional properties for nodes and edges. The code to initialize those
-is often quite similar; maybe this can be abstracted to classes
-like ExtFactorGraph and ExtRegionGraph (Ext stands for Extended), e.g.
-template <typename NodeProperties, typename EdgeProperties>
-class ExtFactorGraph : public FactorGraph {
-	public:
-		std::vector<NodeProperties>               nodeProps;
-		std::vector<std::vector<EdgeProperties> > edgeProps;
-	// blabla
-}
-A disadvantage of this approach may be worse cachability.
-A problem is if there are nog properties for nodes (type 1), nodes (type 2)
-or edges. Maybe this can be solved using specializations, or using variadac
-template arguments or something similar?
-Idea: you could define a "class Empty {}", and add some code that checks for
-the typeid, comparing it with Empty, and doing something special in that case 
-(e.g., not allocating memory).
-The main disadvantage of this approach seems to be that it leads to even more
-entanglement.
+- Cache second-order neighborhoods (delta's) in BipGraph?
 
-- Instead of polymorphism by inheritance,
-use polymorphism by template parameterization. For example, the real reason
-you introduced the complicated inheritance scheme was for functions like
-    Factor calcMarginal( const InferenceAlgorithm & obj, const VarSet & ns, bool reInit );
-Now instead, you could use a template function:
-template<typename InferenceAlgorithm>
-    Factor calcMarginal( const InferenceAlgorithm &obj, const VarSet &ns, bool reInit );
-This would assume that InferenceAlgorithm supports certain methods, like
-clone(), grm(), ......
-Ideally, you would use concepts to define different classes of inference
-algorithms with different capabilities, for example the ability to calculate logZ,
-the ability to calculate marginals, the ability to calculate bounds, the ability
-to calculate MAP states, etcetera. Then, use traits classes in order to be able to
-query the capabilities of the model. For example, you would be able to query whether
-the inference algorithm supports calculation of logZ.
-Unfortunately, this is compile-time polymorphism, whereas tests/test needs runtime polymorphism.
-
-- If you ever do a rewrite, make sure that the graphical properties are
-not entangled with the probabilistic properties. E.g., a factor graph
-really should be represented as a bipartite graph, with a separate array
-of variable labels and dimensions, and a seperate array of (pointers to)
-factor tables. In this way, each factor could be implemented differently,
-e.g., we could have some sparse factors, some noisy-OR factors, some dense
-factors, some arbitrary precision factors, etc. Or we could make more use
-of templates to have a more generic factor graph. Maybe in the end, 
-HasA relations are better than IsA relations...
-Also, the current setup is stupid: I wrote a new function that works
-on FactorGraphs, and I had to write boiler plate code for it in graphicalmodel.h
-and in regiongraph.h (which is stupid).
+- If you ever do a rewrite, make sure that the graphical properties are not
+  entangled with the probabilistic properties. E.g., a factor graph really
+  should be represented as a bipartite graph, with a separate array of variable
+  labels and dimensions, and a seperate array of (pointers to) factor tables. In
+  this way, each factor could be implemented differently, e.g., we could have
+  some sparse factors, some noisy-OR factors, some dense factors, some arbitrary
+  precision factors, etc. Or we could make more use of templates to have a more
+  generic factor graph. 
 
 - Use Boost::uBLAS framework to deal with matrices, especially, with
-2D sparse matrices. See http://www.boost.org/libs/numeric/ublas/doc/matrix_sparse.htm
-and tests/errorbounds/errorbounds3
+  2D sparse matrices. 
+  See http://www.boost.org/libs/numeric/ublas/doc/matrix_sparse.htm
+  and tests/errorbounds/errorbounds3
 
 - Introduce naming scheme:
-all Vars and VarSets should be named v_..., e.g. v_i instead of i
-all Factors should be named f_..., e.g. f_I instead of I
-all indices should be named _..., e.g. _k instead of k
-all iterators should be named i_, e.g. i_i is an iterator to i
-all const_iterators should be named ci_, e.g. ci_i is an iterator to i
-
-- Improve weightedgraph or use Boost::Graph
-
-- Iterations and maxDiff are only interesting for iterative inference
-algorithms. Yet, tests/test wants to know these values in a generic
-way. Maybe we have to think of some way (e.g. using a Properties object)
-to return these values from run(). Then we can simply look whether a
-InferenceAlgorithm supports these fields. What other results could
-we return? Time. MaxDiff during initialization for LC methods.
-Or maybe we could use some traits mechanism which we can ask whether the
-object has _iterations and _maxdiff variables.
-
-- Think about whether the cavity initialization belongs to init() or to run().
-
-- Fix LCLin.
-
-- setFactor and setFactors should only change Probs, not Factors.
-
-- Simplify Properties framework: each Property should be a std::string.
-Each DAIAlg should have its own _properties struct and handle conversion.
-
-- Forwardport the Bart patch
-
-- Another design question that needs to be answered: should a BP object own a
-  FactorGraph, or only store a reference to a FactorGraph (which can optimize
-  memory), or should it be a FactorGraph with additional variables and functions?
-  Probably, the first or second option would be the best. Since FactorGraphs are
-  assumed to be rather static, it would make sense to store *references* to
-  FactorGraphs inside AIAlgs. Or maybe some smart_ptr? It would make sense to 
-  prevent unnecessary copying of FactorGraphs. Also, general marginalization 
-  functions now copy a complete object. Instead, it would make more sense that
-  they construct a new object without copying the FactorGraph. Or they can be made
-  simply methods of the general InfAlg class.
-
-
-
-DIFFICULT
-
-- What to do in case of NANs?
-
-- Bug: TreeEP::logZ() seems to be wrong (?).
-
-- Kees' trick for preventing NANs in GBP updates:  if quantity smaller than epsilon, replace by epsilon.
-
-
-OPTIONAL
+  all Vars and VarSets should be named v_..., e.g. v_i instead of i
+  all Factors should be named f_..., e.g. f_I instead of I
+  all indices should be named _..., e.g. _k instead of k
+  all iterators should be named i_, e.g. i_i is an iterator to i
+  all const_iterators should be named ci_, e.g. ci_i is an iterator to i
 
 - Define a better fileformat for .fg files (maybe using XML)?
 
-- Find a good multi-platform build system (GNU autotool? Boost JAM?)
-
-- Another design question that needs to be answered: should a BP object own a
-  FactorGraph, or only store a reference to a FactorGraph (which can optimize
-  memory), or should it be a FactorGraph with additional variables and functions?
-  Probably, the first or second option would be the best. Since FactorGraphs are
-  assumed to be rather static, it would make sense to store *references* to
-  FactorGraphs inside AIAlgs. Or maybe some smart_ptr? It would make sense to 
-  prevent unnecessary copying of FactorGraphs. Also, general marginalization 
-  functions now copy a complete object. Instead, it would make more sense that
-  they construct a new object without copying the FactorGraph. Or they can be made
-  simply methods of the general InfAlg class.
-
-- Forwardport the Bart/Max patch.
-
 - Alternative implementation of undo factor changes: the only things that have to be
-undone are setting a factor to all ones and setting a factor to a Kronecker delta. This
-could also be implemented in the factor itself, which could maintain its state 
-(one/delta/full) and act accordingly.
+  undone are setting a factor to all ones and setting a factor to a Kronecker delta. This
+  could also be implemented in the factor itself, which could maintain its state 
+  (one/delta/full) and act accordingly.
 
-- Think about the _fac2ind variable: a better implementation of this feature is
-probably possible.
+- Think about the RegionGraph::fac2OR variable: a better implementation of this feature is
+  probably possible.
 
 - Optimize GBP with precalculated indices.
 
 - Optimize all indices as follows: keep a cache of all indices that have been
-computed (use a hash). Then, instead of computing on the fly, use the precomputed
-ones.
+  computed (use a hash). Then, instead of computing on the fly, use the precomputed ones.
 
 - Variable elimination should be implemented generically using a function
   object that tells you which variable to delete.
@@ -162,3 +74,44 @@ ones.
 - Add support for sparse potentials.
 
 - Optimize BP_SEQMAX (it should use a better data structure than a vector for the residuals).
+
+
+BAD IDEAS:
+
+- A FactorGraph and a RegionGraph are often equipped with
+  additional properties for nodes and edges. The code to initialize those
+  is often quite similar; maybe this can be abstracted to classes
+  like ExtFactorGraph and ExtRegionGraph (Ext stands for Extended), e.g.
+  template <typename NodeProperties, typename EdgeProperties>
+  class ExtFactorGraph : public FactorGraph {
+	public:
+		std::vector<NodeProperties>               nodeProps;
+		std::vector<std::vector<EdgeProperties> > edgeProps;
+	// blabla
+  }
+  A disadvantage of this approach may be worse cachability.
+  A problem is if there are nog properties for nodes (type 1), nodes (type 2)
+  or edges. Maybe this can be solved using specializations, or using variadac
+  template arguments or something similar?
+  Idea: you could define a "class Empty {}", and add some code that checks for
+  the typeid, comparing it with Empty, and doing something special in that case 
+  (e.g., not allocating memory).
+  The main disadvantage of this approach seems to be that it leads to even more
+  entanglement.
+
+- Instead of polymorphism by inheritance, use polymorphism by template
+  parameterization. For example, the real reason you introduced the complicated
+  inheritance scheme was for functions like
+      Factor calcMarginal( const InferenceAlgorithm & obj, const VarSet & ns, bool reInit );
+  Now instead, you could use a template function:
+      template<typename InferenceAlgorithm>
+      Factor calcMarginal( const InferenceAlgorithm &obj, const VarSet &ns, bool reInit );
+  This would assume that InferenceAlgorithm supports certain methods, like
+  clone(), grm(), ......  Ideally, you would use concepts to define different
+  classes of inference algorithms with different capabilities, for example the
+  ability to calculate logZ, the ability to calculate marginals, the ability to
+  calculate bounds, the ability to calculate MAP states, etcetera. Then, use
+  traits classes in order to be able to query the capabilities of the model. For
+  example, you would be able to query whether the inference algorithm supports
+  calculation of logZ.  Unfortunately, this is compile-time polymorphism, whereas
+  tests/test needs runtime polymorphism.

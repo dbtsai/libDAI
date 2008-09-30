@@ -1,13 +1,21 @@
 libDAI - A free/open source C++ library for Discrete Approximate Inference methods
 ==================================================================================
 
-v 0.2.2 - May 26, 2008
+v 0.2.2 - September 30, 2008
 
 
 Copyright (C) 2006-2008  Joris Mooij  [joris dot mooij at tuebingen dot mpg dot de]
 Radboud University Nijmegen, The Netherlands /
 Max Planck Institute for Biological Cybernetics, Germany
-    
+
+with contributions from:
+
+Martijn Leisink
+Giuseppe Passino
+Christian Wojek
+Claudio Lima
+Bastian Wemmenhove
+
 
 ----------------------------------------------------------------------------------
 This file is part of libDAI.
@@ -35,142 +43,107 @@ that made substantive use of this program, it is your moral obligation as a
 scientist to (a) mention the fashion in which this software was used, including
 the version number, with a citation to the literature, to allow replication;
 (b) mention this software in the Acknowledgements section.  The appropriate
-citation is: J. M. Mooij (2008) libDAI: A free/open source C++ library for
-Discrete Approximate Inference methods, http://mloss.org/software/view/77/.
+citation is: 
+
+J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete 
+Approximate Inference methods", http://mloss.org/software/view/77/.
+
 Moreover, as a personal note, I would appreciate it if you would email me with
 citations of papers referencing this work so I can mention them to my funding
 agent and tenure committee.
 
-What is libDAI?
----------------
-libDAI is a free/open source C++ library (licensed under GPL, see the file
-COPYING for more details) that provides implementations of various
-(deterministic) approximate inference methods for discrete graphical models.
-libDAI supports arbitrary factor graphs with discrete variables (this includes
-discrete Markov Random Fields and Bayesian Networks).
 
+About libDAI
+------------
+libDAI is a free/open source C++ library (licensed under GPL) that provides
+implementations of various (approximate) inference methods for discrete
+graphical models. libDAI supports arbitrary factor graphs with discrete
+variables; this includes discrete Markov Random Fields and Bayesian Networks.
+
+The library is targeted at researchers; to be able to use the library, a good
+understanding of graphical models is needed.
+
+
+Limitations
+-----------
 libDAI is not intended to be a complete package for approximate inference.
 Instead, it should be considered as an "inference engine", providing various
 inference methods. In particular, it contains no GUI, currently only supports
 its own file format for input and output (although support for standard file
-formats may be added), and provides no visualization.
-
-Because libDAI is implemented in C++, it is very fast compared with e.g. MatLab
-implementations. libDAI does provide a MatLab interface for easy integration
-with MatLab. Currently, libDAI supports the following deterministic approximate
-inference methods:
-
-    * Mean Field
-    * (Loopy) Belief Propagation
-    * Tree Expectation Propagation
-    * Generalized Belief Propagation
-    * Double-loop GBP
-    * Loop Corrected Approximate Inference
-
-Exact inference by JunctionTree is also provided.
-
-Many of these algorithms are not yet available in similar open source software,
-to the best of the author's knowledge (open source packages supporting both
-directed and undirected graphical models are Murphy's BNT, Intel's PNL and gR).
-
-The library is targeted at researchers; to be able to use the library, a good
-understanding of graphical models is needed. However, the code will hopefully
-find its way into real-world applications as well. 
+formats may be added later), and provides very limited visualization
+functionalities.
 
 
-Rationale
----------
-In my opinion, the lack of open source reference implementations hampers
-progress in research on approximate inference. Methods differ widely in terms
-of quality and performance characteristics, which also depend in different ways
-on various properties of the graphical models. Finding the best approximate
-inference method for a particular application therefore often requires
-empirical comparisons. However, implementing and debugging these methods takes
-a lot of time which could otherwise be spent on research. I hope that this code
-will aid researchers to be able to easily compare various (existing as well as
-new) approximate inference methods, in this way accelerating research and
-stimulating real-world applications of approximate inference.  
+Features
+--------
+Currently, libDAI supports the following (approximate) inference methods:
+
+    * Exact inference by brute force enumeration;
+    * Exact inference by junction-tree methods;
+    * Mean Field;
+    * Loopy Belief Propagation [KFL01];
+    * Tree Expectation Propagation [MiQ04];
+    * Generalized Belief Propagation [YFW05];
+    * Double-loop GBP [HAK03];
+    * Various variants of Loop Corrected Belief Propagation [MoK07, MoR05].
+
+
+Why C++?
+--------
+Because libDAI is implemented in C++, it is very fast compared with
+implementations in MatLab (a factor 1000 faster is not uncommon). libDAI does
+provide a MatLab interface for easy integration with MatLab.
 
 
 Releases
 --------
-Releases can be obtained from http://www.mbfys.ru.nl/~jorism/libDAI.
+Releases can be obtained from http://mloss.org/software/view/77/
 License: GNU Public License v2 (or higher).
 
 libDAI-0.2      December 1, 2006
 libDAI-0.2.1    May 26, 2008
+libDAI-0.2.2	September 30, 2008
 
 
 Acknowledgments
 ---------------
-The development reported here is part of the Interactive Collaborative
-Information Systems (ICIS) project, supported by the Dutch Ministry of Economic
-Affairs, grant BSIK03024. I would like to thank Martijn Leisink for providing
-the basis on which libDAI has been built.
-
-
-Known issues
-------------
-Due to a bug in GCC 3.3.x and earlier (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=20358) 
-it doesn't compile with these versions (it does compile with GCC version 3.4 and higher).
-Workaround: replace the two NAN's in factor.h causing the error messages by -1.
+This work is part of the Interactive Collaborative Information Systems (ICIS) 
+project, supported by the Dutch Ministry of Economic Affairs, grant BSIK03024. 
+I would like to thank Martijn Leisink for providing the basis on which libDAI has been built.
 
 
 Documentation
 -------------
-Almost nonexistant. But I'm working on it. In the meantime, I'll provide limited support
-by email. The following gives an overview of different methods and their properties
-(can be slightly obsolete):
+Some doxygen documentation is available. Install doxygen and use "make doc" to build the
+documentation. If the documentation is not clear enough, feel free to send me an email 
+(or even better, to improve the documentation!).
 
-BP
-    updates     UpdateType SEQFIX,SEQRND,SEQMAX,PARALL
-    tol         double
-    maxiter     size_t
-    verbose     size_t
-MF
-    tol         double
-    maxiter     size_t
-    verbose     size_t
-HAK
-    clusters    MIN,DELTA,LOOP
-    loopdepth
-    doubleloop  bool
-    tol         double
-    maxiter     size_t
-    verbose     size_t
-JTREE
-    updates     UpdateType  HUGIN,SHSH
-    verbose     size_t
-MR
-    updates     UpdateType  FULL,LINEAR
-    inits       InitType    RESPPROP,CLAMPING,EXACT
-    verbose     size_t
-TREEEP
-    type        TypeType    ORG,ALT
-    tol         double
-    maxiter     size_t
-    verbose     size_t
-LC
-    cavity      CavityType  FULL,PAIR,PAIR2,UNIFORM
-    updates     UpdateType  SEQFIX,SEQRND(,NONE)
-    reinit      bool
-    cavainame   string
-    cavaiopts   Properties
-    tol         double
-    maxiter     size_t
-    verbose     size_t
+A description of the factor graph (.fg) file format can be found in the file FILEFORMAT.
 
 
+Compatibility
+-------------
+The code has been developed under Debian GNU/Linux with the GCC compiler suite.
+libDAI compiles successfully with g++ versions 4.1, 4.2 and 4.3.
 
-Quick start
------------
+libDAI has also been successfully compiled with MS Visual Studio 2008 under Windows
+(but not all build targets are supported yet).
+
+
+Quick start (linux/cygwin)
+--------------------------
 You need:
-- a recent version of gcc (version 3.4 at least)
-- the Boost C++ libraries (under Debian/Ubuntu you can install them using
-  "apt-get install libboost-dev libboost-program-options-dev")
+- a recent version of gcc (at least version 3.4)
 - GNU make
+- doxygen
+- graphviz
+- recent boost C++ libraries (at least version 1.34)
 
-To build the source, edit the Makefile and then run
+On Debian/Ubuntu, you can easily install all these packages with a single command:
+"apt-get install g++ make doxygen libboost-dev libboost-graph-dev libboost-program-options-dev"
+(root permissions needed).
+
+To build the source, edit the Makefile and adapt it to your local setup. Then, run
     
     make
 
@@ -180,6 +153,23 @@ If the build was successful, you can test the example program:
 
 or the more elaborate test program:
 
-    tests/test --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX
+    tests/testdai --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX
 
-A description of the factor graph (.fg) file format can be found in the file FILEFORMAT.
+
+Quick start (windows)
+---------------------
+You need:
+- A recent version of MicroSoft Visual Studio (2008 works)
+- recent boost C++ libraries (version 1.34 or higher)
+
+To build the source, edit the Makefile and adapt it to your local setup. Then, run (from the command line)
+    
+    nmake -f Makefile.win
+
+If the build was successful, you can test the example program:
+
+    example tests\alarm.fg
+
+or the more elaborate test program:
+
+    tests\testdai --aliases tests\aliases.conf --filename tests\alarm.fg --methods JTREE_HUGIN BP_SEQMAX

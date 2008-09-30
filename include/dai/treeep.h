@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines class TreeEP
+
+
 #ifndef __defined_libdai_treeep_h
 #define __defined_libdai_treeep_h
 
@@ -40,6 +44,7 @@
 namespace dai {
 
 
+/// Approximate inference algorithm "TreeEP" by Minka and Qi
 class TreeEP : public JTree {
     private:
         /// Maximum difference encountered so far
@@ -48,13 +53,24 @@ class TreeEP : public JTree {
         size_t                  _iters;
 
     public:
+        /// Parameters of this inference algorithm
         struct Properties {
-            size_t verbose;
-            size_t maxiter;
-            double tol;
+            /// Enumeration of possible choices for the tree
             DAI_ENUM(TypeType,ORG,ALT)
+
+            /// Verbosity
+            size_t verbose;
+
+            /// Maximum number of iterations
+            size_t maxiter;
+
+            /// Tolerance
+            double tol;
+
+            /// How to choose the tree
             TypeType type;
         } props; // FIXME: should be props2 because of conflict with JTree::props?
+
         /// Name of this inference method
         static const char *Name;
 
@@ -105,21 +121,12 @@ class TreeEP : public JTree {
         /// Default constructor
         TreeEP() : JTree(), _maxdiff(0.0), _iters(0), props(), _Q() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
-        TreeEP( const FactorGraph &fg, const PropertySet &opts );
-
         /// Copy constructor
         TreeEP( const TreeEP &x ) : JTree(x), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props), _Q(x._Q) {
             for( size_t I = 0; I < nrFactors(); I++ )
                 if( offtree( I ) )
                     _Q[I].I() = &factor(I);
         }
-
-        /// Clone *this (virtual copy constructor)
-        virtual TreeEP* clone() const { return new TreeEP(*this); }
-
-        /// Create (virtual default constructor)
-        virtual TreeEP* create() const { return new TreeEP(); }
 
         /// Assignment operator
         TreeEP& operator=( const TreeEP &x ) {
@@ -136,28 +143,29 @@ class TreeEP : public JTree {
             return *this;
         }
 
-        /// Identifies itself for logging purposes
+        /// Construct from FactorGraph fg and PropertySet opts
+        TreeEP( const FactorGraph &fg, const PropertySet &opts );
+
+
+        /// @name General InfAlg interface
+        //@{
+        virtual TreeEP* clone() const { return new TreeEP(*this); }
+        virtual TreeEP* create() const { return new TreeEP(); }
         virtual std::string identify() const;
-
-        /// Get log partition sum
         virtual Real logZ() const;
-
-        /// Clear messages and beliefs
         virtual void init();
-
-        /// Clear messages and beliefs corresponding to the nodes in ns
         virtual void init( const VarSet &/*ns*/ ) { init(); }
-
-        /// The actual approximate inference algorithm
         virtual double run();
-
-        /// Return maximum difference between single node beliefs in the last pass
         virtual double maxDiff() const { return _maxdiff; }
-
-        /// Return number of passes over the factorgraph
         virtual size_t Iterations() const { return _iters; }
+        //@}
 
 
+        /// @name Additional interface specific for TreeEP
+        //@{ 
+        //@}
+
+    private:
         void ConstructRG( const DEdgeVec &tree );
         bool offtree( size_t I ) const { return (fac2OR[I] == -1U); }
 

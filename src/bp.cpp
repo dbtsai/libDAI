@@ -26,7 +26,6 @@
 #include <set>
 #include <algorithm>
 #include <dai/bp.h>
-#include <dai/diffs.h>
 #include <dai/util.h>
 #include <dai/properties.h>
 
@@ -431,7 +430,7 @@ Real BP::logZ() const {
     for(size_t i = 0; i < nrVars(); ++i )
         sum += (1.0 - nbV(i).size()) * beliefV(i).entropy();
     for( size_t I = 0; I < nrFactors(); ++I )
-        sum -= KL_dist( beliefF(I), factor(I) );
+        sum -= dist( beliefF(I), factor(I), Prob::DISTKL );
     return sum;
 }
 

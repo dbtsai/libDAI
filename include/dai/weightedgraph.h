@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines some utility functions for weighted graphs
+
+
 #ifndef __defined_libdai_weightedgraph_h
 #define __defined_libdai_weightedgraph_h
 
@@ -35,26 +39,33 @@
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 
 
-
 namespace dai {
 
 
-/// Directed edge
+/// Represents a directed edge pointing from n1 to n2
 class DEdge {
     public:
-        size_t  n1, n2;
+        size_t n1;  ///< First node index
+        size_t n2;  ///< Second node index
     
+        /// Default constructor
         DEdge() {}
+
+        /// Constructor
         DEdge( size_t m1, size_t m2 ) : n1(m1), n2(m2) {}
-        bool operator==( const DEdge &x ) const {
-            return ((n1 == x.n1) && (n2 == x.n2));
-        }
-        bool operator!=( const DEdge &x ) const {
-            return !(*this == x);
-        }
+
+        /// Tests for equality
+        bool operator==( const DEdge &x ) const { return ((n1 == x.n1) && (n2 == x.n2)); }
+
+        /// Tests for inequality
+        bool operator!=( const DEdge &x ) const { return !(*this == x); }
+
+        /// Smaller-than operator (performs lexicographical comparison)
         bool operator<( const DEdge &x ) const {
             return( (n1 < x.n1) || ((n1 == x.n1) && (n2 < x.n2)) );
         }
+
+        /// Writes a DEdge to an output stream
         friend std::ostream & operator << (std::ostream & os, const DEdge & e) {
             os << "(" << e.n1 << "," << e.n2 << ")";
             return os;
@@ -62,17 +73,27 @@ class DEdge {
 };
 
 
-/// Undirected edge
+/// Undirected edge between nodes n1 and n2
 class UEdge {
     public:
-        size_t  n1, n2;
+        size_t  n1;  ///< First node index
+        size_t  n2;  ///< Second node index
     
+        /// Default constructor
         UEdge() {}
+
+        /// Constructor
         UEdge( size_t m1, size_t m2 ) : n1(m1), n2(m2) {}
+
+        /// Construct from DEdge
         UEdge( const DEdge & e ) : n1(e.n1), n2(e.n2) {}
+
+        /// Tests for inequality (disregarding the ordering of n1 and n2)
         bool operator==( const UEdge &x ) {
             return ((n1 == x.n1) && (n2 == x.n2)) || ((n1 == x.n2) && (n2 == x.n1));
         }
+
+        /// Smaller-than operator
         bool operator<( const UEdge &x ) const {
             size_t s = n1, l = n2;
             if( s > l )
@@ -82,6 +103,8 @@ class UEdge {
                 std::swap( xs, xl );
             return( (s < xs) || ((s == xs) && (l < xl)) );
         }
+
+        /// Writes a UEdge to an output stream
         friend std::ostream & operator << (std::ostream & os, const UEdge & e) {
             if( e.n1 < e.n2 )
                 os << "{" << e.n1 << "," << e.n2 << "}";
@@ -92,17 +115,25 @@ class UEdge {
 };
 
 
+/// Vector of UEdge
 typedef std::vector<UEdge>  UEdgeVec;
+
+/// Vector of DEdge
 typedef std::vector<DEdge>  DEdgeVec;
+
+/// Represents an undirected weighted graph, with weights of type T
 template<class T> class WeightedGraph : public std::map<UEdge, T> {};
+
+/// Represents an undirected graph
 typedef std::set<UEdge>     Graph;
 
 
-/// Use Prim's algorithm to construct a minimal spanning tree from the weighted graph Graph
-/// The weights should be positive. Use implementation in Boost Graph Library.
-template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> & Graph ) {
+/// Uses Prim's algorithm to construct a minimal spanning tree from the (positively) weighted graph G.
+/** Uses implementation in Boost Graph Library.
+ */
+template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> &G ) {
     DEdgeVec result;
-    if( Graph.size() > 0 ) {
+    if( G.size() > 0 ) {
         using namespace boost;
         using namespace std;
         typedef adjacency_list< vecS, vecS, undirectedS, property<vertex_distance_t, int>, property<edge_weight_t, double> > boostGraph;
@@ -111,9 +142,9 @@ template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> & Gra
         set<size_t> nodes;
         vector<E> edges;
         vector<double> weights;
-        edges.reserve( Graph.size() );
-        weights.reserve( Graph.size() );
-        for( typename WeightedGraph<T>::const_iterator e = Graph.begin(); e != Graph.end(); e++ ) {
+        edges.reserve( G.size() );
+        weights.reserve( G.size() );
+        for( typename WeightedGraph<T>::const_iterator e = G.begin(); e != G.end(); e++ ) {
             weights.push_back( e->second );
             edges.push_back( E( e->first.n1, e->first.n2 ) );
             nodes.insert( e->first.n1 );
@@ -165,8 +196,9 @@ template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> & Gra
 }
 
 
-/// Use Prim's algorithm to construct a maximal spanning tree from the weighted graph Graph
-/// The weights should be positive. Use implementation in Boost Graph Library.
+/// Use Prim's algorithm to construct a minimal spanning tree from the (positively) weighted graph G.
+/** Uses implementation in Boost Graph Library.
+ */
 template<typename T> DEdgeVec MaxSpanningTreePrims( const WeightedGraph<T> & Graph ) {
     T maxweight = Graph.begin()->second;
     for( typename WeightedGraph<T>::const_iterator it = Graph.begin(); it != Graph.end(); it++ )
@@ -182,92 +214,12 @@ template<typename T> DEdgeVec MaxSpanningTreePrims( const WeightedGraph<T> & Gra
 }
 
 
-/// Calculate rooted tree from a tree T and a root
+/// Constructs a rooted tree from a tree and a root
 DEdgeVec GrowRootedTree( const Graph & T, size_t Root );
 
 
+/// Constructs a random undirected graph of N nodes, where each node has connectivity d
 UEdgeVec RandomDRegularGraph( size_t N, size_t d );
-
-
-/// Use Dijkstra's algorithm to solve the shortest path problem for the weighted graph Graph and source vertex index s
-template<typename T>
-std::map<size_t,size_t> DijkstraShortestPaths( const WeightedGraph<T> & Graph, size_t s ) {
-/*
- * from wikipedia 
- *
-In the following algorithm, u := Extract_Min(Q) searches for the vertex u in the vertex set Q that has the least d[u] value. That vertex is removed from the set Q and returned to the user.
-
-  function Dijkstra(G, w, s)
-     for each vertex v in V[G]                        // Initializations
-           d[v] := infinity                                 // Unknown distance function from s to v
-           previous[v] := undefined
-     d[s] := 0                                        // Distance from s to s
-     S := empty set                                   // Set of all visited vertices
-     Q := V[G]                                        // Set of all unvisited vertices
-     while Q is not an empty set                      // The algorithm itself
-           u := Extract_Min(Q)                        // Remove best vertex from priority queue
-           S := S union {u}                           // Mark it 'visited'
-           for each edge (u,v) outgoing from u
-                  if d[u] + w(u,v) < d[v]             // Relax (u,v)
-                        d[v] := d[u] + w(u,v) 
-                        previous[v] := u
-
-To find the shortest path from s to t:
-
-u := t
-while defined previous[u]
-      insert u to the beginning of S
-      u := previous[u]
-	
-*/
-
-    // Calculate set of nodes in G
-    std::set<size_t> nodes;
-    for( typename WeightedGraph<T>::const_iterator e = Graph.begin(); e != Graph.end(); e++ ) {
-        nodes.insert( e->n1.n1 );
-        nodes.insert( e->n1.n2 );
-    }
-    if( !nodes.count( s ) )
-        return std::map<size_t, size_t>();
-
-    std::map<size_t, double> d;
-    std::map<size_t, size_t> previous;
-    for( std::set<size_t>::const_iterator n = nodes.begin(); n != nodes.end(); n++ )
-        d[*n] = std::numeric_limits<double>::infinity();
-
-    d[s] = 0;
-    std::set<size_t> S;
-    std::set<size_t> Q = nodes;
-
-    while( Q.size() ) {
-        double least = d[*Q.begin()];
-        std::set<size_t>::iterator u_least = Q.begin();
-        for( std::set<size_t>::iterator _u = Q.begin(); _u != Q.end(); _u++ )
-            if( d[*_u] < least ) {
-                u_least = _u;
-                least = d[*_u];
-            }
-        size_t u = *u_least;
-        Q.erase( u_least );
-            
-        S.insert( u );
-        for( typename WeightedGraph<T>::const_iterator e = Graph.begin(); e != Graph.end(); e++ ) {
-            size_t v;
-            if( e->n1.n1 == u )
-                v = e->n1.n2;
-            else if( e->n1.n2 == u )
-                v = e->n1.n1;
-            else
-                continue;
-            if( d[u] + e->n2 < d[v] ) {
-                d[v] = d[u] + e->n2;
-                previous[v] = u;
-            }
-        }
-    }
-
-    return previous;
-}
 
 
 } // end of namespace dai

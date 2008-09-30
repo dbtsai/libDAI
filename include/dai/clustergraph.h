@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines class ClusterGraph
+
+
 #ifndef __defined_libdai_clustergraph_h
 #define __defined_libdai_clustergraph_h
 
@@ -34,17 +38,24 @@ namespace dai {
 
 
     /// A ClusterGraph is a hypergraph with VarSets as nodes.
-    /// It is implemented as bipartite graph with variable nodes
-    /// and cluster (VarSet) nodes. The additional
-    /// functionality compared to a simple set<VarSet> is
-    /// finding maximal clusters, finding cliques, etc...
+    /** It is implemented as bipartite graph with variable (Var) nodes
+     *  and cluster (VarSet) nodes. 
+     */
     class ClusterGraph {
         public:
+            /// Stores the neighborhood structure
             BipartiteGraph       G;
+
+            /// Stores the variables corresponding to the nodes
             std::vector<Var>     vars;
+
+            /// Stores the clusters corresponding to the hyperedges
             std::vector<VarSet>  clusters;
 
+            /// Shorthand for BipartiteGraph::Neighbor
             typedef BipartiteGraph::Neighbor Neighbor;
+
+            /// Shorthand for BipartiteGraph::Edge
             typedef BipartiteGraph::Edge     Edge;
 
         public:
@@ -87,7 +98,7 @@ namespace dai {
                 return maximal;
             }
 
-            /// Erase all VarSets that are not maximal
+            /// Erases all VarSets that are not maximal
             ClusterGraph& eraseNonMaximal() {
                 for( size_t I = 0; I < G.nr2(); ) {
                     if( !isMaximal(I) ) {
@@ -99,12 +110,12 @@ namespace dai {
                 return *this;
             }
 
-            /// Return number of clusters
+            /// Returns number of clusters
             size_t size() const {
                 return G.nr2();
             }
 
-            /// Return index of variable n
+            /// Returns index of variable n
             size_t findVar( const Var &n ) const {
                 return find( vars.begin(), vars.end(), n ) - vars.begin();
             }
@@ -160,13 +171,14 @@ namespace dai {
                 return *this;
             }
             
-            /// Provide read access to clusters
+            /// Returns a const reference to the clusters
             const std::vector<VarSet> & toVector() const { return clusters; }
 
-            /// Calculate cost of eliminating the variable with index i,
-            /// using as a measure "number of added edges in the adjacency graph"
-            /// where the adjacency graph has the variables as its nodes and
-            /// connects nodes i1 and i2 iff i1 and i2 occur in some common cluster
+            /// Calculates cost of eliminating the variable with index i.
+            /** The cost is measured as "number of added edges in the adjacency graph",
+             *  where the adjacency graph has the variables as its nodes and
+             *  connects nodes i1 and i2 iff i1 and i2 occur in some common cluster.
+             */
             size_t eliminationCost( size_t i ) {
                 std::vector<size_t> id_n = G.delta1( i );
 
@@ -183,16 +195,17 @@ namespace dai {
                 return cost;
             }
 
-            /// Perform Variable Elimination without Probs, i.e. only keeping track of
-            /// the interactions that are created along the way.
-            /// Input:  a set of outer clusters and an elimination sequence
-            /// Output: a set of elimination "cliques"
+            /// Performs Variable Elimination without Probs, i.e. only keeping track of
+            /*  the interactions that are created along the way.
+             *  \param ElimSeq A set of outer clusters and an elimination sequence
+             *  \return A set of elimination "cliques"
+             */
             ClusterGraph VarElim( const std::vector<Var> &ElimSeq ) const;
 
-            /// Perform Variable Eliminiation using the MinFill heuristic
+            /// Performs Variable Eliminiation using the MinFill heuristic
             ClusterGraph VarElim_MinFill() const;
 
-            /// Send to output stream
+            /// Writes a ClusterGraph to an output stream
             friend std::ostream & operator << ( std::ostream & os, const ClusterGraph & cl ) {
                 os << cl.toVector();
                 return os;

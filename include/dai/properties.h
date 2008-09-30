@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines the Property and PropertySet classes
+
+
 #ifndef __defined_libdai_properties_h
 #define __defined_libdai_properties_h
 
@@ -36,17 +40,22 @@
 namespace dai {
 
 
+/// Type of the key of a Property
 typedef std::string PropertyKey;
+
+/// Type of the value of a Property
 typedef boost::any  PropertyValue;
+
+/// A Property is a pair of a key and a corresponding value
 typedef std::pair<PropertyKey, PropertyValue> Property;
 
 
-/// Sends a Property object to an output stream
+/// Writes a Property object to an output stream
 std::ostream& operator<< (std::ostream & os, const Property & p);
 
 
-/// The PropertySet class represents a set of properties
-class PropertySet : public std::map<PropertyKey, PropertyValue> {
+/// Represents a set of properties, mapping keys (of type PropertyKey) to values (of type PropertyValue)
+class PropertySet : private std::map<PropertyKey, PropertyValue> {
     public:
         /// Gets a property
         const PropertyValue & Get(const PropertyKey &key) const { 
@@ -59,7 +68,7 @@ class PropertySet : public std::map<PropertyKey, PropertyValue> {
             return x->second; 
         }
 
-        /// Sets a property 
+        /// Sets a property
         PropertySet & Set(const PropertyKey &key, const PropertyValue &val) { this->operator[](key) = val; return *this; }
 
         /// Gets a property, casted as ValueType
@@ -74,7 +83,7 @@ class PropertySet : public std::map<PropertyKey, PropertyValue> {
             }
         }
 
-        /// Converts a property from string to ValueType, if necessary
+        /// Converts a property from string to ValueType (if necessary)
         template<typename ValueType>
         void ConvertTo(const PropertyKey &key) { 
             PropertyValue val = Get(key);
@@ -123,14 +132,12 @@ class PropertySet : public std::map<PropertyKey, PropertyValue> {
         /// Shorthand for (temporarily) adding properties, e.g. PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
         PropertySet operator()(const PropertyKey &key, const PropertyValue &val) const { PropertySet copy = *this; return copy.Set(key,val); }
 
-        /// Check if a property with given key exists
+        /// Check if a property with the given key exists
         bool hasKey(const PropertyKey &key) const { PropertySet::const_iterator x = find(key); return (x != this->end()); }
 
-        /// Sends a PropertySet object to an output stream
+        // Friends
         friend std::ostream& operator<< (std::ostream & os, const PropertySet & ps);
-
-        /// Reads a PropertySet object from an input stream
-        friend std::istream& operator >> (std::istream& is, PropertySet & ps);
+        friend std::istream& operator>> (std::istream& is, PropertySet & ps);
 };
 
 

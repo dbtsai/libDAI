@@ -32,7 +32,6 @@ namespace dai {
 using namespace std;
 
 
-/// Calculate rooted tree from a tree T and a root
 DEdgeVec GrowRootedTree( const Graph & T, size_t Root ) {
     DEdgeVec result;
     if( T.size() == 0 )

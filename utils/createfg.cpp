@@ -57,7 +57,7 @@ Factor BinaryFactor( const Var &n1, const Var &n2, double coupling ) {
     double buf[4];
     buf[0] = (buf[3] = exp(coupling));
     buf[1] = (buf[2] = exp(-coupling));
-    return Factor(n1 | n2, &buf[0]);
+    return Factor( VarSet(n1, n2), &buf[0] );
 }
 
 
@@ -70,7 +70,7 @@ Factor RandomFactor( const VarSet &ns, double beta ) {
 
 
 Factor PottsFactor( const Var &n1, const Var &n2, double beta ) {
-    Factor fac( n1 | n2, 1.0 );
+    Factor fac( VarSet( n1, n2 ), 1.0 );
     assert( n1.states() == n2.states() );
     for( size_t s = 0; s < n1.states(); s++ )
         fac[ s * (n1.states() + 1) ] = exp(beta);
@@ -204,9 +204,9 @@ void MakeGridNonbinaryFG( bool periodic, size_t n, size_t states, double beta, F
     for( size_t i = 0; i < n; i++ ) {
         for( size_t j = 0; j < n; j++ ) {
             if( i+1 < n || periodic )
-                factors.push_back( RandomFactor( vars[i*n+j] | vars[((i+1)%n)*n+j], beta ) );
+                factors.push_back( RandomFactor( VarSet( vars[i*n+j], vars[((i+1)%n)*n+j] ), beta ) );
             if( j+1 < n || periodic )
-                factors.push_back( RandomFactor( vars[i*n+j] | vars[i*n+((j+1)%n)], beta ) );
+                factors.push_back( RandomFactor( VarSet( vars[i*n+j], vars[i*n+((j+1)%n)] ), beta ) );
         }
     }
 
@@ -237,7 +237,7 @@ void MakeLoopNonbinaryFG( size_t N, size_t states, double beta, FactorGraph &fg 
 
     factors.reserve( N );
     for( size_t i = 0; i < N; i++ ) {
-        factors.push_back( RandomFactor( vars[i] | vars[(i+1)%N], beta ) );
+        factors.push_back( RandomFactor( VarSet( vars[i], vars[(i+1)%N] ), beta ) );
     }
 
     fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );

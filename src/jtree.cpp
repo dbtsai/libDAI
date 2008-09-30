@@ -324,7 +324,7 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
     // find new root clique (the one with maximal statespace overlap with ns)
     size_t maxval = 0, maxalpha = 0;
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
-        size_t val = nrStates( ns & OR(alpha).vars() );
+        size_t val = VarSet(ns & OR(alpha).vars()).nrStates();
         if( val > maxval ) {
             maxval = val;
             maxalpha = alpha;
@@ -504,9 +504,11 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
 }
 
 
-// first return value is treewidth
-// second return value is number of states in largest clique
-pair<size_t,size_t> treewidth( const FactorGraph & fg ) {
+/// Calculates upper bound to the treewidth of a FactorGraph
+/** \relates JTree
+ *  \return a pair (number of variables in largest clique, number of states in largest clique)
+ */
+std::pair<size_t,size_t> treewidth( const FactorGraph & fg ) {
     ClusterGraph _cg;
 
     // Copy factors
@@ -525,7 +527,7 @@ pair<size_t,size_t> treewidth( const FactorGraph & fg ) {
     for( size_t i = 0; i < ElimVec.size(); i++ ) {
         if( ElimVec[i].size() > treewidth )
             treewidth = ElimVec[i].size();
-        size_t s = nrStates(ElimVec[i]);
+        size_t s = ElimVec[i].nrStates();
         if( s > nrstates )
             nrstates = s;
     }

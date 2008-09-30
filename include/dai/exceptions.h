@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines Exception class and the DAI_THROW macro
+
+
 #ifndef __defined_libdai_exceptions_h
 #define __defined_libdai_exceptions_h
 
@@ -29,37 +33,52 @@
 #include <string>
 
 
+/// Used by DAI_THROW
 #define DAI_QUOTE(x) #x
+
+/// Used by DAI_THROW
 #define DAI_TOSTRING(x) DAI_QUOTE(x)
 
+/// Macro that simplifies throwing an exceptions with a useful error message
+/** \param cod Corresponds to one of the enum values in dai::Exception::codes
+ *
+ * Example:
+ *  \code
+ *  DAI_THROW(NOT_IMPLEMENTED);
+ *  \endcode
+ */
 #define DAI_THROW(cod) throw dai::Exception(dai::Exception::cod, std::string(__FILE__ ", line " DAI_TOSTRING(__LINE__)))
 
 
 namespace dai {
 
 
-    class Exception : public std::runtime_error {
-        public:
+/// Represents an exception (based on std::runtime_error)
+class Exception : public std::runtime_error {
+    public:
+        /// Constructor
             Exception(size_t code, const std::string& msg = "") : std::runtime_error(ErrorStrings[code] + " [" +  msg + "]") {}
 
-        enum {NOT_IMPLEMENTED,
-              UNKNOWN_DAI_ALGORITHM,
-              UNKNOWN_PROPERTY_TYPE,
-              MALFORMED_PROPERTY,
-              UNKNOWN_ENUM_VALUE,
-              CANNOT_READ_FILE,
-              CANNOT_WRITE_FILE,
-              INVALID_FACTORGRAPH_FILE,
-              NOT_ALL_PROPERTIES_SPECIFIED,
-              MULTIPLE_UNDO,
-              FACTORGRAPH_NOT_CONNECTED,
-              IMPOSSIBLE_TYPECAST,
-              INTERNAL_ERROR,
-              NUM_ERRORS};  // NUM_ERRORS should be the last entry
+        /// Enumeration of exceptions used in libDAI
+        enum codes {NOT_IMPLEMENTED,
+                    UNKNOWN_DAI_ALGORITHM,
+                    UNKNOWN_PROPERTY_TYPE,
+                    MALFORMED_PROPERTY,
+                    UNKNOWN_ENUM_VALUE,
+                    CANNOT_READ_FILE,
+                    CANNOT_WRITE_FILE,
+                    INVALID_FACTORGRAPH_FILE,
+                    NOT_ALL_PROPERTIES_SPECIFIED,
+                    MULTIPLE_UNDO,
+                    FACTORGRAPH_NOT_CONNECTED,
+                    IMPOSSIBLE_TYPECAST,
+                    INTERNAL_ERROR,
+                    NUM_ERRORS};  // NUM_ERRORS should be the last entry
 
-        private:
-            static std::string ErrorStrings[NUM_ERRORS];
-    };
+    private:
+        /// Error messages corresponding to the exceptions enumerated above
+        static std::string ErrorStrings[NUM_ERRORS];
+};
 
 
 }

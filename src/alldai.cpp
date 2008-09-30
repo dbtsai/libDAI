@@ -35,31 +35,31 @@ using namespace std;
 InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const PropertySet &opts ) {
     if( name == ExactInf::Name )
         return new ExactInf (fg, opts);
-#ifdef WITH_BP
+#ifdef DAI_WITH_BP
     if( name == BP::Name ) 
         return new BP (fg, opts);
 #endif
-#ifdef WITH_MF
+#ifdef DAI_WITH_MF
     if( name == MF::Name ) 
         return new MF (fg, opts);
 #endif
-#ifdef WITH_HAK
+#ifdef DAI_WITH_HAK
     if( name == HAK::Name ) 
         return new HAK (fg, opts);
 #endif
-#ifdef WITH_LC
+#ifdef DAI_WITH_LC
     if( name == LC::Name )
         return new LC (fg, opts);
 #endif
-#ifdef WITH_TREEEP
+#ifdef DAI_WITH_TREEEP
     if( name == TreeEP::Name )
         return new TreeEP (fg, opts);
 #endif
-#ifdef WITH_JTREE
+#ifdef DAI_WITH_JTREE
     if( name == JTree::Name )
         return new JTree (fg, opts);
 #endif
-#ifdef WITH_MR
+#ifdef DAI_WITH_MR
     if( name == MR::Name )
         return new MR (fg, opts);
 #endif

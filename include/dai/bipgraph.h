@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines BipartiteGraph class
+
+
 #ifndef __defined_libdai_bipgraph_h
 #define __defined_libdai_bipgraph_h
 
@@ -34,58 +38,69 @@
 namespace dai {
 
 
-/// A BipartiteGraph represents the neighborhood structure of nodes in a bipartite graph.
+/// Represents the neighborhood structure of nodes in a bipartite graph.
 /** A bipartite graph has two types of nodes: type 1 and type 2. Edges can occur only between
  *  nodes of different type. Nodes are indexed by an unsigned integer, edges are indexed as
  *  a pair of unsigned integers, where the pair (a,b) means the b'th neighbor of the a'th node.
- *  The BipartiteGraph stores neighborhood structures as vectors of vectors of Neighbor entries:
- *  each node has a vector of Neighbor entries, which is also known as a Neighbors type.
+ *
+ *  The BipartiteGraph stores for each node of type 1 a vector of Neighbor structures, where
+ *  each Neighbor corresponds to a neighboring node of type 2. In addition, each node of type 2
+ *  stores a vector of Neighbor structures describing its neighboring nodes of type 1.
  */
 class BipartiteGraph {
     public:
-        /// A Neighbor describes a neighboring node of some other node in a BipartiteGraph.
-        /** Iterating over all neighbors of node n1 of type 1 can be done in the following way:
+        /// Describes a neighboring node of some other node in a BipartiteGraph.
+        /** Iterating over all neighbors of the n1'th node of type 1 can be done in the following way:
          *  \code
+         *      size_t n1 = ...;
          *      foreach( const BipartiteGraph::Neighbor &n2, nb1(n1) ) {
          *          size_t _n2 = n2.iter;
          *          size_t _n1 = n2.dual;
-         *          // n2 == n2.node;
-         *          // The _n2'th neighbor of n1 is n2, and the _n1'th neighbor of n2 is n1:
-         *          // nb1(n1)[_n2] == n2, nb2(n2)[_n1] == n1 
+         *          std::cout << "The " << _n2 << "'th neighbor of the " << n1 << "'th node of type 1 is: the " << n2 << "'th node of type 2" << endl;
+         *
+         *          // The _n2'th neighbor of n1 is n2:
+         *          assert( nb1(n1)[_n2] == n2 );
+         *          // The _n1'th neighbor of n2 is n1:
+         *          assert( nb2(n2)[_n1] == n1 );
+         *          // n2 can be used as an abbreviation of n2.node:
+         *          assert( static_cast<size_t>(n2) == n2.node );
          *      }
          *  \endcode
          */
         struct Neighbor {
             /// Corresponds to the index of this Neighbor entry in the vector of neighbors
-            unsigned iter;
+            size_t iter;
             /// Contains the number of the neighboring node
-            unsigned node;
+            size_t node;
             /// Contains the "dual" iter
-            unsigned dual;
-            /// Cast to unsigned returns node member
-            operator unsigned () const { return node; }
+            size_t dual;
+
             /// Default constructor
             Neighbor() {}
-            /// Constructor
+            /// Constructor that sets the Neighbor members accordingly to the parameters
             Neighbor( size_t iter, size_t node, size_t dual ) : iter(iter), node(node), dual(dual) {}
+
+            /// Cast to size_t returns member node
+            operator size_t () const { return node; }
         };
 
-        /// Neighbors is a vector of Neighbor entries; each node has an associated Neighbors variable, which describes its neighbors.
+        /// Describes the neighbors of some node.
         typedef std::vector<Neighbor> Neighbors;
 
-        /// Edge is used as index of an edge: an Edge(a,b) corresponds to the edge between the a'th node and its b'th neighbor. It depends on the context whether the first node (with index a) is of type 1 or of type 2.
+        /// Used as index of an edge: an Edge(a,b) corresponds to the edge between the a'th node and its b'th neighbor (it depends on the context whether the first node (with index a) is of type 1 or of type 2).
         typedef std::pair<size_t,size_t> Edge;
 
     private:
-        /// _nb1 contains for each node of type 1 a vector of its neighbors
+        /// Contains for each node of type 1 a vector of its neighbors
         std::vector<Neighbors> _nb1;
-        /// _nb2 contains for each node of type 2 a vector of its neighbors
+
+        /// Contains for each node of type 2 a vector of its neighbors
         std::vector<Neighbors> _nb2;
 
         /// Used internally by isTree()
         struct levelType {
-            std::vector<size_t> ind1;       // indices of vertices of type 1
-            std::vector<size_t> ind2;       // indices of vertices of type 2
+            std::vector<size_t> ind1;       // indices of nodes of type 1
+            std::vector<size_t> ind2;       // indices of nodes of type 2
         };
 
     public:
@@ -104,21 +119,27 @@ class BipartiteGraph {
             return *this;
         }
 
-        /// Create bipartite graph from a range of edges. 
-        /** nr1 is the number of nodes of type 1, nr2 the number of nodes of type 2. 
-         *  The value_type of an EdgeInputIterator should be Edge.
-         */
-        template<typename EdgeInputIterator>
-        void construct( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end );
-
-        /// Construct bipartite graph from a range of edges. 
-        /** nr1 is the number of nodes of type 1, nr2 the number of nodes of type 2. 
-         *  The value_type of an EdgeInputIterator should be Edge.
+        /// Constructs BipartiteGraph from a range of edges. 
+        /** \tparam EdgeInputIterator Iterator with value_type Edge.
+         *  \param nr1 The number of nodes of type 1.
+         *  \param nr2 The number of nodes of type 2. 
+         *  \param begin Points to the first Edge.
+         *  \param end Points just beyond the last Edge.
          */
         template<typename EdgeInputIterator>
         BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ) {
             construct( nr1, nr2, begin, end );
         }
+
+        /// (Re)constructs BipartiteGraph from a range of edges. 
+        /** \tparam EdgeInputIterator Iterator with value_type Edge.
+         *  \param nr1 The number of nodes of type 1.
+         *  \param nr2 The number of nodes of type 2. 
+         *  \param begin Points to the first Edge.
+         *  \param end Points just beyond the last Edge.
+         */
+        template<typename EdgeInputIterator>
+        void construct( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end );
 
         /// Returns constant reference to the _i2'th neighbor of node i1 of type 1
         const Neighbor & nb1( size_t i1, size_t _i2 ) const { 
@@ -197,16 +218,18 @@ class BipartiteGraph {
             return sum;
         }
         
-        /// Add node of type 1 without neighbors.
+        /// Adds a node of type 1 without neighbors.
         void add1() { _nb1.push_back( Neighbors() ); }
         
-        /// Add node of type 2 without neighbors.
+        /// Adds a node of type 2 without neighbors.
         void add2() { _nb2.push_back( Neighbors() ); }
 
-        /// Add node of type 1 with neighbors specified by a range.
-        /** The value_type of an NodeInputIterator should be a size_t, corresponding to
+        /// Adds a node of type 1, with neighbors specified by a range of indices of nodes of type 2.
+        /** \tparam NodeInputIterator Iterator with value_type size_t, corresponding to
          *  the indices of nodes of type 2 that should become neighbors of the added node.
-         *  For improved efficiency, the size of the range may be specified by sizeHint.
+         *  \param begin Points to the index of the first neighbor.
+         *  \param end Points just beyond the index of the last neighbor.
+         *  \param sizeHint For improved efficiency, the size of the range may be specified by sizeHint.
          */
         template <typename NodeInputIterator>
         void add1( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
@@ -223,10 +246,12 @@ class BipartiteGraph {
             _nb1.push_back( nbs1new );
         }
 
-        /// Add node of type 2 with neighbors specified by a range.
-        /** The value_type of an NodeInputIterator should be a size_t, corresponding to
+        /// Adds a node of type 2, with neighbors specified by a range of indices of nodes of type 1.
+        /** \tparam NodeInputIterator Iterator with value_type size_t, corresponding to
          *  the indices of nodes of type 1 that should become neighbors of the added node.
-         *  For improved efficiency, the size of the range may be specified by sizeHint.
+         *  \param begin Points to the index of the first neighbor.
+         *  \param end Points just beyond the index of the last neighbor.
+         *  \param sizeHint For improved efficiency, the size of the range may be specified by sizeHint.
          */
         template <typename NodeInputIterator>
         void add2( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
@@ -243,13 +268,13 @@ class BipartiteGraph {
             _nb2.push_back( nbs2new );
         }
 
-        /// Remove node n1 of type 1 and all incident edges.
+        /// Removes node n1 of type 1 and all incident edges.
         void erase1( size_t n1 );
 
-        /// Remove node n2 of type 2 and all incident edges.
+        /// Removes node n2 of type 2 and all incident edges.
         void erase2( size_t n2 );
 
-        /// Add edge between node n1 of type 1 and node n2 of type 2.
+        /// Adds an edge between node n1 of type 1 and node n2 of type 2.
         /** If check == true, only adds the edge if it does not exist already.
          */
         void addEdge( size_t n1, size_t n2, bool check = true ) {
@@ -272,13 +297,13 @@ class BipartiteGraph {
             }
         }
 
-        /// Calculate second-order neighbors (i.e., neighbors of neighbors) of node n1 of type 1.
-        /** If include == true, include n1 itself, otherwise exclude n1.
+        /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node n1 of type 1.
+        /** If include == true, includes n1 itself, otherwise excludes n1.
          */
         std::vector<size_t> delta1( size_t n1, bool include = false ) const;
 
-        /// Calculate second-order neighbors (i.e., neighbors of neighbors) of node n2 of type 2.
-        /** If include == true, include n2 itself, otherwise exclude n2.
+        /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node n2 of type 2.
+        /** If include == true, includes n2 itself, otherwise excludes n2.
          */
         std::vector<size_t> delta2( size_t n2, bool include = false ) const;
 
@@ -286,14 +311,15 @@ class BipartiteGraph {
         bool isConnected() const;
 
         /// Returns true if the graph is a tree, i.e., if it is singly connected and connected.
-        /** This is equivalent to whether for each pair of vertices in the graph, there exists
-         *  a unique path in the graph that starts at the first and ends at the second vertex.
+        /** This is equivalent to whether for each pair of nodes in the graph, there exists
+         *  a unique path in the graph that starts at the first and ends at the second node.
          */
         bool isTree() const;
 
-        /// Stream to output stream os in graphviz .dot syntax
+        /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
 
+    private:
         /// Checks internal consistency
         void check() const;
 };

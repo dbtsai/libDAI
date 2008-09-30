@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines class BP
+
+
 #ifndef __defined_libdai_bp_h
 #define __defined_libdai_bp_h
 
@@ -34,6 +38,7 @@
 namespace dai {
 
 
+/// Approximate inference algorithm "(Loopy) Belief Propagation"
 class BP : public DAIAlgFG {
     private:
         typedef std::vector<size_t> ind_t;
@@ -50,37 +55,45 @@ class BP : public DAIAlgFG {
         size_t _iters;
     
     public:
+        /// Parameters of this inference algorithm
         struct Properties {
-            size_t verbose;
-            size_t maxiter;
-            double tol;
-            bool logdomain;
-            double damping;
+            /// Enumeration of possible update schedules
             DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
-            UpdateType updates;
+
+            /// Enumeration of inference variants
             DAI_ENUM(InfType,SUMPROD,MAXPROD)
+        
+            /// Verbosity
+            size_t verbose;
+
+            /// Maximum number of iterations
+            size_t maxiter;
+
+            /// Tolerance
+            double tol;
+
+            /// Do updates in logarithmic domain?
+            bool logdomain;
+
+            /// Damping constant
+            double damping;
+
+            /// Update schedule
+            UpdateType updates;
+
+            /// Type of inference: sum-product or max-product?
             InfType inference;
         } props;
+
+        /// Name of this inference algorithm
         static const char *Name;
 
     public:
         /// Default constructor
         BP() : DAIAlgFG(), _edges(), _maxdiff(0.0), _iters(0U), props() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
-        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), props() {
-            setProperties( opts );
-            construct();
-        }
-
         /// Copy constructor
         BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
-
-        /// Clone *this (virtual copy constructor)
-        virtual BP* clone() const { return new BP(*this); }
-
-        /// Create (virtual default constructor)
-        virtual BP* create() const { return new BP(); }
 
         /// Assignment operator
         BP& operator=( const BP &x ) {
@@ -94,39 +107,35 @@ class BP : public DAIAlgFG {
             return *this;
         }
 
-        /// Identifies itself for logging purposes
+        /// Construct from FactorGraph fg and PropertySet opts
+        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), props() {
+            setProperties( opts );
+            construct();
+        }
+
+
+        /// @name General InfAlg interface
+        //@{
+        virtual BP* clone() const { return new BP(*this); }
+        virtual BP* create() const { return new BP(); }
         virtual std::string identify() const;
-
-        /// Get single node belief
         virtual Factor belief( const Var &n ) const;
-
-        /// Get general belief
         virtual Factor belief( const VarSet &ns ) const;
-
-        /// Get all beliefs
         virtual std::vector<Factor> beliefs() const;
-
-        /// Get log partition sum
         virtual Real logZ() const;
-
-        /// Clear messages and beliefs
         virtual void init();
-
-        /// Clear messages and beliefs corresponding to the nodes in ns
         virtual void init( const VarSet &ns );
-
-        /// The actual approximate inference algorithm
         virtual double run();
-
-        /// Return maximum difference between single node beliefs in the last pass
         virtual double maxDiff() const { return _maxdiff; }
-
-        /// Return number of passes over the factorgraph
         virtual size_t Iterations() const { return _iters; }
+        //@}
 
 
+        /// @name Additional interface specific for BP
+        //@{
         Factor beliefV( size_t i ) const;
         Factor beliefF( size_t I ) const;
+        //@}
 
     private:
         const Prob & message(size_t i, size_t _I) const { return _edges[i][_I].message; }

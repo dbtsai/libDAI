@@ -41,10 +41,11 @@ INC=include/dai
 SRC=src
 LIB=lib
 
-# Extensions (library, object, executable extensions)
+# Extensions (library, object, executable, MEX file extensions)
 LE=.lib
 OE=.obj
 EE=.exe
+ME=.mexglx
 
 # Libraries (for some reason, we have to add the VC library path, although it is in the environment)
 LIBS=/link $(LIB)/libdai$(LE) /LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\ATLMFC\LIB" /LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\LIB" /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v6.0A\lib"
@@ -69,31 +70,31 @@ CCFLAGS=$(CCFLAGS) /DWINDOWS
 
 OBJECTS=exactinf$(OE)
 !IFDEF WITH_BP
-CCFLAGS=$(CCFLAGS) /DWITH_BP
+CCFLAGS=$(CCFLAGS) /DDAI_WITH_BP
 OBJECTS=$(OBJECTS) bp$(OE)
 !ENDIF
 !IFDEF WITH_MF
-CCFLAGS=$(CCFLAGS) /DWITH_MF
+CCFLAGS=$(CCFLAGS) /DDAI_WITH_MF
 OBJECTS=$(OBJECTS) mf$(OE)
 !ENDIF
 !IFDEF WITH_HAK
-CCFLAGS=$(CCFLAGS) /DWITH_HAK
+CCFLAGS=$(CCFLAGS) /DDAI_WITH_HAK
 OBJECTS=$(OBJECTS) hak$(OE)
 !ENDIF
 !IFDEF WITH_LC
-CCFLAGS=$(CCFLAGS) /DWITH_LC
+CCFLAGS=$(CCFLAGS) /DDAI_WITH_LC
 OBJECTS=$(OBJECTS) lc$(OE)
 !ENDIF
 !IFDEF WITH_TREEEP
-CCFLAGS=$(CCFLAGS) /DWITH_TREEEP
+CCFLAGS=$(CCFLAGS) /DDAI_WITH_TREEEP
 OBJECTS=$(OBJECTS) treeep$(OE)
 !ENDIF
 !IFDEF WITH_JTREE
-CCFLAGS=$(CCFLAGS) /DWITH_JTREE
+CCFLAGS=$(CCFLAGS) /DDAI_WITH_JTREE
 OBJECTS=$(OBJECTS) jtree$(OE)
 !ENDIF
 !IFDEF WITH_MR
-CCFLAGS=$(CCFLAGS) /DWITH_MR
+CCFLAGS=$(CCFLAGS) /DDAI_WITH_MR
 OBJECTS=$(OBJECTS) mr$(OE)
 !ENDIF
 
@@ -101,7 +102,6 @@ OBJECTS=$(OBJECTS) mr$(OE)
 # Replace the following by the directory where Matlab has been installed
 MATLABDIR=/opt/matlab/bin
 # Replace the following with the extension of compiled MEX files on this platform, e.g. .mexglx for x86
-ME=.mexglx
 MEX=$(MATLABDIR)/mex
 MEXFLAGS=-I.
 !IFDEF DEBUG
@@ -114,7 +114,7 @@ MEXFLAGS=$(MEXFLAGS) /DSMALLMEM
 !ENDIF
 !ENDIF
 
-HEADERS=$(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
+HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
 
 TARGETS=tests utils $(LIB)/libdai$(LE) example$(EE)
 # testregression disabled, it uses diff
@@ -124,10 +124,10 @@ TARGETS = $(TARGETS) matlabs
 !ENDIF
 all : $(TARGETS)
 
-matlabs : matlab/dai.$(ME) matlab/dai_readfg.$(ME) matlab/dai_writefg.$(ME) matlab/dai_potstrength.$(ME)
+matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) varset$(OE) $(OBJECTS)
-	lib /out:$(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) varset$(OE) $(OBJECTS)
+$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
+	lib /out:$(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 
 tests : tests/testdai$(EE)
 
@@ -141,6 +141,6 @@ doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
 	doxygen doxygen.conf
 
 clean :
-	del *$(OE) *.ilk *.pdb *$(EE) matlab\*.$(ME) matlab\*$(OE) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
+	del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) matlab\*$(OE) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
 
 !INCLUDE Makefile.shared

@@ -179,7 +179,7 @@ bool RegionGraph::Check_Counting_Numbers() {
     // Checks whether the counting numbers satisfy the fundamental relation
     
     bool all_valid = true;
-    for( vector<Var>::const_iterator n = vars.begin(); n != vars.end(); n++ ) {
+    for( vector<Var>::const_iterator n = vars().begin(); n != vars().end(); n++ ) {
         double c_n = 0.0;
         for( size_t alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars().contains( *n ) )
@@ -229,6 +229,7 @@ void RegionGraph::RecomputeOR( size_t I ) {
 }
 
 
+/// Send RegionGraph to output stream
 ostream & operator << (ostream & os, const RegionGraph & rg) {
     os << "Outer regions" << endl;
     for( size_t alpha = 0; alpha < rg.nrORs(); alpha++ )

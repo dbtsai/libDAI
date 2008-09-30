@@ -95,7 +95,6 @@ double rnd_stdnormal() {
     return _normal_rnd();
 }
 
-// Returns integer in interval [min, max]
 int rnd_int( int min, int max ) {
     return (int)floor(_uni_rnd() * (max + 1 - min) + min);
 }

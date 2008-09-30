@@ -28,7 +28,6 @@
 namespace dai {
 
 
-/// Sends a single Property object to an output stream
 std::ostream& operator<< (std::ostream & os, const Property & p) {
     os << p.first << "=";
     if( p.second.type() == typeid(size_t) )
@@ -47,7 +46,7 @@ std::ostream& operator<< (std::ostream & os, const Property & p) {
 }
 
 
-/// Sends a PropertySet object to an output stream
+/// Writes a PropertySet object to an output stream
 std::ostream& operator<< (std::ostream & os, const PropertySet & ps) {
     os << "[";
     for( PropertySet::const_iterator p = ps.begin(); p != ps.end(); p++ ) {

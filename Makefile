@@ -41,10 +41,11 @@ INC=include/dai
 SRC=src
 LIB=lib
 
-# Extensions (library, object, executable extensions)
+# Extensions (library, object, executable, MEX file extensions)
 LE=.a
 OE=.o
 EE=
+ME=.mexglx
 
 # Libraries
 LIBS=-ldai
@@ -69,31 +70,31 @@ endif
 
 OBJECTS:=exactinf$(OE)
 ifdef WITH_BP
-CCFLAGS:=$(CCFLAGS) -DWITH_BP
+CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP
 OBJECTS:=$(OBJECTS) bp$(OE)
 endif
 ifdef WITH_MF
-CCFLAGS:=$(CCFLAGS) -DWITH_MF
+CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MF
 OBJECTS:=$(OBJECTS) mf$(OE)
 endif
 ifdef WITH_HAK
-CCFLAGS:=$(CCFLAGS) -DWITH_HAK
+CCFLAGS:=$(CCFLAGS) -DDAI_WITH_HAK
 OBJECTS:=$(OBJECTS) hak$(OE)
 endif
 ifdef WITH_LC
-CCFLAGS:=$(CCFLAGS) -DWITH_LC
+CCFLAGS:=$(CCFLAGS) -DDAI_WITH_LC
 OBJECTS:=$(OBJECTS) lc$(OE)
 endif
 ifdef WITH_TREEEP
-CCFLAGS:=$(CCFLAGS) -DWITH_TREEEP
+CCFLAGS:=$(CCFLAGS) -DDAI_WITH_TREEEP
 OBJECTS:=$(OBJECTS) treeep$(OE)
 endif
 ifdef WITH_JTREE
-CCFLAGS:=$(CCFLAGS) -DWITH_JTREE
+CCFLAGS:=$(CCFLAGS) -DDAI_WITH_JTREE
 OBJECTS:=$(OBJECTS) jtree$(OE)
 endif
 ifdef WITH_MR
-CCFLAGS:=$(CCFLAGS) -DWITH_MR
+CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MR
 OBJECTS:=$(OBJECTS) mr$(OE)
 endif
 
@@ -101,7 +102,6 @@ ifdef WITH_MATLAB
 # Replace the following by the directory where Matlab has been installed
 MATLABDIR=/opt/matlab/bin
 # Replace the following with the extension of compiled MEX files on this platform, e.g. .mexglx for x86
-ME=.mexglx
 MEX=$(MATLABDIR)/mex
 MEXFLAGS=-I.
 ifdef DEBUG
@@ -114,7 +114,7 @@ MEXFLAGS:=$(MEXFLAGS) -DSMALLMEM
 endif
 endif
 
-HEADERS=$(INC)/bipgraph.h $(INC)/diffs.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
+HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
 
 TARGETS=tests utils $(LIB)/libdai$(LE) example$(EE) testregression doc
 ifdef WITH_MATLAB
@@ -123,11 +123,11 @@ endif
 all : $(TARGETS)
 	echo -e "\a"
 
-matlabs : matlab/dai.$(ME) matlab/dai_readfg.$(ME) matlab/dai_writefg.$(ME) matlab/dai_potstrength.$(ME)
+matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) varset$(OE) $(OBJECTS)
+$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 	-mkdir -p lib
-	ar rcus $(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) varset$(OE) $(OBJECTS)
+	ar rcus $(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 
 tests : tests/testdai$(EE)
 
@@ -144,7 +144,7 @@ doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
 .PHONY : clean
 clean :
 	-rm *$(OE) 
-	-rm matlab/*.$(ME) matlab/*$(OE) 
+	-rm matlab/*$(ME) matlab/*$(OE) 
 	-rm example$(EE) tests/testdai$(EE) utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib

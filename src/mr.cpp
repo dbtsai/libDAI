@@ -28,7 +28,6 @@
 #include <dai/bp.h>
 #include <dai/jtree.h>
 #include <dai/util.h>
-#include <dai/diffs.h>
 
 
 namespace dai {

@@ -1,0 +1,120 @@
+#   Copyright (C) 2006-2008  Joris Mooij  [joris dot mooij at tuebingen dot mpg dot de]
+#   Radboud University Nijmegen, The Netherlands /
+#   Max Planck Institute for Biological Cybernetics, Germany
+#   
+#   This file is part of libDAI.
+#
+#   libDAI is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   libDAI is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with libDAI; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+bipgraph$(OE) : $(SRC)/bipgraph.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/bipgraph.cpp
+
+daialg$(OE) : $(SRC)/daialg.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/daialg.cpp
+
+exactinf$(OE) : $(SRC)/exactinf.cpp $(INC)/exactinf.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/exactinf.cpp
+
+bp$(OE) : $(SRC)/bp.cpp $(INC)/bp.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/bp.cpp
+
+lc$(OE) : $(SRC)/lc.cpp $(INC)/lc.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/lc.cpp
+
+mf$(OE) : $(SRC)/mf.cpp $(INC)/mf.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/mf.cpp
+
+factorgraph$(OE) : $(SRC)/factorgraph.cpp $(INC)/factorgraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/factorgraph.cpp
+
+util$(OE) : $(SRC)/util.cpp $(INC)/util.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/util.cpp
+
+regiongraph$(OE) : $(SRC)/regiongraph.cpp $(INC)/regiongraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/regiongraph.cpp
+
+hak$(OE) : $(SRC)/hak.cpp $(INC)/hak.h $(HEADERS) $(INC)/regiongraph.h
+	$(CC) $(CCFLAGS) -c $(SRC)/hak.cpp
+
+clustergraph$(OE) : $(SRC)/clustergraph.cpp $(INC)/clustergraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/clustergraph.cpp
+
+jtree$(OE) : $(SRC)/jtree.cpp $(INC)/jtree.h $(HEADERS) $(INC)/weightedgraph.h $(INC)/clustergraph.h $(INC)/regiongraph.h
+	$(CC) $(CCFLAGS) -c $(SRC)/jtree.cpp
+
+treeep$(OE) : $(SRC)/treeep.cpp $(INC)/treeep.h $(HEADERS) $(INC)/weightedgraph.h $(INC)/clustergraph.h $(INC)/regiongraph.h $(INC)/jtree.h
+	$(CC) $(CCFLAGS) -c $(SRC)/treeep.cpp
+
+weightedgraph$(OE) : $(SRC)/weightedgraph.cpp $(INC)/weightedgraph.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/weightedgraph.cpp
+
+mr$(OE) : $(SRC)/mr.cpp $(INC)/mr.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/mr.cpp
+
+properties$(OE) : $(SRC)/properties.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/properties.cpp
+
+exceptions$(OE) : $(SRC)/exceptions.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/exceptions.cpp
+
+alldai$(OE) : $(SRC)/alldai.cpp $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/alldai.cpp
+
+
+# EXAMPLE
+##########
+
+example$(EE) : example.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCFLAGS) $(CCO) example$(EE) example.cpp $(LIBS)
+
+
+# TESTS
+########
+
+tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCFLAGS) $(CCO) tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
+
+
+# MATLAB INTERFACE
+###################
+
+matlab/dai.$(ME) : matlab/dai.cpp $(HEADERS) matlab/matlab$(OE) $(LIB)/libdai$(LE)
+	$(MEX) $(MEXFLAGS) -o matlab/dai matlab/dai.cpp matlab/matlab$(OE) $(LIB)/libdai$(LE)
+
+matlab/dai_readfg.$(ME) : matlab/dai_readfg.cpp $(HEADERS) factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE)
+	$(MEX) $(MEXFLAGS) -o matlab/dai_readfg matlab/dai_readfg.cpp factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE)
+
+matlab/dai_writefg.$(ME) : matlab/dai_writefg.cpp $(HEADERS) factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE)
+	$(MEX) $(MEXFLAGS) -o matlab/dai_writefg matlab/dai_writefg.cpp factorgraph$(OE) matlab/matlab$(OE) exceptions$(OE)
+
+matlab/dai_potstrength.$(ME) : matlab/dai_potstrength.cpp $(HEADERS) matlab/matlab$(OE) exceptions$(OE)
+	$(MEX) $(MEXFLAGS) -o matlab/dai_potstrength matlab/dai_potstrength.cpp matlab/matlab$(OE) exceptions$(OE)
+
+matlab/matlab$(OE) : matlab/matlab.cpp matlab/matlab.h $(HEADERS)
+	$(MEX) $(MEXFLAGS) -outdir matlab -c matlab/matlab.cpp
+
+
+# UTILS
+########
+
+utils/createfg$(EE) : utils/createfg.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCFLAGS) $(CCO) utils/createfg$(EE) utils/createfg.cpp $(LIBS) $(BOOSTLIBS)
+
+utils/fg2dot$(EE) : utils/fg2dot.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCFLAGS) $(CCO) utils/fg2dot$(EE) utils/fg2dot.cpp $(LIBS)
+
+utils/fginfo$(EE) : utils/fginfo.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCFLAGS) $(CCO) utils/fginfo$(EE) utils/fginfo.cpp $(LIBS)

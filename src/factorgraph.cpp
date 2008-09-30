@@ -41,31 +41,30 @@ using namespace std;
 
 FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _backup() {
     // add factors, obtain variables
-    set<Var> _vars;
+    set<Var> varset;
     _factors.reserve( P.size() );
     size_t nrEdges = 0;
     for( vector<Factor>::const_iterator p2 = P.begin(); p2 != P.end(); p2++ ) {
         _factors.push_back( *p2 );
-        copy( p2->vars().begin(), p2->vars().end(), inserter( _vars, _vars.begin() ) );
+        copy( p2->vars().begin(), p2->vars().end(), inserter( varset, varset.begin() ) );
         nrEdges += p2->vars().size();
     }
 
-    // add _vars
-    vars.reserve( _vars.size() );
-    for( set<Var>::const_iterator p1 = _vars.begin(); p1 != _vars.end(); p1++ )
-        vars.push_back( *p1 );
+    // add vars
+    _vars.reserve( varset.size() );
+    for( set<Var>::const_iterator p1 = varset.begin(); p1 != varset.end(); p1++ )
+        _vars.push_back( *p1 );
 
     // create graph structure
     constructGraph( nrEdges );
 }
 
 
-/// Part of constructors (creates edges, neighbours and adjacency matrix)
 void FactorGraph::constructGraph( size_t nrEdges ) {
     // create a mapping for indices
     hash_map<size_t, size_t> hashmap;
     
-    for( size_t i = 0; i < vars.size(); i++ )
+    for( size_t i = 0; i < vars().size(); i++ )
         hashmap[var(i).label()] = i;
     
     // create edge list
@@ -82,6 +81,7 @@ void FactorGraph::constructGraph( size_t nrEdges ) {
 }
 
 
+/// Writes a FactorGraph to an output stream
 ostream& operator << (ostream& os, const FactorGraph& fg) {
     os << fg.nrFactors() << endl;
 
@@ -111,6 +111,7 @@ ostream& operator << (ostream& os, const FactorGraph& fg) {
 }
 
 
+/// Reads a FactorGraph from an input stream
 istream& operator >> (istream& is, FactorGraph& fg) {
     long verbose = 0;
 
@@ -452,7 +453,7 @@ FactorGraph FactorGraph::maximalFactors() const {
     for( size_t I = 0; I < nrFactors(); I++ )
         facs[newindex[maxfac[I]]] *= factor(I);
 
-    return FactorGraph( facs.begin(), facs.end(), vars.begin(), vars.end(), facs.size(), nrVars() );
+    return FactorGraph( facs.begin(), facs.end(), vars().begin(), vars().end(), facs.size(), nrVars() );
 }
 
 

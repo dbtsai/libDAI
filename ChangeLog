@@ -1,14 +1,20 @@
-libDAI-0.2.2 (2008-??-??)
+libDAI-0.2.2 (2008-09-30)
 -------------------------
 
-* Now compiles also under Visual C++ and cygwin.
-* Added Exceptions framework.
+New features:
 * Approximate inference methods now report the number of iterations needed.
 * Added damping to various algorithms to improve convergence properties.
-* Replaced ENUM2,ENUM3,ENUM4,ENUM5,ENUM6 by single DAI_ENUM macro.
-* Removed utils/remove_short_loops and matlab/remove_short_loops.
 * Added more features to utils/createfg for creating factor graphs.
-* Replaced sub_nb class in mr.h by boost::dynamic_bitset.
+* Added ExactInf class for brute force exact inference.
+* [Giuseppe Pasino] Added "logdomain" property to BP, a boolean that controls 
+  whether calculations are done in the log-domain or in the linear domain;
+  doing calculations in the log-domain may help if the numerical range
+  of a double is too small.
+* [Claudio Lima] Added Max-Product functionality to BP.
+* Improved documentation.
+
+Improved architecture:
+* Added Exceptions framework.
 * Pervasive change of BipartiteGraph implementation (based on an idea by
   Giuseppe Passino). BipartiteGraph no longer stores the node properties 
   (former _V1 and _V2), nor does it store a dense adjacency matrix anymore, 
@@ -16,21 +22,44 @@ libDAI-0.2.2 (2008-??-??)
   neighboring nodes. This yields a significant memory/speed improvement for 
   large factor graphs, and is more elegant as well. Iterating over neighbors is
   made easy by using boost::foreach.
-* Improved index.h (merged from SVN head):
+* Added conditional compilation of inference methods.
+* VarSet is now implemented using a std::vector<Var> instead of a
+  std::set<Var>, which yields a significant speed improvement. Furthermore,
+  the implementation has been generalized, resulting in the small_set<T> class
+  which can be used to represent sets of small cardinality; VarSet is the
+  specialization with T = Var.
+* Improved ClusterGraph implementation, yielding significant speedups
+  for the JunctionTree algorithm on large factorgraphs.
+
+Code cleanup:
+* Moved everything into namespace "dai".
+* Renamed DEBUG to DAI_DEBUG to avoid conflicts.
+* Replaced ENUM2,ENUM3,ENUM4,ENUM5,ENUM6 by single DAI_ENUM macro.
+* Removed utils/remove_short_loops and matlab/remove_short_loops.
+* Replaced sub_nb class in mr.h by boost::dynamic_bitset.
+* Improved index.h:
   - Renamed Index -> IndexFor
   - Added some .reserve()'s to IndexFor methods which yields a 
     25% speedup of testregression
   - Replaced multind by Permute
   - Added MultiFor
   - Added State
-* Improved factor.h (merged from SVN head): mainly new functionality.
-* Moved everything into namespace "dai".
-* Added ExactInf class for brute force exact inference.
-* Renamed DEBUG to DAI_DEBUG to avoid conflicts.
-* Added conditional compilation of inference methods.
+* New funcstionality of factor.h.
+* Moved Properties and MaxDiff frameworks from InfAlg to each individual
+  inference algorithm, because the Properties framework was not as 
+  convenient as I hoped, and not every inference algorithm needs a maxdiff
+  variable. Also, replaced some FactorGraph functionality in InfAlg by a
+  function that returns the FactorGraph. The result is cleaner (less 
+  entangled) code.
+* Removed x2x.
+* Replaced Complex with real numbers (negative potentials are just too rare
+  to warrant the additional "complexity" :)).
+
+Miscellaneous improvements:
+* Now compiles also with MS Visual C++ and with GCC under cygwin.
 * Contributions by Peter Gober:
   - Renamed variable _N in mr.* for compatibility with g++ under cygwin.
-* Contributions by Giuseppe Passino:
+* Misc contributions by Giuseppe Passino:
   - removed "using namespace std;" from header files - bad practice;
   - moved header files in include/dai and sources in src;
   - changed #ifndefs to GNU style;
@@ -41,83 +70,60 @@ libDAI-0.2.2 (2008-??-??)
     o added methods takeExp, takeLog, takeLog0 for transformation in-place;
     o explicit constructor (prevents implicit conversion from size_t to TProb);
     o added operator+,+=,-,-=, with argument T (for calculations in log-scale);
-  - Added "logdomain" property to BP, a boolean that controls whether 
-    calculations are done in the log-domain or in the linear domain;
-    doing calculations in the log-domain may help if the numerical range
-    of a double is too small.
-* Contributions by Christian Wojek:
+* Misc contributions by Christian Wojek:
   - New FactorGraph constructor that constructs from given ranges of factors
     and variables;
   - Optimization of FactorGraph constructors using tr1::unordered_map.
-* Contributions by Claudio Lima:
-  - Added Max-Product functinoality to BP.
 * FactorGraph constructors no longer check for short loops (huge speed
   increase for large factor graphs), nor for negative entries. Also, the 
   normtype is now Prob::NORMPROB by default.
-* VarSet is now implemented using a std::vector<Var> instead of a
-  std::set<Var>, which yields a significant speed improvement. Furthermore,
-  the implementation has been generalized, resulting in the small_set<T> class
-  which can be used to represent sets of small cardinality; VarSet is the
-  specialization with T = Var.
 * Improved MaxSpanningTreePrims algorithm (uses boost::graph).
-* Small optimization in Diffs.
-* Replaced Complex with real numbers (negative potentials is just not
-  used enough to warrant the additional "complexity" :)).
-* Moved Properties and MaxDiff frameworks from InfAlg to each individual
-  inference algorithm, because the Properties framework was not as 
-  convenient as I hoped, and not every inference algorithm needs a maxdiff
-  variable. Also, replaced some FactorGraph functionality in InfAlg by a
-  function that returns the FactorGraph. The result is cleaner (less 
-  entangled) code.
-* Improved ClusterGraph implementation, yielding significant speedups
-  for the JunctionTree algorithm on large factorgraphs.
-* Improved documetation.
-* Removed x2x.
-* Interface changes:
-  - VarSet::
-      VarSet::stateSpace() -> nrStates(const VarSet &)
-      VarSet( const std::set<Var> ) -> VarSet( begin, end, sizeHint=0 )
-      VarSet( const std::vector<Var> ) -> VarSet( begin, end, sizeHint=0 )
-      removed bool operator||
-      operator&&(const VarSet&) -> intersects(const VarSet&)
-      operator&&(const Var&) -> contains(const Var&)
-  - FactorGraph::
-      delta(const Var &) -> delta(size_t)
-      Delta(const Var &) -> Delta(size_t)
-      makeCavity(const Var &) -> makeCavity(size_t)
-      vars() -> vars
-      factors() -> factors
-      removed MakeFactorCavity(size_t)
-      removed ExactMarginal(const VarSet &)
-      removed ExactlogZ()
-      removed updatedFactor(size_t)
-      removed _normtype and NormType()
-      removed hasShortLoops(...) and removeShortLoops(...)
-      WriteToDotFile(const char *filename) -> printDot( std::ostream& os )
-      undoProb(size_t) -> restoreFactor(size_t)
-      saveProb(size_t) -> backupFactor(size_t)
-      undoProbs(const VarSet &) -> restoreFactors(const VarSet &)
-      saveProbs(const VarSet &) -> backupFactors(const VarSet &)
-      ReadFromFile(const char*) returns void (throws on error)
-      WriteToFile(const char*) returns void (throws on error)
-      removed hasNegatives()
-  - RegionGraph::
-      nr_ORs() -> nrORs()
-      nr_IRs() -> nrIRs()
-      ORs() -> ORs
-      IRs() -> IRs
-  - *::Regenerate() -> *::construct()
-  - Renamed Index -> IndexFor
-  - Diffs:
-      max() -> maxDiff()
-      max_size() -> maxSize()
-  - Prob::max() -> Prob::maxVal()
-  - Factor::
-      max() -> maxVal()
-      part_sum() -> partSum()
-  - toc() in util.h now returns seconds as a double
-  - VarSet::operator&&
-  - Properties -> PropertySet
+
+Interface changes:
+* VarSet::
+  - VarSet::stateSpace() -> nrStates(const VarSet &)
+  - VarSet( const std::set<Var> ) -> VarSet( begin, end, sizeHint=0 )
+  - VarSet( const std::vector<Var> ) -> VarSet( begin, end, sizeHint=0 )
+  - removed bool operator||
+  - operator&&(const VarSet&) -> intersects(const VarSet&)
+  - operator&&(const Var&) -> contains(const Var&)
+* FactorGraph::
+  - delta(const Var &) -> delta(size_t)
+  - Delta(const Var &) -> Delta(size_t)
+  - makeCavity(const Var &) -> makeCavity(size_t)
+  - vars() -> vars
+  - factors() -> factors
+  - removed MakeFactorCavity(size_t)
+  - removed ExactMarginal(const VarSet &)
+  - removed ExactlogZ()
+  - removed updatedFactor(size_t)
+  - removed _normtype and NormType()
+  - removed hasShortLoops(...) and removeShortLoops(...)
+  - WriteToDotFile(const char *filename) -> printDot( std::ostream& os )
+  - undoProb(size_t) -> restoreFactor(size_t)
+  - saveProb(size_t) -> backupFactor(size_t)
+  - undoProbs(const VarSet &) -> restoreFactors(const VarSet &)
+  - saveProbs(const VarSet &) -> backupFactors(const VarSet &)
+  - ReadFromFile(const char*) returns void (throws on error)
+  - WriteToFile(const char*) returns void (throws on error)
+  - removed hasNegatives()
+* RegionGraph::
+  - nr_ORs() -> nrORs()
+  - nr_IRs() -> nrIRs()
+  - ORs() -> ORs
+  - IRs() -> IRs
+* *::Regenerate() -> *::construct()
+* Renamed Index -> IndexFor
+* Diffs:
+  - max() -> maxDiff()
+  - max_size() -> maxSize()
+* Prob::max() -> Prob::maxVal()
+* Factor::
+  - max() -> maxVal()
+  - part_sum() -> partSum()
+* toc() in util.h now returns seconds as a double
+* VarSet::operator&&
+* Properties -> PropertySet
 
 
 libDAI-0.2.1 (2008-05-26)

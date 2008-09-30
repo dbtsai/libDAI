@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines class MR
+
+
 #ifndef __defined_libdai_mr_h
 #define __defined_libdai_mr_h
 
@@ -37,6 +41,7 @@
 namespace dai {
 
 
+/// Approximate inference algorithm by Montanari and Rizzo
 class MR : public DAIAlgFG {
     private:
         bool supported;                                            // is the underlying factor graph supported?
@@ -60,31 +65,36 @@ class MR : public DAIAlgFG {
         size_t _iters;
 
     public:
+        /// Parameters of this inference algorithm
         struct Properties {
-            size_t verbose;
-            double tol;
+            /// Enumeration of different types of update equations
             DAI_ENUM(UpdateType,FULL,LINEAR)
+
+            /// Enumeration of different ways of initializing the cavity correlations
             DAI_ENUM(InitType,RESPPROP,CLAMPING,EXACT)
+
+            /// Verbosity
+            size_t verbose;
+
+            /// Tolerance
+            double tol;
+
+            /// Update equations
             UpdateType updates;
+
+            /// How to initialize the cavity correlations
             InitType inits;
         } props;
+
+        /// Name of this inference method
         static const char *Name;
 
     public:
         /// Default constructor
         MR() : DAIAlgFG(), supported(), con(), nb(), tJ(), theta(), M(), kindex(), cors(), N(), Mag(), _maxdiff(), _iters(), props() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
-        MR( const FactorGraph &fg, const PropertySet &opts );
-
         /// Copy constructor
         MR( const MR &x ) : DAIAlgFG(x), supported(x.supported), con(x.con), nb(x.nb), tJ(x.tJ), theta(x.theta), M(x.M), kindex(x.kindex), cors(x.cors), N(x.N), Mag(x.Mag), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
-
-        /// Clone *this (virtual copy constructor)
-        virtual MR* clone() const { return new MR(*this); }
-
-        /// Create (virtual default constructor)
-        virtual MR* create() const { return new MR(); }
 
         /// Assignment operator
         MR& operator=( const MR &x ) {
@@ -107,45 +117,32 @@ class MR : public DAIAlgFG {
             return *this;
         }
 
-        /// Identifies itself for logging purposes
+        /// Construct from FactorGraph fg and PropertySet opts
+        MR( const FactorGraph &fg, const PropertySet &opts );
+
+
+        /// @name General InfAlg interface
+        //@{
+        virtual MR* clone() const { return new MR(*this); }
+        virtual MR* create() const { return new MR(); }
         virtual std::string identify() const;
-
-        /// Get single node belief
         virtual Factor belief( const Var &n ) const;
-
-        /// Get general belief
-        virtual Factor belief( const VarSet &/*ns*/ ) const { 
-            DAI_THROW(NOT_IMPLEMENTED);
-            return Factor(); 
-        }
-
-        /// Get all beliefs
+        virtual Factor belief( const VarSet &/*ns*/ ) const { DAI_THROW(NOT_IMPLEMENTED); return Factor(); }
         virtual std::vector<Factor> beliefs() const;
-
-        /// Get log partition sum
-        virtual Real logZ() const { 
-            DAI_THROW(NOT_IMPLEMENTED);
-            return 0.0; 
-        }
-
-        /// Clear messages and beliefs
+        virtual Real logZ() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual void init() {}
-
-        /// Clear messages and beliefs corresponding to the nodes in ns
-        virtual void init( const VarSet &/*ns*/ ) {
-            DAI_THROW(NOT_IMPLEMENTED);
-        }
-
-        /// The actual approximate inference algorithm
+        virtual void init( const VarSet &/*ns*/ ) { DAI_THROW(NOT_IMPLEMENTED); }
         virtual double run();
-
-        /// Return maximum difference between single node beliefs in the last pass
         virtual double maxDiff() const { return _maxdiff; }
-
-        /// Return number of passes over the factorgraph
         virtual size_t Iterations() const { return _iters; }
+        //@}
 
 
+        /// @name Additional interface specific for MR
+        //@{ 
+        //@}
+        
+    private:
         void init(size_t Nin, double *_w, double *_th);
         void makekindex();
         void init_cor();

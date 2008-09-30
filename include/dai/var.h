@@ -23,6 +23,10 @@
 */
 
 
+/// \file
+/// \brief Defines class Var
+
+
 #ifndef __defined_libdai_var_h
 #define __defined_libdai_var_h
 
@@ -33,10 +37,9 @@
 namespace dai {
 
 
-/// Represents a discrete variable.
-/**  It contains the label of the variable, an integer-valued
- *  unique ID for that variable, and the number of possible 
- *  values ("states") of the variable.
+/// Represents a discrete random variable.
+/** It contains the \a label of the variable (an integer-valued unique ID) 
+ *  and the number of possible values (\a states) of the variable.
  */
 class Var {
     private:
@@ -75,7 +78,7 @@ class Var {
         /// Equal-to operator (only compares labels)
         bool operator == ( const Var& n ) const { return( _label == n._label ); }
 
-        /// Write a Var to output stream
+        /// Writes a Var to an output stream
         friend std::ostream& operator << ( std::ostream& os, const Var& n ) {
             return( os << "[" << n.label() << "]" );
         }

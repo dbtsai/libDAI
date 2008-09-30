@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines class MF
+
+
 #ifndef __defined_libdai_mf_h
 #define __defined_libdai_mf_h
 
@@ -33,6 +37,7 @@
 namespace dai {
 
 
+/// Approximate inference algorithm "Mean Field"
 class MF : public DAIAlgFG {
     private:
         std::vector<Factor>  _beliefs;
@@ -42,32 +47,30 @@ class MF : public DAIAlgFG {
         size_t _iters;
 
     public:
+        /// Parameters of this inference algorithm
         struct Properties {
+            /// Verbosity
             size_t verbose;
+
+            /// Maximum number of iterations
             size_t maxiter;
+
+            /// Tolerance
             double tol;
+
+            /// Damping constant
             double damping;
         } props;
+
+        /// Name of this inference algorithm
         static const char *Name;
 
     public:
         /// Default constructor
         MF() : DAIAlgFG(), _beliefs(), _maxdiff(0.0), _iters(0U), props() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
-        MF( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), _maxdiff(0.0), _iters(0U), props() {
-            setProperties( opts );
-            construct();
-        }
-
         /// Copy constructor
         MF( const MF &x ) : DAIAlgFG(x), _beliefs(x._beliefs), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
-
-        /// Clone *this (virtual copy constructor)
-        virtual MF* clone() const { return new MF(*this); }
-
-        /// Create (virtual default constructor)
-        virtual MF* create() const { return new MF(); }
 
         /// Assignment operator
         MF& operator=( const MF &x ) {
@@ -81,44 +84,40 @@ class MF : public DAIAlgFG {
             return *this;
         }
 
-        /// Identifies itself for logging purposes
+        /// Construct from FactorGraph fg and PropertySet opts
+        MF( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), _maxdiff(0.0), _iters(0U), props() {
+            setProperties( opts );
+            construct();
+        }
+
+
+        /// @name General InfAlg interface
+        //@{
+        virtual MF* clone() const { return new MF(*this); }
+        virtual MF* create() const { return new MF(); }
         virtual std::string identify() const;
-
-        /// Get single node belief
         virtual Factor belief( const Var &n ) const;
-
-        /// Get general belief
         virtual Factor belief( const VarSet &ns ) const;
-
-        /// Get all beliefs
         virtual std::vector<Factor> beliefs() const;
-
-        /// Get log partition sum
         virtual Real logZ() const;
-
-        /// Clear messages and beliefs
         virtual void init();
-
-        /// Clear messages and beliefs corresponding to the nodes in ns
         virtual void init( const VarSet &ns );
-
-        /// The actual approximate inference algorithm
         virtual double run();
-
-        /// Return maximum difference between single node beliefs in the last pass
         virtual double maxDiff() const { return _maxdiff; }
-
-        /// Return number of passes over the factorgraph
         virtual size_t Iterations() const { return _iters; }
+        //@}
 
 
+        /// @name Additional interface specific for MF
+        //@{ 
+        Factor beliefV( size_t i ) const;
+        //@}
+        
+    private:
         void construct();
-
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;
-
-        Factor beliefV( size_t i ) const;
 };
 
 

@@ -26,7 +26,6 @@
 #include <dai/jtree.h>
 #include <dai/treeep.h>
 #include <dai/util.h>
-#include <dai/diffs.h>
 
 
 namespace dai {
@@ -236,7 +235,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
                             if( piet.vars() >> ij ) {
                                 piet = piet.marginal( ij );
                                 Factor pietf = piet.marginal(v_i) * piet.marginal(*j);
-                                wg[UEdge(i,findVar(*j))] = KL_dist( piet, pietf );
+                                wg[UEdge(i,findVar(*j))] = dist( piet, pietf, Prob::DISTKL );
                             } else
                                 wg[UEdge(i,findVar(*j))] = 0;
                         } else {
@@ -256,7 +255,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
 void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     vector<VarSet> Cliques;
     for( size_t i = 0; i < tree.size(); i++ )
-        Cliques.push_back( var(tree[i].n1) | var(tree[i].n2) );
+        Cliques.push_back( VarSet( var(tree[i].n1), var(tree[i].n2) ) );
     
     // Construct a weighted graph (each edge is weighted with the cardinality 
     // of the intersection of the nodes, where the nodes are the elements of

@@ -44,7 +44,7 @@ void findLoopClusters( const FactorGraph & fg, std::set<VarSet> &allcl, VarSet n
 
 size_t countLoops( const FactorGraph & fg, size_t loopdepth ) {
     set<VarSet> loops;
-    for( vector<Var>::const_iterator i0 = fg.vars.begin(); i0 != fg.vars.end(); i0++ ) {
+    for( vector<Var>::const_iterator i0 = fg.vars().begin(); i0 != fg.vars().end(); i0++ ) {
         VarSet i0d = fg.delta(*i0);
         if( loopdepth > 1 )
             findLoopClusters( fg, loops, *i0, *i0, loopdepth - 1, i0d );
@@ -123,10 +123,10 @@ int main( int argc, char *argv[] ) {
                 cavsizes[di.size()]++;
             else
                 cavsizes[di.size()] = 1;
-            size_t Ds = nrStates( fg.Delta(i) );
+            size_t Ds = fg.Delta(i).nrStates();
             if( Ds > max_Delta_size )
                 max_Delta_size = Ds;
-            cavsum_lcbp += nrStates( di );
+            cavsum_lcbp += di.nrStates();
             for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
                 cavsum_lcbp2 += j->states();
         }

@@ -30,6 +30,7 @@ namespace dai {
 using namespace std;
 
 
+/// Calculates the marginal of obj on ns by clamping all variables in ns and calculating logZ for each joined state.
 Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
     Factor Pns (ns);
     
@@ -74,6 +75,7 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
 }
 
 
+/// Calculates beliefs of all pairs in ns (by clamping nodes in ns and calculating logZ and the beliefs for each state).
 vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reInit ) {
     // convert ns to vector<VarSet>
     size_t N = ns.size();
@@ -89,7 +91,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
             if( j == k )
                 pairbeliefs.push_back( Factor() );
             else
-                pairbeliefs.push_back( Factor( vns[j] | vns[k] ) );
+                pairbeliefs.push_back( Factor( VarSet(vns[j], vns[k]) ) );
 
     InfAlg *clamped = obj.clone();
     if( !reInit )
@@ -144,6 +146,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
 }
 
 
+/// Calculates beliefs of all pairs in ns (by clamping pairs in ns and calculating logZ for each joined state).
 Factor calcMarginal2ndO( const InfAlg & obj, const VarSet& ns, bool reInit ) {
     // returns a a probability distribution whose 1st order interactions
     // are unspecified, whose 2nd order interactions approximate those of 
@@ -159,6 +162,7 @@ Factor calcMarginal2ndO( const InfAlg & obj, const VarSet& ns, bool reInit ) {
 }
 
 
+/// Calculates 2nd order interactions of the marginal of obj on ns.
 vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool reInit ) {
     vector<Factor> result;
     result.reserve( ns.size() * (ns.size() - 1) / 2 );
@@ -172,7 +176,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
     for( long j = 0; j < (long)ns.size() - 1; j++, nj++ ) {
         size_t k = 0;
         for( VarSet::const_iterator nk = nj; (++nk) != ns.end(); k++ ) {
-            Factor pairbelief( *nj | *nk );
+            Factor pairbelief( VarSet(*nj, *nk) );
 
             // clamp Vars j and k to their possible values
             for( size_t j_val = 0; j_val < nj->states(); j_val++ ) 

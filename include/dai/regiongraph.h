@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines classes Region, FRegion and RegionGraph
+
+
 #ifndef __defined_libdai_regiongraph_h
 #define __defined_libdai_regiongraph_h
 
@@ -100,11 +104,16 @@ class FRegion : public Factor {
 /// A RegionGraph is a bipartite graph consisting of outer regions (type FRegion) and inner regions (type Region)
 class RegionGraph : public FactorGraph {
     public:
+        /// Stores the neighborhood structure
         BipartiteGraph          G;
+
+        /// The outer regions (corresponding to nodes of type 1)
         std::vector<FRegion>    ORs;
+
+        /// The inner regions (corresponding to nodes of type 2)
         std::vector<Region>     IRs;
 
-        /// Give back the OR index that corresponds to a factor index
+        /// Stores for each factor index the index of the outer region it belongs to
         std::vector<size_t>     fac2OR;
 
 
@@ -199,7 +208,7 @@ class RegionGraph : public FactorGraph {
         /// Recompute all outer regions involving factor I
         void RecomputeOR( size_t I );
 
-        /// Send RegionGraph to output stream
+        // Friends
         friend std::ostream & operator << ( std::ostream & os, const RegionGraph & rg );
 };
 

@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines class HAK.
+
+
 #ifndef __defined_libdai_hak_h
 #define __defined_libdai_hak_h
 
@@ -34,7 +38,7 @@
 namespace dai {
 
 
-/// HAK provides an implementation of the single and double-loop algorithms by Heskes, Albers and Kappen
+/// Approximate inference algorithm: implementation of single-loop ("Generalized Belief Propagation") and double-loop algorithms by Heskes, Albers and Kappen
 class HAK : public DAIAlgRG {
     private:
         std::vector<Factor>                _Qa;
@@ -47,37 +51,42 @@ class HAK : public DAIAlgRG {
         size_t _iters;
 
     public:
+        /// Parameters of this inference algorithm
         struct Properties {
-            size_t verbose;
-            size_t maxiter;
-            double tol;
-            double damping;
+            /// Enumeration of possible cluster choices
             DAI_ENUM(ClustersType,MIN,DELTA,LOOP)
+
+            /// Verbosity
+            size_t verbose;
+
+            /// Maximum number of iterations
+            size_t maxiter;
+
+            /// Tolerance
+            double tol;
+
+            /// Damping constant
+            double damping;
+
+            /// How to choose the clusters
             ClustersType clusters;
+
+            /// Use single-loop (GBP) or double-loop (HAK)
             bool doubleloop;
+
+            /// Depth of loops (only relevant for clusters == ClustersType::LOOP)
             size_t loopdepth;
         } props;
-        /// Name of this inference method
+
+        /// Name of this inference algorithm
         static const char *Name;
 
     public:
         /// Default constructor
         HAK() : DAIAlgRG(), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
-        HAK( const FactorGraph &fg, const PropertySet &opts );
-
-        /// Construct from RegionGraph rg and PropertySet opts
-        HAK( const RegionGraph &rg, const PropertySet &opts );
-
         /// Copy constructor
         HAK( const HAK &x ) : DAIAlgRG(x), _Qa(x._Qa), _Qb(x._Qb), _muab(x._muab), _muba(x._muba), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
-
-        /// Clone *this (virtual copy constructor)
-        virtual HAK* clone() const { return new HAK(*this); }
-
-        /// Create (virtual default constructor)
-        virtual HAK* create() const { return new HAK(); }
 
         /// Assignment operator
         HAK& operator=( const HAK &x ) {
@@ -94,37 +103,32 @@ class HAK : public DAIAlgRG {
             return *this;
         }
 
-        /// Identifies itself for logging purposes
+        /// Construct from FactorGraph fg and PropertySet opts
+        HAK( const FactorGraph &fg, const PropertySet &opts );
+
+        /// Construct from RegionGraph rg and PropertySet opts
+        HAK( const RegionGraph &rg, const PropertySet &opts );
+
+
+        /// @name General InfAlg interface
+        //@{
+        virtual HAK* clone() const { return new HAK(*this); }
+        virtual HAK* create() const { return new HAK(); }
         virtual std::string identify() const;
-
-        /// Get single node belief
         virtual Factor belief( const Var &n ) const;
-
-        /// Get general belief
         virtual Factor belief( const VarSet &ns ) const;
-
-        /// Get all beliefs
         virtual std::vector<Factor> beliefs() const;
-
-        /// Get log partition sum
         virtual Real logZ() const;
-
-        /// Clear messages and beliefs
         virtual void init();
-
-        /// Clear messages and beliefs corresponding to the nodes in ns
         virtual void init( const VarSet &ns );
-
-        /// The actual approximate inference algorithm
         virtual double run();
-
-        /// Return maximum difference between single node beliefs in the last pass
         virtual double maxDiff() const { return _maxdiff; }
-
-        /// Return number of passes over the factorgraph
         virtual size_t Iterations() const { return _iters; }
+        //@}
 
 
+        /// @name Additional interface specific for HAK
+        //@{ 
         Factor & muab( size_t alpha, size_t _beta ) { return _muab[alpha][_beta]; }
         Factor & muba( size_t alpha, size_t _beta ) { return _muba[alpha][_beta]; }
         const Factor& Qa( size_t alpha ) const { return _Qa[alpha]; };
@@ -132,14 +136,15 @@ class HAK : public DAIAlgRG {
 
         double doGBP();
         double doDoubleLoop();
-
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
+        //@}
 
     private:
         void constructMessages();
         void findLoopClusters( const FactorGraph &fg, std::set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars );
+
+        void setProperties( const PropertySet &opts );
+        PropertySet getProperties() const;
+        std::string printProperties() const;
 };
 
 
