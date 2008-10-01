@@ -56,7 +56,8 @@ Code cleanup:
   to warrant the additional "complexity" :)).
 
 Miscellaneous improvements:
-* Now compiles also with MS Visual C++ and with GCC under cygwin.
+* Now compiles also with MS Visual C++ (thanks to Jiuxiang Hu) and with 
+  GCC under cygwin.
 * Contributions by Peter Gober:
   - Renamed variable _N in mr.* for compatibility with g++ under cygwin.
 * Misc contributions by Giuseppe Passino:

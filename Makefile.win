@@ -133,7 +133,7 @@ tests : tests/testdai$(EE)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
-testregression : tests/testdai
+testregression : tests/testdai$(EE)
 	echo Testing...this can take a while...
 	cd tests; time ./testregression; cd ..
 

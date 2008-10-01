@@ -78,14 +78,14 @@ alldai$(OE) : $(SRC)/alldai.cpp $(HEADERS)
 ##########
 
 example$(EE) : example.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) $(CCO) example$(EE) example.cpp $(LIBS)
+	$(CC) $(CCFLAGS) $(CCO)example$(EE) example.cpp $(LIBS)
 
 
 # TESTS
 ########
 
 tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) $(CCO) tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
+	$(CC) $(CCFLAGS) $(CCO)tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
 
 
 # MATLAB INTERFACE
@@ -111,10 +111,10 @@ matlab/matlab$(OE) : matlab/matlab.cpp matlab/matlab.h $(HEADERS)
 ########
 
 utils/createfg$(EE) : utils/createfg.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) $(CCO) utils/createfg$(EE) utils/createfg.cpp $(LIBS) $(BOOSTLIBS)
+	$(CC) $(CCFLAGS) $(CCO)utils/createfg$(EE) utils/createfg.cpp $(LIBS) $(BOOSTLIBS)
 
 utils/fg2dot$(EE) : utils/fg2dot.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) $(CCO) utils/fg2dot$(EE) utils/fg2dot.cpp $(LIBS)
+	$(CC) $(CCFLAGS) $(CCO)utils/fg2dot$(EE) utils/fg2dot.cpp $(LIBS)
 
 utils/fginfo$(EE) : utils/fginfo.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) $(CCO) utils/fginfo$(EE) utils/fginfo.cpp $(LIBS)
+	$(CC) $(CCFLAGS) $(CCO)utils/fginfo$(EE) utils/fginfo.cpp $(LIBS)
