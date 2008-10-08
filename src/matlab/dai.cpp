@@ -81,7 +81,6 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     // Get psi and construct factorgraph
     vector<Factor> factors = mx2Factors(PSI_IN, 0);
     FactorGraph fg(factors);
-    long nr_v = fg.nrVars();
 
     // Get method
     buflen = mxGetN( METHOD_IN ) + 1;
@@ -95,7 +94,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     // Convert to options object props
     stringstream ss;
     ss << opts;
-    Properties props;
+    PropertySet props;
     ss >> props;
     
     // Construct InfAlg object, init and run
@@ -108,7 +107,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     double logZ = obj->logZ();
 
     // Save maxdiff
-    double maxdiff = obj->MaxDiff();
+    double maxdiff = obj->maxDiff();
 
 
     // Hand over results to MATLAB

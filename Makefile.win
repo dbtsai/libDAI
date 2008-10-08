@@ -41,7 +41,7 @@ INC=include/dai
 SRC=src
 LIB=lib
 
-# Extensions (library, object, executable, MEX file extensions)
+# Extensions (library, object, executable, matlab compiled MEX file)
 LE=.lib
 OE=.obj
 EE=.exe
@@ -59,7 +59,7 @@ CC=cl
 CCO=/Fe
 
 # Flags for the C++ compiler
-CCFLAGS=/I./include /IC:\boost_1_36_0 /EHsc /Ox
+CCFLAGS=/Iinclude /IC:\boost_1_36_0 /EHsc /Ox
 !IFDEF DEBUG
 CCFLAGS=$(CCFLAGS) /Zi /DDAI_DEBUG
 !ENDIF
@@ -100,10 +100,9 @@ OBJECTS=$(OBJECTS) mr$(OE)
 
 !IFDEF WITH_MATLAB
 # Replace the following by the directory where Matlab has been installed
-MATLABDIR=/opt/matlab/bin
-# Replace the following with the extension of compiled MEX files on this platform, e.g. .mexglx for x86
-MEX=$(MATLABDIR)/mex
-MEXFLAGS=-I.
+MATLABDIR=c:\matlab
+MEX=$(MATLABDIR)\bin\mex
+MEXFLAGS=-Iinclude CXX\#$(CC) CXXFLAGS\#"/EHsc /Ox"
 !IFDEF DEBUG
 MEXFLAGS=$(MEXFLAGS) -g /DDAI_DEBUG
 !ENDIF
@@ -141,6 +140,6 @@ doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
 	doxygen doxygen.conf
 
 clean :
-	del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) matlab\*$(OE) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
+	del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
 
 !INCLUDE Makefile.shared

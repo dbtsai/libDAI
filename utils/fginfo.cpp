@@ -155,6 +155,19 @@ int main( int argc, char *argv[] ) {
                 cout << "Girth: infinity" << endl;
         }
 
+        map<size_t,size_t> facsizes;
+        for( size_t I = 0; I < fg.nrFactors(); I++ ) {
+            size_t Isize = fg.factor(I).vars().size();
+            if( facsizes.count( Isize ) )
+                facsizes[Isize]++;
+            else
+                facsizes[Isize] = 1;
+        }
+        cout << "Factor sizes: ";
+        for( map<size_t,size_t>::const_iterator it = facsizes.begin(); it != facsizes.end(); it++ ) 
+            cout << it->first << "(" << it->second << ") ";
+        cout << endl;
+
         return 0;
     }
 }

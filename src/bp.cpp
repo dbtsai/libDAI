@@ -39,6 +39,9 @@ using namespace std;
 const char *BP::Name = "BP";
 
 
+#define DAI_BP_FAST 1
+
+
 void BP::setProperties( const PropertySet &opts ) {
     assert( opts.hasKey("tol") );
     assert( opts.hasKey("maxiter") );
@@ -104,9 +107,11 @@ void BP::construct() {
             newEP.message = Prob( var(i).states() );
             newEP.newMessage = Prob( var(i).states() );
 
-            newEP.index.reserve( factor(I).states() );
-            for( IndexFor k( var(i), factor(I).vars() ); k >= 0; ++k )
-                newEP.index.push_back( k );
+            if( DAI_BP_FAST ) {
+                newEP.index.reserve( factor(I).states() );
+                for( IndexFor k( var(i), factor(I).vars() ); k >= 0; ++k )
+                    newEP.index.push_back( k );
+            }
 
             newEP.residual = 0.0;
             _edges[i].push_back( newEP );
@@ -144,7 +149,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
     // calculate updated message I->i
     size_t I = nbV(i,_I);
 
-    if( 0 == 1 ) {
+    if( !DAI_BP_FAST ) {
         /* UNOPTIMIZED (SIMPLE TO READ, BUT SLOW) VERSION */
         Factor prod( factor( I ) );
         foreach( const Neighbor &j, nbF(I) )
@@ -370,7 +375,7 @@ Factor BP::belief( const VarSet &ns ) const {
 
 
 Factor BP::beliefF (size_t I) const {
-    if( 0 == 1 ) {
+    if( !DAI_BP_FAST ) {
         /*  UNOPTIMIZED (SIMPLE TO READ, BUT SLOW) VERSION */
 
         Factor prod( factor(I) );

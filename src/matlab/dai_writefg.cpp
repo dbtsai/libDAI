@@ -51,7 +51,7 @@ using namespace dai;
 #define NR_OUT          0
 
 
-void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
+void mexFunction( int nlhs, mxArray * /*plhs*/[], int nrhs, const mxArray*prhs[] )
 { 
     char *filename;
 
@@ -76,8 +76,6 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     
     // Construct factorgraph
     FactorGraph fg(factors);
-    long nr_v = fg.nrVars();
-    long nr_f = fg.nrFactors();
 
     try {
         fg.WriteToFile( filename );

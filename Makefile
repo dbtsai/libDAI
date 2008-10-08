@@ -41,7 +41,7 @@ INC=include/dai
 SRC=src
 LIB=lib
 
-# Extensions (library, object, executable, MEX file extensions)
+# Extensions (library, object, executable, matlab compiled MEX file)
 LE=.a
 OE=.o
 EE=
@@ -59,7 +59,7 @@ CC=g++
 CCO=-o
 
 # Flags for the C++ compiler
-CCFLAGS=-Wno-deprecated -Wall -W -Wextra -fpic -I./include -Llib -O3 #-pg
+CCFLAGS=-O3 -Wno-deprecated -Wall -W -Wextra -fpic -Iinclude -Llib
 ifdef DEBUG
 CCFLAGS:=$(CCFLAGS) -g -DDAI_DEBUG
 endif
@@ -100,10 +100,9 @@ endif
 
 ifdef WITH_MATLAB
 # Replace the following by the directory where Matlab has been installed
-MATLABDIR=/opt/matlab/bin
-# Replace the following with the extension of compiled MEX files on this platform, e.g. .mexglx for x86
-MEX=$(MATLABDIR)/mex
-MEXFLAGS=-I.
+MATLABDIR=/agbs/share/sw/matlab
+MEX=$(MATLABDIR)/bin/mex
+MEXFLAGS=-Iinclude CXX\#$(CC) CXXFLAGS\#'-O3 -Wno-deprecated -Wall -W -Wextra -fpic'
 ifdef DEBUG
 MEXFLAGS:=$(MEXFLAGS) -g -DDAI_DEBUG
 endif
@@ -143,8 +142,8 @@ doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
 
 .PHONY : clean
 clean :
-	-rm *$(OE) 
-	-rm matlab/*$(ME) matlab/*$(OE) 
+	-rm *$(OE)
+	-rm matlab/*$(ME)
 	-rm example$(EE) tests/testdai$(EE) utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib
