@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines the DAI_ENUM macro
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_enum_h

@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines general utility functions and adds an abstraction layer for platform-dependent functionality
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_util_h

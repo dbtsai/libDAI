@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines ExactInf class
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_exactinf_h

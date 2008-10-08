@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines class TreeEP
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_treeep_h

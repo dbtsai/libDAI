@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines the FactorGraph class
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_factorgraph_h

@@ -115,12 +115,14 @@ endif
 
 HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
 
-TARGETS=tests utils $(LIB)/libdai$(LE) example$(EE) testregression doc
+TARGETS=tests utils $(LIB)/libdai$(LE) testregression doc examples
 ifdef WITH_MATLAB
 TARGETS:=$(TARGETS) matlabs
 endif
 all : $(TARGETS)
 	echo -e "\a"
+
+examples : examples/example$(EE) examples/example_bipgraph$(EE)
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
@@ -136,7 +138,7 @@ testregression : tests/testdai
 	@echo Starting regression test...this can take a minute or so!
 	cd tests; time ./testregression; cd ..
 
-doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
+doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 	-mkdir -p doc
 	doxygen doxygen.conf
 
@@ -144,7 +146,9 @@ doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
 clean :
 	-rm *$(OE)
 	-rm matlab/*$(ME)
-	-rm example$(EE) tests/testdai$(EE) utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
+	-rm examples/example$(EE) examples/example_bipgraph$(EE)
+	-rm tests/testdai$(EE)
+	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib
 

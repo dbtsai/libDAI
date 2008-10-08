@@ -1,3 +1,12 @@
+git HEAD
+--------
+* Improved documentation of include/dai/bipgraph.h
+* Moved example to examples/ and added examples/example_bipgraph.cpp
+* Cleanup of matlab interface
+* Small improvement of utils/fginfo
+* Small cleanup of BP code
+
+
 libDAI-0.2.2 (2008-09-30)
 -------------------------
 

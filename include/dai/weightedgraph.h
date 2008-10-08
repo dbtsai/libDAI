@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines some utility functions for weighted graphs
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_weightedgraph_h

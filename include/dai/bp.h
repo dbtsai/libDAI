@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines class BP
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_bp_h

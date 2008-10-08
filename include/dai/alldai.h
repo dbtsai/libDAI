@@ -22,6 +22,8 @@
 
 /// \file
 /// \brief Main libDAI header file
+/// \todo Improve documentation
+/// \todo Improve documentation of examples/example
 
 
 #ifndef __defined_libdai_alldai_h
@@ -101,8 +103,8 @@ static const char* DAINames[] = {
 
 /** \mainpage libDAI reference manual
  *  \author Joris Mooij
- *  \version 0.2.2
- *  \date 30 September 2008
+ *  \version git HEAD
+ *  \date October 8, 2008
  *
  *  \section about About libDAI
  *  libDAI is a free/open source C++ library (licensed under GPL) that provides
@@ -139,8 +141,11 @@ static const char* DAINames[] = {
  *  implementations in MatLab (a factor 1000 faster is not uncommon).
  *  libDAI does provide a MatLab interface for easy integration with MatLab. 
  *
+ *  \section quickstart Quick start
+ *  An example program illustrating basic usage of libDAI is given in examples/example.cpp.
  */
 
+/// \example example.cpp
 
 /** \page Bibliography
  *  \section Bibliograpy

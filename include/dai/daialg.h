@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines abstract base class InfAlg, its descendants DAIAlg<T>, the specializations DAIAlgFG and DAIAlgRG and some generic inference methods.
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_daialg_h

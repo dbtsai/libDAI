@@ -25,6 +25,7 @@
 
 /// \file
 /// \brief Defines the IndexFor, MultiFor, Permute and State classes
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_index_h

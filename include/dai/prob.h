@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines TProb<T> and Prob classes
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_prob_h

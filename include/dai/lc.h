@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines class LC
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_lc_h

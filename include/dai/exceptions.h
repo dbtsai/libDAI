@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines Exception class and the DAI_THROW macro
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_exceptions_h

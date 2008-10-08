@@ -115,13 +115,15 @@ MEXFLAGS=$(MEXFLAGS) /DSMALLMEM
 
 HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
 
-TARGETS=tests utils $(LIB)/libdai$(LE) example$(EE)
+TARGETS=tests utils $(LIB)/libdai$(LE) examples
 # testregression disabled, it uses diff
-# doc disabled, it uses doxygen
+# doc disabled, it uses doxygen, graphviz and latex
 !IFDEF WITH_MATLAB
 TARGETS = $(TARGETS) matlabs
 !ENDIF
 all : $(TARGETS)
+
+examples : examples/example$(EE) examples/example_bipgraph$(EE)
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
@@ -133,13 +135,13 @@ tests : tests/testdai$(EE)
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
 testregression : tests/testdai$(EE)
-	echo Testing...this can take a while...
+	echo Starting regression test...this can take a minute or so!
 	cd tests; time ./testregression; cd ..
 
-doc : $(INC)/*.h $(SRC)/*.cpp doxygen.conf
+doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 	doxygen doxygen.conf
 
 clean :
-	del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
+	del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
 
 !INCLUDE Makefile.shared

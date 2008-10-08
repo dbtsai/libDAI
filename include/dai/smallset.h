@@ -25,6 +25,7 @@
 
 /// \file
 /// \brief Defines smallSet<T> class
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_smallset_h

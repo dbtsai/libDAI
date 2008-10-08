@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines class MF
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_mf_h

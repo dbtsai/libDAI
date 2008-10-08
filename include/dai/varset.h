@@ -25,6 +25,7 @@
 
 /// \file
 /// \brief Defines VarSet class
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_varset_h

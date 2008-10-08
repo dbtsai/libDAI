@@ -25,6 +25,7 @@
 
 /// \file
 /// \brief Defines class Var
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_var_h

@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines class HAK.
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_hak_h

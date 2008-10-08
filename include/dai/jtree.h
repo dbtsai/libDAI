@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines class JTree
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_jtree_h

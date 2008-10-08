@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines classes Region, FRegion and RegionGraph
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_regiongraph_h

@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines the Property and PropertySet classes
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_properties_h

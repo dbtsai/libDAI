@@ -74,11 +74,14 @@ alldai$(OE) : $(SRC)/alldai.cpp $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/alldai.cpp
 
 
-# EXAMPLE
-##########
+# EXAMPLES
+###########
 
-example$(EE) : example.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCFLAGS) $(CCO)example$(EE) example.cpp $(LIBS)
+examples/example$(EE) : examples/example.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCFLAGS) $(CCO)examples/example$(EE) examples/example.cpp $(LIBS)
+
+examples/example_bipgraph$(EE) : examples/example_bipgraph.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCFLAGS) $(CCO)examples/example_bipgraph$(EE) examples/example_bipgraph.cpp $(LIBS)
 
 
 # TESTS

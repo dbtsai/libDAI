@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines class MR
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_mr_h

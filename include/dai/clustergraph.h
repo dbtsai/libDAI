@@ -22,6 +22,7 @@
 
 /// \file
 /// \brief Defines class ClusterGraph
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_clustergraph_h
