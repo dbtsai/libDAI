@@ -1,6 +1,10 @@
 TODO:
 
 - Improve documentation.
+  * COPYING 
+  * FILEFORMAT
+  * Merge README with mainpage, removing duplicate text
+  * Document examples, tests and utils
 
 - Adapt http://www.boost.org/development/requirements.html#Design_and_Programming
 

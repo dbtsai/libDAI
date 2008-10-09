@@ -42,16 +42,6 @@
 namespace dai {
 
 
-/// Real number (alias for double, which could be changed to long double if necessary)
-typedef double             Real;
-
-// Predefine class
-template<typename T> class TProb;
-
-/// Represents a probability measure, with entries of type Real.
-typedef TProb<Real>        Prob;
-
-
 /// Represents a vector with entries of type \a T.
 /** A TProb<T> is a std::vector<T> with an interface designed for dealing with probability mass functions.
  *  It is mainly used for representing measures on a finite outcome space, e.g., the probability 
@@ -115,7 +105,7 @@ template <typename T> class TProb {
             return *this;
         }
 
-        /// Sets all entries to i.i.d. random numbers from a uniform[0,1) distribution
+        /// Draws all entries i.i.d. from a uniform distribution on [0,1)
         TProb<T> & randomize() { 
             std::generate(_p.begin(), _p.end(), rnd_uniform);
             return *this;
@@ -532,6 +522,10 @@ template<typename T> TProb<T> max( const TProb<T> &a, const TProb<T> &b ) {
             result[i] = b[i];
     return result;
 }
+
+
+/// Represents a vector with entries of type Real.
+typedef TProb<Real> Prob;
 
 
 } // end of namespace dai

@@ -22,7 +22,6 @@
 
 /// \file
 /// \brief Defines the DAI_ENUM macro
-/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_enum_h
@@ -34,16 +33,18 @@
 #include <dai/exceptions.h>
 
 
-/// Extends the C++ enum type by supporting input/output streaming and conversion to and from const char*
-/** Example of usage:
+/// Extends the C++ enum type by supporting input/output streaming and conversion to and from const char* and size_t
+/** For more details see the source code.
+ *
+ *  \par Example:
  *  \code
- *      DAI_ENUM(colors,RED,GREEN,BLUE)
+ *  DAI_ENUM(colors,RED,GREEN,BLUE)
  *  \endcode
- *  defines a class encapsulating an
+ *  defines a class \a colors encapsulating an
  *  \code
- *      enum colors {RED, GREEN, BLUE};
+ *  enum {RED, GREEN, BLUE};
  *  \endcode
- *  It offers additional functionality over the plain "enum" keyword.
+ *  which offers additional functionality over the plain \c enum keyword.
  */
 #define DAI_ENUM(x,val0,...) class x {\
     public:\

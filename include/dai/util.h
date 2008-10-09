@@ -49,6 +49,10 @@
 #define foreach BOOST_FOREACH
 
 
+/// Real number (alias for double, which could be changed to long double if necessary)
+typedef double Real;
+
+
 #ifdef WINDOWS
     /// Returns true if argument is NAN (Not A Number)
     bool isnan( double x );

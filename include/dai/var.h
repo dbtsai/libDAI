@@ -46,7 +46,8 @@ namespace dai {
  *  In this manual, we use the following notational conventions. The discrete
  *  random variable with label \f$l\f$ is denoted as \f$x_l\f$, and the number 
  *  of possible values of this variable as \f$S_l\f$; this is represented in
- *  code by the object Var(\f$l\f$,\f$S_l\f$).
+ *  code by the object Var(\f$l\f$,\f$S_l\f$). The set of possible values of
+ *  variable \f$x_l\f$ is denoted \f$X_l := \{0,1,\dots,S_l-1\}\f$.
  */
 class Var {
     private:

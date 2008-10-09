@@ -42,26 +42,28 @@
 namespace dai {
 
 
-// predefine TFactor<T> class
-template<typename T> class      TFactor;
-
-
-/// Represents a factor with probability entries represented as Real
-typedef TFactor<Real>           Factor;
-
-
-/// Represents a probability factor.
-/** A \e factor is a function of the Cartesian product of the state
- *  spaces of some set of variables to the nonnegative real numbers.
- *  More formally, if \f$x_i \in X_i\f$ for all \f$i\f$, then a factor
- *  depending on the variables \f$\{x_i\}\f$ is a function defined
- *  on \f$\prod_i X_i\f$ with values in \f$[0,\infty)\f$.
+/// Represents a (probability) factor.
+/** Mathematically, a \e factor is a function from the Cartesian product 
+ *  of the state spaces of some variables to the nonnegative real numbers.
+ *  More formally, denoting a discrete variable with label \f$l\f$ by
+ *  \f$x_l\f$ and its state space by \f$X_l = \{0,1,\dots,S_l-1\}\f$,
+ *  then a factor depending on the variables \f$\{x_i\}_{i\in I}\f$ is 
+ *  a function \f$f_I : \prod_{i\in I} X_i \to [0,\infty)\f$.
  *  
- *  A Factor has two components: a VarSet, defining the set of variables
- *  that the factor depends on, and a TProb<T>, containing the values of
- *  the factor for all possible joint states of the variables.
+ *  In libDAI, a factor is represented by a TFactor<\a T> object, which has two
+ *  components: 
+ *  \arg a VarSet, corresponding with the set of variables \f$\{x_i\}_{i\in I}\f$ 
+ *  that the factor depends on;
+ *  \arg a TProb<\a T>, a vector containing the values of the factor for each possible 
+ *  joint state of the variables.
  *
- *  \tparam T Should be castable from and to double.
+ *  The factor values are stored in the entries of the TProb<\a T> in a particular
+ *  ordering, which is defined by the one-to-one correspondence of a joint state 
+ *  in \f$\prod_{i\in I} X_i\f$ with a linear index in 
+ *  \f$\{0,1,\dots,\prod_{i\in I} S_i-1\}\f$ according to the mapping \f$\sigma\f$
+ *  induced by VarSet::calcState(const std::map<Var,size_t> &).
+ *
+ *  \tparam T Should be a scalar that is castable from and to double and should support elementary arithmetic operations.
  */
 template <typename T> class TFactor {
     private:
@@ -69,26 +71,26 @@ template <typename T> class TFactor {
         TProb<T>    _p;
 
     public:
-        /// Construct Factor with empty VarSet
+        /// Construct TFactor depending on no variables, with value p
         TFactor ( Real p = 1.0 ) : _vs(), _p(1,p) {}
 
-        /// Construct Factor from VarSet
+        /// Construct TFactor depending on variables in ns, with uniform distribution
         TFactor( const VarSet& ns ) : _vs(ns), _p(_vs.nrStates()) {}
         
-        /// Construct Factor from VarSet and initial value
+        /// Construct TFactor depending on variables in ns, with all values set to p
         TFactor( const VarSet& ns, Real p ) : _vs(ns), _p(_vs.nrStates(),p) {}
         
-        /// Construct Factor from VarSet and initial array
+        /// Construct TFactor depending on variables in ns, copying the values from the array p
         TFactor( const VarSet& ns, const Real *p ) : _vs(ns), _p(_vs.nrStates(),p) {}
 
-        /// Construct Factor from VarSet and TProb<T>
+        /// Construct TFactor depending on variables in ns, with values set to the TProb p
         TFactor( const VarSet& ns, const TProb<T>& p ) : _vs(ns), _p(p) {
 #ifdef DAI_DEBUG
             assert( _vs.nrStates() == _p.size() );
 #endif
         }
         
-        /// Construct Factor from Var
+        /// Construct TFactor depending on the variable n, with uniform distribution
         TFactor( const Var& n ) : _vs(n), _p(n.states()) {}
 
         /// Copy constructor
@@ -103,150 +105,175 @@ template <typename T> class TFactor {
             return *this;
         }
 
-        /// Returns const reference to probability entries
+        /// Returns const reference to value vector
         const TProb<T> & p() const { return _p; }
-        /// Returns reference to probability entries
+        /// Returns reference to value vector
         TProb<T> & p() { return _p; }
 
-        /// Returns const reference to variables
+        /// Returns const reference to variable set
         const VarSet & vars() const { return _vs; }
 
         /// Returns the number of possible joint states of the variables
         size_t states() const { return _p.size(); }
 
-        /// Returns a copy of the i'th probability value
+        /// Returns a copy of the i'th entry of the value vector
         T operator[] (size_t i) const { return _p[i]; }
 
-        /// Returns a reference to the i'th probability value
+        /// Returns a reference to the i'th entry of the value vector
         T& operator[] (size_t i) { return _p[i]; }
 
-        /// Sets all probability entries to p
+        /// Sets all values to p
         TFactor<T> & fill (T p) { _p.fill( p ); return(*this); }
 
-        /// Fills all probability entries with random values
+        /// Draws all values i.i.d. from a uniform distribution on [0,1)
         TFactor<T> & randomize () { _p.randomize(); return(*this); }
 
-        /// Returns product of *this with x
-        TFactor<T> operator* (T x) const {
-            Factor result = *this;
-            result.p() *= x;
+        /// Returns product of *this with scalar t
+        TFactor<T> operator* (T t) const {
+            TFactor<T> result = *this;
+            result.p() *= t;
             return result;
         }
 
-        /// Multiplies each probability entry with x
-        TFactor<T>& operator*= (T x) {
-            _p *= x;
+        /// Multiplies with scalar t
+        TFactor<T>& operator*= (T t) {
+            _p *= t;
             return *this;
         }
 
-        /// Returns quotient of *this with x
-        TFactor<T> operator/ (T x) const {
-            Factor result = *this;
-            result.p() /= x;
+        /// Returns quotient of *this with scalar t
+        TFactor<T> operator/ (T t) const {
+            TFactor<T> result = *this;
+            result.p() /= t;
             return result;
         }
 
-        /// Divides each probability entry by x
-        TFactor<T>& operator/= (T x) {
-            _p /= x;
+        /// Divides by scalar t
+        TFactor<T>& operator/= (T t) {
+            _p /= t;
             return *this;
         }
 
-        /// Returns product of *this with another Factor
-        TFactor<T> operator* (const TFactor<T>& Q) const;
-
-        /// Returns quotient of *this with another Factor
-        TFactor<T> operator/ (const TFactor<T>& Q) const;
-
-        /// Multiplies *this with another Factor
-        TFactor<T>& operator*= (const TFactor<T>& Q) { return( *this = (*this * Q) ); }
-
-        /// Divides *this by another Factor
-        TFactor<T>& operator/= (const TFactor<T>& Q) { return( *this = (*this / Q) ); }
-
-        /// Returns sum of *this and another Factor (their vars() should be identical)
-        TFactor<T> operator+ (const TFactor<T>& Q) const {
-#ifdef DAI_DEBUG
-            assert( Q._vs == _vs );
-#endif
-            TFactor<T> sum(*this); 
-            sum._p += Q._p; 
-            return sum; 
-        }
-
-        /// Returns difference of *this and another Factor (their vars() should be identical)
-        TFactor<T> operator- (const TFactor<T>& Q) const {
-#ifdef DAI_DEBUG
-            assert( Q._vs == _vs );
-#endif
-            TFactor<T> sum(*this); 
-            sum._p -= Q._p; 
-            return sum; 
-        }
-
-        /// Adds another Factor to *this (their vars() should be identical)
-        TFactor<T>& operator+= (const TFactor<T>& Q) { 
-#ifdef DAI_DEBUG
-            assert( Q._vs == _vs );
-#endif
-            _p += Q._p;
+        /// Adds scalar t to *this
+        TFactor<T>& operator+= (T t) { 
+            _p += t;
             return *this;
         }
 
-        /// Subtracts another Factor from *this (their vars() should be identical)
-        TFactor<T>& operator-= (const TFactor<T>& Q) { 
-#ifdef DAI_DEBUG
-            assert( Q._vs == _vs );
-#endif
-            _p -= Q._p;
+        /// Subtracts scalar t from *this
+        TFactor<T>& operator-= (T t) { 
+            _p -= t;
             return *this;
         }
 
-        /// Adds scalar to *this
-        TFactor<T>& operator+= (T q) { 
-            _p += q;
-            return *this;
-        }
-
-        /// Subtracts scalar from *this
-        TFactor<T>& operator-= (T q) { 
-            _p -= q;
-            return *this;
-        }
-
-        /// Returns sum of *this and a scalar
-        TFactor<T> operator+ (T q) const {
+        /// Returns sum of *this and scalar t
+        TFactor<T> operator+ (T t) const {
             TFactor<T> result(*this); 
-            result._p += q; 
+            result._p += t; 
             return result; 
         }
 
-        /// Returns difference of *this with a scalar
-        TFactor<T> operator- (T q) const {
+        /// Returns *this minus scalar t
+        TFactor<T> operator- (T t) const {
             TFactor<T> result(*this); 
-            result._p -= q; 
+            result._p -= t; 
             return result; 
         }
 
-        /// Returns *this raised to some power
-        TFactor<T> operator^ (Real a) const { TFactor<T> x; x._vs = _vs; x._p = _p^a; return x; }
+        /// Returns product of *this with another TFactor f
+        /** The result is a TFactor depending on the union of the variables
+         *  on which *this and f depend.
+         */
+        TFactor<T> operator* (const TFactor<T>& f) const;
 
-        /// Raises *this to some power
+        /// Returns quotient of *this by another TFactor f
+        /** The result is a TFactor depending on the union of the variables
+         *  on which *this and f depend.
+         */
+        TFactor<T> operator/ (const TFactor<T>& f) const;
+
+        /// Multiplies *this with another TFactor f
+        /** The result is a TFactor depending on the union of the variables
+         *  on which *this and f depend.
+         */
+        TFactor<T>& operator*= (const TFactor<T>& f) { return( *this = (*this * f) ); }
+
+        /// Divides *this by another TFactor f
+        /** The result is a TFactor depending on the union of the variables
+         *  on which *this and f depend.
+         */
+        TFactor<T>& operator/= (const TFactor<T>& f) { return( *this = (*this / f) ); }
+
+        /// Returns sum of *this and another TFactor f
+        /** \pre this->vars() == f.vars()
+         */
+        TFactor<T> operator+ (const TFactor<T>& f) const {
+#ifdef DAI_DEBUG
+            assert( f._vs == _vs );
+#endif
+            TFactor<T> sum(*this); 
+            sum._p += f._p; 
+            return sum; 
+        }
+
+        /// Returns *this minus another TFactor f
+        /** \pre this->vars() == f.vars()
+         */
+        TFactor<T> operator- (const TFactor<T>& f) const {
+#ifdef DAI_DEBUG
+            assert( f._vs == _vs );
+#endif
+            TFactor<T> sum(*this); 
+            sum._p -= f._p; 
+            return sum; 
+        }
+
+        /// Adds another TFactor f to *this
+        /** \pre this->vars() == f.vars()
+         */
+        TFactor<T>& operator+= (const TFactor<T>& f) { 
+#ifdef DAI_DEBUG
+            assert( f._vs == _vs );
+#endif
+            _p += f._p;
+            return *this;
+        }
+
+        /// Subtracts another TFactor f from *this
+        /** \pre this->vars() == f.vars()
+         */
+        TFactor<T>& operator-= (const TFactor<T>& f) { 
+#ifdef DAI_DEBUG
+            assert( f._vs == _vs );
+#endif
+            _p -= f._p;
+            return *this;
+        }
+
+        /// Returns *this raised to the power a
+        TFactor<T> operator^ (Real a) const { 
+            TFactor<T> x; 
+            x._vs = _vs; 
+            x._p = _p^a; 
+            return x; 
+        }
+
+        /// Raises *this to the power a
         TFactor<T>& operator^= (Real a) { _p ^= a; return *this; }
 
-        /// Sets all entries that are smaller than epsilon to zero
-        TFactor<T>& makeZero( Real epsilon ) {
+        /// Sets all values that are smaller than epsilon to 0
+        TFactor<T>& makeZero( T epsilon ) {
             _p.makeZero( epsilon );
             return *this;
         }
 
-        /// Sets all entries that are smaller than epsilon to epsilon
-        TFactor<T>& makePositive( Real epsilon ) {
+        /// Sets all values that are smaller than epsilon to epsilon
+        TFactor<T>& makePositive( T epsilon ) {
             _p.makePositive( epsilon );
             return *this;
         }
             
-        /// Returns inverse of *this.
+        /// Returns pointwise inverse of *this.
         /** If zero == true, uses 1 / 0 == 0; otherwise 1 / 0 == Inf.
          */
         TFactor<T> inverse(bool zero=true) const { 
@@ -256,26 +283,30 @@ template <typename T> class TFactor {
             return inv; 
         }
 
-        /// Returns *this divided by another Factor
-        TFactor<T> divided_by( const TFactor<T>& denom ) const { 
+        /// Returns *this divided pointwise by another TFactor f
+        /** \pre this->vars() == f.vars()
+         */
+        TFactor<T> divided_by( const TFactor<T>& f ) const { 
 #ifdef DAI_DEBUG
-            assert( denom._vs == _vs );
+            assert( f._vs == _vs );
 #endif
             TFactor<T> quot(*this); 
-            quot._p /= denom._p; 
+            quot._p /= f._p; 
             return quot; 
         }
 
-        /// Divides *this by another Factor
-        TFactor<T>& divide( const TFactor<T>& denom ) {
+        /// Divides *this pointwise by another TFactor f
+        /** \pre this->vars() == f.vars()
+         */
+        TFactor<T>& divide( const TFactor<T>& f ) {
 #ifdef DAI_DEBUG
-            assert( denom._vs == _vs );
+            assert( f._vs == _vs );
 #endif
-            _p /= denom._p;
+            _p /= f._p;
             return *this;
         }
 
-        /// Returns exp of *this
+        /// Returns pointwise exp of *this
         TFactor<T> exp() const { 
             TFactor<T> e; 
             e._vs = _vs; 
@@ -283,7 +314,7 @@ template <typename T> class TFactor {
             return e; 
         }
 
-        /// Returns absolute value of *this
+        /// Returns pointwise absolute value of *this
         TFactor<T> abs() const { 
             TFactor<T> e; 
             e._vs = _vs; 
@@ -291,7 +322,7 @@ template <typename T> class TFactor {
             return e; 
         }
 
-        /// Returns logarithm of *this
+        /// Returns pointwise logarithm of *this
         /** If zero==true, uses log(0)==0; otherwise, log(0)=-Inf.
          */
         TFactor<T> log(bool zero=false) const {
@@ -301,82 +332,88 @@ template <typename T> class TFactor {
             return l; 
         }
 
-        /// Normalizes *this Factor
-        T normalize( typename Prob::NormType norm = Prob::NORMPROB ) { return _p.normalize( norm ); }
+        /// Normalizes *this TFactor according to the specified norm
+        T normalize( typename Prob::NormType norm=Prob::NORMPROB ) { return _p.normalize( norm ); }
 
-        /// Returns a normalized copy of *this
-        TFactor<T> normalized( typename Prob::NormType norm = Prob::NORMPROB ) const { 
+        /// Returns a normalized copy of *this, according to the specified norm
+        TFactor<T> normalized( typename Prob::NormType norm=Prob::NORMPROB ) const { 
             TFactor<T> result;
             result._vs = _vs;
             result._p = _p.normalized( norm );
             return result;
         }
 
-        /// Returns a slice of this factor, where the subset ns is in state ns_state
-        Factor slice( const VarSet & ns, size_t ns_state ) const {
+        /// Returns a slice of this TFactor, where the subset ns is in state nsState
+        /** \pre ns sould be a subset of vars()
+         *  \pre nsState < ns.states()
+         */
+        TFactor<T> slice( const VarSet& ns, size_t nsState ) const {
             assert( ns << _vs );
             VarSet nsrem = _vs / ns;
-            Factor result( nsrem, 0.0 );
+            TFactor<T> result( nsrem, T(0) );
             
             // OPTIMIZE ME
             IndexFor i_ns (ns, _vs);
             IndexFor i_nsrem (nsrem, _vs);
             for( size_t i = 0; i < states(); i++, ++i_ns, ++i_nsrem )
-                if( (size_t)i_ns == ns_state )
+                if( (size_t)i_ns == nsState )
                     result._p[i_nsrem] = _p[i];
 
             return result;
         }
 
-        /// Returns unnormalized marginal; ns should be a subset of vars()
-        TFactor<T> partSum(const VarSet & ns) const;
+        /// Returns unnormalized marginal obtained by summing out all variables except those in ns
+        TFactor<T> partSum(const VarSet &ns) const;
 
-        /// Returns (normalized by default) marginal; ns should be a subset of vars()
-        TFactor<T> marginal(const VarSet & ns, bool normed = true) const { if(normed) return partSum(ns).normalized(); else return partSum(ns); }
-
-        /// Sums out all variables except those in ns
-        TFactor<T> notSum(const VarSet & ns) const { return partSum(vars() ^ ns); }
-
-        /// Embeds this factor in a larger VarSet
-        TFactor<T> embed(const VarSet & ns) const { 
-            VarSet vs = vars();
-            assert( ns >> vs );
-            if( vs == ns )
-                return *this;
-            else
-                return (*this) * Factor(ns / vs, 1.0);
+        /// Returns (normalized by default) marginal on ns, obtained by summing out all variables except those in ns
+        /** If normed==true, the result is normalized.
+         */
+        TFactor<T> marginal(const VarSet & ns, bool normed=true) const { 
+            if( normed ) 
+                return partSum(ns).normalized(); 
+            else 
+                return partSum(ns); 
         }
 
-        /// Returns true if *this has NANs
+        /// Embeds this factor in a larger VarSet
+        /** \pre vars() should be a subset of ns
+         */
+        TFactor<T> embed(const VarSet & ns) const { 
+            assert( ns >> _vs );
+            if( _vs == ns )
+                return *this;
+            else
+                return (*this) * TFactor<T>(ns / _vs, 1);
+        }
+
+        /// Returns true if *this has NaN values
         bool hasNaNs() const { return _p.hasNaNs(); }
 
-        /// Returns true if *this has negative entries
+        /// Returns true if *this has negative values
         bool hasNegatives() const { return _p.hasNegatives(); }
 
-        /// Returns total sum of probability entries
+        /// Returns total sum of values
         T totalSum() const { return _p.totalSum(); }
 
-        /// Returns maximum absolute value of probability entries
+        /// Returns maximum absolute value
         T maxAbs() const { return _p.maxAbs(); }
 
-        /// Returns maximum value of probability entries
+        /// Returns maximum value
         T maxVal() const { return _p.maxVal(); }
 
-        /// Returns minimum value of probability entries
+        /// Returns minimum value
         T minVal() const { return _p.minVal(); }
 
         /// Returns entropy of *this
         Real entropy() const { return _p.entropy(); }
 
-        /// Returns strength of *this, between variables i and j, using (52) of [\ref MoK07b]
+        /// Returns strength of *this, between variables i and j, as defined in eq. (52) of [\ref MoK07b]
         T strength( const Var &i, const Var &j ) const;
 };
 
 
 template<typename T> TFactor<T> TFactor<T>::partSum(const VarSet & ns) const {
-#ifdef DAI_DEBUG
-    assert( ns << _vs );
-#endif
+    ns &= _vs;
 
     TFactor<T> res( ns, 0.0 );
 
@@ -402,7 +439,7 @@ template<typename T> TFactor<T> TFactor<T>::operator* (const TFactor<T>& Q) cons
 
 
 template<typename T> TFactor<T> TFactor<T>::operator/ (const TFactor<T>& Q) const {
-    TFactor<T> quot( _vs + Q._vs, 0.0 );
+    TFactor<T> quot( _vs | Q._vs, 0.0 );
 
     IndexFor i1(_vs, quot._vs);
     IndexFor i2(Q._vs, quot._vs);
@@ -445,7 +482,9 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
 }
 
 
-/// Writes a Factor to an output stream
+/// Writes a TFactor to an output stream
+/** \relates TFactor
+ */
 template<typename T> std::ostream& operator<< (std::ostream& os, const TFactor<T>& P) {
     os << "(" << P.vars() << " <";
     for( size_t i = 0; i < P.states(); i++ )
@@ -455,41 +494,57 @@ template<typename T> std::ostream& operator<< (std::ostream& os, const TFactor<T
 }
 
 
-/// Returns distance between two Factors (with identical vars())
-template<typename T> Real dist( const TFactor<T> & x, const TFactor<T> & y, Prob::DistType dt ) {
-    if( x.vars().empty() || y.vars().empty() )
+/// Returns distance between two TFactors f and g, according to the distance measure dt
+/** \relates TFactor
+ *  \pre f.vars() == g.vars()
+ */
+template<typename T> Real dist( const TFactor<T> &f, const TFactor<T> &g, Prob::DistType dt ) {
+    if( f.vars().empty() || g.vars().empty() )
         return -1;
     else {
 #ifdef DAI_DEBUG
-        assert( x.vars() == y.vars() );
+        assert( f.vars() == g.vars() );
 #endif
-        return dist( x.p(), y.p(), dt );
+        return dist( f.p(), g.p(), dt );
     }
 }
 
 
-/// Returns the pointwise maximum of two Factors
-template<typename T> TFactor<T> max( const TFactor<T> & P, const TFactor<T> & Q ) {
-    assert( P._vs == Q._vs );
-    return TFactor<T>( P._vs, min( P.p(), Q.p() ) );
+/// Returns the pointwise maximum of two TFactors
+/** \relates TFactor
+ *  \pre f.vars() == g.vars()
+ */
+template<typename T> TFactor<T> max( const TFactor<T> &f, const TFactor<T> &g ) {
+    assert( f._vs == g._vs );
+    return TFactor<T>( f._vs, min( f.p(), g.p() ) );
 }
 
 
-/// Returns the pointwise minimum of two Factors
-template<typename T> TFactor<T> min( const TFactor<T> & P, const TFactor<T> & Q ) {
-    assert( P._vs == Q._vs );
-    return TFactor<T>( P._vs, max( P.p(), Q.p() ) );
+/// Returns the pointwise minimum of two TFactors
+/** \relates TFactor
+ *  \pre f.vars() == g.vars()
+ */
+template<typename T> TFactor<T> min( const TFactor<T> &f, const TFactor<T> &g ) {
+    assert( f._vs == g._vs );
+    return TFactor<T>( f._vs, max( f.p(), g.p() ) );
 }
 
 
-/// Calculates the mutual information between the two variables in P
-template<typename T> Real MutualInfo(const TFactor<T> & P) {
-    assert( P.vars().size() == 2 );
-    VarSet::const_iterator it = P.vars().begin();
+/// Calculates the mutual information between the two variables that f depends on, under the distribution given by f
+/** \relates TFactor
+ *  \pre f.vars().size() == 2
+ */ 
+template<typename T> Real MutualInfo(const TFactor<T> &f) {
+    assert( f.vars().size() == 2 );
+    VarSet::const_iterator it = f.vars().begin();
     Var i = *it; it++; Var j = *it;
-    TFactor<T> projection = P.marginal(i) * P.marginal(j);
-    return real( dist( P.normalized(), projection, Prob::DISTKL ) );
+    TFactor<T> projection = f.marginal(i) * f.marginal(j);
+    return real( dist( f.normalized(), projection, Prob::DISTKL ) );
 }
+
+
+/// Represents a factor with values of type Real.
+typedef TFactor<Real> Factor;
 
 
 } // end of namespace dai

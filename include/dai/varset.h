@@ -44,7 +44,8 @@ namespace dai {
 
 
 /// Represents a set of variables.
-/** \note A VarSet is implemented using a SmallSet<Var> instead
+/** The variables in the set are sorted according to their labels.
+ *  \note A VarSet is implemented using a SmallSet<Var> instead
  *  of the more natural std::set<Var> because of efficiency reasons.
  */
 class VarSet : public SmallSet<Var> {
@@ -66,12 +67,13 @@ class VarSet : public SmallSet<Var> {
         /// Construct from SmallSet<Var>
         VarSet( const SmallSet<Var> &x ) : SmallSet<Var>(x) {}
 
-        /// Calculates the product of the number of states of all variables in this VarSet.
-        /** This is equal to the number of joint configurations of the variables.
-         *  If *this corresponds with the set \f$\{x_{l(0)},x_{l(1)},\dots,x_{l(n-1)}\}\f$,
-         *  where variable \f$x_l\f$ has label \f$l\f$, and denoting by \f$S_l\f$ the number of possible values
-         *  ("states") of variable \f$x_l\f$, the number of joint configurations
-         *  of the variables in this set is given by \f[N := \prod_{i=0}^{n-1} S_{l(i)}.\f]
+        /// Calculates the number of states of this VarSet.
+        /** The number of states of the Cartesian product of the variables in this VarSet
+         *  is simply the product of the number of states of each variable in this VarSet.
+         *  If *this corresponds with the set \f$\{x_l\}_{l\in L}\f$,
+         *  where variable \f$x_l\f$ has label \f$l\f$, and denoting by \f$S_l\f$ the 
+         *  number of possible values ("states") of variable \f$x_l\f$, the number of 
+         *  joint configurations of the variables in \f$\{x_l\}_{l\in L}\f$ is given by \f$\prod_{l\in L} S_l\f$.
          */
         size_t nrStates() {
             size_t states = 1;
@@ -95,9 +97,9 @@ class VarSet : public SmallSet<Var> {
         template <typename VarIterator>
         VarSet( VarIterator begin, VarIterator end, size_t sizeHint=0 ) : SmallSet<Var>(begin,end,sizeHint) {}
 
-        /// Calculates the linear index in the cartesian product of the variables in *this, which corresponds to a particular joint assignment of the variables specified by \a states.
+        /// Calculates the linear index in the Cartesian product of the variables in *this, which corresponds to a particular joint assignment of the variables specified by \a states.
         /** \param states Specifies the states of some variables.
-         *  \return The linear index in the cartesian product of the variables in *this
+         *  \return The linear index in the Cartesian product of the variables in *this
          *  corresponding with the joint assignment specified by \a states, where it is
          *  assumed that \a states[\a m]==0 for all \a m in *this which are not in \a states.
          *  
@@ -114,7 +116,11 @@ class VarSet : public SmallSet<Var> {
          *      &= & s(x_{l(0)}) + s(x_{l(1)}) S_{l(0)} + s(x_{l(2)}) S_{l(0)} S_{l(1)} + \dots + s(x_{l(n-1)}) S_{l(0)} \cdots S_{l(n-2)}.
          *  \f}
          *
-         *  \note This function is the inverse of calcStates( size_t ).
+         *  \note If *this corresponds with \f$\{x_l\}_{l\in L}\f$, and \a states specifies a state
+         *  for each variable \f$x_l\f$ for \f$l\in L\f$, calcState(const std::map<Var,size_t> &) induces a mapping 
+         *  \f$\sigma : \prod_{l\in L} X_l \to \{0,1,\dots,\prod_{l\in L} S_l-1\}\f$ that
+         *  maps a joint state to a linear index; this is the inverse of the mapping 
+         *  \f$\sigma^{-1}\f$ induced by calcStates(size_t).
          */
         size_t calcState( const std::map<Var, size_t> &states ) {
             size_t prod = 1;
@@ -141,7 +147,11 @@ class VarSet : public SmallSet<Var> {
          *    s(x_{l(i)}) = \left[\frac{S \mbox { mod } \prod_{j=0}^{i} S_{l(j)}}{\prod_{j=0}^{i-1} S_{l(j)}}\right] \qquad \mbox{for all $i=0,\dots,n-1$}.
          *  \f}
          *  where \f$S\f$ denotes the value of \a linearState.
-         *  \note This function is the inverse of calcState( const std::map<Var,size_t> &).
+         *
+         *  \note If *this corresponds with \f$\{x_l\}_{l\in L}\f$, calcStates(size_t) induces a mapping 
+         *  \f$\sigma^{-1} : \{0,1,\dots,\prod_{l\in L} S_l-1\} \to \prod_{l\in L} X_l \to \f$ that
+         *  maps a linear index to a joint state; this is the inverse of the mapping \f$\sigma\f$ 
+         *  induced by calcState(const std::map<Var,size_t> &).
          */
         std::map<Var, size_t> calcStates( size_t linearState ) {
             std::map<Var, size_t> states;
