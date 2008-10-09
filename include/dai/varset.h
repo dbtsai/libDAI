@@ -25,7 +25,6 @@
 
 /// \file
 /// \brief Defines VarSet class
-/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_varset_h
@@ -34,6 +33,7 @@
 
 #include <vector>
 #include <map>
+#include <cassert>
 #include <ostream>
 #include <dai/var.h>
 #include <dai/util.h>
@@ -44,29 +44,35 @@ namespace dai {
 
 
 /// Represents a set of variables.
-/** \note A VarSet is implemented using a std::vector<Var> instead
+/** \note A VarSet is implemented using a SmallSet<Var> instead
  *  of the more natural std::set<Var> because of efficiency reasons.
  */
-class VarSet : public smallSet<Var> {
+class VarSet : public SmallSet<Var> {
     public:
         /// Default constructor
-        VarSet() : smallSet<Var>() {}
+        VarSet() : SmallSet<Var>() {}
 
         /// Copy constructor
-        VarSet( const VarSet &x ) : smallSet<Var>(x) {}
+        VarSet( const VarSet &x ) : SmallSet<Var>(x) {}
 
         /// Assignment operator
         VarSet& operator=( const VarSet &x ) {
             if( this != &x ) {
-                smallSet<Var>::operator=( x );
+                SmallSet<Var>::operator=( x );
             }
             return *this;
         }
         
-        /// Construct from smallSet<Var>
-        VarSet( const smallSet<Var> &x ) : smallSet<Var>(x) {}
+        /// Construct from SmallSet<Var>
+        VarSet( const SmallSet<Var> &x ) : SmallSet<Var>(x) {}
 
         /// Calculates the product of the number of states of all variables in this VarSet.
+        /** This is equal to the number of joint configurations of the variables.
+         *  If *this corresponds with the set \f$\{x_{l(0)},x_{l(1)},\dots,x_{l(n-1)}\}\f$,
+         *  where variable \f$x_l\f$ has label \f$l\f$, and denoting by \f$S_l\f$ the number of possible values
+         *  ("states") of variable \f$x_l\f$, the number of joint configurations
+         *  of the variables in this set is given by \f[N := \prod_{i=0}^{n-1} S_{l(i)}.\f]
+         */
         size_t nrStates() {
             size_t states = 1;
             for( VarSet::const_iterator n = begin(); n != end(); n++ )
@@ -75,25 +81,40 @@ class VarSet : public smallSet<Var> {
         }
 
         /// Construct a VarSet with one element
-        VarSet( const Var &n ) : smallSet<Var>(n) {}
+        VarSet( const Var &n ) : SmallSet<Var>(n) {}
 
         /// Construct a VarSet with two elements
-        VarSet( const Var &n1, const Var &n2 ) : smallSet<Var>(n1,n2) {} 
+        VarSet( const Var &n1, const Var &n2 ) : SmallSet<Var>(n1,n2) {} 
 
-        /// Construct a VarSet from a range of iterators.
-        /** \tparam VarIterator Iterator with value_type Var.
+        /// Construct a VarSet from a range.
+        /** \tparam VarIterator Iterates over instances of type Var.
          *  \param begin Points to first Var to be added.
          *  \param end Points just beyond last Var to be added.
          *  \param sizeHint For efficiency, the number of elements can be speficied by sizeHint.
          */
         template <typename VarIterator>
-        VarSet( VarIterator begin, VarIterator end, size_t sizeHint=0 ) : smallSet<Var>(begin,end,sizeHint) {}
+        VarSet( VarIterator begin, VarIterator end, size_t sizeHint=0 ) : SmallSet<Var>(begin,end,sizeHint) {}
 
-        /// Calculates the linear index in the cartesian product of the variables in *this, which corresponds to a particular joint assignment of the variables.
+        /// Calculates the linear index in the cartesian product of the variables in *this, which corresponds to a particular joint assignment of the variables specified by \a states.
         /** \param states Specifies the states of some variables.
          *  \return The linear index in the cartesian product of the variables in *this
-         *  corresponding with the joint assignment specified by \c states (where it is
-         *  assumed that states[m] == 0 for all m in vars which are not in states).
+         *  corresponding with the joint assignment specified by \a states, where it is
+         *  assumed that \a states[\a m]==0 for all \a m in *this which are not in \a states.
+         *  
+         *  The linear index is calculated as follows. The variables in *this are
+         *  ordered according to their label (in ascending order); say *this corresponds with
+         *  the set \f$\{x_{l(0)},x_{l(1)},\dots,x_{l(n-1)}\}\f$ with \f$l(0) < l(1) < \dots < l(n-1)\f$,
+         *  where variable \f$x_l\f$ has label \a l. Denote by \f$S_l\f$ the number of possible values
+         *  ("states") of variable \f$x_l\f$. The argument \a states corresponds
+         *  with a mapping \a s that assigns to each variable \f$x_l\f$ a state \f$s(x_l) \in \{0,1,\dots,S_l-1\}\f$,
+         *  where \f$s(x_l)=0\f$ if \f$x_l\f$ is not specified in \a states. The linear index \a S corresponding
+         *  with \a states is now calculated as:
+         *  \f{eqnarray*}
+         *    S &:=& \sum_{i=0}^{n-1} s(x_{l(i)}) \prod_{j=0}^{i-1} S_{l(j)} \\
+         *      &= & s(x_{l(0)}) + s(x_{l(1)}) S_{l(0)} + s(x_{l(2)}) S_{l(0)} S_{l(1)} + \dots + s(x_{l(n-1)}) S_{l(0)} \cdots S_{l(n-2)}.
+         *  \f}
+         *
+         *  \note This function is the inverse of calcStates( size_t ).
          */
         size_t calcState( const std::map<Var, size_t> &states ) {
             size_t prod = 1;
@@ -107,16 +128,53 @@ class VarSet : public smallSet<Var> {
             return state;
         }
 
+        /// Calculates the joint assignment of the variables in *this corresponding to the linear index \a linearState.
+        /** \param linearState should be smaller than nrStates().
+         *  \return A mapping \f$s\f$ that maps each Var \f$x_l\f$ in *this to its state \f$s(x_l)\f$, as specified by \a linearState.
+         *
+         *  The variables in *this are ordered according to their label (in ascending order); say *this corresponds with
+         *  the set \f$\{x_{l(0)},x_{l(1)},\dots,x_{l(n-1)}\}\f$ with \f$l(0) < l(1) < \dots < l(n-1)\f$,
+         *  where variable \f$x_l\f$ has label \a l. Denote by \f$S_l\f$ the number of possible values
+         *  ("states") of variable \f$x_l\f$ with label \a l. 
+         *  The mapping \a s returned by this function is defined as:
+         *  \f{eqnarray*}
+         *    s(x_{l(i)}) = \left[\frac{S \mbox { mod } \prod_{j=0}^{i} S_{l(j)}}{\prod_{j=0}^{i-1} S_{l(j)}}\right] \qquad \mbox{for all $i=0,\dots,n-1$}.
+         *  \f}
+         *  where \f$S\f$ denotes the value of \a linearState.
+         *  \note This function is the inverse of calcState( const std::map<Var,size_t> &).
+         */
+        std::map<Var, size_t> calcStates( size_t linearState ) {
+            std::map<Var, size_t> states;
+            for( VarSet::const_iterator n = begin(); n != end(); n++ ) {
+                states[*n] = linearState % n->states();
+                linearState /= n->states();
+            }
+            assert( linearState == 0 );
+            return states;
+        }
+
         /// Writes a VarSet to an output stream
         friend std::ostream& operator<< (std::ostream &os, const VarSet& ns)  {
+            os << "{";
             for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
-                os << *n;
+                os << (n != ns.begin() ? "," : "") << *n;
+            os << "}";
             return( os );
         }
 };
 
 
 } // end of namespace dai
+
+
+/** \example example_varset.cpp
+ *  This example shows how to use the Var and VarSet classes. It also explains the concept of "states" for VarSets.
+ *
+ *  \section Output
+ *  \verbinclude examples/example_varset.out
+ *
+ *  \section Source
+ */
 
 
 #endif

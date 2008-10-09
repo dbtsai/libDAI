@@ -116,7 +116,7 @@ double MF::run() {
             foreach( const Neighbor &j, nbF(I) ) // for all j in I \ i
                 if( j != i )
                     henk *= _beliefs[j];
-            piet = factor(I).log0();
+            piet = factor(I).log(true);
             piet *= henk;
             piet = piet.partSum(var(i));
             piet = piet.exp();
@@ -199,7 +199,7 @@ Real MF::logZ() const {
             henk *= _beliefs[j];
         henk.normalize();
         Factor piet;
-        piet = factor(I).log0();
+        piet = factor(I).log(true);
         piet *= henk;
         sum -= piet.totalSum();
     }

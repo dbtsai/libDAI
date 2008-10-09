@@ -122,7 +122,7 @@ endif
 all : $(TARGETS)
 	echo -e "\a"
 
-examples : examples/example$(EE) examples/example_bipgraph$(EE)
+examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE)
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
@@ -146,7 +146,7 @@ doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 clean :
 	-rm *$(OE)
 	-rm matlab/*$(ME)
-	-rm examples/example$(EE) examples/example_bipgraph$(EE)
+	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE)
 	-rm tests/testdai$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc

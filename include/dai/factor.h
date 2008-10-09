@@ -246,11 +246,13 @@ template <typename T> class TFactor {
             return *this;
         }
             
-        /// Returns inverse of *this
-        TFactor<T> inverse() const { 
+        /// Returns inverse of *this.
+        /** If zero == true, uses 1 / 0 == 0; otherwise 1 / 0 == Inf.
+         */
+        TFactor<T> inverse(bool zero=true) const { 
             TFactor<T> inv; 
             inv._vs = _vs; 
-            inv._p = _p.inverse(true);  // FIXME
+            inv._p = _p.inverse(zero);
             return inv; 
         }
 
@@ -290,19 +292,13 @@ template <typename T> class TFactor {
         }
 
         /// Returns logarithm of *this
-        TFactor<T> log() const {
+        /** If zero==true, uses log(0)==0; otherwise, log(0)=-Inf.
+         */
+        TFactor<T> log(bool zero=false) const {
             TFactor<T> l; 
             l._vs = _vs; 
-            l._p = _p.log(); 
+            l._p = _p.log(zero); 
             return l; 
-        }
-
-        /// Returns logarithm of *this (defining log(0)=0)
-        TFactor<T> log0() const {
-            TFactor<T> l0; 
-            l0._vs = _vs; 
-            l0._p = _p.log0(); 
-            return l0; 
         }
 
         /// Normalizes *this Factor

@@ -123,7 +123,7 @@ TARGETS = $(TARGETS) matlabs
 !ENDIF
 all : $(TARGETS)
 
-examples : examples/example$(EE) examples/example_bipgraph$(EE)
+examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE)
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 

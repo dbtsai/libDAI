@@ -478,7 +478,7 @@ Real HAK::logZ() const {
         sum += IR(beta).c() * Qb(beta).entropy();
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
         sum += OR(alpha).c() * Qa(alpha).entropy();
-        sum += (OR(alpha).log0() * Qa(alpha)).totalSum();
+        sum += (OR(alpha).log(true) * Qa(alpha)).totalSum();
     }
     return sum;
 }

@@ -22,7 +22,7 @@
 
 /// \file
 /// \brief Defines TProb<T> and Prob classes
-/// \todo Improve documentation
+/// \todo Rename to Vector<T>
 
 
 #ifndef __defined_libdai_prob_h
@@ -42,23 +42,25 @@
 namespace dai {
 
 
-/// Real number (alias for double, could be changed to long double if necessary)
-typedef double                  Real;
+/// Real number (alias for double, which could be changed to long double if necessary)
+typedef double             Real;
 
-template<typename T> class      TProb;
+// Predefine class
+template<typename T> class TProb;
 
 /// Represents a probability measure, with entries of type Real.
-typedef TProb<Real>             Prob;
+typedef TProb<Real>        Prob;
 
 
-/// Represents a probability measure on a finite outcome space (i.e., corresponding to a discrete random variable).
-/** It is implemented as a std::vector<T> but adds a convenient interface.
- *  It is not necessarily normalized at all times.
- *  \tparam T Should be castable from and to double.
+/// Represents a vector with entries of type \a T.
+/** A TProb<T> is a std::vector<T> with an interface designed for dealing with probability mass functions.
+ *  It is mainly used for representing measures on a finite outcome space, e.g., the probability 
+ *  distribution of a discrete random variable.
+ *  \tparam T Should be a scalar that is castable from and to double and should support elementary arithmetic operations.
  */
 template <typename T> class TProb {
     private:
-        /// The probability measure
+        /// The vector
         std::vector<T> _p;
 
     public:
@@ -80,22 +82,22 @@ template <typename T> class TProb {
         /// Default constructor
         TProb() : _p() {}
         
-        /// Construct uniform distribution of given length
+        /// Construct uniform distribution over n outcomes, i.e., a vector of length n with each entry set to 1/n
         explicit TProb( size_t n ) : _p(std::vector<T>(n, 1.0 / n)) {}
         
-        /// Construct from given length and initial value
-        TProb( size_t n, Real p ) : _p(n, (T)p) {}
+        /// Construct vector of length n with each entry set to p
+        explicit TProb( size_t n, Real p ) : _p(n, (T)p) {}
         
-        /// Construct from given length and initial array
+        /// Construct vector of length n by copying the elements between p and p+n
         TProb( size_t n, const Real* p ) : _p(p, p + n ) {}
         
-        /// Returns a const reference to the probability vector
+        /// Returns a const reference to the vector
         const std::vector<T> & p() const { return _p; }
 
-        /// Returns a reference to the probability vector
+        /// Returns a reference to the vector
         std::vector<T> & p() { return _p; }
         
-        /// Returns a copy of the i'th probability entry
+        /// Returns a copy of the i'th entry
         T operator[]( size_t i ) const { 
 #ifdef DAI_DEBUG
             return _p.at(i);
@@ -104,27 +106,27 @@ template <typename T> class TProb {
 #endif
         }
         
-        /// Returns a reference to the i'th probability entry
+        /// Returns reference to the i'th entry
         T& operator[]( size_t i ) { return _p[i]; }
 
-        /// Sets all elements to x
+        /// Sets all entries to x
         TProb<T> & fill(T x) { 
             std::fill( _p.begin(), _p.end(), x );
             return *this;
         }
 
-        /// Sets all elements to i.i.d. random numbers from a uniform[0,1) distribution
+        /// Sets all entries to i.i.d. random numbers from a uniform[0,1) distribution
         TProb<T> & randomize() { 
             std::generate(_p.begin(), _p.end(), rnd_uniform);
             return *this;
         }
 
-        /// Returns number of elements
+        /// Returns length of the vector, i.e., the number of entries
         size_t size() const {
             return _p.size();
         }
 
-        /// Sets entries that are smaller than epsilon to zero
+        /// Sets entries that are smaller than epsilon to 0
         TProb<T>& makeZero( Real epsilon ) {
             for( size_t i = 0; i < size(); i++ )
                 if( fabs(_p[i]) < epsilon )
@@ -133,27 +135,27 @@ template <typename T> class TProb {
         }
 
         /// Sets entries that are smaller than epsilon to epsilon
-        TProb<T>& makePositive (Real epsilon) {
+        TProb<T>& makePositive( Real epsilon ) {
             for( size_t i = 0; i < size(); i++ )
                 if( (0 < (Real)_p[i]) && ((Real)_p[i] < epsilon) )
                     _p[i] = epsilon;
             return *this;
         }
 
-        /// Multiplies each entry with x
+        /// Multiplies each entry with scalar x
         TProb<T>& operator*= (T x) {
             std::transform( _p.begin(), _p.end(), _p.begin(), std::bind2nd( std::multiplies<T>(), x) );
             return *this;
         }
 
-        /// Returns product of *this with x
+        /// Returns product of *this with scalar x
         TProb<T> operator* (T x) const {
             TProb<T> prod( *this );
             prod *= x;
             return prod;
         }
 
-        /// Divides each entry by x
+        /// Divides each entry by scalar x
         TProb<T>& operator/= (T x) {
 #ifdef DAI_DEBUG
             assert( x != 0.0 );
@@ -162,40 +164,40 @@ template <typename T> class TProb {
             return *this;
         }
 
-        /// Returns quotient of *this and x
+        /// Returns quotient of *this and scalar x
         TProb<T> operator/ (T x) const {
             TProb<T> quot( *this );
             quot /= x;
             return quot;
         }
 
-        /// Adds x to each entry
+        /// Adds scalar x to each entry
         TProb<T>& operator+= (T x) {
             std::transform( _p.begin(), _p.end(), _p.begin(), std::bind2nd( std::plus<T>(), x ) );
             return *this;
         }
 
-        /// Returns sum of *this and x
+        /// Returns sum of *this and scalar x
         TProb<T> operator+ (T x) const {
             TProb<T> sum( *this );
             sum += x;
             return sum;
         }
 
-        /// Subtracts x from each entry
+        /// Subtracts scalar x from each entry
         TProb<T>& operator-= (T x) {
             std::transform( _p.begin(), _p.end(), _p.begin(), std::bind2nd( std::minus<T>(), x ) );
             return *this;
         }
 
-        /// Returns difference of *this and x
+        /// Returns difference of *this and scalar x
         TProb<T> operator- (T x) const {
             TProb<T> diff( *this );
             diff -= x;
             return diff;
         }
 
-        /// Pointwise comparison
+        /// Lexicographical comparison (sizes should be identical)
         bool operator<= (const TProb<T> & q) const {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -206,7 +208,7 @@ template <typename T> class TProb {
             return true;
         }
 
-        /// Pointwise multiplication with q
+        /// Pointwise multiplication with q (sizes should be identical)
         TProb<T>& operator*= (const TProb<T> & q) {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -215,7 +217,7 @@ template <typename T> class TProb {
             return *this;
         }
         
-        /// Return product of *this with q
+        /// Return product of *this with q (sizes should be identical)
         TProb<T> operator* (const TProb<T> & q) const {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -225,7 +227,7 @@ template <typename T> class TProb {
             return prod;
         }
 
-        /// Pointwise addition with q
+        /// Pointwise addition with q (sizes should be identical)
         TProb<T>& operator+= (const TProb<T> & q) {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -234,7 +236,7 @@ template <typename T> class TProb {
             return *this;
         }
         
-        /// Return sum of *this and q
+        /// Returns sum of *this and q (sizes should be identical)
         TProb<T> operator+ (const TProb<T> & q) const {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -244,7 +246,7 @@ template <typename T> class TProb {
             return sum;
         }
         
-        /// Pointwise subtraction of q
+        /// Pointwise subtraction of q (sizes should be identical)
         TProb<T>& operator-= (const TProb<T> & q) {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -253,7 +255,7 @@ template <typename T> class TProb {
             return *this;
         }
         
-        /// Return *this minus q
+        /// Return *this minus q (sizes should be identical)
         TProb<T> operator- (const TProb<T> & q) const {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -263,7 +265,7 @@ template <typename T> class TProb {
             return diff;
         }
 
-        /// Pointwise division by q, where division by zero yields zero
+        /// Pointwise division by q, where division by 0 yields 0 (sizes should be identical)
         TProb<T>& operator/= (const TProb<T> & q) {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -277,7 +279,7 @@ template <typename T> class TProb {
             return *this;
         }
         
-        /// Pointwise division by q, where division by zero yields infinity
+        /// Pointwise division by q, where division by 0 yields +Inf (sizes should be identical)
         TProb<T>& divide (const TProb<T> & q) {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -286,7 +288,7 @@ template <typename T> class TProb {
             return *this;
         }
         
-        /// Returns quotient of *this with q
+        /// Returns quotient of *this with q (sizes should be identical)
         TProb<T> operator/ (const TProb<T> & q) const {
 #ifdef DAI_DEBUG
             assert( size() == q.size() );
@@ -297,23 +299,21 @@ template <typename T> class TProb {
         }
 
         /// Returns pointwise inverse
-        TProb<T> inverse(bool zero = false) const {
+        /** If zero==true; uses 1/0==0, otherwise 1/0==Inf.
+         */
+        TProb<T> inverse(bool zero=true) const {
             TProb<T> inv;
             inv._p.reserve( size() );
             if( zero )
                 for( size_t i = 0; i < size(); i++ )
                     inv._p.push_back( _p[i] == 0.0 ? 0.0 : 1.0 / _p[i] );
             else
-                for( size_t i = 0; i < size(); i++ ) {
-#ifdef DAI_DEBUG
-                    assert( _p[i] != 0.0 );
-#endif
+                for( size_t i = 0; i < size(); i++ )
                     inv._p.push_back( 1.0 / _p[i] );
-                }
             return inv;
         }
 
-        /// Raises elements to the power a
+        /// Raises entries to the power a
         TProb<T>& operator^= (Real a) {
             if( a != 1.0 )
                 std::transform( _p.begin(), _p.end(), _p.begin(), std::bind2nd( std::ptr_fun<T, Real, T>(std::pow), a) );
@@ -358,15 +358,14 @@ template <typename T> class TProb {
         }
 
         /// Applies log pointwise
-        const TProb<T>& takeLog() {
-            std::transform( _p.begin(), _p.end(), _p.begin(),  std::ptr_fun<T, T>(std::log) );
-            return *this;
-        }
-
-        /// Applies log pointwise (defining log(0)=0)
-        const TProb<T>& takeLog0()  {
-            for( size_t i = 0; i < size(); i++ )
-               _p[i] = ( (_p[i] == 0.0) ? 0.0 : std::log( _p[i] ) );
+        /** If zero==true, uses log(0)==0; otherwise, log(0)==-Inf.
+         */
+        const TProb<T>& takeLog(bool zero=false) {
+            if( zero ) {
+                for( size_t i = 0; i < size(); i++ )
+                   _p[i] = ( (_p[i] == 0.0) ? 0.0 : std::log( _p[i] ) );
+            } else
+                std::transform( _p.begin(), _p.end(), _p.begin(),  std::ptr_fun<T, T>(std::log) );
             return *this;
         }
 
@@ -378,52 +377,12 @@ template <typename T> class TProb {
         }
 
         /// Returns pointwise log
-        TProb<T> log() const {
+        /** If zero==true, uses log(0)==0; otherwise, log(0)==-Inf.
+         */
+        TProb<T> log(bool zero=false) const {
             TProb<T> l(*this);
-            l.takeLog();
+            l.takeLog(zero);
             return l;
-        }
-
-        /// Returns pointwise log (defining log(0)=0)
-        TProb<T> log0() const {
-            TProb<T> l0(*this);
-            l0.takeLog0();
-            return l0;
-        }
-
-        /// Returns distance of p and q, measured using dt
-        friend Real dist( const TProb<T> &p, const TProb<T> &q, DistType dt ) {
-#ifdef DAI_DEBUG
-            assert( p.size() == q.size() );
-#endif
-            Real result = 0.0;
-            switch( dt ) {
-                case DISTL1:
-                    for( size_t i = 0; i < p.size(); i++ )
-                        result += fabs((Real)p[i] - (Real)q[i]);
-                    break;
-                    
-                case DISTLINF:
-                    for( size_t i = 0; i < p.size(); i++ ) {
-                        Real z = fabs((Real)p[i] - (Real)q[i]);
-                        if( z > result )
-                            result = z;
-                    }
-                    break;
-
-                case DISTTV:
-                    for( size_t i = 0; i < p.size(); i++ )
-                        result += fabs((Real)p[i] - (Real)q[i]);
-                    result *= 0.5;
-                    break;
-
-                case DISTKL:
-                    for( size_t i = 0; i < p.size(); i++ ) {
-                        if( p[i] != 0.0 )
-                            result += p[i] * (std::log(p[i]) - std::log(q[i]));
-                    }
-            }
-            return result;
         }
 
         /// Returns sum of all entries
@@ -432,7 +391,7 @@ template <typename T> class TProb {
             return Z;
         }
 
-        /// Returns maximum absolute value of entries
+        /// Returns maximum absolute value of all entries
         T maxAbs() const {
             T Z = 0;
             for( size_t i = 0; i < size(); i++ ) {
@@ -443,20 +402,20 @@ template <typename T> class TProb {
             return Z;
         }
 
-        /// Returns maximum value of entries
+        /// Returns maximum value of all entries
         T maxVal() const {
             T Z = *std::max_element( _p.begin(), _p.end() );
             return Z;
         }
 
-        /// Returns minimum value of entries
+        /// Returns minimum value of all entries
         T minVal() const {
             T Z = *std::min_element( _p.begin(), _p.end() );
             return Z;
         }
 
-        /// Normalizes using the specified norm
-        T normalize( NormType norm = NORMPROB ) {
+        /// Normalizes vector using the specified norm
+        T normalize( NormType norm=NORMPROB ) {
             T Z = 0.0;
             if( norm == NORMPROB )
                 Z = totalSum();
@@ -486,34 +445,68 @@ template <typename T> class TProb {
             return (std::find_if( _p.begin(), _p.end(), std::bind2nd( std::less<Real>(), 0.0 ) ) != _p.end());
         }
         
-        /// Returns true if one or more entries are non-positive (causes problems with logscale)
-        bool hasNonPositives() const {
-            return (std::find_if( _p.begin(), _p.end(), std::bind2nd( std::less_equal<Real>(), 0.0 ) ) != _p.end());
-        }
-
-        /// Returns entropy
+        /// Returns entropy of *this
         Real entropy() const {
             Real S = 0.0;
             for( size_t i = 0; i < size(); i++ )
-                S -= xlogx(_p[i]);
+                S -= (_p[i] == 0 ? 0 : _p[i] * std::log(_p[i]));
             return S;
         }
-
-        /// Writes a TProb<T> to an output stream
-        friend std::ostream& operator<< (std::ostream& os, const TProb<T>& P) {
-            os << "[";
-            std::copy( P._p.begin(), P._p.end(), std::ostream_iterator<T>(os, " ") );
-            os << "]";
-            return os;
-        }
-
-    private:
-        /// Returns x*log(x), or 0 if x == 0
-        Real xlogx( Real x ) const { return( x == 0.0 ? 0.0 : x * std::log(x)); }
 };
 
 
-/// Returns TProb<T> containing the pointwise minimum of a and b (which should have equal size)
+/// Returns distance of p and q (sizes should be identical), measured using distance measure dt
+/** \relates TProb
+ */
+template<typename T> Real dist( const TProb<T> &p, const TProb<T> &q, typename TProb<T>::DistType dt ) {
+#ifdef DAI_DEBUG
+    assert( p.size() == q.size() );
+#endif
+    Real result = 0.0;
+    switch( dt ) {
+        case TProb<T>::DISTL1:
+            for( size_t i = 0; i < p.size(); i++ )
+                result += fabs((Real)p[i] - (Real)q[i]);
+            break;
+            
+        case TProb<T>::DISTLINF:
+            for( size_t i = 0; i < p.size(); i++ ) {
+                Real z = fabs((Real)p[i] - (Real)q[i]);
+                if( z > result )
+                    result = z;
+            }
+            break;
+
+        case TProb<T>::DISTTV:
+            for( size_t i = 0; i < p.size(); i++ )
+                result += fabs((Real)p[i] - (Real)q[i]);
+            result *= 0.5;
+            break;
+
+        case TProb<T>::DISTKL:
+            for( size_t i = 0; i < p.size(); i++ ) {
+                if( p[i] != 0.0 )
+                    result += p[i] * (std::log(p[i]) - std::log(q[i]));
+            }
+    }
+    return result;
+}
+
+
+/// Writes a TProb<T> to an output stream
+/** \relates TProb
+ */
+template<typename T> std::ostream& operator<< (std::ostream& os, const TProb<T>& P) {
+    os << "[";
+    std::copy( P.p().begin(), P.p().end(), std::ostream_iterator<T>(os, " ") );
+    os << "]";
+    return os;
+}
+
+
+/// Returns the TProb<T> containing the pointwise minimum of a and b (which should have equal size)
+/** \relates TProb
+ */
 template<typename T> TProb<T> min( const TProb<T> &a, const TProb<T> &b ) {
     assert( a.size() == b.size() );
     TProb<T> result( a.size() );
@@ -526,7 +519,9 @@ template<typename T> TProb<T> min( const TProb<T> &a, const TProb<T> &b ) {
 }
 
 
-/// Returns TProb<T> containing the pointwise maximum of a and b (which should have equal size)
+/// Returns the TProb<T> containing the pointwise maximum of a and b (which should have equal size)
+/** \relates TProb
+ */
 template<typename T> TProb<T> max( const TProb<T> &a, const TProb<T> &b ) {
     assert( a.size() == b.size() );
     TProb<T> result( a.size() );

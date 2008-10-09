@@ -23,7 +23,6 @@
 /// \file
 /// \brief Main libDAI header file
 /// \todo Improve documentation
-/// \todo Improve documentation of examples/example
 
 
 #ifndef __defined_libdai_alldai_h

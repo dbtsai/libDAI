@@ -190,9 +190,9 @@ void TreeEP::TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<F
 double TreeEP::TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const {
     double sum = 0.0;
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
-        sum += (Qa[_a[alpha]] * _Qa[alpha].log0()).totalSum();
+        sum += (Qa[_a[alpha]] * _Qa[alpha].log(true)).totalSum();
     for( size_t beta = 0; beta < _Qb.size(); beta++ )
-        sum -= (Qb[_b[beta]] * _Qb[beta].log0()).totalSum();
+        sum -= (Qb[_b[beta]] * _Qb[beta].log(true)).totalSum();
     return sum + _logZ;
 }
 
@@ -441,7 +441,7 @@ Real TreeEP::logZ() const {
 
     // energy of the on-tree factors
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        sum += (OR(alpha).log0() * Qa[alpha]).totalSum();
+        sum += (OR(alpha).log(true) * Qa[alpha]).totalSum();
 
     // energy of the off-tree factors
     for( size_t I = 0; I < nrFactors(); I++ )

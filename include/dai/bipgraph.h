@@ -22,7 +22,6 @@
 
 /// \file
 /// \brief Defines BipartiteGraph class
-/// \todo Improve documentation of examples_bipgraph
 
 
 #ifndef __defined_libdai_bipgraph_h

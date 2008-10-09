@@ -83,6 +83,9 @@ examples/example$(EE) : examples/example.cpp $(HEADERS) $(LIB)/libdai$(LE)
 examples/example_bipgraph$(EE) : examples/example_bipgraph.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCFLAGS) $(CCO)examples/example_bipgraph$(EE) examples/example_bipgraph.cpp $(LIBS)
 
+examples/example_varset$(EE) : examples/example_varset.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCFLAGS) $(CCO)examples/example_varset$(EE) examples/example_varset.cpp $(LIBS)
+
 
 # TESTS
 ########

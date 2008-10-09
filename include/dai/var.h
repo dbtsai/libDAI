@@ -25,7 +25,6 @@
 
 /// \file
 /// \brief Defines class Var
-/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_var_h
@@ -39,8 +38,15 @@ namespace dai {
 
 
 /// Represents a discrete random variable.
-/** It contains the \a label of the variable (an integer-valued unique ID) 
- *  and the number of possible values (\a states) of the variable.
+/** A Var stores the \a label of the variable (an integer-valued unique ID) 
+ *  and the number of possible values (\a states) of that variable. Two
+ *  Var objects with the same label are assumed to be identical (i.e., it 
+ *  is assumed that their states are also the same).
+ *
+ *  In this manual, we use the following notational conventions. The discrete
+ *  random variable with label \f$l\f$ is denoted as \f$x_l\f$, and the number 
+ *  of possible values of this variable as \f$S_l\f$; this is represented in
+ *  code by the object Var(\f$l\f$,\f$S_l\f$).
  */
 class Var {
     private:
@@ -66,22 +72,22 @@ class Var {
         /// Returns reference to number of states
         size_t& states () { return _states; }
 
-        /// Smaller-than operator (only compares labels)
+        /// Smaller-than operator (compares only labels)
         bool operator < ( const Var& n ) const { return( _label <  n._label ); }
-        /// Larger-than operator (only compares labels)
+        /// Larger-than operator (compares only labels)
         bool operator > ( const Var& n ) const { return( _label >  n._label ); }
-        /// Smaller-than-or-equal-to operator (only compares labels)
+        /// Smaller-than-or-equal-to operator (compares only labels)
         bool operator <= ( const Var& n ) const { return( _label <= n._label ); }
-        /// Larger-than-or-equal-to operator (only compares labels)
+        /// Larger-than-or-equal-to operator (compares only labels)
         bool operator >= ( const Var& n ) const { return( _label >= n._label ); }
-        /// Not-equal-to operator (only compares labels)
+        /// Not-equal-to operator (compares only labels)
         bool operator != ( const Var& n ) const { return( _label != n._label ); }
-        /// Equal-to operator (only compares labels)
+        /// Equal-to operator (compares only labels)
         bool operator == ( const Var& n ) const { return( _label == n._label ); }
 
         /// Writes a Var to an output stream
         friend std::ostream& operator << ( std::ostream& os, const Var& n ) {
-            return( os << "[" << n.label() << "]" );
+            return( os << "x" << n.label() );
         }
 };
 
