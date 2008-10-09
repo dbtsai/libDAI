@@ -413,11 +413,11 @@ template <typename T> class TFactor {
 
 
 template<typename T> TFactor<T> TFactor<T>::partSum(const VarSet & ns) const {
-    ns &= _vs;
+    VarSet res_ns = ns & _vs;
 
-    TFactor<T> res( ns, 0.0 );
+    TFactor<T> res( res_ns, 0.0 );
 
-    IndexFor i_res( ns, _vs );
+    IndexFor i_res( res_ns, _vs );
     for( size_t i = 0; i < _p.size(); i++, ++i_res )
         res._p[i_res] += _p[i];
 
