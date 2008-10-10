@@ -57,6 +57,9 @@ namespace dai {
  *  and (long)i is equal to the linear index of the corresponding
  *  state of indexVars, where the variables in indexVars that are
  *  not in forVars assume their zero'th value.
+ *  \idea Optimize all indices as follows: keep a cache of all (or only 
+ *  relatively small) indices that have been computed (use a hash). Then, 
+ *  instead of computing on the fly, use the precomputed ones.
  */
 class IndexFor {
     private:

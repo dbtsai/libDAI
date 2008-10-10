@@ -20,6 +20,10 @@
 */
 
 
+/// \file
+/// \brief Defines some utility functions for interfacing with MatLab
+
+
 #ifndef __defined_libdai_matlab_h
 #define __defined_libdai_matlab_h
 

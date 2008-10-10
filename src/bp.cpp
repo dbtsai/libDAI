@@ -248,6 +248,7 @@ double BP::run() {
             }
     } else {
         update_seq.reserve( nredges );
+        /// \todo Investigate whether performance increases by switching the order of following two loops:
         for( size_t i = 0; i < nrVars(); ++i )
             foreach( const Neighbor &I, nbV(i) )
                 update_seq.push_back( Edge( i, I.iter ) );

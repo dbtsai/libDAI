@@ -40,6 +40,8 @@ namespace dai {
 
 
 /// Approximate inference algorithm "(Loopy) Belief Propagation"
+/** \todo Optimize BP_SEQMAX (it should use a better data structure than a vector for the residuals).
+ */
 class BP : public DAIAlgFG {
     private:
         typedef std::vector<size_t> ind_t;

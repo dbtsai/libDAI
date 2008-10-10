@@ -63,6 +63,8 @@ namespace dai {
  *  induced by VarSet::calcState(const std::map<Var,size_t> &).
  *
  *  \tparam T Should be a scalar that is castable from and to double and should support elementary arithmetic operations.
+ *  \todo Define a better fileformat for .fg files (maybe using XML)?
+ *  \todo Add support for sparse factors.
  */
 template <typename T> class TFactor {
     private:

@@ -60,86 +60,31 @@ CCO=-o
 
 # Flags for the C++ compiler
 CCFLAGS=-O3 -Wno-deprecated -Wall -W -Wextra -fpic -Iinclude -Llib
-ifdef DEBUG
-CCFLAGS:=$(CCFLAGS) -g -DDAI_DEBUG
-endif
+CCDEBUGFLAGS=-g -DDAI_DEBUG
 
-ifdef WINDOWS
-CCFLAGS:=$(CCFLAGS) -DWINDOWS
-endif
-
-OBJECTS:=exactinf$(OE)
-ifdef WITH_BP
-CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP
-OBJECTS:=$(OBJECTS) bp$(OE)
-endif
-ifdef WITH_MF
-CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MF
-OBJECTS:=$(OBJECTS) mf$(OE)
-endif
-ifdef WITH_HAK
-CCFLAGS:=$(CCFLAGS) -DDAI_WITH_HAK
-OBJECTS:=$(OBJECTS) hak$(OE)
-endif
-ifdef WITH_LC
-CCFLAGS:=$(CCFLAGS) -DDAI_WITH_LC
-OBJECTS:=$(OBJECTS) lc$(OE)
-endif
-ifdef WITH_TREEEP
-CCFLAGS:=$(CCFLAGS) -DDAI_WITH_TREEEP
-OBJECTS:=$(OBJECTS) treeep$(OE)
-endif
-ifdef WITH_JTREE
-CCFLAGS:=$(CCFLAGS) -DDAI_WITH_JTREE
-OBJECTS:=$(OBJECTS) jtree$(OE)
-endif
-ifdef WITH_MR
-CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MR
-OBJECTS:=$(OBJECTS) mr$(OE)
-endif
+# Build targets
+TARGETS=tests utils $(LIB)/libdai$(LE) examples testregression doc
 
 ifdef WITH_MATLAB
-# Replace the following by the directory where Matlab has been installed
-MATLABDIR=/agbs/share/sw/matlab
-MEX=$(MATLABDIR)/bin/mex
-MEXFLAGS=-Iinclude CXX\#$(CC) CXXFLAGS\#'-O3 -Wno-deprecated -Wall -W -Wextra -fpic'
-ifdef DEBUG
-MEXFLAGS:=$(MEXFLAGS) -g -DDAI_DEBUG
-endif
-ifdef NEW_MATLAB
-MEXFLAGS:=$(MEXFLAGS) -largeArrayDims
-else
-MEXFLAGS:=$(MEXFLAGS) -DSMALLMEM
-endif
+	# Replace the following by the directory where Matlab has been installed
+	MATLABDIR=/agbs/share/sw/matlab
+	MEX=$(MATLABDIR)/bin/mex
+	MEXFLAGS=-Iinclude CXX\#$(CC) CXXFLAGS\#'-O3 -Wno-deprecated -Wall -W -Wextra -fpic'
 endif
 
-HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
 
-TARGETS=tests utils $(LIB)/libdai$(LE) testregression doc examples
-ifdef WITH_MATLAB
-TARGETS:=$(TARGETS) matlabs
-endif
-all : $(TARGETS)
-	echo -e "\a"
+include Makefile.shared
 
-examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE)
-
-matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
 $(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 	-mkdir -p lib
 	ar rcus $(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 
-tests : tests/testdai$(EE)
-
-utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
-
-testregression : tests/testdai
+testregression : tests/testdai$(EE)
 	@echo Starting regression test...this can take a minute or so!
 	cd tests; time ./testregression; cd ..
 
 doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
-	-mkdir -p doc
 	doxygen doxygen.conf
 
 .PHONY : clean
@@ -151,5 +96,3 @@ clean :
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib
-
-include Makefile.shared

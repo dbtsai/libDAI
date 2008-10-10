@@ -40,6 +40,8 @@ namespace dai {
 
 
 /// Approximate inference algorithm: implementation of single-loop ("Generalized Belief Propagation") and double-loop algorithms by Heskes, Albers and Kappen
+/** \todo Optimize HAK with precalculated indices, similarly to BP.
+ */
 class HAK : public DAIAlgRG {
     private:
         std::vector<Factor>                _Qa;

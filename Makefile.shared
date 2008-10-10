@@ -19,6 +19,70 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+ifdef DEBUG
+	CCFLAGS:=$(CCFLAGS) $(CCDEBUGFLAGS)
+endif
+ifdef WINDOWS
+	CCFLAGS:=$(CCFLAGS) -DWINDOWS
+endif
+ifdef WITH_MATLAB
+	TARGETS:=$(TARGETS) matlabs
+	ifdef DEBUG
+		MEXFLAGS:=$(MEXFLAGS) $(CCDEBUGFLAGS)
+	endif
+	ifdef NEW_MATLAB
+		MEXFLAGS:=$(MEXFLAGS) -largeArrayDims
+	else
+		MEXFLAGS:=$(MEXFLAGS) -DSMALLMEM
+	endif
+endif
+
+
+OBJECTS:=exactinf$(OE)
+ifdef WITH_BP
+	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP
+	OBJECTS:=$(OBJECTS) bp$(OE)
+endif
+ifdef WITH_MF
+	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MF
+	OBJECTS:=$(OBJECTS) mf$(OE)
+endif
+ifdef WITH_HAK
+	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_HAK
+	OBJECTS:=$(OBJECTS) hak$(OE)
+endif
+ifdef WITH_LC
+	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_LC
+	OBJECTS:=$(OBJECTS) lc$(OE)
+endif
+ifdef WITH_TREEEP
+	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_TREEEP
+	OBJECTS:=$(OBJECTS) treeep$(OE)
+endif
+ifdef WITH_JTREE
+	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_JTREE
+	OBJECTS:=$(OBJECTS) jtree$(OE)
+endif
+ifdef WITH_MR
+	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MR
+	OBJECTS:=$(OBJECTS) mr$(OE)
+endif
+
+
+HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
+
+
+all : $(TARGETS)
+
+examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE)
+
+matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
+
+tests : tests/testdai$(EE)
+
+utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
+
+
 bipgraph$(OE) : $(SRC)/bipgraph.cpp $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/bipgraph.cpp
 

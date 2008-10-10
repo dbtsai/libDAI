@@ -200,6 +200,8 @@ namespace dai {
             /*  the interactions that are created along the way.
              *  \param ElimSeq A set of outer clusters and an elimination sequence
              *  \return A set of elimination "cliques"
+             *  \todo Variable elimination should be implemented generically using a function
+             *  object that tells you which variable to delete.
              */
             ClusterGraph VarElim( const std::vector<Var> &ElimSeq ) const;
 

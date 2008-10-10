@@ -60,6 +60,11 @@ namespace dai {
  *
  *  Factor graphs explicitly express the factorization structure of the
  *  corresponding probability distribution.
+ *
+ *  \todo Alternative implementation of undo factor changes: the only things that have to be
+ *  undone currently are setting a factor to 1 and setting a factor to a Kronecker delta. This
+ *  could also be implemented in the TFactor itself, which could maintain its state 
+ *  (ones/delta/full) and act accordingly.
  */ 
 class FactorGraph {
     public:

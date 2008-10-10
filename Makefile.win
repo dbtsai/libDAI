@@ -30,7 +30,7 @@ WITH_MR=true
 # Build with debug info?
 DEBUG=true
 # Build matlab interface?
-#WITH_MATLAB=true
+WITH_MATLAB=
 # New/old matlab version?
 NEW_MATLAB=true
 # Windows or linux (default)?
@@ -53,86 +53,31 @@ LIBS=/link $(LIB)/libdai$(LE) /LIBPATH:"C:\Program Files\Microsoft Visual Studio
 # We use the BOOST Program Options library
 BOOSTLIBS=/LIBPATH:C:\boost_1_36_0\stage\lib
 
-# Compile using GNU C++ Compiler
+# Compile using Visual C++ Compiler
 CC=cl
 # Output filename option
 CCO=/Fe
 
 # Flags for the C++ compiler
 CCFLAGS=/Iinclude /IC:\boost_1_36_0 /EHsc /Ox
-!IFDEF DEBUG
-CCFLAGS=$(CCFLAGS) /Zi /DDAI_DEBUG
-!ENDIF
+CCDEBUGFLAGS=/Zi -DDAI_DEBUG
 
-!IFDEF WINDOWS
-CCFLAGS=$(CCFLAGS) /DWINDOWS
-!ENDIF
+# Build targets
+TARGETS=tests utils $(LIB)/libdai$(LE) examples # testregression doc
 
-OBJECTS=exactinf$(OE)
-!IFDEF WITH_BP
-CCFLAGS=$(CCFLAGS) /DDAI_WITH_BP
-OBJECTS=$(OBJECTS) bp$(OE)
-!ENDIF
-!IFDEF WITH_MF
-CCFLAGS=$(CCFLAGS) /DDAI_WITH_MF
-OBJECTS=$(OBJECTS) mf$(OE)
-!ENDIF
-!IFDEF WITH_HAK
-CCFLAGS=$(CCFLAGS) /DDAI_WITH_HAK
-OBJECTS=$(OBJECTS) hak$(OE)
-!ENDIF
-!IFDEF WITH_LC
-CCFLAGS=$(CCFLAGS) /DDAI_WITH_LC
-OBJECTS=$(OBJECTS) lc$(OE)
-!ENDIF
-!IFDEF WITH_TREEEP
-CCFLAGS=$(CCFLAGS) /DDAI_WITH_TREEEP
-OBJECTS=$(OBJECTS) treeep$(OE)
-!ENDIF
-!IFDEF WITH_JTREE
-CCFLAGS=$(CCFLAGS) /DDAI_WITH_JTREE
-OBJECTS=$(OBJECTS) jtree$(OE)
-!ENDIF
-!IFDEF WITH_MR
-CCFLAGS=$(CCFLAGS) /DDAI_WITH_MR
-OBJECTS=$(OBJECTS) mr$(OE)
-!ENDIF
+ifdef WITH_MATLAB
+	# Replace the following by the directory where Matlab has been installed
+	MATLABDIR=c:\matlab
+	MEX=$(MATLABDIR)\bin\mex
+	MEXFLAGS=-Iinclude CXX\#$(CC) CXXFLAGS\#"/EHsc /Ox"
+endif
 
-!IFDEF WITH_MATLAB
-# Replace the following by the directory where Matlab has been installed
-MATLABDIR=c:\matlab
-MEX=$(MATLABDIR)\bin\mex
-MEXFLAGS=-Iinclude CXX\#$(CC) CXXFLAGS\#"/EHsc /Ox"
-!IFDEF DEBUG
-MEXFLAGS=$(MEXFLAGS) -g /DDAI_DEBUG
-!ENDIF
-!IFDEF NEW_MATLAB
-MEXFLAGS=$(MEXFLAGS) -largeArrayDims
-!ELSE
-MEXFLAGS=$(MEXFLAGS) /DSMALLMEM
-!ENDIF
-!ENDIF
 
-HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
+include Makefile.shared
 
-TARGETS=tests utils $(LIB)/libdai$(LE) examples
-# testregression disabled, it uses diff
-# doc disabled, it uses doxygen, graphviz and latex
-!IFDEF WITH_MATLAB
-TARGETS = $(TARGETS) matlabs
-!ENDIF
-all : $(TARGETS)
-
-examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE)
-
-matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
 $(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 	lib /out:$(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
-
-tests : tests/testdai$(EE)
-
-utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
 testregression : tests/testdai$(EE)
 	echo Starting regression test...this can take a minute or so!
@@ -141,7 +86,6 @@ testregression : tests/testdai$(EE)
 doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 	doxygen doxygen.conf
 
+.PHONY : clean
 clean :
-	del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
-
-!INCLUDE Makefile.shared
+	-del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)

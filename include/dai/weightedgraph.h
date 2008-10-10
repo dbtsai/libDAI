@@ -20,9 +20,11 @@
 */
 
 
-/// \file
-/// \brief Defines some utility functions for weighted graphs
-/// \todo Improve documentation
+/** \file
+ *  \brief Defines some utility functions for weighted graphs
+ *  \todo Improve documentation
+ *  \todo Improve general support for graphs and trees.
+ */
 
 
 #ifndef __defined_libdai_weightedgraph_h

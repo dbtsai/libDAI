@@ -52,6 +52,7 @@ namespace dai {
  *  neighboring nodes of type 1. 
  *  Thus, each node has an associated variable of type BipartiteGraph::Neighbors, which is a vector of
  *  Neighbor structures, describing its neighboring nodes of the other type.
+ *  \idea Cache second-order neighborhoods in BipartiteGraph.
  */
 class BipartiteGraph {
     public:
@@ -303,6 +304,8 @@ class BipartiteGraph {
         std::vector<size_t> delta2( size_t n2, bool include = false ) const;
 
         /// Returns true if the graph is connected
+        /** \todo Should be optimized by invoking boost::graph library
+         */
         bool isConnected() const;
 
         /// Returns true if the graph is a tree, i.e., if it is singly connected and connected.
