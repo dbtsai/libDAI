@@ -119,10 +119,10 @@ void TreeEP::TreeEPSubTree::init() {
 
 void TreeEP::TreeEPSubTree::InvertAndMultiply( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) {
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
-        _Qa[alpha] = Qa[_a[alpha]].divided_by( _Qa[alpha] );
+        _Qa[alpha] = Qa[_a[alpha]] / _Qa[alpha];
 
     for( size_t beta = 0; beta < _Qb.size(); beta++ )
-        _Qb[beta] = Qb[_b[beta]].divided_by( _Qb[beta] );
+        _Qb[beta] = Qb[_b[beta]] / _Qb[beta];
 }
 
 
@@ -151,15 +151,15 @@ void TreeEP::TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<F
                     delta[s(*n)] = 1.0;
                     _Qa[_RTree[i].n2] *= delta;
                 }
-            Factor new_Qb = _Qa[_RTree[i].n2].partSum( _Qb[i].vars() );
-            _Qa[_RTree[i].n1] *= new_Qb.divided_by( _Qb[i] ); 
+            Factor new_Qb = _Qa[_RTree[i].n2].marginal( _Qb[i].vars(), false );
+            _Qa[_RTree[i].n1] *= new_Qb / _Qb[i]; 
             _Qb[i] = new_Qb;
         }
 
         // DistributeEvidence
         for( size_t i = 0; i < _RTree.size(); i++ ) {
-            Factor new_Qb = _Qa[_RTree[i].n1].partSum( _Qb[i].vars() );
-            _Qa[_RTree[i].n2] *= new_Qb.divided_by( _Qb[i] ); 
+            Factor new_Qb = _Qa[_RTree[i].n1].marginal( _Qb[i].vars(), false );
+            _Qa[_RTree[i].n2] *= new_Qb / _Qb[i]; 
             _Qb[i] = new_Qb;
         }
 

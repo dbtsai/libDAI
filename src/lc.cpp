@@ -226,15 +226,15 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
     Factor A_I;
     for( VarSet::const_iterator k = Ivars.begin(); k != Ivars.end(); k++ )
         if( var(i) != *k )
-            A_I *= (_pancakes[findVar(*k)] * factor(I).inverse()).partSum( Ivars / var(i) );
+            A_I *= (_pancakes[findVar(*k)] * factor(I).inverse()).marginal( Ivars / var(i), false );
     if( Ivars.size() > 1 )
         A_I ^= (1.0 / (Ivars.size() - 1));
-    Factor A_Ii = (_pancakes[i] * factor(I).inverse() * _phis[i][_I].inverse()).partSum( Ivars / var(i) );
-    Factor quot = A_I.divided_by(A_Ii);
+    Factor A_Ii = (_pancakes[i] * factor(I).inverse() * _phis[i][_I].inverse()).marginal( Ivars / var(i), false );
+    Factor quot = A_I / A_Ii;
     if( props.damping != 0.0 )
         quot = (quot^(1.0 - props.damping)) * (_phis[i][_I]^props.damping);
 
-    piet *= quot.divided_by( _phis[i][_I] ).normalized();
+    piet *= quot / _phis[i][_I].normalized();
     _phis[i][_I] = quot.normalized();
 
     piet.normalize();

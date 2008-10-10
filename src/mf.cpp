@@ -118,7 +118,7 @@ double MF::run() {
                     henk *= _beliefs[j];
             piet = factor(I).log(true);
             piet *= henk;
-            piet = piet.partSum(var(i));
+            piet = piet.marginal(var(i), false);
             piet = piet.exp();
             jan *= piet; 
         }

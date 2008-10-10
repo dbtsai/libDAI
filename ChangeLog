@@ -1,10 +1,25 @@
-git HEAD
---------
-* Improved documentation of include/dai/bipgraph.h
-* Moved example to examples/ and added examples/example_bipgraph.cpp
-* Cleanup of matlab interface
-* Small improvement of utils/fginfo
-* Small cleanup of BP code
+git 765e0048664c14c693ceb70a286e1fc41a2f9d02
+--------------------------------------------
+* Improved documentation of include/dai/{bipgraph.h, prob.h, smallset.h,
+  var.h, varset.h, factor.h, enum.h} and of examples/example.cpp
+* examples/
+  - Moved example.cpp to examples/ 
+  - Added examples/example_bipgraph.cpp
+  - Added examples/example_varset.cpp
+* Interface changes:
+  - Replaced TProb<T>::log0() by TProb<T>::log(true)
+  - Replaced TProb<T>::takeLog0() by TProb<T>::takeLog(true)
+  - Replaced TFactor<T>::log0() by TFactor<T>::log(true)
+  - Removed TProb<T>::hasNonPositives()
+  - Renamed smallSet<T> to SmallSet<T>
+  - Removed TFactor<T>::divided_by, use operator/ instead
+  - Removed TFactor<T>::divide, use operator/= instead
+  - Removed TFactor<T>::partSum(const VarSet&), use marginal(const VarSet&,true) instead
+* Miscellaneous small changes and cleanups:
+  - Changed output stream operator<< for Var and VarSet
+  - Cleanup of matlab interface code
+  - Small improvement of utils/fginfo
+  - Small cleanup of BP code
 
 
 libDAI-0.2.2 (2008-09-30)

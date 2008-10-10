@@ -219,9 +219,9 @@ void JTree::runHUGIN() {
     for( size_t i = RTree.size(); (i--) != 0; ) {
 //      Make outer region RTree[i].n1 consistent with outer region RTree[i].n2
 //      IR(i) = seperator OR(RTree[i].n1) && OR(RTree[i].n2)
-        Factor new_Qb = Qa[RTree[i].n2].partSum( IR( i ) );
+        Factor new_Qb = Qa[RTree[i].n2].marginal( IR( i ), false );
         _logZ += log(new_Qb.normalize());
-        Qa[RTree[i].n1] *= new_Qb.divided_by( Qb[i] ); 
+        Qa[RTree[i].n1] *= new_Qb / Qb[i]; 
         Qb[i] = new_Qb;
     }
     if( RTree.empty() )
@@ -234,7 +234,7 @@ void JTree::runHUGIN() {
 //      Make outer region RTree[i].n2 consistent with outer region RTree[i].n1
 //      IR(i) = seperator OR(RTree[i].n1) && OR(RTree[i].n2)
         Factor new_Qb = Qa[RTree[i].n1].marginal( IR( i ) );
-        Qa[RTree[i].n2] *= new_Qb.divided_by( Qb[i] ); 
+        Qa[RTree[i].n2] *= new_Qb / Qb[i]; 
         Qb[i] = new_Qb;
     }
 
@@ -260,7 +260,7 @@ void JTree::runShaferShenoy() {
         foreach( const Neighbor &k, nbOR(i) )
             if( k != e ) 
                 piet *= message( i, k.iter );
-        message( j, _e ) = piet.partSum( IR(e) );
+        message( j, _e ) = piet.marginal( IR(e), false );
         _logZ += log( message(j,_e).normalize() );
     }
 
@@ -480,16 +480,16 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                             Qa[T[i].n2] *= piet; 
                         }
 
-                    Factor new_Qb = Qa[T[i].n2].partSum( IR( b[i] ) );
+                    Factor new_Qb = Qa[T[i].n2].marginal( IR( b[i] ), false );
                     logZ += log(new_Qb.normalize());
-                    Qa[T[i].n1] *= new_Qb.divided_by( Qb[b[i]] ); 
+                    Qa[T[i].n1] *= new_Qb / Qb[b[i]]; 
                     Qb[b[i]] = new_Qb;
                 }
                 logZ += log(Qa[T[0].n1].normalize());
 
                 Factor piet( nsrem, 0.0 );
                 piet[s] = exp(logZ);
-                Pns += piet * Qa[T[0].n1].partSum( ns / nsrem );      // OPTIMIZE ME
+                Pns += piet * Qa[T[0].n1].marginal( ns / nsrem, false );      // OPTIMIZE ME
 
                 // Restore clamped beliefs
                 for( map<size_t,Factor>::const_iterator alpha = Qa_old.begin(); alpha != Qa_old.end(); alpha++ )

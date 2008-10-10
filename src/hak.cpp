@@ -237,7 +237,7 @@ double HAK::doGBP() {
         for( size_t beta = 0; beta < nrIRs(); beta++ ) {
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
-                muab( alpha, _beta ) = _Qa[alpha].marginal(IR(beta)).divided_by( muba(alpha,_beta) );
+                muab( alpha, _beta ) = _Qa[alpha].marginal(IR(beta)) / muba(alpha,_beta);
                 /* TODO: INVESTIGATE THIS PROBLEM
                  *
                  * In some cases, the muab's can have very large entries because the muba's have very
@@ -275,7 +275,7 @@ double HAK::doGBP() {
 
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
-                muba(alpha,_beta) = _Qb[beta].divided_by( muab(alpha,_beta) );
+                muba(alpha,_beta) = _Qb[beta] / muab(alpha,_beta);
 
                 /* TODO: INVESTIGATE WHETHER THIS HACK (INVENTED BY KEES) TO PREVENT NANS MAKES SENSE 
                  *

@@ -44,9 +44,13 @@ namespace dai {
 
 
 /// Represents a set of variables.
-/** The variables in the set are sorted according to their labels.
- *  \note A VarSet is implemented using a SmallSet<Var> instead
+/** \note A VarSet is implemented using a SmallSet<Var> instead
  *  of the more natural std::set<Var> because of efficiency reasons.
+ *  That is, internally, the variables in the set are sorted according 
+ *  to their labels: the set of variables \f$\{x_l\}_{l\in L}\f$ is 
+ *  represented as a vector \f$(x_{l(0)},x_{l(1)},\dots,x_{l(|L|-1)})\f$ 
+ *  where \f$l(0) < l(1) < \dots < l(|L|-1)\f$ 
+ *  and \f$L = \{l(0),l(1),\dots,l(|L|-1)\}\f$.
  */
 class VarSet : public SmallSet<Var> {
     public:
@@ -144,12 +148,12 @@ class VarSet : public SmallSet<Var> {
          *  ("states") of variable \f$x_l\f$ with label \a l. 
          *  The mapping \a s returned by this function is defined as:
          *  \f{eqnarray*}
-         *    s(x_{l(i)}) = \left[\frac{S \mbox { mod } \prod_{j=0}^{i} S_{l(j)}}{\prod_{j=0}^{i-1} S_{l(j)}}\right] \qquad \mbox{for all $i=0,\dots,n-1$}.
+         *    s(x_{l(i)}) = \left\lfloor\frac{S \mbox { mod } \prod_{j=0}^{i} S_{l(j)}}{\prod_{j=0}^{i-1} S_{l(j)}}\right\rfloor \qquad \mbox{for all $i=0,\dots,n-1$}.
          *  \f}
          *  where \f$S\f$ denotes the value of \a linearState.
          *
          *  \note If *this corresponds with \f$\{x_l\}_{l\in L}\f$, calcStates(size_t) induces a mapping 
-         *  \f$\sigma^{-1} : \{0,1,\dots,\prod_{l\in L} S_l-1\} \to \prod_{l\in L} X_l \to \f$ that
+         *  \f$\sigma^{-1} : \{0,1,\dots,\prod_{l\in L} S_l-1\} \to \prod_{l\in L} X_l\f$ that
          *  maps a linear index to a joint state; this is the inverse of the mapping \f$\sigma\f$ 
          *  induced by calcState(const std::map<Var,size_t> &).
          */
