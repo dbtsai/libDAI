@@ -279,24 +279,16 @@ int main( int argc, char *argv[] ) {
         cout.precision( 3 );
 
         cout << "# " << filename << endl;
-        cout.width( 40 );
-        cout << left << "# METHOD" << "  ";
-        if( report_time ) {
-            cout.width( 10 );
-            cout << right << "SECONDS" << "   ";
-        }
-        if( report_iters ) {
-            cout.width( 10 );
-            cout << "ITERS" << "  ";
-        }
-        cout.width( 10 );
-        cout << "MAX ERROR" << "  ";
-        cout.width( 10 );
-        cout << "AVG ERROR" << "  ";
-        cout.width( 10 );
-        cout << "LOGZ ERROR" << "  ";
-        cout.width( 10 );
-        cout << "MAXDIFF" << "  ";
+        cout.width( 39 );
+        cout << left << "# METHOD" << "\t";
+        if( report_time )
+            cout << right << "SECONDS" << "\t";
+        if( report_iters )
+            cout << "ITERS" << "\t";
+        cout << "MAX ERROR" << "\t";
+        cout << "AVG ERROR" << "\t";
+        cout << "LOGZ ERROR" << "\t";
+        cout << "MAXDIFF" << "\t";
         cout << endl;
 
         for( size_t m = 0; m < methods.size(); m++ ) {
@@ -316,18 +308,15 @@ int main( int argc, char *argv[] ) {
             }
             piet.calcErrs(q0);
 
-            cout.width( 40 );
-            cout << left << methods[m] << "  ";
-            if( report_time ) {
-                cout.width( 10 );
-                cout << right << piet.time << "    ";
-            }
+            cout.width( 39 );
+            cout << left << methods[m] << "\t";
+            if( report_time )
+                cout << right << piet.time << "\t";
             if( report_iters ) {
-                cout.width( 10 );
                 if( piet.has_iters ) {
-                    cout << piet.iters << "  ";
+                    cout << piet.iters << "\t";
                 } else {
-                    cout << "N/A         ";
+                    cout << "N/A  \t";
                 }
             }
 
@@ -335,31 +324,29 @@ int main( int argc, char *argv[] ) {
                 cout.setf( ios_base::scientific );
                 cout.precision( 3 );
                 
-                cout.width( 10 ); 
                 double me = clipdouble( piet.maxErr(), 1e-9 );
-                cout << me << "  ";
+                cout << me << "\t";
                 
-                cout.width( 10 );
                 double ae = clipdouble( piet.avgErr(), 1e-9 );
-                cout << ae << "  ";
+                cout << ae << "\t";
                 
-                cout.width( 10 );
                 if( piet.has_logZ ) {
+                    cout.setf( ios::showpos );
                     double le = clipdouble( piet.logZ / logZ0 - 1.0, 1e-9 );
-                    cout << le << "  ";
+                    cout << le << "\t";
+                    cout.unsetf( ios::showpos );
                 } else
-                    cout << "N/A         ";
+                    cout << "N/A       \t";
 
-                cout.width( 10 );
                 if( piet.has_maxdiff ) {
                     double md = clipdouble( piet.maxdiff, 1e-9 );
                     if( isnan( me ) )
                         md = me;
                     if( isnan( ae ) )
                         md = ae;
-                    cout << md << "  ";
+                    cout << md << "\t";
                 } else
-                    cout << "N/A         ";
+                    cout << "N/A    \t";
             }
             cout << endl;
 

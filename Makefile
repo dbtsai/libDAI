@@ -82,7 +82,7 @@ $(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) fac
 
 testregression : tests/testdai$(EE)
 	@echo Starting regression test...this can take a minute or so!
-	cd tests; time ./testregression; cd ..
+	cd tests && ./testregression && cd ..
 
 doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 	doxygen doxygen.conf

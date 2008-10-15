@@ -493,10 +493,10 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
 /** \relates TFactor
  */
 template<typename T> std::ostream& operator<< (std::ostream& os, const TFactor<T>& P) {
-    os << "(" << P.vars() << " <";
+    os << "(" << P.vars() << ", (";
     for( size_t i = 0; i < P.states(); i++ )
-        os << P[i] << " ";
-    os << ">)";
+        os << (i == 0 ? "" : ", ") << P[i];
+    os << "))";
     return os;
 }
 

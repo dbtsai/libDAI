@@ -63,7 +63,7 @@ CCFLAGS=/Iinclude /IC:\boost_1_36_0 /EHsc /Ox
 CCDEBUGFLAGS=/Zi -DDAI_DEBUG
 
 # Build targets
-TARGETS=tests utils $(LIB)/libdai$(LE) examples # testregression doc
+TARGETS=tests utils $(LIB)/libdai$(LE) examples testregression # doc
 
 ifdef WITH_MATLAB
 	# Replace the following by the directory where Matlab has been installed
@@ -77,15 +77,16 @@ include Makefile.shared
 
 
 $(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
+	-mkdir lib
 	lib /out:$(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 
 testregression : tests/testdai$(EE)
-	echo Starting regression test...this can take a minute or so!
-	cd tests; time ./testregression; cd ..
+	@echo Starting regression test...this can take a minute or so!
+	cd tests && testregression.bat && cd ..
 
 doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 	doxygen doxygen.conf
 
 .PHONY : clean
 clean :
-	-del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
+	-del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) examples\*.ilk examples\*.pdb tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
