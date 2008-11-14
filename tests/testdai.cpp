@@ -282,7 +282,7 @@ int main( int argc, char *argv[] ) {
         cout.width( 39 );
         cout << left << "# METHOD" << "\t";
         if( report_time )
-            cout << right << "SECONDS" << "\t";
+            cout << right << "SECONDS  " << "\t";
         if( report_iters )
             cout << "ITERS" << "\t";
         cout << "MAX ERROR" << "\t";
