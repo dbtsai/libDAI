@@ -67,6 +67,10 @@ ifdef WITH_MR
 	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MR
 	OBJECTS:=$(OBJECTS) mr$(OE)
 endif
+ifdef WITH_GIBBS
+	CCFLAGS:=$(CCFLAGS) -DDAI_WITH_GIBBS
+	OBJECTS:=$(OBJECTS) gibbs$(OE)
+endif
 
 
 HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
@@ -127,6 +131,9 @@ weightedgraph$(OE) : $(SRC)/weightedgraph.cpp $(INC)/weightedgraph.h $(HEADERS)
 
 mr$(OE) : $(SRC)/mr.cpp $(INC)/mr.h $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/mr.cpp
+
+gibbs$(OE) : $(SRC)/gibbs.cpp $(INC)/gibbs.h $(HEADERS)
+	$(CC) $(CCFLAGS) -c $(SRC)/gibbs.cpp
 
 properties$(OE) : $(SRC)/properties.cpp $(HEADERS)
 	$(CC) $(CCFLAGS) -c $(SRC)/properties.cpp

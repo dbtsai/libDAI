@@ -54,6 +54,9 @@
 #ifdef DAI_WITH_MR
     #include <dai/mr.h>
 #endif
+#ifdef DAI_WITH_GIBBS
+    #include <dai/gibbs.h>
+#endif
 
 
 /// Namespace for libDAI
@@ -92,6 +95,9 @@ static const char* DAINames[] = {
 #endif
 #ifdef DAI_WITH_MR
     MR::Name,
+#endif
+#ifdef DAI_WITH_GIBBS
+    Gibbs::Name,
 #endif
     ""
 };

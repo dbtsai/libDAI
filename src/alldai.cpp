@@ -63,6 +63,10 @@ InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const PropertySet 
     if( name == MR::Name )
         return new MR (fg, opts);
 #endif
+#ifdef DAI_WITH_GIBBS
+    if( name == Gibbs::Name )
+        return new Gibbs (fg, opts);
+#endif
     DAI_THROW(UNKNOWN_DAI_ALGORITHM);
 }
 

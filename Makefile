@@ -27,6 +27,7 @@ WITH_LC=true
 WITH_TREEEP=true
 WITH_JTREE=true
 WITH_MR=true
+WITH_GIBBS=true
 # Build with debug info?
 DEBUG=true
 # Build matlab interface?
