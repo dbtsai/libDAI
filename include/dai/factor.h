@@ -81,8 +81,13 @@ template <typename T> class TFactor {
         /// Constructs TFactor depending on variables in ns, with all values set to p
         TFactor( const VarSet& ns, Real p ) : _vs(ns), _p(_vs.nrStates(),p) {}
         
-        /// Constructs TFactor depending on variables in ns, copying the values from the array p
-        TFactor( const VarSet& ns, const Real *p ) : _vs(ns), _p(_vs.nrStates(),p) {}
+        /// Constructs TFactor depending on variables in ns, copying the values from the range starting at begin
+        /** \param ns contains the variables that the new TFactor should depend on.
+         *  \tparam Iterator Iterates over instances of type T; should support addition of size_t.
+         *  \param begin Points to first element to be added.
+         */
+        template<typename TIterator>
+        TFactor( const VarSet& ns, TIterator begin ) : _vs(ns), _p(begin, begin + _vs.nrStates(), _vs.nrStates()) {}
 
         /// Constructs TFactor depending on variables in ns, with values set to the TProb p
         TFactor( const VarSet& ns, const TProb<T>& p ) : _vs(ns), _p(p) {

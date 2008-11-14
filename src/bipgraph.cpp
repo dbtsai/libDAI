@@ -110,6 +110,9 @@ std::vector<size_t> BipartiteGraph::delta2( size_t n2, bool include ) const {
 
 
 bool BipartiteGraph::isConnected() const {
+    // TODO: use BGL, like:
+    // std::vector<int> component( num_vertices( g ) );
+    // int num_comp = connected_components( g, make_iterator_property_map(component.begin(), get(vertex_index, g)) );
     if( nr1() == 0 ) {
         return true;
     } else {

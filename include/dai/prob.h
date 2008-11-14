@@ -78,8 +78,17 @@ template <typename T> class TProb {
         /// Construct vector of length n with each entry set to p
         explicit TProb( size_t n, Real p ) : _p(n, (T)p) {}
         
-        /// Construct vector of length n by copying the elements between p and p+n
-        TProb( size_t n, const Real* p ) : _p(p, p + n ) {}
+        /// Construct vector from a range
+        /** \tparam Iterator Iterates over instances that can be cast to T.
+         *  \param begin Points to first instance to be added.
+         *  \param end Points just beyond last instance to be added.
+         *  \param sizeHint For efficiency, the number of elements can be speficied by sizeHint.
+         */
+        template <typename Iterator>
+        TProb( Iterator begin, Iterator end, size_t sizeHint=0 ) : _p() {
+            _p.reserve( sizeHint );
+            _p.insert( _p.begin(), begin, end );
+        }
         
         /// Returns a const reference to the vector
         const std::vector<T> & p() const { return _p; }
@@ -441,6 +450,18 @@ template <typename T> class TProb {
             for( size_t i = 0; i < size(); i++ )
                 S -= (_p[i] == 0 ? 0 : _p[i] * std::log(_p[i]));
             return S;
+        }
+
+        /// Returns a random index, according to the (normalized) distribution described by *this
+        size_t draw() {
+            double x = rnd_uniform() * totalSum();
+            T s = 0;
+            for( size_t i = 0; i < size(); i++ ) {
+                s += _p[i];
+                if( s > x ) 
+                    return i;
+            }
+            return( size() - 1 );
         }
 };
 
