@@ -46,22 +46,28 @@ class Gibbs : public DAIAlgFG {
 
     protected:
         typedef std::vector<size_t> _count_t;
+        typedef std::vector<size_t> _state_t;
+
         size_t _sample_count;
         std::vector<_count_t> _var_counts;
         std::vector<_count_t> _factor_counts;
+        std::vector<size_t> _factor_entries;
+        _state_t _state;
 
-        typedef std::vector<size_t> _state_t;
-        void update_counts(_state_t &st);
-        void randomize_state(_state_t &st);
-        Prob get_var_dist(_state_t &st, size_t i);
-        void resample_var(_state_t &st, size_t i);
-        size_t get_factor_entry(const _state_t &st, int factor);
+        void update_counts();
+        void randomize_state();
+        Prob get_var_dist( size_t i );
+        void resample_var( size_t i );
+        size_t get_factor_entry( size_t I );
+        size_t get_factor_entry_interval( size_t I, size_t i );
+        void calc_factor_entries();
+        void update_factor_entries( size_t i );
 
     public:
         // default constructor
-        Gibbs() : DAIAlgFG() {}
+        Gibbs() : DAIAlgFG(), _sample_count(0), _var_counts(), _factor_counts(), _factor_entries(), _state() {}
         // copy constructor
-        Gibbs(const Gibbs & x) : DAIAlgFG(x), _sample_count(x._sample_count), _var_counts(x._var_counts), _factor_counts(x._factor_counts) {}
+        Gibbs(const Gibbs & x) : DAIAlgFG(x), _sample_count(x._sample_count), _var_counts(x._var_counts), _factor_counts(x._factor_counts), _factor_entries(x._factor_entries), _state(x._state) {}
         // construct Gibbs object from FactorGraph
         Gibbs( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg) {
             setProperties( opts );
@@ -74,6 +80,8 @@ class Gibbs : public DAIAlgFG {
                 _sample_count = x._sample_count;
                 _var_counts = x._var_counts;
                 _factor_counts = x._factor_counts;
+                _factor_entries = x._factor_entries;
+                _state = x._state;
             }
             return *this;
         }
