@@ -224,7 +224,7 @@ double BP::run() {
     if( props.verbose >= 1 )
         cout << "Starting " << identify() << "...";
     if( props.verbose >= 3)
-       cout << endl; 
+        cout << endl;
 
     double tic = toc();
     Diffs diffs(nrVars(), 1.0);

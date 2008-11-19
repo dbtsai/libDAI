@@ -1,4 +1,5 @@
-/*  Copyright (C) 2008  Frederik Eaton [frederik at ofb dot net]
+/*  Copyright (C) 2008  Frederik Eaton  [frederik at ofb dot net],
+                        Joris Mooij  [joris dot mooij at tuebingen dot mpg dot de]
 
     This file is part of libDAI.
 
@@ -185,7 +186,7 @@ double Gibbs::run() {
     }
     
     if( props.verbose >= 3 )
-        cout << "Gibbs::run:  ran " << props.iters << " passes (" << toc() - tic << " clocks)." << endl;
+        cout << Name << "::run:  ran " << props.iters << " passes (" << toc() - tic << " clocks)." << endl;
 
     return 0.0;
 }
@@ -208,9 +209,9 @@ Factor Gibbs::belief( const Var &n ) const {
 
 vector<Factor> Gibbs::beliefs() const {
     vector<Factor> result;
-    for( size_t i = 0; i < nrVars(); i++ )
+    for( size_t i = 0; i < nrVars(); ++i )
         result.push_back( beliefV(i) );
-    for( size_t I = 0; I < nrFactors(); I++ )
+    for( size_t I = 0; I < nrFactors(); ++I )
         result.push_back( beliefF(I) );
     return result;
 }

@@ -264,11 +264,11 @@ class Permute {
             return *this;
         }
 
-        /// Converts the linear index li to a vector index
-        /// corresponding with the dimensions in _dims,
-        /// permutes it according to sigma, 
-        /// and converts it back to a linear index
-        /// according to the permuted dimensions.
+        /// Calculates a permuted linear index.
+        /** Converts the linear index li to a vector index
+         *  corresponding with the dimensions in _dims, permutes it according to sigma, 
+         *  and converts it back to a linear index  according to the permuted dimensions.
+         */
         size_t convert_linear_index( size_t li ) {
             size_t N = _dims.size();
 
@@ -333,8 +333,7 @@ class State {
             return( state );
         }
 
-        /// Return state of variable n,
-        /// or zero if n is not in this State
+        /// Return state of variable n, or zero if n is not in this State
         size_t operator() ( const Var &n ) const {
             assert( valid() );
             states_type::const_iterator entry = states.find( n );
@@ -344,8 +343,7 @@ class State {
                 return entry->second;
         }
 
-        /// Return linear state of variables in varset,
-        /// setting them to zero if they are not in this State
+        /// Return linear state of variables in varset, setting them to zero if they are not in this State
         size_t operator() ( const VarSet &vs ) const {
             assert( valid() );
             size_t vs_state = 0;

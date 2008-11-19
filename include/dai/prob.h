@@ -82,7 +82,7 @@ template <typename T> class TProb {
         /** \tparam Iterator Iterates over instances that can be cast to T.
          *  \param begin Points to first instance to be added.
          *  \param end Points just beyond last instance to be added.
-         *  \param sizeHint For efficiency, the number of elements can be speficied by sizeHint.
+         *  \param sizeHint For efficiency, the number of entries can be speficied by sizeHint.
          */
         template <typename Iterator>
         TProb( Iterator begin, Iterator end, size_t sizeHint=0 ) : _p() {

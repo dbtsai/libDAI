@@ -1,4 +1,5 @@
-/*  Copyright (C) 2008  Frederik Eaton [frederik at ofb dot net]
+/*  Copyright (C) 2008  Frederik Eaton  [frederik at ofb dot net],
+                        Joris Mooij  [joris dot mooij at tuebingen dot mpg dot de]
 
     This file is part of libDAI.
 
@@ -18,6 +19,11 @@
 */
 
 
+/// \file
+/// \brief Defines class Gibbs
+/// \todo Improve documentation
+
+
 #ifndef __defined_libdai_gibbs_h
 #define __defined_libdai_gibbs_h
 
@@ -30,7 +36,17 @@
 namespace dai {
 
 
+/// Approximate inference algorithm "Gibbs sampling"
 class Gibbs : public DAIAlgFG {
+    private:
+        typedef std::vector<size_t> _count_t;
+        typedef std::vector<size_t> _state_t;
+
+        size_t _sample_count;
+        std::vector<_count_t> _var_counts;
+        std::vector<_count_t> _factor_counts;
+        _state_t _state;
+
     public:
         /// Parameters of this inference algorithm
         struct Properties {
@@ -44,36 +60,17 @@ class Gibbs : public DAIAlgFG {
         /// Name of this inference algorithm
         static const char *Name;
 
-    protected:
-        typedef std::vector<size_t> _count_t;
-        typedef std::vector<size_t> _state_t;
-
-        size_t _sample_count;
-        std::vector<_count_t> _var_counts;
-        std::vector<_count_t> _factor_counts;
-        _state_t _state;
-
-        void updateCounts();
-        void randomizeState();
-        Prob getVarDist( size_t i );
-        void resampleVar( size_t i );
-        size_t getFactorEntry( size_t I );
-        size_t getFactorEntryDiff( size_t I, size_t i );
-
     public:
-        // default constructor
+        /// Default constructor
         Gibbs() : DAIAlgFG(), _sample_count(0), _var_counts(), _factor_counts(), _state() {}
-        // copy constructor
+
+        /// Copy constructor
         Gibbs(const Gibbs & x) : DAIAlgFG(x), _sample_count(x._sample_count), _var_counts(x._var_counts), _factor_counts(x._factor_counts), _state(x._state) {}
-        // construct Gibbs object from FactorGraph
-        Gibbs( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg) {
-            setProperties( opts );
-            construct();
-        }
-        // assignment operator
-        Gibbs & operator=(const Gibbs & x) {
-            if(this!=&x) {
-                DAIAlgFG::operator=(x);
+
+        /// Assignment operator
+        Gibbs& operator=( const Gibbs &x ) {
+            if( this != &x ) {
+                DAIAlgFG::operator=( x );
                 _sample_count = x._sample_count;
                 _var_counts = x._var_counts;
                 _factor_counts = x._factor_counts;
@@ -81,7 +78,16 @@ class Gibbs : public DAIAlgFG {
             }
             return *this;
         }
-        
+
+        /// Construct from FactorGraph fg and PropertySet opts
+        Gibbs( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _sample_count(0), _var_counts(), _factor_counts(), _state() {
+            setProperties( opts );
+            construct();
+        }
+
+
+        /// @name General InfAlg interface
+        //@{
         virtual Gibbs* clone() const { return new Gibbs(*this); }
         virtual Gibbs* create() const { return new Gibbs(); }
         virtual std::string identify() const { return std::string(Name) + printProperties(); }
@@ -94,9 +100,22 @@ class Gibbs : public DAIAlgFG {
         virtual double run();
         virtual double maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual size_t Iterations() const { return props.iters; }
+        //@}
 
+
+        /// @name Additional interface specific for BP
+        //@{
         Factor beliefV( size_t i ) const;
         Factor beliefF( size_t I ) const;
+        void randomizeState();
+        //@}
+
+    private:
+        void updateCounts();
+        Prob getVarDist( size_t i );
+        void resampleVar( size_t i );
+        size_t getFactorEntry( size_t I );
+        size_t getFactorEntryDiff( size_t I, size_t i );
 
         void construct();
         /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member
