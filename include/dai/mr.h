@@ -2,6 +2,9 @@
     Radboud University Nijmegen, The Netherlands /
     Max Planck Institute for Biological Cybernetics, Germany
 
+    Copyright (C) 2007  Bastian Wemmenhove
+    Radboud University Nijmegen, The Netherlands
+
     This file is part of libDAI.
 
     libDAI is free software; you can redistribute it and/or modify

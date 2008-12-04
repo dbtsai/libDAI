@@ -1,7 +1,9 @@
-git 765e0048664c14c693ceb70a286e1fc41a2f9d02
+git 39a4865f4eb0b32109ca50e7980028fed835adb9
 --------------------------------------------
+* [Frederik Eaton] Added Gibbs sampler to algorithms
 * Improved documentation of include/dai/{bipgraph.h, prob.h, smallset.h,
   var.h, varset.h, factor.h, enum.h} and of examples/example.cpp
+  Merged TODO and FILEFORMAT into doxygen documentation
 * examples/
   - Moved example.cpp to examples/ 
   - Added examples/example_bipgraph.cpp
@@ -15,11 +17,15 @@ git 765e0048664c14c693ceb70a286e1fc41a2f9d02
   - Removed TFactor<T>::divided_by, use operator/ instead
   - Removed TFactor<T>::divide, use operator/= instead
   - Removed TFactor<T>::partSum(const VarSet&), use marginal(const VarSet&,true) instead
+  - Improved constructors of TProb and TFactor to use iterators instead of pointers
 * Miscellaneous small changes and cleanups:
+  - Changed regression test so that it also works under Windows
   - Changed output stream operator<< for Var and VarSet
+  - Added TProb::draw() function, which draws a random index
   - Cleanup of matlab interface code
   - Small improvement of utils/fginfo
   - Small cleanup of BP code
+  - Switched Makefile.win to GNU Make syntax
 
 
 libDAI-0.2.2 (2008-09-30)
