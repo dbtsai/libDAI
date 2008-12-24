@@ -38,8 +38,10 @@
 #include <algorithm>
 
 
-#ifdef WINDOWS
+#if defined(WINDOWS)
     #include <map>
+#elif defined(CYGWIN)
+    #include <boost/tr1/unordered_map.hpp>
 #else
     #include <tr1/unordered_map>
 #endif

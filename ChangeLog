@@ -1,3 +1,6 @@
+* [Peter Gober] Made libDAI compile out-of-the-box on Cygwin.
+
+
 git 39a4865f4eb0b32109ca50e7980028fed835adb9
 --------------------------------------------
 * [Frederik Eaton] Added Gibbs sampler to algorithms

@@ -436,7 +436,13 @@ template <typename T> class TProb {
     
         /// Returns true if one or more entries are NaN
         bool hasNaNs() const {
-            return (std::find_if( _p.begin(), _p.end(), isnan ) != _p.end());
+            bool foundnan = false;
+            for( typename std::vector<T>::const_iterator x = _p.begin(); x != _p.end(); x++ )
+                if( isnan( *x ) ) {
+                    foundnan = true;
+                    break;
+                }
+            return foundnan;
         }
 
         /// Returns true if one or more entries are negative

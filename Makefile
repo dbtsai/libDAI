@@ -34,8 +34,12 @@ DEBUG=true
 WITH_MATLAB=
 # New/old matlab version?
 NEW_MATLAB=true
-# Windows or linux (default)?
+
+# Default OS = GNU/Linux
+# Windows Visual C++?
 WINDOWS=
+# Cygwin?
+CYGWIN=
 
 # Directories
 INC=include/dai
@@ -52,7 +56,11 @@ ME=.mexglx
 LIBS=-ldai
 
 # We use the BOOST Program Options library
-BOOSTLIBS=-lboost_program_options
+ifdef CYGWIN
+  BOOSTLIBS=-lboost_program_options-gcc34-mt
+else
+  BOOSTLIBS=-lboost_program_options
+endif
 
 # Compile using GNU C++ Compiler
 CC=g++
@@ -61,6 +69,10 @@ CCO=-o
 
 # Flags for the C++ compiler
 CCFLAGS=-O3 -Wno-deprecated -Wall -W -Wextra -fpic -Iinclude -Llib
+ifdef CYGWIN
+  CCFLAGS:=$(CCFLAGS) -I/usr/local/include/boost-1_37 -DCYGWIN -static
+  # dynamic linking of Boost libraries seems not to work on Cygwin
+endif
 CCDEBUGFLAGS=-g -DDAI_DEBUG
 
 # Build targets

@@ -38,6 +38,12 @@
 #endif
 
 
+#ifdef CYGWIN
+bool isnan( double x ) {
+    return __isnand( x );  // isnan() is a macro in Cygwin (as required by C99)
+}
+#endif
+
 #ifdef WINDOWS
 bool isnan( double x ) {
     return _isnan( x );
