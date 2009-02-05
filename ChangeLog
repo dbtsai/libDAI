@@ -1,8 +1,15 @@
-* [Peter Gober] Made libDAI compile out-of-the-box on Cygwin.
+* Improved Makefile (libDAI now also builds out-of-the-box on MacOSX, 
+  thanks to Dan Preston; merged Makefile.win and Makefile.shared into Makefile)
+* Fixed bug in calcMarginal, calcPairBeliefs, calcPairBeliefsNew where
+  states with zero probability mass were clamped, leading to NaNs or assertion
+  errors (thanks to Dan Preston for reporting this)
+* toc() now returns POSIX system time with maximum accuracy of microseconds
+* Exception objects now remember their error code
 
 
-git 39a4865f4eb0b32109ca50e7980028fed835adb9
+git 065eae35cbfcc36f1a945ae3053c80c23f366306
 --------------------------------------------
+* [Peter Gober] Made libDAI build out-of-the-box on Cygwin.
 * [Frederik Eaton] Added Gibbs sampler to algorithms
 * Improved documentation of include/dai/{bipgraph.h, prob.h, smallset.h,
   var.h, varset.h, factor.h, enum.h} and of examples/example.cpp

@@ -141,15 +141,15 @@ You need:
 - GNU make
 - doxygen
 - graphviz
-- recent boost C++ libraries (at least version 1.34)
+- recent boost C++ libraries (at least version 1.34 or 1.37 for cygwin)
 
 On Debian/Ubuntu, you can easily install all these packages with a single command:
 "apt-get install g++ make doxygen libboost-dev libboost-graph-dev libboost-program-options-dev"
 (root permissions needed).
 
 On Cygwin, the prebuilt Cygwin package boost-1.33.1-x is known not to work.
-You can however obtain the latest boost version from http://www.boost.org/
-and compile/install it with:
+You can however obtain the latest boost version (you need at least 1.37.0)
+from http://www.boost.org/ and compile/install it with:
 
   ./configure
   make
@@ -175,7 +175,7 @@ You need:
 - recent boost C++ libraries (version 1.34 or higher)
 - GNU make (can be obtained from http://gnuwin32.sourceforge.net)
 For the regression test, you need:
-- GNU diff (can be obtained from http://gnuwin32.sourceforge.net)
+- GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
 
 To build the source, edit the Makefile and adapt it to your local setup. Then, run (from the command line)
     

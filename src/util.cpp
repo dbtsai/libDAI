@@ -32,9 +32,8 @@
     #include <boost/math/special_functions/log1p.hpp>  // for log1p
     #include <float.h>  // for _isnan
 #else
-    // Assume POSIX compliant system. We need the following for querying the CPU time for this process
-    #include <sys/times.h>
-    #include <sys/param.h>
+    // Assume POSIX compliant system. We need the following for querying the system time
+    #include <sys/time.h>
 #endif
 
 
@@ -63,13 +62,14 @@ namespace dai {
 // Returns user+system time in seconds
 double toc() {
 #ifdef WINDOWS
-    SYSTEMTIME  tbuf;
+    SYSTEMTIME tbuf;
     GetSystemTime(&tbuf);
     return( (double)(tbuf.wSecond + (double)tbuf.wMilliseconds / 1000.0) );
 #else
-    tms tbuf;
-    times(&tbuf);
-    return( (double)(tbuf.tms_utime + tbuf.tms_stime) / HZ );
+    struct timeval tv;
+    struct timezone tz;
+    gettimeofday( &tv, &tz );
+    return( (double)(tv.tv_sec + (double)tv.tv_usec / 1000000.0) );
 #endif
 }
 

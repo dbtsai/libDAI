@@ -57,26 +57,37 @@ namespace dai {
 /// Represents an exception (based on std::runtime_error)
 class Exception : public std::runtime_error {
     public:
-        /// Constructor
-            Exception(size_t code, const std::string& msg = "") : std::runtime_error(ErrorStrings[code] + " [" +  msg + "]") {}
-
         /// Enumeration of exceptions used in libDAI
-        enum codes {NOT_IMPLEMENTED,
-                    UNKNOWN_DAI_ALGORITHM,
-                    UNKNOWN_PROPERTY_TYPE,
-                    MALFORMED_PROPERTY,
-                    UNKNOWN_ENUM_VALUE,
-                    CANNOT_READ_FILE,
-                    CANNOT_WRITE_FILE,
-                    INVALID_FACTORGRAPH_FILE,
-                    NOT_ALL_PROPERTIES_SPECIFIED,
-                    MULTIPLE_UNDO,
-                    FACTORGRAPH_NOT_CONNECTED,
-                    IMPOSSIBLE_TYPECAST,
-                    INTERNAL_ERROR,
-                    NUM_ERRORS};  // NUM_ERRORS should be the last entry
+        enum Code {NOT_IMPLEMENTED,
+                   UNKNOWN_DAI_ALGORITHM,
+                   UNKNOWN_PROPERTY_TYPE,
+                   MALFORMED_PROPERTY,
+                   UNKNOWN_ENUM_VALUE,
+                   CANNOT_READ_FILE,
+                   CANNOT_WRITE_FILE,
+                   INVALID_FACTORGRAPH_FILE,
+                   NOT_ALL_PROPERTIES_SPECIFIED,
+                   MULTIPLE_UNDO,
+                   FACTORGRAPH_NOT_CONNECTED,
+                   IMPOSSIBLE_TYPECAST,
+                   INTERNAL_ERROR,
+                   NOT_NORMALIZABLE,
+                   NUM_ERRORS};  // NUM_ERRORS should be the last entry
+
+        /// Constructor
+        Exception( Code _code, const std::string& msg="" ) : std::runtime_error(ErrorStrings[_code] + " [" +  msg + "]"), errorcode(_code) {}
+
+        /// Copy constructor
+        Exception( const Exception &e ) : std::runtime_error(e), errorcode(e.errorcode) {}
+
+        /// Returns error code of this exception
+        Code code() const { return errorcode; }
+
 
     private:
+        /// Contains the error code of this exception
+        Code errorcode;
+
         /// Error messages corresponding to the exceptions enumerated above
         static std::string ErrorStrings[NUM_ERRORS];
 };

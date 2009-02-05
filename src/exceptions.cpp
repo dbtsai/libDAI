@@ -39,7 +39,8 @@ namespace dai {
         "Multiple undo levels unsupported",
         "FactorGraph is not connected",
         "Impossible typecast",
-        "Internal error"
+        "Internal error",
+        "Quantity not normalizable"
     }; 
 
 

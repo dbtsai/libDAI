@@ -143,7 +143,8 @@
  *  - Generalized Belief Propagation [\ref YFW05];
  *  - Double-loop GBP [\ref HAK03];
  *  - Various variants of Loop Corrected Belief Propagation
- *    [\ref MoK07, \ref MoR05].
+ *    [\ref MoK07, \ref MoR05];
+ *  - Gibbs sampler.
  *
  *  \section language Why C++?
  *  Because libDAI is implemented in C++, it is very fast compared with

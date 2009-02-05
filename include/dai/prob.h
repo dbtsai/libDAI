@@ -37,6 +37,7 @@
 #include <numeric>
 #include <functional>
 #include <dai/util.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -420,10 +421,10 @@ template <typename T> class TProb {
                 Z = totalSum();
             else if( norm == NORMLINF )
                 Z = maxAbs();
-#ifdef DAI_DEBUG
-            assert( Z != 0.0 );
-#endif
-            *this /= Z;
+            if( Z == 0.0 )
+                DAI_THROW(NOT_NORMALIZABLE);
+            else
+                *this /= Z;
             return Z;
         }
 

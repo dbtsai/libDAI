@@ -64,6 +64,9 @@ typedef double Real;
 
     /// Returns log(1+x)
     double log1p( double x );
+
+    /// Define INFINITY
+    #define INFINITY (std::numeric_limits<double>::infinity())
 #endif
 
 
@@ -85,7 +88,7 @@ namespace dai {
 #endif
 
 
-/// Returns the time in seconds
+/// Returns wall clock time in seconds
 double toc();
 
 

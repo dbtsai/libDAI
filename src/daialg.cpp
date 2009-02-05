@@ -31,6 +31,8 @@ using namespace std;
 
 
 /// Calculates the marginal of obj on ns by clamping all variables in ns and calculating logZ for each joined state.
+/*  reInit should be set to true if at least one of the possible clamped states would be invalid (leading to a factor graph with zero partition sum).
+ */
 Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
     Factor Pns (ns);
     
@@ -38,7 +40,7 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
     if( !reInit )
         clamped->init();
 
-    Real logZ0 = 0.0;
+    Real logZ0 = -INFINITY;
     for( State s(ns); s.valid(); s++ ) {
         // save unclamped factors connected to ns
         clamped->backupFactors( ns );
@@ -52,18 +54,26 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
             clamped->init();
         else
             clamped->init(ns);
-        clamped->run();
 
-        Real Z;
-        if( s == 0 ) {
-            logZ0 = clamped->logZ();
-            Z = 1.0;
-        } else {
-            // subtract logZ0 to avoid very large numbers
-            Z = exp(clamped->logZ() - logZ0);
+        Real logZ;
+        try {
+            clamped->run();
+            logZ = clamped->logZ();
+        } catch( Exception &e ) {
+            if( e.code() == Exception::NOT_NORMALIZABLE )
+                logZ = -INFINITY;
+            else
+                throw;
         }
 
-        Pns[s] = Z;
+        if( logZ0 == -INFINITY )
+            if( logZ != -INFINITY )
+                logZ0 = logZ;
+
+        if( logZ == -INFINITY )
+            Pns[s] = 0;
+        else
+            Pns[s] = exp(logZ - logZ0); // subtract logZ0 to avoid very large numbers
         
         // restore clamped factors
         clamped->restoreFactors( ns );
@@ -76,6 +86,8 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
 
 
 /// Calculates beliefs of all pairs in ns (by clamping nodes in ns and calculating logZ and the beliefs for each state).
+/*  reInit should be set to true if at least one of the possible clamped states would be invalid (leading to a factor graph with zero partition sum).
+ */
 vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reInit ) {
     // convert ns to vector<VarSet>
     size_t N = ns.size();
@@ -97,7 +109,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
     if( !reInit )
         clamped->init();
 
-    Real logZ0 = 0.0;
+    Real logZ0 = -INFINITY;
     for( size_t j = 0; j < N; j++ ) {
         // clamp Var j to its possible values
         for( size_t j_val = 0; j_val < vns[j].states(); j_val++ ) {
@@ -106,17 +118,27 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
                 clamped->init();
             else
                 clamped->init(ns);
-            clamped->run();
 
-            //if( j == 0 )
-            //  logZ0 = obj.logZ();
-            double Z_xj = 1.0;
-            if( j == 0 && j_val == 0 ) {
-                logZ0 = clamped->logZ();
-            } else {
-                // subtract logZ0 to avoid very large numbers
-                Z_xj = exp(clamped->logZ() - logZ0);
+            Real logZ;
+            try {
+                clamped->run();
+                logZ = clamped->logZ();
+            } catch( Exception &e ) {
+                if( e.code() == Exception::NOT_NORMALIZABLE )
+                    logZ = -INFINITY;
+                else
+                    throw;
             }
+
+            if( logZ0 == -INFINITY )
+                if( logZ != -INFINITY )
+                    logZ0 = logZ;
+
+            double Z_xj;
+            if( logZ == -INFINITY )
+                Z_xj = 0;
+            else
+                Z_xj = exp(logZ - logZ0); // subtract logZ0 to avoid very large numbers
 
             for( size_t k = 0; k < N; k++ ) 
                 if( k != j ) {
@@ -140,13 +162,15 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
     result.reserve( N * (N - 1) / 2 );
     for( size_t j = 0; j < N; j++ )
         for( size_t k = j+1; k < N; k++ )
-            result.push_back( (pairbeliefs[j * N + k] * pairbeliefs[k * N + j]) ^ 0.5 );
+            result.push_back( ((pairbeliefs[j * N + k] * pairbeliefs[k * N + j]) ^ 0.5).normalized() );
 
     return result;
 }
 
 
 /// Calculates beliefs of all pairs in ns (by clamping pairs in ns and calculating logZ for each joined state).
+/*  reInit should be set to true if at least one of the possible clamped states would be invalid (leading to a factor graph with zero partition sum).
+ */
 Factor calcMarginal2ndO( const InfAlg & obj, const VarSet& ns, bool reInit ) {
     // returns a a probability distribution whose 1st order interactions
     // are unspecified, whose 2nd order interactions approximate those of 
@@ -190,15 +214,27 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
                         clamped->init();
                     else
                         clamped->init(ns);
-                    clamped->run();
 
-                    double Z_xj = 1.0;
-                    if( j_val == 0 && k_val == 0 ) {
-                        logZ0 = clamped->logZ();
-                    } else {
-                        // subtract logZ0 to avoid very large numbers
-                        Z_xj = exp(clamped->logZ() - logZ0);
+                    Real logZ;
+                    try {
+                        clamped->run();
+                        logZ = clamped->logZ();
+                    } catch( Exception &e ) {
+                        if( e.code() == Exception::NOT_NORMALIZABLE )
+                            logZ = -INFINITY;
+                        else
+                            throw;
                     }
+
+                    if( logZ0 == -INFINITY )
+                        if( logZ != -INFINITY )
+                            logZ0 = logZ;
+
+                    double Z_xj;
+                    if( logZ == -INFINITY )
+                        Z_xj = 0;
+                    else
+                        Z_xj = exp(logZ - logZ0); // subtract logZ0 to avoid very large numbers
 
                     // we assume that j.label() < k.label()
                     // i.e. we make an assumption here about the indexing
@@ -208,7 +244,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
                     clamped->restoreFactors( ns );
                 }
         
-            result.push_back( pairbelief );
+            result.push_back( pairbelief.normalized() );
         }
     }
     
