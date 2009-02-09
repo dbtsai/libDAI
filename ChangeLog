@@ -5,6 +5,7 @@
   errors (thanks to Dan Preston for reporting this)
 * toc() now returns POSIX system time with maximum accuracy of microseconds
 * Exception objects now remember their error code
+* Added examples/example_springler.cpp
 
 
 git 065eae35cbfcc36f1a945ae3053c80c23f366306
