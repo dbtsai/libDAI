@@ -133,9 +133,11 @@ libDAI compiles successfully with g++ versions 3.4, 4.1, 4.2 and 4.3.
 libDAI has also been successfully compiled with MS Visual Studio 2008 under Windows
 (but not all build targets are supported yet) and with Cygwin under Windows.
 
+Finally, libDAI has been compiled successfully on MacOS X.
 
-Quick start (linux/cygwin)
---------------------------
+
+Quick start (linux/cygwin/Mac OS X)
+-----------------------------------
 You need:
 - a recent version of gcc (at least version 3.4)
 - GNU make
@@ -144,8 +146,13 @@ You need:
 - recent boost C++ libraries (at least version 1.34 or 1.37 for cygwin)
 
 On Debian/Ubuntu, you can easily install all these packages with a single command:
-"apt-get install g++ make doxygen libboost-dev libboost-graph-dev libboost-program-options-dev"
+"apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev"
 (root permissions needed).
+
+On Mac OS X, these packages can be installed easily via MacPorts.
+First, install MacPorts according to the instructions at http://www.macports.org/
+Then, a simple "port install boost doxygen graphviz"
+should be enough to install everything that is needed.
 
 On Cygwin, the prebuilt Cygwin package boost-1.33.1-x is known not to work.
 You can however obtain the latest boost version (you need at least 1.37.0)
@@ -155,7 +162,10 @@ from http://www.boost.org/ and compile/install it with:
   make
   make install
 
-To build the source, edit the Makefile and adapt it to your local setup. Then, run
+
+To build the libDAI source, edit the Makefile and adapt it to your local setup. 
+At least one should specify the OS and possibly adapt some directories to match
+the local setup. Then, run
     
     make
 
@@ -168,7 +178,7 @@ or the more elaborate test program:
     tests/testdai --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX
 
 
-Quick start (windows)
+Quick start (Windows)
 ---------------------
 You need:
 - A recent version of MicroSoft Visual Studio (2008 works)

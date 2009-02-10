@@ -444,10 +444,10 @@ const char *POTTS3D_TYPE = "potts3d";
 
 int main( int argc, char *argv[] ) {
     try {
-		size_t N, K, k, d, j, n1, n2, n3;
+        size_t N, K, k, d, j, n1, n2, n3;
         size_t prime;
         size_t seed;
-		double beta, sigma_w, sigma_th, noise, mean_w, mean_th;
+        double beta, sigma_w, sigma_th, noise, mean_w, mean_th;
         string type;
         size_t states = 2;
 
@@ -779,17 +779,9 @@ int main( int argc, char *argv[] ) {
 
         cout << "# seed = " << seed << endl;
         cout << fg;
-    }
-    catch(exception& e) {
-        cerr << "Error: " << e.what() << endl; 
-        return 1;
-    } 
-    catch(const char * e) {
+    } catch( const char *e ) {
         cerr << "Error: " << e << endl;
         return 1;
-    } 
-    catch(...) {
-        cerr << "Exception of unknown type!" << endl;
     }
 
     return 0;

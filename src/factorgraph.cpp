@@ -115,114 +115,110 @@ ostream& operator << (ostream& os, const FactorGraph& fg) {
 istream& operator >> (istream& is, FactorGraph& fg) {
     long verbose = 0;
 
-    try {
-        vector<Factor> facs;
-        size_t nr_Factors;
-        string line;
-        
+    vector<Factor> facs;
+    size_t nr_Factors;
+    string line;
+    
+    while( (is.peek()) == '#' )
+        getline(is,line);
+    is >> nr_Factors;
+    if( is.fail() )
+        DAI_THROW(INVALID_FACTORGRAPH_FILE);
+    if( verbose >= 2 )
+        cout << "Reading " << nr_Factors << " factors..." << endl;
+
+    getline (is,line);
+    if( is.fail() )
+        DAI_THROW(INVALID_FACTORGRAPH_FILE);
+
+    map<long,size_t> vardims;
+    for( size_t I = 0; I < nr_Factors; I++ ) {
+        if( verbose >= 3 )
+            cout << "Reading factor " << I << "..." << endl;
+        size_t nr_members;
         while( (is.peek()) == '#' )
             getline(is,line);
-        is >> nr_Factors;
-        if( is.fail() )
-            DAI_THROW(INVALID_FACTORGRAPH_FILE);
-        if( verbose >= 2 )
-            cout << "Reading " << nr_Factors << " factors..." << endl;
-
-        getline (is,line);
-        if( is.fail() )
-            DAI_THROW(INVALID_FACTORGRAPH_FILE);
-
-        map<long,size_t> vardims;
-        for( size_t I = 0; I < nr_Factors; I++ ) {
-            if( verbose >= 3 )
-                cout << "Reading factor " << I << "..." << endl;
-            size_t nr_members;
-            while( (is.peek()) == '#' )
-                getline(is,line);
-            is >> nr_members;
-            if( verbose >= 3 )
-                cout << "  nr_members: " << nr_members << endl;
-
-            vector<long> labels;
-            for( size_t mi = 0; mi < nr_members; mi++ ) {
-                long mi_label;
-                while( (is.peek()) == '#' )
-                    getline(is,line);
-                is >> mi_label;
-                labels.push_back(mi_label);
-            }
-            if( verbose >= 3 )
-                cout << "  labels: " << labels << endl;
-
-            vector<size_t> dims;
-            for( size_t mi = 0; mi < nr_members; mi++ ) {
-                size_t mi_dim;
-                while( (is.peek()) == '#' )
-                    getline(is,line);
-                is >> mi_dim;
-                dims.push_back(mi_dim);
-            }
-            if( verbose >= 3 )
-                cout << "  dimensions: " << dims << endl;
-
-            // add the Factor
-            VarSet I_vars;
-            for( size_t mi = 0; mi < nr_members; mi++ ) {
-                map<long,size_t>::iterator vdi = vardims.find( labels[mi] );
-                if( vdi != vardims.end() ) {
-                    // check whether dimensions are consistent
-                    if( vdi->second != dims[mi] )
-                        DAI_THROW(INVALID_FACTORGRAPH_FILE);
-                } else
-                    vardims[labels[mi]] = dims[mi];
-                I_vars |= Var(labels[mi], dims[mi]);
-            }
-            facs.push_back( Factor( I_vars, 0.0 ) );
-            
-            // calculate permutation sigma (internally, members are sorted)
-            vector<size_t> sigma(nr_members,0);
-            VarSet::iterator j = I_vars.begin();
-            for( size_t mi = 0; mi < nr_members; mi++,j++ ) {
-                long search_for = j->label();
-                vector<long>::iterator j_loc = find(labels.begin(),labels.end(),search_for);
-                sigma[mi] = j_loc - labels.begin();
-            }
-            if( verbose >= 3 )
-                cout << "  sigma: " << sigma << endl;
-
-            // calculate multindices
-            Permute permindex( dims, sigma );
-            
-            // read values
-            size_t nr_nonzeros;
-            while( (is.peek()) == '#' )
-                getline(is,line);
-            is >> nr_nonzeros;
-            if( verbose >= 3 ) 
-                cout << "  nonzeroes: " << nr_nonzeros << endl;
-            for( size_t k = 0; k < nr_nonzeros; k++ ) {
-                size_t li;
-                double val;
-                while( (is.peek()) == '#' )
-                    getline(is,line);
-                is >> li;
-                while( (is.peek()) == '#' )
-                    getline(is,line);
-                is >> val;
-
-                // store value, but permute indices first according
-                // to internal representation
-                facs.back()[permindex.convert_linear_index( li  )] = val;
-            }
-        }
-
+        is >> nr_members;
         if( verbose >= 3 )
-            cout << "factors:" << facs << endl;
+            cout << "  nr_members: " << nr_members << endl;
 
-        fg = FactorGraph(facs);
-    } catch (char *e) {
-        cout << e << endl;
+        vector<long> labels;
+        for( size_t mi = 0; mi < nr_members; mi++ ) {
+            long mi_label;
+            while( (is.peek()) == '#' )
+                getline(is,line);
+            is >> mi_label;
+            labels.push_back(mi_label);
+        }
+        if( verbose >= 3 )
+            cout << "  labels: " << labels << endl;
+
+        vector<size_t> dims;
+        for( size_t mi = 0; mi < nr_members; mi++ ) {
+            size_t mi_dim;
+            while( (is.peek()) == '#' )
+                getline(is,line);
+            is >> mi_dim;
+            dims.push_back(mi_dim);
+        }
+        if( verbose >= 3 )
+            cout << "  dimensions: " << dims << endl;
+
+        // add the Factor
+        VarSet I_vars;
+        for( size_t mi = 0; mi < nr_members; mi++ ) {
+            map<long,size_t>::iterator vdi = vardims.find( labels[mi] );
+            if( vdi != vardims.end() ) {
+                // check whether dimensions are consistent
+                if( vdi->second != dims[mi] )
+                    DAI_THROW(INVALID_FACTORGRAPH_FILE);
+            } else
+                vardims[labels[mi]] = dims[mi];
+            I_vars |= Var(labels[mi], dims[mi]);
+        }
+        facs.push_back( Factor( I_vars, 0.0 ) );
+        
+        // calculate permutation sigma (internally, members are sorted)
+        vector<size_t> sigma(nr_members,0);
+        VarSet::iterator j = I_vars.begin();
+        for( size_t mi = 0; mi < nr_members; mi++,j++ ) {
+            long search_for = j->label();
+            vector<long>::iterator j_loc = find(labels.begin(),labels.end(),search_for);
+            sigma[mi] = j_loc - labels.begin();
+        }
+        if( verbose >= 3 )
+            cout << "  sigma: " << sigma << endl;
+
+        // calculate multindices
+        Permute permindex( dims, sigma );
+        
+        // read values
+        size_t nr_nonzeros;
+        while( (is.peek()) == '#' )
+            getline(is,line);
+        is >> nr_nonzeros;
+        if( verbose >= 3 ) 
+            cout << "  nonzeroes: " << nr_nonzeros << endl;
+        for( size_t k = 0; k < nr_nonzeros; k++ ) {
+            size_t li;
+            double val;
+            while( (is.peek()) == '#' )
+                getline(is,line);
+            is >> li;
+            while( (is.peek()) == '#' )
+                getline(is,line);
+            is >> val;
+
+            // store value, but permute indices first according
+            // to internal representation
+            facs.back()[permindex.convert_linear_index( li  )] = val;
+        }
     }
+
+    if( verbose >= 3 )
+        cout << "factors:" << facs << endl;
+
+    fg = FactorGraph(facs);
 
     return is;
 }
