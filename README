@@ -149,9 +149,9 @@ On Debian/Ubuntu, you can easily install all these packages with a single comman
 "apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev"
 (root permissions needed).
 
-On Mac OS X, these packages can be installed easily via MacPorts.
+On Mac OS X (10.4 is known to work), these packages can be installed easily via MacPorts.
 First, install MacPorts according to the instructions at http://www.macports.org/
-Then, a simple "port install boost doxygen graphviz"
+Then, a simple "sudo port install gmake boost doxygen graphviz"
 should be enough to install everything that is needed.
 
 On Cygwin, the prebuilt Cygwin package boost-1.33.1-x is known not to work.
