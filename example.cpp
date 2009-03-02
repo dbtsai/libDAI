@@ -55,11 +55,16 @@ int main( int argc, char *argv[] ) {
         bp.init();
         bp.run();
 
-        cout << "Exact single node marginals:" << endl;
+        BP mp(fg, opts("updates",string("SEQFIX"))("logdomain",false)("inference",string("MAXPROD")));
+        mp.init();
+        mp.run();
+        vector<size_t> mpstate = mp.findMaximum();
+
+        cout << "Exact variable marginals:" << endl;
         for( size_t i = 0; i < fg.nrVars(); i++ )
             cout << jt.belief(fg.var(i)) << endl;
 
-        cout << "Approximate (loopy belief propagation) single node marginals:" << endl;
+        cout << "Approximate (loopy belief propagation) variable marginals:" << endl;
         for( size_t i = 0; i < fg.nrVars(); i++ )
             cout << bp.belief(fg.var(i)) << endl;
 
@@ -73,6 +78,18 @@ int main( int argc, char *argv[] ) {
 
         cout << "Exact log partition sum: " << jt.logZ() << endl;
         cout << "Approximate (loopy belief propagation) log partition sum: " << bp.logZ() << endl;
+
+        cout << "Max-product variable marginals:" << endl;
+        for( size_t i = 0; i < fg.nrVars(); i++ )
+            cout << mp.belief(fg.var(i)) << endl;
+
+        cout << "Max-product factor marginals:" << endl;
+        for( size_t I = 0; I < fg.nrFactors(); I++ )
+            cout << mp.belief(fg.factor(I).vars()) << "=" << mp.beliefF(I) << endl;
+
+        cout << "Max-product state:" << endl;
+        for( size_t i = 0; i < mpstate.size(); i++ )
+            cout << fg.var(i) << ": " << mpstate[i] << endl;
     }
 
     return 0;
