@@ -140,6 +140,11 @@ class BP : public DAIAlgFG {
         Factor beliefF( size_t I ) const;
         //@}
 
+        /// Calculates the joint state of all variables that has maximum probability
+        /** Assumes that run() has been called and that props.inference == MAXPROD
+         */
+        std::vector<std::size_t> findMaximum() const;
+
     private:
         const Prob & message(size_t i, size_t _I) const { return _edges[i][_I].message; }
         Prob & message(size_t i, size_t _I) { return _edges[i][_I].message; }
@@ -161,6 +166,10 @@ class BP : public DAIAlgFG {
             }
         }
         void findMaxResidual( size_t &i, size_t &_I );
+        /// Calculates unnormalized belief of variable
+        void calcBeliefV( size_t i, Prob &p ) const;
+        /// Calculates unnormalized belief of factor
+        void calcBeliefF( size_t I, Prob &p ) const;
 
         void construct();
         /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member

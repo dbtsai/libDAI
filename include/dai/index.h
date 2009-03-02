@@ -357,8 +357,8 @@ class State {
             return vs_state;
         }
 
-        /// Postfix increment operator
-        void operator++( int ) {
+        /// Prefix increment operator
+        void operator++( ) {
             if( valid() ) {
                 state++;
                 states_type::iterator entry = states.begin();
@@ -371,6 +371,11 @@ class State {
                 if( entry == states.end() )
                     state = -1;
             }
+        }
+        
+        /// Postfix increment operator
+        void operator++( int ) {
+        	operator++();
         }
 
         /// Returns true if the current state is valid

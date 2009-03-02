@@ -79,6 +79,13 @@ class FactorGraph {
 
         /// Shorthand for BipartiteGraph::Edge
         typedef BipartiteGraph::Edge      Edge;
+        
+        /// Iterator over factors
+        typedef std::vector<Factor>::iterator iterator;
+        
+        /// Const iterator over factors
+        typedef std::vector<Factor>::const_iterator const_iterator;
+        
 
     private:
         std::vector<Var>         _vars;
@@ -133,6 +140,14 @@ class FactorGraph {
         const Factor & factor(size_t I) const { return _factors[I]; }
         /// Returns const reference to all factors
         const std::vector<Factor> & factors() const { return _factors; }
+        /// Returns iterator pointing to first factor
+        iterator begin() { return _factors.begin(); }
+        /// Returns const iterator pointing to first factor
+        const_iterator begin() const { return _factors.begin(); }
+        /// Returns iterator pointing beyond last factor
+        iterator end() { return _factors.end(); }
+        /// Returns const iterator pointing beyond last factor
+        const_iterator end() const { return _factors.end(); }
 
         /// Returns number of variables
         size_t nrVars() const { return vars().size(); }

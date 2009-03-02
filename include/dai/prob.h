@@ -55,6 +55,11 @@ template <typename T> class TProb {
         std::vector<T> _p;
 
     public:
+        /// Iterator over entries
+    	typedef typename std::vector<T>::iterator iterator;
+        /// Const iterator over entries
+    	typedef typename std::vector<T>::const_iterator const_iterator;
+
         /// Enumerates different ways of normalizing a probability measure.
         /** 
          *  - NORMPROB means that the sum of all entries should be 1;
@@ -108,6 +113,18 @@ template <typename T> class TProb {
         
         /// Returns reference to the i'th entry
         T& operator[]( size_t i ) { return _p[i]; }
+        
+        /// Returns iterator pointing to first entry
+        iterator begin() { return _p.begin(); }
+
+        /// Returns const iterator pointing to first entry
+        const_iterator begin() const { return _p.begin(); }
+
+        /// Returns iterator pointing beyond last entry
+        iterator end() { return _p.end(); }
+
+        /// Returns const iterator pointing beyond last entry
+        const_iterator end() const { return _p.end(); }
 
         /// Sets all entries to x
         TProb<T> & fill(T x) { 
