@@ -370,7 +370,7 @@ template <typename T> class TProb {
             TProb<T> x;
             x._p.reserve( size() );
             for( size_t i = 0; i < size(); i++ )
-                x._p.push_back( _p[i] < 0 ? (-p[i]) : p[i] );
+                x._p.push_back( _p[i] < 0 ? (-_p[i]) : _p[i] );
             return x;
         }
 
