@@ -101,9 +101,16 @@ void BP::construct() {
     // create edge properties
     _edges.clear();
     _edges.reserve( nrVars() );
+    _edge2lut.clear();
+    if( props.updates == Properties::UpdateType::SEQMAX )
+        _edge2lut.reserve( nrVars() );
     for( size_t i = 0; i < nrVars(); ++i ) {
         _edges.push_back( vector<EdgeProp>() );
         _edges[i].reserve( nbV(i).size() ); 
+        if( props.updates == Properties::UpdateType::SEQMAX ) {
+            _edge2lut.push_back( vector<LutType::iterator>() );
+            _edge2lut[i].reserve( nbV(i).size() );
+        }
         foreach( const Neighbor &I, nbV(i) ) {
             EdgeProp newEP;
             newEP.message = Prob( var(i).states() );
@@ -117,6 +124,8 @@ void BP::construct() {
 
             newEP.residual = 0.0;
             _edges[i].push_back( newEP );
+            if( props.updates == Properties::UpdateType::SEQMAX )
+                _edge2lut[i].push_back( _lut.insert( std::make_pair( newEP.residual, std::make_pair( i, _edges[i].size() - 1 ))) );
         }
     }
 }
@@ -128,12 +137,15 @@ void BP::init() {
         foreach( const Neighbor &I, nbV(i) ) {
             message( i, I.iter ).fill( c );
             newMessage( i, I.iter ).fill( c );
+            if( props.updates == Properties::UpdateType::SEQMAX )
+				updateResidual( i, I.iter, 0.0 );
         }
     }
 }
 
 
 void BP::findMaxResidual( size_t &i, size_t &_I ) {
+/*
     i = 0;
     _I = 0;
     double maxres = residual( i, _I );
@@ -144,6 +156,12 @@ void BP::findMaxResidual( size_t &i, size_t &_I ) {
                 _I = I.iter;
                 maxres = residual( i, _I );
             }
+*/
+    assert( !_lut.empty() );
+    LutType::const_iterator largestEl = _lut.end();
+    --largestEl;
+    i  = largestEl->second.first;
+    _I = largestEl->second.second;
 }
 
 
@@ -217,6 +235,10 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
         else
             newMessage(i,_I) = marg;
     }
+
+    // Update the residual if necessary
+    if( props.updates == Properties::UpdateType::SEQMAX )
+        updateResidual( i, _I , dist( newMessage( i, _I ), message( i, _I ), Prob::DISTLINF ) );
 }
 
 
@@ -245,8 +267,6 @@ double BP::run() {
         for( size_t i = 0; i < nrVars(); ++i )
             foreach( const Neighbor &I, nbV(i) ) {
                 calcNewMessage( i, I.iter );
-                // calculate initial residuals
-                residual( i, I.iter ) = dist( newMessage( i, I.iter ), message( i, I.iter ), Prob::DISTLINF );
             }
     } else {
         update_seq.reserve( nredges );
@@ -273,10 +293,8 @@ double BP::run() {
                     if( J.iter != _I ) {
                         foreach( const Neighbor &j, nbF(J) ) {
                             size_t _J = j.dual;
-                            if( j != i ) {
+                            if( j != i )
                                 calcNewMessage( j, _J );
-                                residual( j, _J ) = dist( newMessage( j, _J ), message( j, _J ), Prob::DISTLINF );
-                            }
                         }
                     }
                 }
@@ -465,9 +483,37 @@ string BP::identify() const {
 void BP::init( const VarSet &ns ) {
     for( VarSet::const_iterator n = ns.begin(); n != ns.end(); ++n ) {
         size_t ni = findVar( *n );
-        foreach( const Neighbor &I, nbV( ni ) )
-            message( ni, I.iter ).fill( props.logdomain ? 0.0 : 1.0 );
+        foreach( const Neighbor &I, nbV( ni ) ) {
+            double val = props.logdomain ? 0.0 : 1.0;
+            message( ni, I.iter ).fill( val );
+            newMessage( ni, I.iter ).fill( val );
+            if( props.updates == Properties::UpdateType::SEQMAX )
+                updateResidual( ni, I.iter, 0.0 );
+        }
     }
+}
+
+
+void BP::updateMessage( size_t i, size_t _I ) {
+    if( props.damping == 0.0 ) {
+        message(i,_I) = newMessage(i,_I);
+        if( props.updates == Properties::UpdateType::SEQMAX )
+            updateResidual( i, _I, 0.0 );
+    } else {
+        message(i,_I) = (message(i,_I) ^ props.damping) * (newMessage(i,_I) ^ (1.0 - props.damping));
+        if( props.updates == Properties::UpdateType::SEQMAX )
+            updateResidual( i, _I, dist( newMessage(i,_I), message(i,_I), Prob::DISTLINF ) );
+    }
+}
+
+
+void BP::updateResidual( size_t i, size_t _I, double r ) {
+	EdgeProp* pEdge = &_edges[i][_I];
+	pEdge->residual = r;
+	
+	// rearrange look-up table (delete and reinsert new key)
+	_lut.erase( _edge2lut[i][_I] );
+	_edge2lut[i][_I] = _lut.insert( std::make_pair( r, std::make_pair(i, _I) ) );
 }
 
 

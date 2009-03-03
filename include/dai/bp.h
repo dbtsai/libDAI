@@ -40,11 +40,10 @@ namespace dai {
 
 
 /// Approximate inference algorithm "(Loopy) Belief Propagation"
-/** \todo Optimize BP_SEQMAX (it should use a better data structure than a vector for the residuals).
- */
 class BP : public DAIAlgFG {
     private:
         typedef std::vector<size_t> ind_t;
+	    typedef std::multimap<double, std::pair<std::size_t, std::size_t> > LutType;
         struct EdgeProp {
             ind_t  index;
             Prob   message;
@@ -52,6 +51,8 @@ class BP : public DAIAlgFG {
             double residual;
         };
         std::vector<std::vector<EdgeProp> > _edges;
+        std::vector<std::vector<LutType::iterator> > _edge2lut;
+        LutType _lut;
         /// Maximum difference encountered so far
         double _maxdiff;
         /// Number of iterations needed
@@ -93,16 +94,22 @@ class BP : public DAIAlgFG {
 
     public:
         /// Default constructor
-        BP() : DAIAlgFG(), _edges(), _maxdiff(0.0), _iters(0U), props() {}
+        BP() : DAIAlgFG(), _edges(), _edge2lut(), _lut(), _maxdiff(0.0), _iters(0U), props() {}
 
         /// Copy constructor
-        BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
+        BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _edge2lut(x._edge2lut), _lut(x._lut), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {
+            for( LutType::iterator l = _lut.begin(); l != _lut.end(); ++l )
+                _edge2lut[l->second.first][l->second.second] = l;
+        }
 
         /// Assignment operator
         BP& operator=( const BP &x ) {
             if( this != &x ) {
                 DAIAlgFG::operator=( x );
                 _edges = x._edges;
+                _lut = x._lut;
+                for( LutType::iterator l = _lut.begin(); l != _lut.end(); ++l )
+                    _edge2lut[l->second.first][l->second.second] = l;
                 _maxdiff = x._maxdiff;
                 _iters = x._iters;
                 props = x.props;
@@ -156,15 +163,8 @@ class BP : public DAIAlgFG {
         const double & residual(size_t i, size_t _I) const { return _edges[i][_I].residual; }
 
         void calcNewMessage( size_t i, size_t _I );
-        void updateMessage( size_t i, size_t _I ) {
-            if( props.damping == 0.0 ) {
-                message(i,_I) = newMessage(i,_I);
-                residual(i,_I) = 0.0;
-            } else {
-                message(i,_I) = (message(i,_I) ^ props.damping) * (newMessage(i,_I) ^ (1.0 - props.damping));
-                residual(i,_I) = dist( newMessage(i,_I), message(i,_I), Prob::DISTLINF );
-            }
-        }
+        void updateMessage( size_t i, size_t _I );
+        void updateResidual( size_t i, size_t _I, double r );
         void findMaxResidual( size_t &i, size_t &_I );
         /// Calculates unnormalized belief of variable
         void calcBeliefV( size_t i, Prob &p ) const;
