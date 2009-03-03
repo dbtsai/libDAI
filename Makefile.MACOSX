@@ -1,0 +1,67 @@
+# This template contains configurations for compiling libDAI under Mac OS X
+# 
+# To use it, simply copy this file to 'Makefile.conf' and adapt 'Makefile.conf'
+# to your local setup
+#
+# A boolean variable VAR can be set to true ("VAR=true") or to false ("VAR=")
+
+# COMPILATION AND BUILD FLAGS
+# Enable/disable various approximate inference methods
+WITH_BP=true
+WITH_MF=true
+WITH_HAK=true
+WITH_LC=true
+WITH_TREEEP=true
+WITH_JTREE=true
+WITH_MR=true
+WITH_GIBBS=true
+# Build doxygen documentation?
+WITH_DOC=true
+# Build with debug info?
+DEBUG=true
+# Build matlab interface?
+WITH_MATLAB=
+# New/old matlab version?
+NEW_MATLAB=true
+
+# OPERATING SYSTEM
+# Choose OS from {LINUX, WINDOWS, CYGWIN, MACOSX}
+OS=MACOSX
+
+# FILE EXTENSIONS
+# Static library
+LE=.a
+# Object file
+OE=.o
+# Binary executable
+EE=
+# MatLab compiled MEX file
+ME=.mexglx
+
+# COMPILER
+# Compile using GNU C++ Compiler
+CC=g++
+# Output filename option of the compiler
+CCO=-o
+# Flags for the C++ compiler
+CCFLAGS=-O3 -Wno-deprecated -Wall -W -Wextra -fpic
+# Flags to add in debugging mode (if DEBUG=true)
+CCDEBUGFLAGS=-g -DDAI_DEBUG
+# Standard include directories
+CCINC=-Iinclude -I/opt/local/include
+
+# LINKER
+# Standard libraries to include
+LIBS=-ldai
+# For linking with the BOOST Program Options library
+BOOSTLIBS=-lboost_program_options-mt
+# Additional library search paths for linker
+CCLIB=-Llib -L/opt/local/lib
+
+# MATLAB
+# Replace the following by the directory where MatLab has been installed
+MATLABDIR=/agbs/share/sw/matlab
+# The following should resolve to the MatLab mex compile command
+MEX=$(MATLABDIR)/bin/mex
+# Specify the same C++ compiler and flags to mex
+MEXFLAGS=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'

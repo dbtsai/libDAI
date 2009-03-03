@@ -19,137 +19,21 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-# Choose OS from {LINUX, WINDOWS, CYGWIN, MACOSX}
-# LINUX:   GNU/Linux and other UNIX variants
-# WINDOWS: Visual C++ with GNU Make
-# CYGWIN:  CygWin
-# MACOSX:  MacOSX
-OS=LINUX
+# Load the local configuration from Makefile.conf
+include Makefile.conf
 
-# Enable/disable various approximate inference methods
-WITH_BP=true
-WITH_MF=true
-WITH_HAK=true
-WITH_LC=true
-WITH_TREEEP=true
-WITH_JTREE=true
-WITH_MR=true
-WITH_GIBBS=true
-
-# Build with debug info?
-DEBUG=true
-
-# Build matlab interface?
-WITH_MATLAB=
-# New/old matlab version?
-NEW_MATLAB=true
-
-# Directories
-#   Location libDAI headers
+# Directories of libDAI sources
+# Location libDAI headers
 INC=include/dai
-#   Location of libDAI source files
+# Location of libDAI source files
 SRC=src
-#   Destination directory of libDAI library
+# Destination directory of libDAI library
 LIB=lib
-#   Additional iclude paths for C compiler
-CCINC=-Iinclude
 
-# Extensions (library, object, executable, matlab compiled MEX file)
-ifneq ($(OS),WINDOWS)
-  LE=.a
-  OE=.o
-  EE=
-  ME=.mexglx
-else
-  LE=.lib
-  OE=.obj
-  EE=.exe
-  ME=.mexglx
-endif
-
-# Libraries
-ifneq ($(OS),WINDOWS)
-  LIBS=-ldai
-  # Additional library paths for linker
-  CCLIB=-Llib
-else
-  # For some reason, we have to add the VC library path, although it is in the environment
-  LIBS=/link $(LIB)/libdai$(LE) /LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\ATLMFC\LIB" /LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\LIB" /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v6.0A\lib"
-endif
-
-# Tell the linker to link with the BOOST Program Options library
-ifeq ($(OS),CYGWIN)
-  BOOSTLIBS=-lboost_program_options-gcc34-mt
-endif
-ifeq ($(OS),MACOSX)
-  BOOSTLIBS=-lboost_program_options-mt
-endif
-ifeq ($(OS),LINUX)
-  BOOSTLIBS=-lboost_program_options-mt
-endif
-ifeq ($(OS),WINDOWS)
-  BOOSTLIBS=/LIBPATH:C:\boost_1_36_0\stage\lib
-endif
-
-# Compiler specific options
-ifneq ($(OS),WINDOWS)
-  # Compile using GNU C++ Compiler
-  CC=g++
-  # Output filename option of the compiler
-  CCO=-o 
-else
-  # Compile using Visual C++ Compiler
-  CC=cl
-  # Output filename option
-  CCO=/Fe
-endif
-
-# Flags for the C++ compiler
-ifneq ($(OS),WINDOWS)
-  CCFLAGS=-O3 -Wno-deprecated -Wall -W -Wextra -fpic
-  CCDEBUGFLAGS=-g -DDAI_DEBUG
-else
-  CCFLAGS=/Iinclude /IC:\boost_1_36_0 /EHsc /Ox
-  CCDEBUGFLAGS=/Zi -DDAI_DEBUG
-endif
-
-ifeq ($(OS),CYGWIN)
-  CCINC:=$(CCINC) -I/usr/local/include/boost-1_37
-  # dynamic linking of Boost libraries seems not to work on Cygwin
-  CCFLAGS:=$(CCFLAGS) -DCYGWIN -static
-endif
-ifeq ($(OS),MACOSX)
-  # indicate where your boost headers and libraries are (likely where macports installs libraries)
-  CCINC:=$(CCINC) -I/opt/local/include
-  CCLIB:=$(CCLIB) -L/opt/local/lib
-endif
-
-# Build targets
+# Define build targets
 TARGETS=tests utils lib examples testregression
-ifneq ($(OS),WINDOWS)
+ifdef WITH_DOC
   TARGETS:=$(TARGETS) doc 
-endif
-
-ifdef WITH_MATLAB
-  ifneq ($(OS),WINDOWS)
-    # Replace the following by the directory where Matlab has been installed
-    MATLABDIR=/agbs/share/sw/matlab
-    MEX=$(MATLABDIR)/bin/mex
-    MEXFLAGS=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'
-  else
-    # Replace the following by the directory where Matlab has been installed
-    MATLABDIR=c:\matlab
-    MEX=$(MATLABDIR)\bin\mex
-    MEXFLAGS=-Iinclude CXX\#$(CC) CXXFLAGS\#"/EHsc /Ox"
-  endif
-endif
-
-
-ifdef DEBUG
-  CCFLAGS:=$(CCFLAGS) $(CCDEBUGFLAGS)
-endif
-ifeq ($(OS),WINDOWS)
-  CCFLAGS:=$(CCFLAGS) -DWINDOWS
 endif
 ifdef WITH_MATLAB
   TARGETS:=$(TARGETS) matlabs
@@ -160,7 +44,7 @@ ifdef WITH_MATLAB
   endif
 endif
 
-
+# Define conditional build targets
 OBJECTS:=exactinf$(OE)
 ifdef WITH_BP
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP
@@ -195,11 +79,19 @@ ifdef WITH_GIBBS
   OBJECTS:=$(OBJECTS) gibbs$(OE)
 endif
 
-
+# Define standard libDAI header dependencies
 HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
 
-
-CC:=$(CC) $(CCINC) $(CCLIB) $(CCFLAGS)
+# Setup final command for C++ compiler and MEX
+ifdef DEBUG
+  CCFLAGS:=$(CCFLAGS) $(CCDEBUGFLAGS)
+endif
+ifneq ($(OS),WINDOWS)
+  CC:=$(CC) $(CCINC) $(CCFLAGS) $(CCLIB)
+else
+  CC:=$(CC) $(CCINC) $(CCFLAGS)
+  LIBS:=$(LIBS) $(CCLIB)
+endif
 MEX:=$(MEX) $(CCLIB) $(CCINC) $(MEXFLAGS)
 
 

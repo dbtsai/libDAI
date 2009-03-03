@@ -18,6 +18,7 @@ Christian Wojek
 Claudio Lima
 Jiuxiang Hu
 Peter Gober
+Patrick Pletscher
 
 
 ----------------------------------------------------------------------------------
@@ -39,14 +40,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ----------------------------------------------------------------------------------
 
 
-SCIENTISTS: please be aware that the fact that this program is released as Free
-Software does not excuse you from scientific propriety, which obligates you to
-give appropriate credit. If you write a scientific paper describing research
-that made substantive use of this program, it is your moral obligation as a
-scientist to (a) mention the fashion in which this software was used, including
-the version number, with a citation to the literature, to allow replication;
-(b) mention this software in the Acknowledgements section.  The appropriate
-citation is: 
+SCIENTISTS: If you write a scientific paper describing research that made 
+substantive use of this program, please (a) mention the fashion in which 
+this software was used, including the version number, with a citation 
+to the literature, to allow replication; (b) mention this software in the 
+Acknowledgements section.  The appropriate citation is: 
 
 J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete 
 Approximate Inference methods", http://mloss.org/software/view/77/.
@@ -143,7 +141,7 @@ You need:
 - GNU make
 - doxygen
 - graphviz
-- recent boost C++ libraries (at least version 1.34 or 1.37 for cygwin)
+- recent boost C++ libraries (at least version 1.34, or 1.37 for cygwin)
 
 On Debian/Ubuntu, you can easily install all these packages with a single command:
 "apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev"
@@ -163,9 +161,10 @@ from http://www.boost.org/ and compile/install it with:
   make install
 
 
-To build the libDAI source, edit the Makefile and adapt it to your local setup. 
-At least one should specify the OS and possibly adapt some directories to match
-the local setup. Then, run
+To build the libDAI source, first copy a template Makefile.* to Makefile.conf
+(for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). 
+Then, edit the Makefile.conf template to adapt it to your local setup.
+Especially directories may change from system to system. Finally, run
     
     make
 
@@ -187,9 +186,10 @@ You need:
 For the regression test, you need:
 - GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
 
-To build the source, edit the Makefile and adapt it to your local setup. Then, run (from the command line)
+To build the source, copy Makefile.WINDOWS to Makefile.conf. Then, edit 
+Makefile.conf to adapt it to your local setup. Finally, run (from the command line)
     
-    make -f Makefile.win
+    make
 
 If the build was successful, you can test the example program:
 
