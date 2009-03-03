@@ -156,9 +156,9 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
         for( set<VarSet>::const_iterator c = scl.begin(); c != scl.end(); c++ )
             cl.push_back(*c);
         if( props.verbose >= 3 ) {
-            cout << Name << " uses the following clusters: " << endl;
+            cerr << Name << " uses the following clusters: " << endl;
             for( vector<VarSet>::const_iterator cli = cl.begin(); cli != cl.end(); cli++ )
-                cout << *cli << endl;
+                cerr << *cli << endl;
         }
     } else
         DAI_THROW(INTERNAL_ERROR);
@@ -168,7 +168,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
     constructMessages();
 
     if( props.verbose >= 3 )
-        cout << Name << " regiongraph: " << *this << endl;
+        cerr << Name << " regiongraph: " << *this << endl;
 }
 
 
@@ -212,9 +212,9 @@ void HAK::init() {
 
 double HAK::doGBP() {
     if( props.verbose >= 1 )
-        cout << "Starting " << identify() << "...";
+        cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3)
-        cout << endl;
+        cerr << endl;
 
     double tic = toc();
 
@@ -260,7 +260,7 @@ double HAK::doGBP() {
             Qb_new.normalize();
             if( Qb_new.hasNaNs() ) {
                 // TODO: WHAT TO DO IN THIS CASE?
-                cout << Name << "::doGBP:  Qb_new has NaNs!" << endl;
+                cerr << Name << "::doGBP:  Qb_new has NaNs!" << endl;
                 return 1.0;
             }
             /* TODO: WHAT IS THE PURPOSE OF THE FOLLOWING CODE?
@@ -289,7 +289,7 @@ double HAK::doGBP() {
                 Qa_new ^= (1.0 / OR(alpha).c());
                 Qa_new.normalize();
                 if( Qa_new.hasNaNs() ) {
-                    cout << Name << "::doGBP:  Qa_new has NaNs!" << endl;
+                    cerr << Name << "::doGBP:  Qa_new has NaNs!" << endl;
                     return 1.0;
                 }
                 /* TODO: WHAT IS THE PURPOSE OF THE FOLLOWING CODE?
@@ -313,7 +313,7 @@ double HAK::doGBP() {
         }
 
         if( props.verbose >= 3 )
-            cout << Name << "::doGBP:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cerr << Name << "::doGBP:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
     }
 
     if( diffs.maxDiff() > _maxdiff )
@@ -322,12 +322,12 @@ double HAK::doGBP() {
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
-                cout << endl;
-            cout << Name << "::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << endl;
+            cerr << Name << "::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 2 )
-                cout << Name << "::doGBP:  ";
-            cout << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
+                cerr << Name << "::doGBP:  ";
+            cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 
@@ -337,9 +337,9 @@ double HAK::doGBP() {
 
 double HAK::doDoubleLoop() {
     if( props.verbose >= 1 )
-        cout << "Starting " << identify() << "...";
+        cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3)
-        cout << endl;
+        cerr << endl;
 
     double tic = toc();
 
@@ -396,7 +396,7 @@ double HAK::doDoubleLoop() {
         total_iter += Iterations();
 
         if( props.verbose >= 3 )
-            cout << Name << "::doDoubleLoop:  maxdiff " << diffs.maxDiff() << " after " << total_iter << " passes" << endl;
+            cerr << Name << "::doDoubleLoop:  maxdiff " << diffs.maxDiff() << " after " << total_iter << " passes" << endl;
     }
 
     // restore _maxiter, _verbose and _maxdiff
@@ -418,12 +418,12 @@ double HAK::doDoubleLoop() {
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
-                cout << endl;
-                cout << Name << "::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << endl;
+                cerr << Name << "::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
             } else {
                 if( props.verbose >= 3 )
-                    cout << Name << "::doDoubleLoop:  ";
-                cout << "converged in " << total_iter << " passes (" << toc() - tic << " seconds)." << endl;
+                    cerr << Name << "::doDoubleLoop:  ";
+                cerr << "converged in " << total_iter << " passes (" << toc() - tic << " seconds)." << endl;
             }
         }
 

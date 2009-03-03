@@ -74,16 +74,16 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
         ClusterGraph _cg( cl );
 
         if( props.verbose >= 3 )
-            cout << "Initial clusters: " << _cg << endl;
+            cerr << "Initial clusters: " << _cg << endl;
 
         // Retain only maximal clusters
         _cg.eraseNonMaximal();
         if( props.verbose >= 3 )
-            cout << "Maximal clusters: " << _cg << endl;
+            cerr << "Maximal clusters: " << _cg << endl;
 
         vector<VarSet> ElimVec = _cg.VarElim_MinFill().eraseNonMaximal().toVector();
         if( props.verbose >= 3 )
-            cout << "VarElim_MinFill result: " << ElimVec << endl;
+            cerr << "VarElim_MinFill result: " << ElimVec << endl;
 
         GenerateJT( ElimVec );
     }
@@ -163,7 +163,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
     Check_Counting_Numbers();
 
     if( props.verbose >= 3 ) {
-        cout << "Resulting regiongraph: " << *this << endl;
+        cerr << "Resulting regiongraph: " << *this << endl;
     }
 }
 

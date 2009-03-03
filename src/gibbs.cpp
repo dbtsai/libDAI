@@ -164,9 +164,9 @@ void Gibbs::init() {
 
 double Gibbs::run() {
     if( props.verbose >= 1 )
-        cout << "Starting " << identify() << "...";
+        cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3 )
-        cout << endl;
+        cerr << endl;
 
     double tic = toc();
     
@@ -186,7 +186,7 @@ double Gibbs::run() {
     }
     
     if( props.verbose >= 3 )
-        cout << Name << "::run:  ran " << props.iters << " passes (" << toc() - tic << " clocks)." << endl;
+        cerr << Name << "::run:  ran " << props.iters << " passes (" << toc() - tic << " clocks)." << endl;
 
     return 0.0;
 }

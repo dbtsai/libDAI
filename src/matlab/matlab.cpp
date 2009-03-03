@@ -83,7 +83,7 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
     // interpret psi, linear cell array of cptabs
     for( size_t cellind = 0; cellind < nr_f; cellind++ ) {
         if( verbose >= 3 )
-            cout << "reading factor " << cellind << ": " << endl;
+            cerr << "reading factor " << cellind << ": " << endl;
         mxArray *cell = mxGetCell(psi, cellind);
         mxArray *mx_member = mxGetField(cell, 0, "Member"); 
         size_t nr_mem = mxGetN(mx_member);
@@ -95,11 +95,11 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
         VarSet factorvars;
         vector<long> labels(nr_mem,0);
         if( verbose >= 3 )
-            cout << "  vars: ";
+            cerr << "  vars: ";
         for( size_t mi = 0; mi < nr_mem; mi++ ) {
             labels[mi] = (long)members[mi];
             if( verbose >= 3 )
-                cout << labels[mi] << "(" << dims[mi] << ") ";
+                cerr << labels[mi] << "(" << dims[mi] << ") ";
             vars.insert( Var(labels[mi], dims[mi]) );
             factorvars |= Var(labels[mi], dims[mi]);
         }
@@ -115,10 +115,10 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
         }
 
         if( verbose >= 3 ) {
-            cout << endl << "  perm: ";
+            cerr << endl << "  perm: ";
             for( vector<size_t>::iterator r=perm.begin(); r!=perm.end(); r++ )
-                cout << *r << " ";
-            cout << endl;
+                cerr << *r << " ";
+            cerr << endl;
         }
 
         // read Factor
@@ -135,7 +135,7 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
 
     if( verbose >= 3 ) {
         for(vector<Factor>::const_iterator I=factors.begin(); I!=factors.end(); I++ )
-            cout << *I << endl;
+            cerr << *I << endl;
     }
 
     return( factors );

@@ -246,9 +246,9 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
 // Somehow NaNs do not often occur in BP...
 double BP::run() {
     if( props.verbose >= 1 )
-        cout << "Starting " << identify() << "...";
+        cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3)
-        cout << endl;
+        cerr << endl;
 
     double tic = toc();
     Diffs diffs(nrVars(), 1.0);
@@ -327,7 +327,7 @@ double BP::run() {
         }
 
         if( props.verbose >= 3 )
-            cout << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cerr << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
     }
 
     if( diffs.maxDiff() > _maxdiff )
@@ -336,12 +336,12 @@ double BP::run() {
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
-                cout << endl;
-                cout << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << endl;
+                cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 3 )
-                cout << Name << "::run:  ";
-                cout << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
+                cerr << Name << "::run:  ";
+                cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 

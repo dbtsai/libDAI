@@ -1,3 +1,4 @@
+* [Frederik Eaton] Change cout to cerr in warnings and error messages
 * [Giuseppe Passino] Optimised maximum-residual BP by using a reversed ordered
   set instead of the linear search (which can yield enormous speedups - a factor
   500 has been measured on a binary Ising grid with 128x128 variables!)

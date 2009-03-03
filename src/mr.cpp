@@ -220,7 +220,7 @@ double MR::init_cor_resp() {
             } while((md > props.tol)&&(runx<runs)); // Precision condition reached -> BP and RP finished
             if(runx==runs)
                 if( props.verbose >= 2 )
-                    cout << "init_cor_resp: Convergence not reached (md=" << md << ")..." << endl;
+                    cerr << "init_cor_resp: Convergence not reached (md=" << md << ")..." << endl;
             if(md > maxdev)
                 maxdev = md;
 
@@ -463,7 +463,7 @@ void MR::solvemcav() {
 
     if(run==maxruns){
         if( props.verbose >= 1 )
-            cout << "solve_mcav: Convergence not reached (maxdev=" << maxdev << ")..." << endl;
+            cerr << "solve_mcav: Convergence not reached (maxdev=" << maxdev << ")..." << endl;
     }
 }
 
@@ -531,7 +531,7 @@ string MR::identify() const {
 double MR::run() {
     if( supported ) {
         if( props.verbose >= 1 )
-            cout << "Starting " << identify() << "...";
+            cerr << "Starting " << identify() << "...";
 
         double tic = toc();
 //        Diffs diffs(nrVars(), 1.0);
@@ -566,7 +566,7 @@ double MR::run() {
         solveM();
 
         if( props.verbose >= 1 )
-            cout << Name << " needed " << toc() - tic << " seconds." << endl;
+            cerr << Name << " needed " << toc() - tic << " seconds." << endl;
 
         return 0.0;
     } else

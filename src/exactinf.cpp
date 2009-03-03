@@ -80,7 +80,7 @@ void ExactInf::init() {
 
 double ExactInf::run() {
     if( props.verbose >= 1 )
-        cout << "Starting " << identify() << "...";
+        cerr << "Starting " << identify() << "...";
 
     Factor P;
     for( size_t I = 0; I < nrFactors(); I++ )
@@ -94,7 +94,7 @@ double ExactInf::run() {
         _beliefsF[I] = P.marginal(factor(I).vars());
 
     if( props.verbose >= 1 )
-        cout << "finished" << endl;
+        cerr << "finished" << endl;
 
     return 0.0;
 }

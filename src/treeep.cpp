@@ -336,7 +336,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
             /*size_t subTreeSize =*/ findEfficientTree( factor(I).vars(), subTree, PreviousRoot );
             PreviousRoot = subTree[0].n1;
             //subTree.resize( subTreeSize );  // FIXME
-//          cout << "subtree " << I << " has size " << subTreeSize << endl;
+//          cerr << "subtree " << I << " has size " << subTreeSize << endl;
 
             TreeEPSubTree QI( subTree, RTree, Qa, Qb, &factor(I) );
             _Q[I] = QI;
@@ -348,7 +348,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
             /*size_t subTreeSize =*/ findEfficientTree( factor(I).vars(), subTree, PreviousRoot );
             PreviousRoot = subTree[0].n1;
             //subTree.resize( subTreeSize ); // FIXME
-//          cout << "subtree " << I << " has size " << subTreeSize << endl;
+//          cerr << "subtree " << I << " has size " << subTreeSize << endl;
 
             TreeEPSubTree QI( subTree, RTree, Qa, Qb, &factor(I) );
             _Q[I] = QI;
@@ -356,7 +356,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
         }
 
     if( props.verbose >= 3 ) {
-        cout << "Resulting regiongraph: " << *this << endl;
+        cerr << "Resulting regiongraph: " << *this << endl;
     }
 }
 
@@ -378,9 +378,9 @@ void TreeEP::init() {
 
 double TreeEP::run() {
     if( props.verbose >= 1 )
-        cout << "Starting " << identify() << "...";
+        cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3)
-        cout << endl;
+        cerr << endl;
 
     double tic = toc();
     Diffs diffs(nrVars(), 1.0);
@@ -408,7 +408,7 @@ double TreeEP::run() {
         }
 
         if( props.verbose >= 3 )
-            cout << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cerr << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
     }
 
     if( diffs.maxDiff() > _maxdiff )
@@ -417,12 +417,12 @@ double TreeEP::run() {
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
-                cout << endl;
-            cout << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << endl;
+            cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 3 )
-                cout << Name << "::run:  ";
-            cout << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
+                cerr << Name << "::run:  ";
+            cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 

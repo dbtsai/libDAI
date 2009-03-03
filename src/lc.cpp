@@ -135,7 +135,7 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet 
     double maxdiff = 0;
 
     if( props.verbose >= 2 )
-        cout << "Initing cavity " << var(i) << "(" << delta(i).size() << " vars, " << delta(i).nrStates() << " states)" << endl;
+        cerr << "Initing cavity " << var(i) << "(" << delta(i).size() << " vars, " << delta(i).nrStates() << " states)" << endl;
 
     if( props.cavity == Properties::CavityType::UNIFORM )
         Bi = Factor(delta(i));
@@ -166,15 +166,15 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
     double tic = toc();
 
     if( props.verbose >= 1 ) {
-        cout << Name << "::InitCavityDists:  ";
+        cerr << Name << "::InitCavityDists:  ";
         if( props.cavity == Properties::CavityType::UNIFORM )
-            cout << "Using uniform initial cavity distributions" << endl;
+            cerr << "Using uniform initial cavity distributions" << endl;
         else if( props.cavity == Properties::CavityType::FULL )
-            cout << "Using full " << name << opts << "...";
+            cerr << "Using full " << name << opts << "...";
         else if( props.cavity == Properties::CavityType::PAIR )
-            cout << "Using pairwise " << name << opts << "...";
+            cerr << "Using pairwise " << name << opts << "...";
         else if( props.cavity == Properties::CavityType::PAIR2 )
-            cout << "Using pairwise(new) " << name << opts << "...";
+            cerr << "Using pairwise(new) " << name << opts << "...";
     }
 
     double maxdiff = 0.0;
@@ -185,7 +185,7 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
     }
 
     if( props.verbose >= 1 ) {
-        cout << Name << "::InitCavityDists used " << toc() - tic << " seconds." << endl;
+        cerr << Name << "::InitCavityDists used " << toc() - tic << " seconds." << endl;
     }
 
     return maxdiff;
@@ -194,7 +194,7 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
 
 long LC::SetCavityDists( std::vector<Factor> &Q ) {
     if( props.verbose >= 1 ) 
-        cout << Name << "::SetCavityDists:  Setting initial cavity distributions" << endl;
+        cerr << Name << "::SetCavityDists:  Setting initial cavity distributions" << endl;
     if( Q.size() != nrVars() )
         return -1;
     for( size_t i = 0; i < nrVars(); i++ ) {
@@ -240,7 +240,7 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
     piet.normalize();
 
     if( piet.hasNaNs() ) {
-        cout << Name << "::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;
+        cerr << Name << "::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;
         hasNaNs = true;
     }
 
@@ -250,9 +250,9 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
 
 double LC::run() {
     if( props.verbose >= 1 )
-        cout << "Starting " << identify() << "...";
+        cerr << "Starting " << identify() << "...";
     if( props.verbose >= 2 )
-        cout << endl;
+        cerr << endl;
 
     double tic = toc();
     Diffs diffs(nrVars(), 1.0);
@@ -286,7 +286,7 @@ double LC::run() {
             break;
         }
     if( hasNaNs ) {
-        cout << Name << "::run:  initial _pancakes has NaNs!" << endl;
+        cerr << Name << "::run:  initial _pancakes has NaNs!" << endl;
         return 1.0;
     }
 
@@ -320,7 +320,7 @@ double LC::run() {
         }
 
         if( props.verbose >= 3 )
-            cout << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cerr << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
     }
 
     if( diffs.maxDiff() > _maxdiff )
@@ -329,12 +329,12 @@ double LC::run() {
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
-                cout << endl;
-                cout << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << endl;
+                cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 2 )
-                cout << Name << "::run:  ";
-                cout << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
+                cerr << Name << "::run:  ";
+                cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 

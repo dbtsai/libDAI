@@ -125,7 +125,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
     if( is.fail() )
         DAI_THROW(INVALID_FACTORGRAPH_FILE);
     if( verbose >= 2 )
-        cout << "Reading " << nr_Factors << " factors..." << endl;
+        cerr << "Reading " << nr_Factors << " factors..." << endl;
 
     getline (is,line);
     if( is.fail() )
@@ -134,13 +134,13 @@ istream& operator >> (istream& is, FactorGraph& fg) {
     map<long,size_t> vardims;
     for( size_t I = 0; I < nr_Factors; I++ ) {
         if( verbose >= 3 )
-            cout << "Reading factor " << I << "..." << endl;
+            cerr << "Reading factor " << I << "..." << endl;
         size_t nr_members;
         while( (is.peek()) == '#' )
             getline(is,line);
         is >> nr_members;
         if( verbose >= 3 )
-            cout << "  nr_members: " << nr_members << endl;
+            cerr << "  nr_members: " << nr_members << endl;
 
         vector<long> labels;
         for( size_t mi = 0; mi < nr_members; mi++ ) {
@@ -151,7 +151,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             labels.push_back(mi_label);
         }
         if( verbose >= 3 )
-            cout << "  labels: " << labels << endl;
+            cerr << "  labels: " << labels << endl;
 
         vector<size_t> dims;
         for( size_t mi = 0; mi < nr_members; mi++ ) {
@@ -162,7 +162,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             dims.push_back(mi_dim);
         }
         if( verbose >= 3 )
-            cout << "  dimensions: " << dims << endl;
+            cerr << "  dimensions: " << dims << endl;
 
         // add the Factor
         VarSet I_vars;
@@ -187,7 +187,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             sigma[mi] = j_loc - labels.begin();
         }
         if( verbose >= 3 )
-            cout << "  sigma: " << sigma << endl;
+            cerr << "  sigma: " << sigma << endl;
 
         // calculate multindices
         Permute permindex( dims, sigma );
@@ -198,7 +198,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             getline(is,line);
         is >> nr_nonzeros;
         if( verbose >= 3 ) 
-            cout << "  nonzeroes: " << nr_nonzeros << endl;
+            cerr << "  nonzeroes: " << nr_nonzeros << endl;
         for( size_t k = 0; k < nr_nonzeros; k++ ) {
             size_t li;
             double val;
@@ -216,7 +216,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
     }
 
     if( verbose >= 3 )
-        cout << "factors:" << facs << endl;
+        cerr << "factors:" << facs << endl;
 
     fg = FactorGraph(facs);
 

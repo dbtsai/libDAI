@@ -99,7 +99,7 @@ double MF::run() {
     double tic = toc();
 
     if( props.verbose >= 1 )
-        cout << "Starting " << identify() << "...";
+        cerr << "Starting " << identify() << "...";
 
     size_t pass_size = _beliefs.size();
     Diffs diffs(pass_size * 3, 1.0);
@@ -126,7 +126,7 @@ double MF::run() {
         jan.normalize();
 
         if( jan.hasNaNs() ) {
-            cout << Name << "::run():  ERROR: jan has NaNs!" << endl;
+            cerr << Name << "::run():  ERROR: jan has NaNs!" << endl;
             return 1.0;
         }
 
@@ -144,12 +144,12 @@ double MF::run() {
     if( props.verbose >= 1 ) {
         if( diffs.maxDiff() > props.tol ) {
             if( props.verbose == 1 )
-                cout << endl;
-            cout << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << endl;
+            cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
         } else {
             if( props.verbose >= 2 )
-                cout << Name << "::run:  ";
-            cout << "converged in " << t / pass_size << " passes (" << toc() - tic << " seconds)." << endl;
+                cerr << Name << "::run:  ";
+            cerr << "converged in " << t / pass_size << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 
