@@ -78,9 +78,18 @@ ifdef WITH_GIBBS
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_GIBBS
   OBJECTS:=$(OBJECTS) gibbs$(OE)
 endif
+ifdef WITH_BP_DUAL
+  CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP_DUAL
+  OBJECTS:=$(OBJECTS) bp_dual$(OE)
+endif
+ifdef WITH_CBP
+  CCFLAGS:=$(CCFLAGS) -DDAI_WITH_CBP
+  OBJECTS:=$(OBJECTS) bbp$(OE) cbp$(OE)
+endif
+
 
 # Define standard libDAI header dependencies
-HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
+HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h $(INC)/util.h
 
 # Setup final command for C++ compiler and MEX
 ifdef DEBUG
@@ -125,6 +134,15 @@ exactinf$(OE) : $(SRC)/exactinf.cpp $(INC)/exactinf.h $(HEADERS)
 
 bp$(OE) : $(SRC)/bp.cpp $(INC)/bp.h $(HEADERS)
 	$(CC) -c $(SRC)/bp.cpp
+
+bp_dual$(OE) : $(SRC)/bp_dual.cpp $(INC)/bp_dual.h $(HEADERS)
+	$(CC) -c $(SRC)/bp_dual.cpp
+
+bbp$(OE) : $(SRC)/bbp.cpp $(INC)/bbp.h $(INC)/bp_dual.h $(HEADERS)
+	$(CC) -c $(SRC)/bbp.cpp
+
+cbp$(OE) : $(SRC)/cbp.cpp $(INC)/cbp.h $(INC)/bbp.h $(INC)/bp_dual.h $(HEADERS)
+	$(CC) -c $(SRC)/cbp.cpp
 
 lc$(OE) : $(SRC)/lc.cpp $(INC)/lc.h $(HEADERS)
 	$(CC) -c $(SRC)/lc.cpp

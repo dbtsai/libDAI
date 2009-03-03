@@ -35,6 +35,7 @@
 #include <iostream>
 #include <cstdio>
 #include <boost/foreach.hpp>
+#include <boost/functional/hash.hpp>
 #include <algorithm>
 
 
@@ -49,6 +50,20 @@
 
 /// An alias to the BOOST_FOREACH macro from the boost::foreach library
 #define foreach BOOST_FOREACH
+
+#ifdef DAI_DEBUG
+#define DAI_PV(x) do {std::cerr << #x "= " << x << std::endl;} while(0)
+#define DAI_DMSG(str) do {std::cerr << str << std::endl;} while(0)
+#else
+#define DAI_PV(x) do {} while(0)
+#define DAI_DMSG(str) do {} while(0)
+#endif
+
+#define DAI_ACCMUT(x,y)                     \
+      x y;                                  \
+      const x const y;
+
+#define DAI_IFVERB(n, stmt) if(props.verbose>=n) { cerr << stmt; }
 
 
 /// Real number (alias for double, which could be changed to long double if necessary)
@@ -77,14 +92,14 @@ namespace dai {
     /// hash_map is an alias for std::map.
     /** Since there is no TR1 unordered_map implementation available yet, we fall back on std::map.
      */
-    template <typename T, typename U>
+    template <typename T, typename U, typename H = boost::hash<T> >
         class hash_map : public std::map<T,U> {};
 #else
     /// hash_map is an alias for std::tr1::unordered_map.
     /** We use the (experimental) TR1 unordered_map implementation included in modern GCC distributions.
      */
-    template <typename T, typename U>
-        class hash_map : public std::tr1::unordered_map<T,U> {};
+    template <typename T, typename U, typename H = boost::hash<T> >
+        class hash_map : public std::tr1::unordered_map<T,U,H> {};
 #endif
 
 

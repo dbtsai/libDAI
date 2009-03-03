@@ -57,6 +57,12 @@
 #ifdef DAI_WITH_GIBBS
     #include <dai/gibbs.h>
 #endif
+#ifdef DAI_WITH_BP_DUAL
+    #include <dai/bp_dual.h>
+#endif
+#ifdef DAI_WITH_CBP
+    #include <dai/cbp.h>
+#endif
 
 
 /// Namespace for libDAI
@@ -98,6 +104,9 @@ static const char* DAINames[] = {
 #endif
 #ifdef DAI_WITH_GIBBS
     Gibbs::Name,
+#endif
+#ifdef DAI_WITH_CBP
+    CBP::Name,
 #endif
     ""
 };

@@ -67,6 +67,14 @@ InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const PropertySet 
     if( name == Gibbs::Name )
         return new Gibbs (fg, opts);
 #endif
+#ifdef DAI_WITH_BP_DUAL
+    if( name == BP_dual::Name )
+        return new BP_dual (fg, opts);
+#endif
+#ifdef DAI_WITH_CBP
+    if( name == CBP::Name )
+        return new CBP (fg, opts);
+#endif
     DAI_THROW(UNKNOWN_DAI_ALGORITHM);
 }
 

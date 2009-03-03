@@ -101,9 +101,16 @@ class BipartiteGraph {
             std::vector<size_t> ind2;       // indices of nodes of type 2
         };
 
+        /// Support for some backwards compatibility with old interface
+        /** Call indexEdges() first to initialize these members
+         */
+        bool _edge_indexed;
+        std::vector<Edge> _edges;
+        hash_map<Edge,size_t> _vv2e;
+
     public:
         /// Default constructor (creates an empty bipartite graph)
-        BipartiteGraph() : _nb1(), _nb2() {}
+        BipartiteGraph() : _nb1(), _nb2(), _edge_indexed(false) {}
 
         /// Constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
@@ -113,7 +120,7 @@ class BipartiteGraph {
          *  \param end Points just beyond the last edge.
          */
         template<typename EdgeInputIterator>
-        BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ) {
+        BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ), _edge_indexed(false) {
             construct( nr1, nr2, begin, end );
         }
 
@@ -301,6 +308,51 @@ class BipartiteGraph {
 
         /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
+
+        // ----------------------------------------------------------------
+        // backwards compatibility layer
+        void indexEdges() {
+            _edges.clear();
+            _vv2e.clear();
+            size_t i=0;
+            foreach(const Neighbors &nb1s, _nb1) {
+                foreach(const Neighbor &n2, nb1s) {
+                    Edge e(i, n2.node);
+                    _edges.push_back(e);
+                }
+                i++;
+            }
+            sort(_edges.begin(), _edges.end()); // unnecessary?
+
+            i=0;
+            foreach(const Edge& e, _edges) {
+                _vv2e[e] = i++;
+            }
+
+            _edge_indexed = true;
+        }
+        
+        const Edge& edge(size_t e) const {
+            assert(_edge_indexed);
+            return _edges[e];
+        }
+        
+        const std::vector<Edge>& edges() const {
+            return _edges;
+        }
+        
+        size_t VV2E(size_t n1, size_t n2) const {
+            assert(_edge_indexed);
+            Edge e(n1,n2);
+            hash_map<Edge,size_t>::const_iterator i = _vv2e.find(e);
+            assert(i != _vv2e.end());
+            return i->second;
+        }
+
+        size_t nr_edges() const {
+            assert(_edge_indexed);
+            return _edges.size();
+        }
 
     private:
         /// Checks internal consistency
