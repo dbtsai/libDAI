@@ -1,3 +1,6 @@
+* [Frederik Eaton] Added Gibbs::state() accessors/mutators
+* [Frederik Eaton] Fixed Gibbs::getVarDist(size_t) to return uniform 
+  distribution if no state is allowed
 * [Frederik Eaton] Improved parsing code in tests/testdai to allow recursive
   alias substitutions
 * Interface changes:

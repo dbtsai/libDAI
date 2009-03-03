@@ -88,12 +88,18 @@ class Gibbs : public DAIAlgFG {
         //@}
 
 
-        /// @name Additional interface specific for BP
+        /// @name Additional interface specific for Gibbs
         //@{
         Factor beliefV( size_t i ) const;
         Factor beliefF( size_t I ) const;
         void randomizeState();
         //@}
+
+        /// Return reference to current state vector
+        std::vector<size_t>& state() { return _state; }
+
+        /// Return const reference to current state vector
+        const std::vector<size_t>& state() const { return _state; }
 
     private:
         void updateCounts();

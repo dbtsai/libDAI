@@ -126,7 +126,7 @@ Prob Gibbs::getVarDist( size_t i ) {
     size_t i_states = var(i).states();
     Prob i_given_MB( i_states, 1.0 );
 
-    // use markov blanket of var(i) to calculate distribution
+    // use Markov blanket of var(i) to calculate distribution
     foreach( const Neighbor &I, nbV(i) ) {
         const Factor &f_I = factor(I);
         size_t I_skip = getFactorEntryDiff( I, i );
@@ -137,7 +137,13 @@ Prob Gibbs::getVarDist( size_t i ) {
         }
     }
 
-    return i_given_MB.normalized();
+    if( i_given_MB.sum() == 0.0 )
+        // If no state of i is allowed, use uniform distribution
+        // FIXME is that indeed the right thing to do?
+        i_given_MB = Prob( i_states );
+    else
+        i_given_MB.normalize();
+    return i_given_MB;
 }
 
 
