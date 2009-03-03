@@ -69,13 +69,29 @@ int main( int argc, char *argv[] ) {
         // Run belief propagation algorithm
         bp.run();
 
-        // Report single-variable marginals for fg, calculated by the junction tree algorithm
-        cout << "Exact single-variable marginals:" << endl;
+        // Construct a BP (belief propagation) object from the FactorGraph fg
+        // using the parameters specified by opts and two additional properties,
+        // specifying the type of updates the BP algorithm should perform and
+        // whether they should be done in the real or in the logdomain
+        //
+        // Note that inference is set to MAXPROD, which means that the object
+        // will perform the max-product algorithm instead of the sum-product algorithm
+        BP mp(fg, opts("updates",string("SEQFIX"))("logdomain",false)("inference",string("MAXPROD")));
+        // Initialize max-product algorithm
+        mp.init();
+        // Run max-product algorithm
+        mp.run();
+        // Calculate joint state of all variables that has maximum probability
+        // based on the max-product result
+        vector<size_t> mpstate = mp.findMaximum();
+
+        // Report variable marginals for fg, calculated by the junction tree algorithm
+        cout << "Exact variable marginals:" << endl;
         for( size_t i = 0; i < fg.nrVars(); i++ ) // iterate over all variables in fg
             cout << jt.belief(fg.var(i)) << endl; // display the "belief" of jt for that variable
 
-        // Report single-variable marginals for fg, calculated by the belief propagation algorithm
-        cout << "Approximate (loopy belief propagation) single-variable marginals:" << endl;
+        // Report variable marginals for fg, calculated by the belief propagation algorithm
+        cout << "Approximate (loopy belief propagation) variable marginals:" << endl;
         for( size_t i = 0; i < fg.nrVars(); i++ ) // iterate over all variables in fg
             cout << bp.belief(fg.var(i)) << endl; // display the belief of bp for that variable
 
@@ -94,6 +110,21 @@ int main( int argc, char *argv[] ) {
 
         // Report log partition sum of fg, approximated by the belief propagation algorithm
         cout << "Approximate (loopy belief propagation) log partition sum: " << bp.logZ() << endl;
+
+        // Report max-product variable marginals
+        cout << "Max-product variable marginals:" << endl;
+        for( size_t i = 0; i < fg.nrVars(); i++ )
+            cout << mp.belief(fg.var(i)) << endl;
+
+        // Report max-product factor marginals
+        cout << "Max-product factor marginals:" << endl;
+        for( size_t I = 0; I < fg.nrFactors(); I++ )
+            cout << mp.belief(fg.factor(I).vars()) << "=" << mp.beliefF(I) << endl;
+
+        // Report max-product joint state
+        cout << "Max-product state:" << endl;
+        for( size_t i = 0; i < mpstate.size(); i++ )
+            cout << fg.var(i) << ": " << mpstate[i] << endl;
     }
 
     return 0;

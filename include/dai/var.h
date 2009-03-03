@@ -32,6 +32,7 @@
 
 
 #include <iostream>
+#include <cassert>
 
 
 namespace dai {
@@ -77,14 +78,38 @@ class Var {
         bool operator < ( const Var& n ) const { return( _label <  n._label ); }
         /// Larger-than operator (compares only labels)
         bool operator > ( const Var& n ) const { return( _label >  n._label ); }
-        /// Smaller-than-or-equal-to operator (compares only labels)
-        bool operator <= ( const Var& n ) const { return( _label <= n._label ); }
-        /// Larger-than-or-equal-to operator (compares only labels)
-        bool operator >= ( const Var& n ) const { return( _label >= n._label ); }
-        /// Not-equal-to operator (compares only labels)
-        bool operator != ( const Var& n ) const { return( _label != n._label ); }
-        /// Equal-to operator (compares only labels)
-        bool operator == ( const Var& n ) const { return( _label == n._label ); }
+        /// Smaller-than-or-equal-to operator (only compares labels)
+        bool operator <= ( const Var& n ) const { 
+#ifdef DAI_DEBUG
+            if( _label == n._label )
+                assert( _states == n._states );
+#endif
+            return( _label <= n._label ); 
+        }
+        /// Larger-than-or-equal-to operator (only compares labels)
+        bool operator >= ( const Var& n ) const { 
+#ifdef DAI_DEBUG
+            if( _label == n._label )
+                assert( _states == n._states );
+#endif
+            return( _label >= n._label ); 
+        }
+        /// Not-equal-to operator (only compares labels)
+        bool operator != ( const Var& n ) const { 
+#ifdef DAI_DEBUG
+            if( _label == n._label )
+                assert( _states == n._states );
+#endif
+            return( _label != n._label ); 
+        }
+        /// Equal-to operator (only compares labels)
+        bool operator == ( const Var& n ) const { 
+#ifdef DAI_DEBUG
+            if( _label == n._label )
+                assert( _states == n._states );
+#endif            
+            return( _label == n._label ); 
+        }
 
         /// Writes a Var to an output stream
         friend std::ostream& operator << ( std::ostream& os, const Var& n ) {
