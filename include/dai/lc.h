@@ -100,24 +100,6 @@ class LC : public DAIAlgFG {
         /// Default constructor
         LC() : DAIAlgFG(), _pancakes(), _cavitydists(), _phis(), _beliefs(), _maxdiff(), _iters(), props() {}
 
-        /// Copy constructor
-        LC( const LC &x ) : DAIAlgFG(x), _pancakes(x._pancakes), _cavitydists(x._cavitydists), _phis(x._phis), _beliefs(x._beliefs), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
-
-        /// Assignment operator
-        LC& operator=( const LC &x ) {
-            if( this != &x ) {
-                DAIAlgFG::operator=( x );
-                _pancakes     = x._pancakes;
-                _cavitydists  = x._cavitydists;
-                _phis         = x._phis;
-                _beliefs      = x._beliefs;
-                _maxdiff      = x._maxdiff;
-                _iters        = x._iters;
-                props         = x.props;
-            }
-            return *this;
-        }
-
         /// Construct from FactorGraph fg and PropertySet opts
         LC( const FactorGraph &fg, const PropertySet &opts );
 

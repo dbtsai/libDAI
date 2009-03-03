@@ -139,18 +139,6 @@ class DAIAlg : public InfAlg, public GRM {
         /// Construct from GRM 
         DAIAlg( const GRM &grm ) : InfAlg(), GRM(grm) {}
 
-        /// Copy constructor
-        DAIAlg( const DAIAlg & x ) : InfAlg(x), GRM(x) {}
-
-        /// Assignment operator
-        DAIAlg & operator=( const DAIAlg &x ) {
-            if( this != &x ) {
-                InfAlg::operator=(x);
-                GRM::operator=(x);
-            }
-            return *this;
-        }
-
         /// Save factor I
         void backupFactor( size_t I ) { GRM::backupFactor( I ); }
         /// Save Factors involving ns

@@ -70,21 +70,6 @@ class MF : public DAIAlgFG {
         /// Default constructor
         MF() : DAIAlgFG(), _beliefs(), _maxdiff(0.0), _iters(0U), props() {}
 
-        /// Copy constructor
-        MF( const MF &x ) : DAIAlgFG(x), _beliefs(x._beliefs), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
-
-        /// Assignment operator
-        MF& operator=( const MF &x ) {
-            if( this != &x ) {
-                DAIAlgFG::operator=( x );
-                _beliefs = x._beliefs;
-                _maxdiff = x._maxdiff;
-                _iters   = x._iters;
-                props    = x.props;
-            }
-            return *this;
-        }
-
         /// Construct from FactorGraph fg and PropertySet opts
         MF( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), _maxdiff(0.0), _iters(0U), props() {
             setProperties( opts );

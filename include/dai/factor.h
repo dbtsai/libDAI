@@ -105,18 +105,6 @@ template <typename T> class TFactor {
         /// Constructs TFactor depending on the variable n, with uniform distribution
         TFactor( const Var& n ) : _vs(n), _p(n.states()) {}
 
-        /// Copy constructor
-        TFactor( const TFactor<T> &x ) : _vs(x._vs), _p(x._p) {}
-        
-        /// Assignment operator
-        TFactor<T> & operator= (const TFactor<T> &x) {
-            if( this != &x ) {
-                _vs = x._vs;
-                _p  = x._p;
-            }
-            return *this;
-        }
-
         /// Returns const reference to value vector
         const TProb<T> & p() const { return _p; }
         /// Returns reference to value vector

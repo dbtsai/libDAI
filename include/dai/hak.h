@@ -88,24 +88,6 @@ class HAK : public DAIAlgRG {
         /// Default constructor
         HAK() : DAIAlgRG(), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {}
 
-        /// Copy constructor
-        HAK( const HAK &x ) : DAIAlgRG(x), _Qa(x._Qa), _Qb(x._Qb), _muab(x._muab), _muba(x._muba), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
-
-        /// Assignment operator
-        HAK& operator=( const HAK &x ) {
-            if( this != &x ) {
-                DAIAlgRG::operator=( x );
-                _Qa      = x._Qa;
-                _Qb      = x._Qb;
-                _muab    = x._muab;
-                _muba    = x._muba;
-                _maxdiff = x._maxdiff;
-                _iters   = x._iters;
-                props    = x.props;
-            }
-            return *this;
-        }
-
         /// Construct from FactorGraph fg and PropertySet opts
         HAK( const FactorGraph &fg, const PropertySet &opts );
 

@@ -96,20 +96,6 @@ class FactorGraph {
         /// Default constructor
         FactorGraph() : G(), _vars(), _factors(), _backup() {}
 
-        /// Copy constructor
-        FactorGraph(const FactorGraph & x) : G(x.G), _vars(x._vars), _factors(x._factors), _backup(x._backup) {}
-
-        /// Assignment operator
-        FactorGraph & operator=(const FactorGraph & x) {
-            if( this != &x ) {
-                G          = x.G;
-                _vars      = x._vars;
-                _factors   = x._factors;
-                _backup    = x._backup;
-            }
-            return *this;
-        }
-
         /// Constructs a FactorGraph from a vector of factors
         FactorGraph(const std::vector<Factor> &P);
 

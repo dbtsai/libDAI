@@ -105,18 +105,6 @@ class BipartiteGraph {
         /// Default constructor (creates an empty bipartite graph)
         BipartiteGraph() : _nb1(), _nb2() {}
 
-        /// Copy constructor (constructs a bipartite graph containing a copy of \c x)
-        BipartiteGraph( const BipartiteGraph & x ) : _nb1(x._nb1), _nb2(x._nb2) {}
-
-        /// Assignment operator (makes \c *this equal to \c x)
-        BipartiteGraph & operator=( const BipartiteGraph & x ) {
-            if( this != &x ) {
-                _nb1 = x._nb1;
-                _nb2 = x._nb2;
-            }
-            return *this;
-        }
-
         /// Constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
          *  \param nr1 The number of nodes of type 1.

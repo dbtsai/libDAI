@@ -57,17 +57,6 @@ class VarSet : public SmallSet<Var> {
         /// Default constructor
         VarSet() : SmallSet<Var>() {}
 
-        /// Copy constructor
-        VarSet( const VarSet &x ) : SmallSet<Var>(x) {}
-
-        /// Assignment operator
-        VarSet& operator=( const VarSet &x ) {
-            if( this != &x ) {
-                SmallSet<Var>::operator=( x );
-            }
-            return *this;
-        }
-        
         /// Construct from SmallSet<Var>
         VarSet( const SmallSet<Var> &x ) : SmallSet<Var>(x) {}
 

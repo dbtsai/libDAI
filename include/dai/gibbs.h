@@ -64,21 +64,6 @@ class Gibbs : public DAIAlgFG {
         /// Default constructor
         Gibbs() : DAIAlgFG(), _sample_count(0), _var_counts(), _factor_counts(), _state() {}
 
-        /// Copy constructor
-        Gibbs(const Gibbs & x) : DAIAlgFG(x), _sample_count(x._sample_count), _var_counts(x._var_counts), _factor_counts(x._factor_counts), _state(x._state) {}
-
-        /// Assignment operator
-        Gibbs& operator=( const Gibbs &x ) {
-            if( this != &x ) {
-                DAIAlgFG::operator=( x );
-                _sample_count = x._sample_count;
-                _var_counts = x._var_counts;
-                _factor_counts = x._factor_counts;
-                _state = x._state;
-            }
-            return *this;
-        }
-
         /// Construct from FactorGraph fg and PropertySet opts
         Gibbs( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _sample_count(0), _var_counts(), _factor_counts(), _state() {
             setProperties( opts );

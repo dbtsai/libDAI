@@ -103,20 +103,6 @@ class IndexFor {
             _index = 0;
         }
 
-        /// Copy constructor
-        IndexFor( const IndexFor & ind ) : _index(ind._index), _sum(ind._sum), _count(ind._count), _dims(ind._dims) {}
-
-        /// Assignment operator
-        IndexFor& operator=( const IndexFor &ind ) {
-            if( this != &ind ) {
-                _index = ind._index;
-                _sum = ind._sum;
-                _count = ind._count;
-                _dims = ind._dims;
-            }
-            return *this;
-        }
-
         /// Sets the index back to zero
         IndexFor& clear() {
             fill( _count.begin(), _count.end(), 0 );
@@ -183,19 +169,6 @@ class MultiFor {
         /// Initialize from vector of index dimensions
         MultiFor( const std::vector<size_t> &d ) : _dims(d), _states(d.size(),0), _state(0) {}
 
-        /// Copy constructor
-        MultiFor( const MultiFor &x ) : _dims(x._dims), _states(x._states), _state(x._state) {}
-
-        /// Assignment operator
-        MultiFor& operator=( const MultiFor & x ) {
-            if( this != &x ) {
-                _dims   = x._dims;
-                _states = x._states;
-                _state  = x._state;
-            }
-            return *this;
-        }
-
         /// Return linear state
         operator size_t() const { 
             assert( valid() );
@@ -252,18 +225,6 @@ class Permute {
             assert( _dims.size() == _sigma.size() );
         }
 
-        /// Copy constructor
-        Permute( const Permute &x ) : _dims(x._dims), _sigma(x._sigma) {}
-
-        /// Assignment operator
-        Permute& operator=( const Permute &x ) {
-            if( this != &x ) {
-                _dims  = x._dims;
-                _sigma = x._sigma;
-            }
-            return *this;
-        }
-
         /// Calculates a permuted linear index.
         /** Converts the linear index li to a vector index
          *  corresponding with the dimensions in _dims, permutes it according to sigma, 
@@ -313,18 +274,6 @@ class State {
         State( const VarSet &vs ) : state(0) {
             for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ )
                 states[*v] = 0;
-        }
-
-        /// Copy constructor
-        State( const State & x ) : state(x.state), states(x.states) {}
-
-        /// Assignment operator
-        State& operator=( const State &x ) {
-            if( this != &x ) {
-                state  = x.state;
-                states = x.states;
-            }
-            return *this;
         }
 
         /// Return linear state

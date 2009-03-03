@@ -1,11 +1,14 @@
+* [Frederik Eaton] Removed unnecessary copy constructors and assignment
+  operators
 * [Frederik Eaton] Change cout to cerr in warnings and error messages
 * [Giuseppe Passino] Optimised maximum-residual BP by using a reversed ordered
-  set instead of the linear search (which can yield enormous speedups - a factor
-  500 has been measured on a binary Ising grid with 128x128 variables!)
+  set instead of the linear search (which can yield enormous speedups - a 
+  factor 500 has been measured on a binary Ising grid with 128x128 variables!)
 * Added debug assertions to Var which check for inconsistent dimensions of 
   variables with the same labels
 * [Giuseppe Passino] Added prefix ++ operator to State (State::operator++())
-* [Giuseppe Passino] Added iterators to FactorGraph (FactorGraph::begin, FactorGraph::end)
+* [Giuseppe Passino] Added iterators to FactorGraph (FactorGraph::begin, 
+  FactorGraph::end)
 * [Giuseppe Passino] Added iterators to TFactor (TFactor::begin, TFactor::end)
 * [Giuseppe Passino] Added iterators to TProb (TProb::begin, TProb::end)
 * [Giuseppe Passino] Added BP::findMaximum(), which can be used after running

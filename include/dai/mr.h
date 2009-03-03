@@ -97,30 +97,6 @@ class MR : public DAIAlgFG {
         /// Default constructor
         MR() : DAIAlgFG(), supported(), con(), nb(), tJ(), theta(), M(), kindex(), cors(), N(), Mag(), _maxdiff(), _iters(), props() {}
 
-        /// Copy constructor
-        MR( const MR &x ) : DAIAlgFG(x), supported(x.supported), con(x.con), nb(x.nb), tJ(x.tJ), theta(x.theta), M(x.M), kindex(x.kindex), cors(x.cors), N(x.N), Mag(x.Mag), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {}
-
-        /// Assignment operator
-        MR& operator=( const MR &x ) {
-            if( this != &x ) {
-                DAIAlgFG::operator=(x);
-                supported = x.supported;
-                con       = x.con; 
-                nb        = x.nb;
-                tJ        = x.tJ;
-                theta     = x.theta;
-                M         = x.M;
-                kindex    = x.kindex;
-                cors      = x.cors;
-                N         = x.N;
-                Mag       = x.Mag;
-                _maxdiff  = x._maxdiff;
-                _iters    = x._iters;
-                props     = x.props;
-            }
-            return *this;
-        }
-
         /// Construct from FactorGraph fg and PropertySet opts
         MR( const FactorGraph &fg, const PropertySet &opts );
 

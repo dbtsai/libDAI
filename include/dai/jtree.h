@@ -79,23 +79,6 @@ class JTree : public DAIAlgRG {
         /// Default constructor
         JTree() : DAIAlgRG(), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {}
 
-        /// Copy constructor
-        JTree( const JTree &x ) : DAIAlgRG(x), _mes(x._mes), _logZ(x._logZ), RTree(x.RTree), Qa(x.Qa), Qb(x.Qb), props(x.props) {}
-
-        /// Assignment operator
-        JTree& operator=( const JTree &x ) {
-            if( this != &x ) {
-                DAIAlgRG::operator=( x );
-                _mes    = x._mes;
-                _logZ   = x._logZ;
-                RTree   = x.RTree;
-                Qa      = x.Qa;
-                Qb      = x.Qb;
-                props   = x.props;
-            }
-            return *this;
-        }
-
         /// Construct from FactorGraph fg and PropertySet opts
         JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic=true );
 

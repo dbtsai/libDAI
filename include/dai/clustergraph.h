@@ -66,19 +66,6 @@ namespace dai {
             /// Construct from vector<VarSet>
             ClusterGraph( const std::vector<VarSet> & cls );
             
-            /// Copy constructor
-            ClusterGraph( const ClusterGraph &x ) : G(x.G), vars(x.vars), clusters(x.clusters) {}
-
-            /// Assignment operator
-            ClusterGraph& operator=( const ClusterGraph &x ) {
-                if( this != &x ) {
-                    G = x.G;
-                    vars = x.vars;
-                    clusters = x.clusters;
-                }
-                return *this;
-            }
-
             /// Returns true if cluster I is not contained in a larger cluster
             bool isMaximal( size_t I ) const {
 #ifdef DAI_DEBUG

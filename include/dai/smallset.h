@@ -85,17 +85,6 @@ class SmallSet {
             _elements.erase( new_end, _elements.end() );
         }
 
-        /// Copy constructor
-        SmallSet( const SmallSet &x ) : _elements( x._elements ) {}
-
-        /// Assignment operator
-        SmallSet & operator=( const SmallSet &x ) {
-            if( this != &x ) {
-                _elements = x._elements;
-            }
-            return *this;
-        }
-        
         /// Set-minus operator: returns all elements in *this, except those in x
         SmallSet operator/ ( const SmallSet& x ) const {
             SmallSet res;

@@ -59,21 +59,6 @@ class ExactInf : public DAIAlgFG {
         /// Default constructor
         ExactInf() : DAIAlgFG(), props(), _beliefsV(), _beliefsF(), _logZ(0) {}
 
-        /// Copy constructor
-        ExactInf( const ExactInf &x ) : DAIAlgFG(x), props(x.props), _beliefsV(x._beliefsV), _beliefsF(x._beliefsF), _logZ(x._logZ) {}
-
-        /// Assignment operator
-        ExactInf& operator=( const ExactInf &x ) {
-            if( this != &x ) {
-                DAIAlgFG::operator=( x );
-                props     = x.props;
-                _beliefsV = x._beliefsV;
-                _beliefsF = x._beliefsF;
-                _logZ     = x._logZ;
-            }
-            return *this;
-        }
-
         /// Construct from FactorGraph fg and PropertySet opts
         ExactInf( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), props(), _beliefsV(), _beliefsF(), _logZ() {
             setProperties( opts );

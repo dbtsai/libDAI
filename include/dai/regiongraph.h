@@ -51,18 +51,6 @@ class Region : public VarSet {
         /// Construct Region from a VarSet and a counting number
         Region(const VarSet & x, double c) : VarSet(x), _c(c) {}
         
-        /// Copy constructor
-        Region(const Region & x) : VarSet(x), _c(x._c) {}
-
-        /// Assignment operator
-        Region & operator=(const Region & x) {
-            if( this != &x ) {
-                VarSet::operator=(x);
-                _c          = x._c;
-            }
-            return *this;
-        }
-
         /// Provide read access to counting number
         const double & c() const { return _c; }
         /// Provide full access to counting number
@@ -83,18 +71,6 @@ class FRegion : public Factor {
         /// Constructs FRegion from a Factor and a counting number
         FRegion( const Factor & x, double c ) : Factor(x), _c(c) {}
         
-        /// Copy constructor
-        FRegion( const FRegion & x ) : Factor(x), _c(x._c) {}
-
-        /// Assignment operator
-        FRegion & operator=(const FRegion & x) {
-            if( this != &x ) {
-                Factor::operator=(x);
-                _c = x._c;
-            }
-            return *this;
-        }
-
         /// Provide read access to counting number
         const double & c() const { return _c; }
         /// Provide full access to counting number
@@ -130,21 +106,6 @@ class RegionGraph : public FactorGraph {
         
         /// Constructs a RegionGraph from a FactorGraph and a vector of outer VarSets (CVM style)
         RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl );
-
-        /// Copy constructor
-        RegionGraph( const RegionGraph &x ) : FactorGraph(x), G(x.G), ORs(x.ORs), IRs(x.IRs), fac2OR(x.fac2OR) {}
-
-        /// Assignment operator
-        RegionGraph & operator=( const RegionGraph &x ) {
-            if( this != &x ) {
-                FactorGraph::operator=( x );
-                G = x.G;
-                ORs = x.ORs;
-                IRs = x.IRs;
-                fac2OR = x.fac2OR;
-            }
-            return *this;
-        }
 
         /// Clone *this (virtual copy constructor)
         virtual RegionGraph* clone() const { return new RegionGraph(*this); }
