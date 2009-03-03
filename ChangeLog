@@ -1,3 +1,15 @@
+* [Frederik Eaton] Improved parsing code in tests/testdai to allow recursive
+  alias substitutions
+* Interface changes:
+    TProb<T>::minVal()     -> TProb<T>::min()
+    TFactor<T>::minVal()   -> TFactor<T>::min()
+    TProb<T>::maxVal()     -> TProb<T>::max()
+    TFactor<T>::maxVal()   -> TFactor<T>::max()
+    TProb<T>::totalSum()   -> TProb<T>sum()
+    TFactor<T>::totalSum() -> TFactor<T>::sum()
+* [Frederik Eaton] Added methods setUniform (), sumAbs(), argmax() to TProb<T>
+* [Frederik Eaton] Added TAGS, lib targets to Makefile
+* [Frederik Eaton] Add useful aliases to aliases.conf
 * [Frederik Eaton] Removed unnecessary copy constructors and assignment
   operators
 * [Frederik Eaton] Change cout to cerr in warnings and error messages

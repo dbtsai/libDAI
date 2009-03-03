@@ -36,6 +36,7 @@
 #include <cassert>
 #include <typeinfo>
 #include <dai/exceptions.h>
+#include <dai/util.h>
 
 
 namespace dai {
@@ -71,6 +72,15 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
 
         /// Sets a property
         PropertySet & Set(const PropertyKey &key, const PropertyValue &val) { this->operator[](key) = val; return *this; }
+
+        /// Set properties according to those in newProps, overriding properties that already exist with new values
+        PropertySet & Set( const PropertySet &newProps ) {
+            const std::map<PropertyKey, PropertyValue> *m = &newProps;
+            foreach(value_type i, *m) {
+                Set(i.first, i.second);
+            }
+            return *this;
+        }
 
         /// Gets a property, casted as ValueType
         template<typename ValueType>

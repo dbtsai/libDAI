@@ -76,7 +76,7 @@ class TestDAI {
                 delete obj;
         }
 
-        string identify() { 
+        string identify() const {
             if( obj != NULL )
                 return obj->identify(); 
             else
@@ -155,47 +155,51 @@ class TestDAI {
 };
 
 
-pair<string, PropertySet> parseMethod( const string &_s, const map<string,string> & aliases ) {
-    // s = first part of _s, until '['
-    string::size_type pos = _s.find_first_of('[');
-    string s;
-    if( pos == string::npos )
-        s = _s;
-    else
-        s = _s.substr(0,pos);
+pair<string, PropertySet> parseMethodRaw( const string &s ) {
+    string::size_type pos = s.find_first_of('[');
+    string name;
+    PropertySet opts;
+    if( pos == string::npos ) {
+        name = s;
+    } else {
+        name = s.substr(0,pos);
 
-    // if the first part is an alias, substitute
-    if( aliases.find(s) != aliases.end() )
-        s = aliases.find(s)->second;
-
-    // attach second part, merging properties if necessary
-    if( pos != string::npos ) {
-        if( s.at(s.length()-1) == ']' ) {
-            s = s.erase(s.length()-1,1) + ',' + _s.substr(pos+1);
-        } else
-            s = s + _s.substr(pos);
+        stringstream ss;
+        ss << s.substr(pos,s.length());
+        ss >> opts;
     }
+    return make_pair(name,opts);
+}
 
-    pair<string, PropertySet> result;
-    string & name = result.first;
-    PropertySet & opts = result.second;
 
-    pos = s.find_first_of('[');
-    if( pos == string::npos )
-        throw "Malformed method";
-    name = s.substr( 0, pos );
+pair<string, PropertySet> parseMethod( const string &_s, const map<string,string> & aliases ) {
+    // break string into method[properties]
+    pair<string,PropertySet> ps = parseMethodRaw(_s);
+    bool looped = false;
+
+    // as long as 'method' is an alias, update:
+    while( aliases.find(ps.first) != aliases.end() && !looped ) {
+        string astr = aliases.find(ps.first)->second;
+        pair<string,PropertySet> aps = parseMethodRaw(astr);
+        if( aps.first == ps.first )
+            looped = true;
+        // override aps properties by ps properties
+        aps.second.Set( ps.second );
+        // replace ps by aps
+        ps = aps;
+        // repeat until method name == alias name ('looped'), or
+        // there is no longer an alias 'method'
+    }
+    
+    // check whether name is valid
     size_t n = 0;
     for( ; strlen( DAINames[n] ) != 0; n++ )
-        if( name == DAINames[n] )
+        if( ps.first == DAINames[n] )
             break;
-    if( strlen( DAINames[n] ) == 0 && (name != "LDPC") )
-        DAI_THROW(UNKNOWN_DAI_ALGORITHM);
+    if( strlen( DAINames[n] ) == 0 && (ps.first != "LDPC") )
+        throw string("Unknown DAI algorithm \"") + ps.first + string("\" in \"") + _s + string("\"");
 
-    stringstream ss;
-    ss << s.substr(pos,s.length());
-    ss >> opts;
-    
-    return result;
+    return ps;
 }
 
 

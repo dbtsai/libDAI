@@ -189,10 +189,10 @@ vector<Factor> MF::beliefs() const {
 
 
 Real MF::logZ() const {
-    Real sum = 0.0;
+    Real s = 0.0;
     
     for(size_t i=0; i < nrVars(); i++ )
-        sum -= beliefV(i).entropy();
+        s -= beliefV(i).entropy();
     for(size_t I=0; I < nrFactors(); I++ ) {
         Factor henk;
         foreach( const Neighbor &j, nbF(I) )  // for all j in I
@@ -201,10 +201,10 @@ Real MF::logZ() const {
         Factor piet;
         piet = factor(I).log(true);
         piet *= henk;
-        sum -= piet.totalSum();
+        s -= piet.sum();
     }
 
-    return -sum;
+    return -s;
 }
 
 

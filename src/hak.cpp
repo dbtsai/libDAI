@@ -473,14 +473,14 @@ vector<Factor> HAK::beliefs() const {
 
 
 Real HAK::logZ() const {
-    Real sum = 0.0;
+    Real s = 0.0;
     for( size_t beta = 0; beta < nrIRs(); beta++ )
-        sum += IR(beta).c() * Qb(beta).entropy();
+        s += IR(beta).c() * Qb(beta).entropy();
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
-        sum += OR(alpha).c() * Qa(alpha).entropy();
-        sum += (OR(alpha).log(true) * Qa(alpha)).totalSum();
+        s += OR(alpha).c() * Qa(alpha).entropy();
+        s += (OR(alpha).log(true) * Qa(alpha)).sum();
     }
-    return sum;
+    return s;
 }
 
 

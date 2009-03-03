@@ -177,23 +177,23 @@ void TreeEP::TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<F
     // Normalize Qa and Qb
     _logZ = 0.0;
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ ) {
-        _logZ += log(Qa[_a[alpha]].totalSum());
+        _logZ += log(Qa[_a[alpha]].sum());
         Qa[_a[alpha]].normalize();
     }
     for( size_t beta = 0; beta < _Qb.size(); beta++ ) {
-        _logZ -= log(Qb[_b[beta]].totalSum());
+        _logZ -= log(Qb[_b[beta]].sum());
         Qb[_b[beta]].normalize();
     }
 }
 
 
 double TreeEP::TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const {
-    double sum = 0.0;
+    double s = 0.0;
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
-        sum += (Qa[_a[alpha]] * _Qa[alpha].log(true)).totalSum();
+        s += (Qa[_a[alpha]] * _Qa[alpha].log(true)).sum();
     for( size_t beta = 0; beta < _Qb.size(); beta++ )
-        sum -= (Qb[_b[beta]] * _Qb[beta].log(true)).totalSum();
-    return sum + _logZ;
+        s -= (Qb[_b[beta]] * _Qb[beta].log(true)).sum();
+    return s + _logZ;
 }
 
 
@@ -431,24 +431,24 @@ double TreeEP::run() {
 
 
 Real TreeEP::logZ() const {
-    double sum = 0.0;
+    double s = 0.0;
 
     // entropy of the tree
     for( size_t beta = 0; beta < nrIRs(); beta++ )
-        sum -= Qb[beta].entropy();
+        s -= Qb[beta].entropy();
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        sum += Qa[alpha].entropy();
+        s += Qa[alpha].entropy();
 
     // energy of the on-tree factors
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        sum += (OR(alpha).log(true) * Qa[alpha]).totalSum();
+        s += (OR(alpha).log(true) * Qa[alpha]).sum();
 
     // energy of the off-tree factors
     for( size_t I = 0; I < nrFactors(); I++ )
         if( offtree(I) )
-            sum += (_Q.find(I))->second.logZ( Qa, Qb );
+            s += (_Q.find(I))->second.logZ( Qa, Qb );
     
-    return sum;
+    return s;
 }
 
 

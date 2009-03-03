@@ -150,6 +150,12 @@ template <typename T> class TProb {
                     _p[i] = 0;
             return *this;
         }
+        
+        /// Set all entries to 1.0/size()
+        TProb<T>& setUniform () {
+            fill(1.0/size());
+            return *this;
+        }
 
         /// Sets entries that are smaller than epsilon to epsilon
         TProb<T>& makePositive( Real epsilon ) {
@@ -403,9 +409,17 @@ template <typename T> class TProb {
         }
 
         /// Returns sum of all entries
-        T totalSum() const {
+        T sum() const {
             T Z = std::accumulate( _p.begin(),  _p.end(), (T)0 );
             return Z;
+        }
+
+        /// Return sum of absolute value of all entries
+        T sumAbs() const {
+            T s = 0;
+            for( size_t i = 0; i < size(); i++ )
+                s += fabs( (Real) _p[i] );
+            return s;
         }
 
         /// Returns maximum absolute value of all entries
@@ -420,22 +434,35 @@ template <typename T> class TProb {
         }
 
         /// Returns maximum value of all entries
-        T maxVal() const {
+        T max() const {
             T Z = *std::max_element( _p.begin(), _p.end() );
             return Z;
         }
 
         /// Returns minimum value of all entries
-        T minVal() const {
+        T min() const {
             T Z = *std::min_element( _p.begin(), _p.end() );
             return Z;
+        }
+
+        /// Returns {arg,}maximum value
+        std::pair<size_t,T> argmax() const {
+            T max = _p[0];
+            size_t arg = 0;
+            for( size_t i = 1; i < size(); i++ ) {
+              if( _p[i] > max ) {
+                max = _p[i];
+                arg = i;
+              }
+            }
+            return make_pair(arg,max);
         }
 
         /// Normalizes vector using the specified norm
         T normalize( NormType norm=NORMPROB ) {
             T Z = 0.0;
             if( norm == NORMPROB )
-                Z = totalSum();
+                Z = sum();
             else if( norm == NORMLINF )
                 Z = maxAbs();
             if( Z == 0.0 )
@@ -478,7 +505,7 @@ template <typename T> class TProb {
 
         /// Returns a random index, according to the (normalized) distribution described by *this
         size_t draw() {
-            double x = rnd_uniform() * totalSum();
+            double x = rnd_uniform() * sum();
             T s = 0;
             for( size_t i = 0; i < size(); i++ ) {
                 s += _p[i];

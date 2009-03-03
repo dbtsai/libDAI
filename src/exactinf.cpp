@@ -86,7 +86,7 @@ double ExactInf::run() {
     for( size_t I = 0; I < nrFactors(); I++ )
         P *= factor(I);
 
-    Real Z = P.totalSum();
+    Real Z = P.sum();
     _logZ = std::log(Z);
     for( size_t i = 0; i < nrVars(); i++ )
         _beliefsV[i] = P.marginal(var(i));

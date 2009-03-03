@@ -212,7 +212,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
             }
         }
         if( props.logdomain ) {
-            prod -= prod.maxVal();
+            prod -= prod.max();
             prod.takeExp();
         }
 
@@ -396,7 +396,7 @@ Factor BP::beliefV( size_t i ) const {
     calcBeliefV( i, p );
 
     if( props.logdomain ) {
-        p -= p.maxVal();
+        p -= p.max();
         p.takeExp();
     }
 
@@ -453,7 +453,7 @@ Factor BP::beliefF( size_t I ) const {
         calcBeliefF( I, prod );
 
         if( props.logdomain ) {
-            prod -= prod.maxVal();
+            prod -= prod.max();
             prod.takeExp();
         }
         prod.normalize();

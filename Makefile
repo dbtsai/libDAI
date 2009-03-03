@@ -85,7 +85,7 @@ ifeq ($(OS),MACOSX)
   BOOSTLIBS=-lboost_program_options-mt
 endif
 ifeq ($(OS),LINUX)
-  BOOSTLIBS=-lboost_program_options
+  BOOSTLIBS=-lboost_program_options-mt
 endif
 ifeq ($(OS),WINDOWS)
   BOOSTLIBS=/LIBPATH:C:\boost_1_36_0\stage\lib
@@ -125,7 +125,7 @@ ifeq ($(OS),MACOSX)
 endif
 
 # Build targets
-TARGETS=tests utils $(LIB)/libdai$(LE) examples testregression
+TARGETS=tests utils lib examples testregression
 ifneq ($(OS),WINDOWS)
   TARGETS:=$(TARGETS) doc 
 endif
@@ -215,6 +215,8 @@ matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/
 tests : tests/testdai$(EE)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
+
+lib: $(LIB)/libdai$(LE) 
 
 
 # OBJECTS
@@ -366,6 +368,10 @@ endif
 
 doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 	doxygen doxygen.conf
+
+TAGS:
+	etags src/*.cpp include/dai/*.h tests/*.cpp utils/*.cpp
+	ctags src/*.cpp include/dai/*.h tests/*.cpp utils/*.cpp
 
 
 # CLEAN
