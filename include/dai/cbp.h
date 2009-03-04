@@ -104,7 +104,7 @@ class CBP : public DAIAlgFG {
     //@{
     virtual CBP* clone() const { return new CBP(*this); }
 //     virtual CBP* create() const { return new CBP(); }
-    virtual CBP* create() const { throw "Unimplemented"; }
+    virtual CBP* create() const { DAI_THROW(NOT_IMPLEMENTED); }
     virtual std::string identify() const { return string(Name) + printProperties(); }
     virtual Factor belief (const Var &n) const { return _beliefs1[findVar(n)]; }
     virtual Factor belief (const VarSet &) const { assert(0); }

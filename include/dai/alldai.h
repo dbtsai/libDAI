@@ -105,6 +105,9 @@ static const char* DAINames[] = {
 #ifdef DAI_WITH_GIBBS
     Gibbs::Name,
 #endif
+#ifdef DAI_WITH_BP_DUAL
+    BP_dual::Name,
+#endif
 #ifdef DAI_WITH_CBP
     CBP::Name,
 #endif

@@ -593,7 +593,7 @@ double numericBBPTest(const BP_dual& bp_dual, bbp_cfn_t cfn, double bbpTol, doub
                 // XXX why is it off by a factor of 2?
                 adj_est.push_back((cf_prb-cf0)/h);
             }
-            Prob p_adj_est(adj_est);
+            Prob p_adj_est(adj_est.begin(), adj_est.end());
             // compare this numerical estimate to the BBP estimate; sum the distances
             cerr << "i: " << i
                  << ", p_adj_est: " << p_adj_est
@@ -643,14 +643,14 @@ double numericBBPTest(const BP_dual& bp_dual, bbp_cfn_t cfn, double bbpTol, doub
                     adj_m_est.push_back((cf_prb-cf0)/h);
                 }
 
-                Prob p_adj_n_est(adj_n_est);
+                Prob p_adj_n_est(adj_n_est.begin(), adj_n_est.end());
                 // compare this numerical estimate to the BBP estimate; sum the distances
                 cerr << "i: " << i << ", I: " << I
                      << ", adj_n_est: " << p_adj_n_est
                      << ", bbp.adj_n(i,I): " << bbp.adj_n(i,I) << endl;
                 d += dist(p_adj_n_est, bbp.adj_n(i,I), Prob::DISTL1);
 
-                Prob p_adj_m_est(adj_m_est);
+                Prob p_adj_m_est(adj_m_est.begin(), adj_m_est.end());
                 // compare this numerical estimate to the BBP estimate; sum the distances
                 cerr << "i: " << i << ", I: " << I
                      << ", adj_m_est: " << p_adj_m_est
@@ -676,7 +676,7 @@ double numericBBPTest(const BP_dual& bp_dual, bbp_cfn_t cfn, double bbpTol, doub
                 // add it to list of adjoints
                 adj_b_1_est.push_back((cf_prb-cf0)/h);
             }
-            Prob p_adj_b_1_est(adj_b_1_est);
+            Prob p_adj_b_1_est(adj_b_1_est.begin(), adj_b_1_est.end());
             // compare this numerical estimate to the BBP estimate; sum the distances
             cerr << "i: " << i
                  << ", adj_b_1_est: " << p_adj_b_1_est

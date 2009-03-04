@@ -30,7 +30,8 @@ void BP_dual::setProperties( const PropertySet &opts ) {
             die=true;
         }
     }
-    if(die) throw "BP_dual: Couldn't set properties";
+    if(die) 
+        DAI_THROW(NOT_ALL_PROPERTIES_SPECIFIED);
     
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
@@ -427,7 +428,7 @@ void _clamp(FactorGraph &g, const Var & n, const vector<size_t> &is ) {
     foreach(size_t i, is) { assert( i <= n.states() ); mask_n[i] = 1.0; }
 
     for( size_t I = 0; I < g.nrFactors(); I++ ) 
-        if( g.factor(I).vars() && n )
+        if( g.factor(I).vars().contains( n ) )
           g.factor(I) *= mask_n;
 }
 
