@@ -1,53 +1,83 @@
+/*  Copyright (C) 2009  Frederik Eaton [frederik at ofb dot net]
+
+    This file is part of libDAI.
+
+    libDAI is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    libDAI is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with libDAI; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+
+/// \file
+/// \brief Defines class BP_dual
+/// \todo Improve documentation
+/// \todo Clean up
+
+
 #ifndef ____defined_libdai_bp_dual_h__
 #define ____defined_libdai_bp_dual_h__
+
 
 #include <dai/daialg.h>
 #include <dai/factorgraph.h>
 #include <dai/enum.h>
 #include <dai/bp.h>
 
+
 namespace dai {
 
-using namespace std;
-
+    
 struct BP_dual_messages {
-  // messages:
-  // indexed by edge index (using VV2E)
-  vector<Prob> n;
-  vector<Real> Zn;
-  vector<Prob> m;
-  vector<Real> Zm;
+    // messages:
+    // indexed by edge index (using VV2E)
+    std::vector<Prob> n;
+    std::vector<Real> Zn;
+    std::vector<Prob> m;
+    std::vector<Real> Zm;
 };
+
 
 struct BP_dual_beliefs {
-  // beliefs:
-  // indexed by node
-  vector<Prob> b1;
-  vector<Real> Zb1;
-  // indexed by factor
-  vector<Prob> b2;
-  vector<Real> Zb2;
+    // beliefs:
+    // indexed by node
+    std::vector<Prob> b1;
+    std::vector<Real> Zb1;
+    // indexed by factor
+    std::vector<Prob> b2;
+    std::vector<Real> Zb2;
 };
 
-void _clamp(FactorGraph &g, const Var & n, const vector<size_t> &is );
 
-// clamp a factor to have one of a set of values
-void _clampFactor(FactorGraph &g, size_t I, const vector<size_t> &is);
+void _clamp( FactorGraph &g, const Var &n, const std::vector<size_t> &is );
+
+
+/// Clamp a factor to have one of a set of values
+void _clampFactor( FactorGraph &g, size_t I, const std::vector<size_t> &is );
+
 
 class BP_dual : public DAIAlgFG {
- public:
-        typedef vector<size_t>  _ind_t;
+    public:
+        typedef std::vector<size_t>  _ind_t;
 
- protected:
-
+    protected:
         // indexed by edge index. for each edge i->I, contains a
         // vector whose entries correspond to those of I, and the
         // value of each entry is the corresponding entry of i
-        vector<_ind_t>          _indices; 
+        std::vector<_ind_t>          _indices; 
 
         BP_dual_messages _msgs;
         BP_dual_messages _new_msgs;
- public:
+    public:
         BP_dual_beliefs _beliefs;
 
         size_t _iters;
@@ -81,10 +111,13 @@ class BP_dual : public DAIAlgFG {
         void upMsgM(size_t iI);
         void upMsgN(size_t iI);
 
-/*             DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL) */
+        /* DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL) */
         typedef BP::Properties::UpdateType UpdateType;
         UpdateType Updates() const { return props.updates; }
         size_t Verbose() const { return props.verbose; }
+
+        /// Default constructor
+        BP_dual() {}
 
         /// construct BP_dual object from FactorGraph
         BP_dual(const FactorGraph & fg, const PropertySet &opts) : DAIAlgFG(fg) {
@@ -116,8 +149,8 @@ class BP_dual : public DAIAlgFG {
         /// @name General InfAlg interface
         //@{
         virtual BP_dual* clone() const { return new BP_dual(*this); }
-/*         virtual BP_dual* create() const { return new BP_dual(); } */
-        virtual BP_dual* create() const { return NULL; }
+        virtual BP_dual* create() const { return new BP_dual(); }
+//        virtual BP_dual* create() const { return NULL; }
         virtual std::string identify() const;
         virtual Factor belief (const Var &n) const { return( belief1( findVar( n ) ) ); }
         virtual Factor belief (const VarSet &n) const;
@@ -130,7 +163,7 @@ class BP_dual : public DAIAlgFG {
         virtual size_t Iterations() const { return _iters; }
         //@}
 
-        void init(const vector<size_t>& state);
+        void init(const std::vector<size_t>& state);
         Factor belief1 (size_t i) const { return Factor(var(i), _beliefs.b1[i]); }
         Factor belief2 (size_t I) const { return Factor(factor(I).vars(), _beliefs.b2[I]); }
 
@@ -142,6 +175,8 @@ class BP_dual : public DAIAlgFG {
         std::string printProperties() const;
 };
 
-}
+
+} // end of namespace dai
+
 
 #endif
