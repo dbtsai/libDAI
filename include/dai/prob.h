@@ -455,7 +455,7 @@ template <typename T> class TProb {
                 arg = i;
               }
             }
-            return make_pair(arg,max);
+            return std::make_pair(arg,max);
         }
 
         /// Normalizes vector using the specified norm

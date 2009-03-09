@@ -383,7 +383,7 @@ template <typename T> class TFactor {
             if( _vs == ns )
                 return *this;
             else
-                return (*this) * TFactor<T>(ns / _vs, 1);
+                return (*this) * TFactor<T>(ns / _vs, (T)1);
         }
 
         /// Returns true if *this has NaN values
