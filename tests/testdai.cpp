@@ -253,6 +253,9 @@ int main( int argc, char *argv[] ) {
         cout << "error and relative logZ error (comparing with the results of" << endl;
         cout << "<method0>, the base method, for which one can use JTREE_HUGIN)." << endl << endl;
         cout << opts_required << opts_optional << endl;
+#ifdef DAI_DEBUG
+        cout << "This is a debugging (unoptimised) build of libdai" << endl;
+#endif
         return 1;
     }
 
