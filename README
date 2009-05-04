@@ -47,7 +47,7 @@ to the literature, to allow replication; (b) mention this software in the
 Acknowledgements section.  The appropriate citation is: 
 
 J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete 
-Approximate Inference methods", http://mloss.org/software/view/77/.
+Approximate Inference methods", http://www.libdai.org
 
 Moreover, as a personal note, I would appreciate it if you would email me with
 citations of papers referencing this work so I can mention them to my funding
@@ -99,7 +99,7 @@ provide a MatLab interface for easy integration with MatLab.
 
 Releases
 --------
-Releases can be obtained from http://mloss.org/software/view/77/
+Releases can be obtained from www.libdai.org
 License: GNU Public License v2 (or higher).
 
 libDAI-0.2      December 1, 2006

@@ -37,6 +37,7 @@
 #include <set>
 #include <cassert>
 #include <limits>
+#include <climits>   // Work-around for bug in boost graph library
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
