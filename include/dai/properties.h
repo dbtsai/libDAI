@@ -59,6 +59,16 @@ std::ostream& operator<< (std::ostream & os, const Property & p);
 /// Represents a set of properties, mapping keys (of type PropertyKey) to values (of type PropertyValue)
 class PropertySet : private std::map<PropertyKey, PropertyValue> {
     public:
+        /// Default constructor
+        PropertySet() {}
+
+        /// Construct PropertySet from a string
+        PropertySet( const std::string &s ) {
+            std::stringstream ss;
+            ss << s;
+            ss >> *this;
+        }
+
         /// Gets a property
         const PropertyValue & Get(const PropertyKey &key) const { 
             PropertySet::const_iterator x = find(key); 
@@ -114,14 +124,14 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
         template<typename ValueType>
         ValueType getStringAs(const PropertyKey &key) const { 
             PropertyValue val = Get(key);
-            if( val.type() == typeid(std::string) ) {
+            if( val.type() == typeid(ValueType) ) {
+                return boost::any_cast<ValueType>(val);
+            } else if( val.type() == typeid(std::string) ) {
                 std::stringstream ss;
                 ss << GetAs<std::string>(key);
                 ValueType result;
                 ss >> result;
                 return result;
-            } else if( val.type() == typeid(ValueType) ) {
-                return boost::any_cast<ValueType>(val);
             } else {
                 DAI_THROW(IMPOSSIBLE_TYPECAST);
                 return ValueType();
@@ -145,6 +155,15 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
 
         /// Check if a property with the given key exists
         bool hasKey(const PropertyKey &key) const { PropertySet::const_iterator x = find(key); return (x != this->end()); }
+
+        /// Returns a set containing all keys
+        std::set<PropertyKey> allKeys() const {
+            std::set<PropertyKey> res;
+            const_iterator i;
+            for( i = begin(); i != end(); i++ )
+                res.insert( i->first );
+            return res;
+        }
 
         // Friends
         friend std::ostream& operator<< (std::ostream & os, const PropertySet & ps);

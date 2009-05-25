@@ -52,17 +52,28 @@
 #define foreach BOOST_FOREACH
 
 #ifdef DAI_DEBUG
-#define DAI_PV(x) do {std::cerr << #x "= " << x << std::endl;} while(0)
+/// \brief "Print variable". Prints the text of an expression, followed by its value (only if DAI_DEBUG is defined)
+/**
+ *  Useful debugging macro to see what your code is doing. 
+ *  Example: \code DAI_PV(3+4) \endcode
+ */ Output: \code 3+4= 7 \endcode
+#define DAI_PV(x) do {std::cerr << #x "= " << (x) << std::endl;} while(0)
+/// "Debugging message": Prints a message (only if DAI_DEBUG is defined)
 #define DAI_DMSG(str) do {std::cerr << str << std::endl;} while(0)
 #else
 #define DAI_PV(x) do {} while(0)
 #define DAI_DMSG(str) do {} while(0)
 #endif
 
+/// Produces accessor and mutator methods according to the common pattern.
+/** Example:
+ *  \code DAI_ACCMUT(size_t& maxIter(), { return props.maxiter; }); \endcode
+ *  \todo At the moment, only the mutator appears in doxygen documentation.
 #define DAI_ACCMUT(x,y)                     \
       x y;                                  \
       const x const y;
 
+/// Macro to give error message \a stmt if props.verbose>=\a n
 #define DAI_IFVERB(n, stmt) if(props.verbose>=n) { cerr << stmt; }
 
 
@@ -157,6 +168,17 @@ std::ostream& operator << (std::ostream& os, const std::pair<T1,T2> & x) {
     return os;
 }
 
+/// Concatenate two vectors
+template<class T>
+std::vector<T> concata (const std::vector<T>& u, const std::vector<T>& v ) {
+    std::vector<T> w;
+    w.reserve( u.size() + v.size() );
+    for( size_t i = 0; i < u.size(); i++ )
+        w.push_back( u[i] );
+    for( size_t i = 0; i < v.size(); i++ )
+        w.push_back( v[i] );
+    return w;
+}
 
 /// Used to keep track of the progress made by iterative algorithms
 class Diffs : public std::vector<double> {

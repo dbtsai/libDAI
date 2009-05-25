@@ -55,7 +55,7 @@ class InfAlg {
         virtual InfAlg* clone() const = 0;
 
         /// Returns a pointer to a newly constructed object *this (i.e., virtual default constructor)
-        virtual InfAlg* create() const = 0;
+        virtual InfAlg* create() const { DAI_THROW(NOT_IMPLEMENTED); }
         
         /// Identifies itself for logging purposes
         virtual std::string identify() const = 0;
@@ -65,6 +65,18 @@ class InfAlg {
 
         /// Returns the "belief" (i.e., approximate marginal probability distribution) of a set of variables
         virtual Factor belief( const VarSet &n ) const = 0;
+
+        /// Returns marginal for a variable.
+        /** Sometimes preferred to belief() for performance reasons.
+          * Faster implementations exist in e.g. BP.
+          */
+        virtual Factor beliefV( size_t i ) const { return belief( fg().var(i) ); }
+
+        /// Returns marginal for a factor.
+        /** Sometimes preferred to belief() for performance reasons.
+          * Faster implementations exist in e.g. BP.
+          */
+        virtual Factor beliefF( size_t I ) const { return belief( fg().factor(I).vars() ); }
 
         /// Returns all "beliefs" (i.e., approximate marginal probability distribution) calculated by the algorithm
         virtual std::vector<Factor> beliefs() const = 0;
