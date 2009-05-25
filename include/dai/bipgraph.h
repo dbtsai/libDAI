@@ -56,14 +56,59 @@ namespace dai {
  */
 class BipartiteGraph {
     public:
-        /// Describes a neighboring node of some other node in a BipartiteGraph.
-        /** A Neighbor structure has three members: \a iter, \a node and \a dual. The \a 
-         *  node member is the most important member: it contains the index of the neighboring node. The \a iter 
-         *  member is useful for iterating over neighbors, and contains the index of this Neighbor entry in the
-         *  corresponding BipartiteGraph::Neighbors variable. The \a dual member is useful to find the dual Neighbor 
-         *  element: a pair of neighboring nodes can be either specified as a node of type 1 and a neighbor of type 
-         *  2, or as a node of type 2 and a neighbor of type 1; the \a dual member contains the index of the dual 
-         *  Neighbor element (see the example for another explanation of the dual member).
+        /// Describes the neighbor relationship of two nodes in a BipartiteGraph.
+        /** Sometimes we want to do an action, such as sending a
+         *  message, for all edges in a graph. However, most graphs
+         *  will be sparse, so we need some way of storing a set of
+         *  the neighbors of a node, which is both fast and
+         *  memory-efficient. We also need to be able to go between
+         *  viewing node \a A as a neighbor of node \a B, and node \a
+         *  B as a neighbor of node \a A. The Neighbor struct solves
+         *  both of these problems. Each node has a list of neighbors,
+         *  stored as a vector<Neighbor>, and extra information is
+         *  included in the Neighbor struct which allows us to access
+         *  a node as a neighbor of its neighbor (the \a dual member).
+         *
+         *  By convention, variable identifiers naming indices into a
+         *  vector of neighbors are prefixed with an underscore ("_"). 
+         *  The neighbor list which they point into is then understood
+         *  from context. For example:
+         *
+         *  \code
+         *  void BP::calcNewMessage( size_t i, size_t _I )
+         *  \endcode
+         *
+         *  Here, \a i is the "absolute" index of node i, but \a _I is
+         *  understood as a "relative" index, giving node I's entry in
+         *  nb1(i). The corresponding Neighbor structure can be
+         *  accessed as nb1(i,_I) or nb1(i)[_I]. The absolute index of
+         *  \a _I, which would be called \a I, can be recovered from
+         *  the \a node member: nb1(i,_I).node. The \a iter member
+         *  gives the relative index \a _I, and the \a dual member
+         *  gives the "dual" relative index, i.e. the index of \a i in
+         *  \a I's neighbor list.
+         *
+         *  \code
+         *  Neighbor n = nb1(i,_I);
+         *  n.node == I &&
+         *  n.iter == _I &&
+         *  nb2(n.node,n.dual).node == i
+         *  \endcode
+         *
+         *  In a FactorGraph, nb1 is called nbV, and nb2 is called
+         *  nbF.
+         *
+         *  There is no easy way to transform a pair of absolute node
+         *  indices \a i and \a I into a Neighbor structure relative
+         *  to one of the nodes. Such a feature has never yet been
+         *  found to be necessary. Iteration over edges can always be
+         *  accomplished using the Neighbor lists, and by writing
+         *  functions that accept relative indices:
+         *  \code
+         *  for( size_t i = 0; i < nrVars(); ++i )
+         *      foreach( const Neighbor &I, nbV(i) )
+         *          calcNewMessage( i, I.iter );
+         *  \endcode
          */
         struct Neighbor {
             /// Corresponds to the index of this Neighbor entry in the vector of neighbors
