@@ -24,155 +24,93 @@
 /// \todo Clean up
 
 
-#ifndef ____defined_libdai_bp_dual_h__
-#define ____defined_libdai_bp_dual_h__
+#ifndef __defined_libdai_bp_dual_h
+#define __defined_libdai_bp_dual_h
 
 
 #include <dai/daialg.h>
 #include <dai/factorgraph.h>
 #include <dai/enum.h>
-#include <dai/bp.h>
 
 
 namespace dai {
 
-    
-struct BP_dual_messages {
-    // messages:
-    // indexed by edge index (using VV2E)
-    std::vector<Prob> n;
-    std::vector<Real> Zn;
-    std::vector<Prob> m;
-    std::vector<Real> Zm;
-};
 
+/** Class to estimate "dual" versions of BP messages, and normalizers, given an InfAlg. 
+ *  These are computed from the variable and factor beliefs of the InfAlg.
+ *  This class is used primarily by BBP.
+ */
+class BP_dual {
 
-struct BP_dual_beliefs {
-    // beliefs:
-    // indexed by node
-    std::vector<Prob> b1;
-    std::vector<Real> Zb1;
-    // indexed by factor
-    std::vector<Prob> b2;
-    std::vector<Real> Zb2;
-};
+protected:
+    template<class T>
+    struct _edges_t : public std::vector<std::vector<T> > {};
 
+    struct messages {
+        // messages:
+        _edges_t<Prob> n;
+        _edges_t<Real> Zn;
+        _edges_t<Prob> m;
+        _edges_t<Real> Zm;
+    };
+    messages _msgs;
 
-void _clamp( FactorGraph &g, const Var &n, const std::vector<size_t> &is );
+    struct beliefs {
+        // beliefs:
+        // indexed by node
+        std::vector<Prob> b1;
+        std::vector<Real> Zb1;
+        // indexed by factor
+        std::vector<Prob> b2;
+        std::vector<Real> Zb2;
+    };
+    beliefs _beliefs;
 
-
-/// Clamp a factor to have one of a set of values
-void _clampFactor( FactorGraph &g, size_t I, const std::vector<size_t> &is );
-
-
-class BP_dual : public DAIAlgFG {
-    public:
-        typedef std::vector<size_t>  _ind_t;
-
-    protected:
-        // indexed by edge index. for each edge i->I, contains a
-        // vector whose entries correspond to those of I, and the
-        // value of each entry is the corresponding entry of i
-        std::vector<_ind_t>          _indices; 
-
-        BP_dual_messages _msgs;
-        BP_dual_messages _new_msgs;
-    public:
-        BP_dual_beliefs _beliefs;
-
-        size_t _iters;
-        double _maxdiff;
-
-        struct Properties {
-          typedef BP::Properties::UpdateType UpdateType;
-          UpdateType updates;
-          double tol;
-          size_t maxiter;
-          size_t verbose;
-        } props;
-
-        /// List of property names
-        static const char *PropertyList[];
-        /// Name of this inference algorithm
-        static const char *Name;
-
-    public:
-        void Regenerate(); // used by constructor
-        void RegenerateIndices();
-        void RegenerateMessages();
-        void RegenerateBeliefs();
-
-        void CalcBelief1(size_t i);
-        void CalcBelief2(size_t I);
-        void CalcBeliefs(); // called after run()
-
-        void calcNewM(size_t iI);
-        void calcNewN(size_t iI);
-        void upMsgM(size_t iI);
-        void upMsgN(size_t iI);
-
-        /* DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL) */
-        typedef BP::Properties::UpdateType UpdateType;
-        UpdateType Updates() const { return props.updates; }
-        size_t Verbose() const { return props.verbose; }
-
-        /// Default constructor
-        BP_dual() {}
-
-        /// construct BP_dual object from FactorGraph
-        BP_dual(const FactorGraph & fg, const PropertySet &opts) : DAIAlgFG(fg) {
-            setProperties(opts);
-            Regenerate();
-        }
+    const InfAlg *_ia;
         
-        DAI_ACCMUT(Prob & msgM(size_t I, size_t i), { return _msgs.m[VV2E(i,I)]; });
-        DAI_ACCMUT(Prob & msgN(size_t i, size_t I), { return _msgs.n[VV2E(i,I)]; });
-        DAI_ACCMUT(Prob & msgM(size_t iI), { return _msgs.m[iI]; });
-        DAI_ACCMUT(Prob & msgN(size_t iI), { return _msgs.n[iI]; });
-        DAI_ACCMUT(Real & zM(size_t I, size_t i), { return _msgs.Zm[VV2E(i,I)]; });
-        DAI_ACCMUT(Real & zN(size_t i, size_t I), { return _msgs.Zn[VV2E(i,I)]; });
-        DAI_ACCMUT(Real & zM(size_t iI), { return _msgs.Zm[iI]; });
-        DAI_ACCMUT(Real & zN(size_t iI), { return _msgs.Zn[iI]; });
-        DAI_ACCMUT(Prob & newMsgM(size_t I, size_t i), { return _new_msgs.m[VV2E(i,I)]; });
-        DAI_ACCMUT(Prob & newMsgN(size_t i, size_t I), { return _new_msgs.n[VV2E(i,I)]; });
-        DAI_ACCMUT(Real & newZM(size_t I, size_t i), { return _new_msgs.Zm[VV2E(i,I)]; });
-        DAI_ACCMUT(Real & newZN(size_t i, size_t I), { return _new_msgs.Zn[VV2E(i,I)]; });
+    void Init();
 
-        DAI_ACCMUT(_ind_t & index(size_t i, size_t I), { return( _indices[VV2E(i,I)] ); });
+    void RegenerateMessages();
+    void RegenerateBeliefs();
 
-        Real belief1Z(size_t i) const { return _beliefs.Zb1[i]; }
-        Real belief2Z(size_t I) const { return _beliefs.Zb2[I]; }
+    void CalcMessages();
+    void CalcBeliefV(size_t i);
+    void CalcBeliefF(size_t I);
+    void CalcBeliefs();
 
-        size_t doneIters() const { return _iters; }
+    void calcNewM(size_t i, size_t _I);
+    void calcNewN(size_t i, size_t _I);
+public:
 
+    /// Construct BP_dual object from (converged) InfAlg object's beliefs and factors. 
+    /*  A pointer to the the InfAlg object is
+     *  stored, so the object must not be destroyed before the BP_dual
+     */
+    BP_dual(const InfAlg *ia) : _ia(ia) {
+        Init();
+    }
 
-        /// @name General InfAlg interface
-        //@{
-        virtual BP_dual* clone() const { return new BP_dual(*this); }
-        virtual BP_dual* create() const { return new BP_dual(); }
-//        virtual BP_dual* create() const { return NULL; }
-        virtual std::string identify() const;
-        virtual Factor belief (const Var &n) const { return( belief1( findVar( n ) ) ); }
-        virtual Factor belief (const VarSet &n) const;
-        virtual std::vector<Factor> beliefs() const;
-        virtual Real logZ() const;
-        virtual void init();
-        virtual void init( const VarSet &ns );
-        virtual double run();
-        virtual double maxDiff() const { return _maxdiff; }
-        virtual size_t Iterations() const { return _iters; }
-        //@}
+    const FactorGraph& fg() const { return _ia->fg(); }
 
-        void init(const std::vector<size_t>& state);
-        Factor belief1 (size_t i) const { return Factor(var(i), _beliefs.b1[i]); }
-        Factor belief2 (size_t I) const { return Factor(factor(I).vars(), _beliefs.b2[I]); }
+    /// msgM: factor -> var messages
+    DAI_ACCMUT(Prob & msgM(size_t i, size_t _I), { return _msgs.m[i][_I]; });
+    /// msgN: var -> factor messages
+    DAI_ACCMUT(Prob & msgN(size_t i, size_t _I), { return _msgs.n[i][_I]; });
+    /// Normalizer for msgM
+    DAI_ACCMUT(Real & zM(size_t i, size_t _I), { return _msgs.Zm[i][_I]; });
+    /// Normalizer for msgN
+    DAI_ACCMUT(Real & zN(size_t i, size_t _I), { return _msgs.Zn[i][_I]; });
 
-        void updateMaxDiff( double maxdiff ) { if( maxdiff > _maxdiff ) _maxdiff = maxdiff; }
+    /// Variable beliefs
+    Factor beliefV(size_t i) const { return Factor(_ia->fg().var(i), _beliefs.b1[i]); }
+    /// Factor beliefs
+    Factor beliefF(size_t I) const { return Factor(_ia->fg().factor(I).vars(), _beliefs.b2[I]); }
 
-        /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
+    /// Normalizer for variable beliefs
+    Real beliefVZ(size_t i) const { return _beliefs.Zb1[i]; }
+    /// Normalizer for factor beliefs
+    Real beliefFZ(size_t I) const { return _beliefs.Zb2[I]; }
+
 };
 
 
