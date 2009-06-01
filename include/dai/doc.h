@@ -207,6 +207,12 @@
  *  "Sufficient Conditions for Convergence of the Sum-Product Algorithm",
  *  <em>IEEE Transactions on Information Theory</em> 53(12):4422-4437.
  *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=4385778
+ *
+ *  \anchor EaG09 \ref EaG09
+ *  F. Eaton and Z. Ghahramani (2009):
+ *  "Choosing a Variable to Clamp",
+ *  <em>Proceedings of the Twelfth International Conference on Artificial Intelligence and Statistics (AISTATS 2009)</em> 5:145-152
+ *  http://jmlr.csail.mit.edu/proceedings/papers/v5/eaton09a/eaton09a.pdf
  */
 
 

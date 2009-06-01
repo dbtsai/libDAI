@@ -1,35 +1,65 @@
-#ifndef ____defined_libdai_cbp_h__
-#define ____defined_libdai_cbp_h__
+/*  Copyright (C) 2009  Frederik Eaton [frederik at ofb dot net]
+
+    This file is part of libDAI.
+
+    libDAI is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    libDAI is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with libDAI; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+
+/// \file
+/// \brief Defines class CBP [\ref EaG09]
+/// \todo Improve documentation
+/// \todo Clean up
+
+
+#ifndef __defined_libdai_cbp_h
+#define __defined_libdai_cbp_h
+
+
+#include <fstream>
+
+#include <boost/shared_ptr.hpp>
 
 #include <dai/daialg.h>
 
 #include <dai/cbp.h>
 #include <dai/bbp.h>
 
-using namespace std;
-
-/* Class for "clamped belief propagation".
-
-'chooseNextClamp' can be overridden (e.g. in BPC); this version
-randomly chooses variables to clamp.
-*/
 
 namespace dai {
 
-template<class T>
-vector<T> concat(const vector<T>& u, const vector<T>& v) {
-    vector<T> w;
-    w.reserve(u.size()+v.size());
-    for(size_t i=0; i<u.size(); i++)
-        w.push_back(u[i]);
-    for(size_t i=0; i<v.size(); i++)
-        w.push_back(v[i]);
-    return w;
-}
 
+/// Find a variable to clamp using BBP (goes with maximum adjoint) 
+/// \see BBP
+std::pair<size_t, size_t> bbpFindClampVar(const InfAlg &in_bp, bool clampingVar,
+            const PropertySet &bbp_props, bbp_cfn_t cfn, 
+            Real *maxVarOut);
+
+
+/// Class for CBP (Clamped Belief Propagation)
+/** This algorithm uses configurable heuristics to choose a variable
+ *  x_i and a state x_i*. Inference is done with x_i "clamped" to x_i*
+ *  (e.g. conditional on x_i==x_i*), and also with the negation of this
+ *  condition. Clamping is done recursively up to a fixed number of
+ *  levels (other stopping criteria are also implemented, see
+ *  "recursion" property). The resulting approximate marginals are
+ *  combined using logZ estimates.
+ */
 class CBP : public DAIAlgFG {
-    vector<Factor> _beliefs1;
-    vector<Factor> _beliefs2;
+    std::vector<Factor> _beliefsV;
+    std::vector<Factor> _beliefsF;
     double _logZ;
     double _est_logZ;
     double _old_est_logZ;
@@ -37,10 +67,7 @@ class CBP : public DAIAlgFG {
     double _sum_level;
     size_t _num_leaves;
 
-    size_t maxClampLevel() { return props.max_levels; }
-    double minMaxAdj() { return props.min_max_adj; }
-    double recTol() { return props.rec_tol; }
-
+    boost::shared_ptr<std::ofstream> _clamp_ofstream;
 
     bbp_cfn_t BBP_cost_function() {
       return props.bbp_cfn;
@@ -48,67 +75,70 @@ class CBP : public DAIAlgFG {
 
     void printDebugInfo();
 
-    void runRecurse(BP_dual &bp_dual,
+    /// Called by 'run', and by itself. Implements the main algorithm. 
+    /** Chooses a variable to clamp, recurses, combines the logZ and
+     *  beliefs estimates of the children, and returns the improved
+     *  estimates in \a lz_out and \a beliefs_out to its parent
+     */
+    void runRecurse(InfAlg *bp,
                     double orig_logZ,
-                    vector<size_t> clamped_vars_list,
-                    set<size_t> clamped_vars,
+                    std::vector<size_t> clamped_vars_list,
                     size_t &num_leaves,
+                    size_t &choose_count,
                     double &sum_level,
-                    Real &lz_out, vector<Factor>& beliefs_out);
+                    Real &lz_out,
+                    std::vector<Factor>& beliefs_out);
 
-    BP getBP();
-    BP_dual getBP_dual();
+    /// Choose the next variable to clamp
+    /** Choose the next variable to clamp, given a converged InfAlg (\a bp),
+     *  and a vector of variables that are already clamped (\a
+     *  clamped_vars_list). Returns the chosen variable in \a i, and
+     *  the set of states in \a xis. If \a maxVarOut is non-NULL and
+     *  props.choose==CHOOSE_BBP then it is used to store the
+     *  adjoint of the chosen variable
+     */
+    virtual bool chooseNextClampVar(InfAlg* bp,
+                                    std::vector<size_t> &clamped_vars_list,
+                                    size_t &i, std::vector<size_t> &xis, Real *maxVarOut);
 
-  public:
+    /// Return the InfAlg to use at each step of the recursion. 
+    /// \todo At present, only returns a BP instance
+    InfAlg* getInfAlg();
+
     size_t _iters;
     double _maxdiff;
 
-    struct Properties {
-      typedef BP::Properties::UpdateType UpdateType;
-      DAI_ENUM(RecurseType,REC_FIXED,REC_LOGZ,REC_BDIFF);
-      DAI_ENUM(ChooseMethodType,CHOOSE_RANDOM,CHOOSE_BBP,CHOOSE_BP_ALL);
-      DAI_ENUM(ClampType,CLAMP_VAR,CLAMP_FACTOR);
+    void setBeliefs(const std::vector<Factor>& bs, double logZ) {
+        size_t i=0;
+        _beliefsV.clear(); _beliefsV.reserve(nrVars());
+        _beliefsF.clear(); _beliefsF.reserve(nrFactors());
+        for(i=0; i<nrVars(); i++) _beliefsV.push_back(bs[i]);
+        for(; i<nrVars()+nrFactors(); i++) _beliefsF.push_back(bs[i]);
+        _logZ = logZ;
+    }
 
-      double tol;
-      double rec_tol;
-      size_t maxiter;
-      size_t verbose;
-      UpdateType updates;
-      size_t max_levels;
-      double min_max_adj;
+    void construct();
 
-      ChooseMethodType choose;
-      RecurseType recursion;
-      ClampType clamp;
-      bbp_cfn_t bbp_cfn;
-      size_t rand_seed;
-    } props;
-
-    Properties::ChooseMethodType ChooseMethod() { return props.choose; }
-    Properties::RecurseType Recursion() { return props.recursion; }
-    Properties::ClampType Clamping() { return props.clamp; }
+  public:
 
     //----------------------------------------------------------------
 
-    // construct CBP object from FactorGraph
+    /// construct CBP object from FactorGraph
     CBP(const FactorGraph &fg, const PropertySet &opts) : DAIAlgFG(fg) {
-        setProperties(opts);
+        props.set(opts);
         construct();
     }
 
     static const char *Name;
-    /// List of property names
-    static const char *PropertyList[];
 
     /// @name General InfAlg interface
     //@{
     virtual CBP* clone() const { return new CBP(*this); }
-//     virtual CBP* create() const { return new CBP(); }
     virtual CBP* create() const { DAI_THROW(NOT_IMPLEMENTED); }
-    virtual std::string identify() const { return string(Name) + printProperties(); }
-    virtual Factor belief (const Var &n) const { return _beliefs1[findVar(n)]; }
+    virtual std::string identify() const { return std::string(Name) + props.toString(); }
+    virtual Factor belief (const Var &n) const { return _beliefsV[findVar(n)]; }
     virtual Factor belief (const VarSet &) const { assert(0); }
-    virtual vector<Factor> beliefs() const { return concat(_beliefs1, _beliefs2); }
+    virtual std::vector<Factor> beliefs() const { return concat(_beliefsV, _beliefsF); }
     virtual Real logZ() const { return _logZ; }
     virtual void init() {};
     virtual void init( const VarSet & ) {};
@@ -117,39 +147,119 @@ class CBP : public DAIAlgFG {
     virtual size_t Iterations() const { return _iters; }
     //@}
 
+    Factor beliefV (size_t i) const { return _beliefsV[i]; }
+    Factor beliefF (size_t I) const { return _beliefsF[I]; }
 
     //----------------------------------------------------------------
 
-    virtual bool chooseNextClampVar(BP_dual& bp,
-                                    vector<size_t> &clamped_vars_list,
-                                    set<size_t> &clamped_vars,
-                                    size_t &i, vector<size_t> &xis, Real *maxVarOut);
+ public:
+/* PROPERTIES(props,CBP) {
+        typedef BP::Properties::UpdateType UpdateType;
+        DAI_ENUM(RecurseType,REC_FIXED,REC_LOGZ,REC_BDIFF);
+        DAI_ENUM(ChooseMethodType,CHOOSE_RANDOM,CHOOSE_MAXENT,CHOOSE_BBP,CHOOSE_BP_L1,CHOOSE_BP_CFN);
+        DAI_ENUM(ClampType,CLAMP_VAR,CLAMP_FACTOR);
+        
+        size_t verbose = 0;
 
-    //----------------------------------------------------------------
+        /// Tolerance to use in BP
+        double tol;
+        /// Update style for BP
+        UpdateType updates;
+        /// Maximum number of iterations for BP
+        size_t maxiter;
 
-    void setBeliefsFrom(const BP& b);
-    void setBeliefs(const vector<Factor>& bs, double logZ) {
-        size_t i=0;
-        _beliefs1.clear(); _beliefs1.reserve(nrVars());
-        _beliefs2.clear(); _beliefs2.reserve(nrFactors());
-        for(i=0; i<nrVars(); i++) _beliefs1.push_back(bs[i]);
-        for(; i<nrVars()+nrFactors(); i++) _beliefs2.push_back(bs[i]);
-        _logZ = logZ;
-    }
-    Factor belief1 (size_t i) const { return _beliefs1[i]; }
-    Factor belief2 (size_t I) const { return _beliefs2[I]; }
+        /// Tolerance to use for controlling recursion depth (\a recurse
+        /// is REC_LOGZ or REC_BDIFF)
+        double rec_tol;
+        /// Maximum number of levels of recursion (\a recurse is REC_FIXED)
+        size_t max_levels = 10;
+        /// If choose=CHOOSE_BBP and maximum adjoint is less than this value, don't recurse
+        double min_max_adj;
+        /// Heuristic for choosing clamping variable
+        ChooseMethodType choose;
+        /// Method for deciding when to stop recursing
+        RecurseType recursion;
+        /// Whether to clamp variables or factors
+        ClampType clamp;
+        /// Properties to pass to BBP
+        PropertySet bbp_props;
+        /// Cost function to use for BBP
+        bbp_cfn_t bbp_cfn;
+        /// Random seed
+        size_t rand_seed = 0;
 
-    //----------------------------------------------------------------
+        /// If non-empty, write clamping choices to this file
+        std::string clamp_outfile = "";
+   }
+*/
+/* {{{ GENERATED CODE: DO NOT EDIT. Created by 
+    ./scripts/regenerate-properties include/dai/cbp.h src/cbp.cpp 
+*/
+    struct Properties {
+        typedef BP::Properties::UpdateType UpdateType;
+        DAI_ENUM(RecurseType,REC_FIXED,REC_LOGZ,REC_BDIFF);
+        DAI_ENUM(ChooseMethodType,CHOOSE_RANDOM,CHOOSE_MAXENT,CHOOSE_BBP,CHOOSE_BP_L1,CHOOSE_BP_CFN);
+        DAI_ENUM(ClampType,CLAMP_VAR,CLAMP_FACTOR);
+        size_t verbose;
+        /// Tolerance to use in BP
+        double tol;
+        /// Update style for BP
+        UpdateType updates;
+        /// Maximum number of iterations for BP
+        size_t maxiter;
+        /// Tolerance to use for controlling recursion depth (\a recurse
+        /// is REC_LOGZ or REC_BDIFF)
+        double rec_tol;
+        /// Maximum number of levels of recursion (\a recurse is REC_FIXED)
+        size_t max_levels;
+        /// If choose=CHOOSE_BBP and maximum adjoint is less than this value, don't recurse
+        double min_max_adj;
+        /// Heuristic for choosing clamping variable
+        ChooseMethodType choose;
+        /// Method for deciding when to stop recursing
+        RecurseType recursion;
+        /// Whether to clamp variables or factors
+        ClampType clamp;
+        /// Properties to pass to BBP
+        PropertySet bbp_props;
+        /// Cost function to use for BBP
+        bbp_cfn_t bbp_cfn;
+        /// Random seed
+        size_t rand_seed;
+        /// If non-empty, write clamping choices to this file
+        std::string clamp_outfile;
 
-    void construct();
+        /// Set members from PropertySet
+        void set(const PropertySet &opts);
+        /// Get members into PropertySet
+        PropertySet get() const;
+        /// Convert to a string which can be parsed as a PropertySet
+        std::string toString() const;
+    } props;
+/* }}} END OF GENERATED CODE */
 
-    void setProperties( const PropertySet &opts );
-    PropertySet getProperties() const;
-    std::string printProperties() const;
+    Properties::ChooseMethodType ChooseMethod() { return props.choose; }
+    Properties::RecurseType Recursion() { return props.recursion; }
+    Properties::ClampType Clamping() { return props.clamp; }
+    size_t maxClampLevel() { return props.max_levels; }
+    double minMaxAdj() { return props.min_max_adj; }
+    double recTol() { return props.rec_tol; }
 };
 
-pair<size_t, size_t> bbpFindClampVar(BP_dual &in_bp_dual, bool clampVar, size_t numClamped, bbp_cfn_t cfn, const PropertySet &props, Real *maxVarOut);
+/// Given a sorted vector of states \a xis and total state count \a n_states, return a vector of states not in \a xis
+std::vector<size_t> complement( std::vector<size_t>& xis, size_t n_states );
 
-}
+/// Computes \f$\frac{\exp(a)}{\exp(a)+\exp(b)}\f$
+Real unSoftMax( Real a, Real b );
+
+/// Computes log of sum of exponents, i.e., \f$\log\left(\exp(a) + \exp(b)\right)\f$
+Real logSumExp( Real a, Real b );
+
+/// Compute sum of pairwise L-infinity distances of the first \a nv factors in each vector
+Real dist( const std::vector<Factor>& b1, const std::vector<Factor>& b2, size_t nv );
+
+
+} // end of namespace dai
+
 
 #endif
