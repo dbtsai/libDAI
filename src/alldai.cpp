@@ -67,15 +67,29 @@ InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const PropertySet 
     if( name == Gibbs::Name )
         return new Gibbs (fg, opts);
 #endif
-#ifdef DAI_WITH_BP_DUAL
-    if( name == BP_dual::Name )
-        return new BP_dual (fg, opts);
-#endif
 #ifdef DAI_WITH_CBP
     if( name == CBP::Name )
         return new CBP (fg, opts);
 #endif
     DAI_THROW(UNKNOWN_DAI_ALGORITHM);
+}
+
+
+/// \todo Make alias file non-testdai-specific, and use it in newInfAlgFromString
+InfAlg *newInfAlgFromString( const std::string &s, const FactorGraph &fg ) {
+    string::size_type pos = s.find_first_of('[');
+    string name;
+    PropertySet opts;
+    if( pos == string::npos ) {
+        name = s;
+    } else {
+        name = s.substr(0,pos);
+
+        stringstream ss;
+        ss << s.substr(pos,s.length());
+        ss >> opts;
+    }
+    return newInfAlg(name,fg,opts);
 }
 
 

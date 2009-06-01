@@ -78,13 +78,9 @@ ifdef WITH_GIBBS
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_GIBBS
   OBJECTS:=$(OBJECTS) gibbs$(OE)
 endif
-ifdef WITH_BP_DUAL
-  CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP_DUAL
-  OBJECTS:=$(OBJECTS) bp_dual$(OE)
-endif
 ifdef WITH_CBP
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_CBP
-  OBJECTS:=$(OBJECTS) bbp$(OE) cbp$(OE)
+  OBJECTS:=$(OBJECTS) bbp$(OE) cbp$(OE) bp_dual$(OE)
 endif
 
 

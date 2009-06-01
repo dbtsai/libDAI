@@ -495,6 +495,8 @@ void BP::init( const VarSet &ns ) {
 
 
 void BP::updateMessage( size_t i, size_t _I ) {
+    if( recordSentMessages )
+        _sentMessages.push_back(make_pair(i,_I));
     if( props.damping == 0.0 ) {
         message(i,_I) = newMessage(i,_I);
         if( props.updates == Properties::UpdateType::SEQMAX )

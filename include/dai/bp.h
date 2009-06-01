@@ -57,6 +57,8 @@ class BP : public DAIAlgFG {
         double _maxdiff;
         /// Number of iterations needed
         size_t _iters;
+        /// The history of message updates (only recorded if recordSentMessages is true)
+        std::vector<std::pair<std::size_t, std::size_t> > _sentMessages;
     
     public:
         /// Parameters of this inference algorithm
@@ -92,12 +94,18 @@ class BP : public DAIAlgFG {
         /// Name of this inference algorithm
         static const char *Name;
 
+        /// Specifies whether the history of message updates should be recorded
+        bool recordSentMessages;
+
     public:
         /// Default constructor
-        BP() : DAIAlgFG(), _edges(), _edge2lut(), _lut(), _maxdiff(0.0), _iters(0U), props() {}
+        BP() : DAIAlgFG(), _edges(), _edge2lut(), _lut(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {}
 
         /// Copy constructor
-        BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _edge2lut(x._edge2lut), _lut(x._lut), _maxdiff(x._maxdiff), _iters(x._iters), props(x.props) {
+        BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _edge2lut(x._edge2lut),
+            _lut(x._lut), _maxdiff(x._maxdiff), _iters(x._iters), _sentMessages(x._sentMessages), 
+            props(x.props), recordSentMessages(x.recordSentMessages) 
+        {
             for( LutType::iterator l = _lut.begin(); l != _lut.end(); ++l )
                 _edge2lut[l->second.first][l->second.second] = l;
         }
@@ -112,13 +120,15 @@ class BP : public DAIAlgFG {
                     _edge2lut[l->second.first][l->second.second] = l;
                 _maxdiff = x._maxdiff;
                 _iters = x._iters;
+                _sentMessages = x._sentMessages;
                 props = x.props;
+                recordSentMessages = x.recordSentMessages;
             }
             return *this;
         }
 
         /// Construct from FactorGraph fg and PropertySet opts
-        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), props() {
+        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {
             setProperties( opts );
             construct();
         }
@@ -151,6 +161,16 @@ class BP : public DAIAlgFG {
         /** Assumes that run() has been called and that props.inference == MAXPROD
          */
         std::vector<std::size_t> findMaximum() const;
+
+        /// Returns history of sent messages
+        const std::vector<std::pair<std::size_t, std::size_t> >& getSentMessages() const {
+            return _sentMessages;
+        }
+
+        /// Clears history of sent messages
+        void clearSentMessages() {
+            _sentMessages.clear();
+        }
 
     private:
         const Prob & message(size_t i, size_t _I) const { return _edges[i][_I].message; }

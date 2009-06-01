@@ -56,7 +56,8 @@
 /**
  *  Useful debugging macro to see what your code is doing. 
  *  Example: \code DAI_PV(3+4) \endcode
- */ Output: \code 3+4= 7 \endcode
+ *  Output: \code 3+4= 7 \endcode
+ */
 #define DAI_PV(x) do {std::cerr << #x "= " << (x) << std::endl;} while(0)
 /// "Debugging message": Prints a message (only if DAI_DEBUG is defined)
 #define DAI_DMSG(str) do {std::cerr << str << std::endl;} while(0)
@@ -69,6 +70,7 @@
 /** Example:
  *  \code DAI_ACCMUT(size_t& maxIter(), { return props.maxiter; }); \endcode
  *  \todo At the moment, only the mutator appears in doxygen documentation.
+ */
 #define DAI_ACCMUT(x,y)                     \
       x y;                                  \
       const x const y;
@@ -130,6 +132,11 @@ double rnd_stdnormal();
 /// Returns a random integer in interval [min, max]
 int rnd_int( int min, int max );
 
+/// Returns a random integer in the half-open interval \f$[0,n)\f$
+inline int rnd( int n) {
+    return rnd_int( 0, n-1 );
+}
+
 
 /// Writes a std::vector to a std::ostream
 template<class T> 
@@ -170,7 +177,7 @@ std::ostream& operator << (std::ostream& os, const std::pair<T1,T2> & x) {
 
 /// Concatenate two vectors
 template<class T>
-std::vector<T> concata (const std::vector<T>& u, const std::vector<T>& v ) {
+std::vector<T> concat (const std::vector<T>& u, const std::vector<T>& v ) {
     std::vector<T> w;
     w.reserve( u.size() + v.size() );
     for( size_t i = 0; i < u.size(); i++ )

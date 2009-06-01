@@ -215,9 +215,20 @@ class FactorGraph {
             }
         }
 
-        /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$);
-        /// If backup == true, make a backup of all factors that are changed
+        /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$)
+        /** If backup == true, make a backup of all factors that are changed
+         */
         virtual void clamp( const Var & n, size_t i, bool backup = false );
+
+        /// Clamp a variable in a factor graph to have one out of a list of values
+        /** If backup == true, make a backup of all factors that are changed
+         */
+        void clampVar( size_t i, const std::vector<size_t> &xis, bool backup = false );
+
+        /// Clamp a factor in a factor graph to have one out of a list of values
+        /** If backup == true, make a backup of all factors that are changed
+         */
+        void clampFactor( size_t I, const std::vector<size_t> &xIs, bool backup = false );
 
         /// Set all factors interacting with the i'th variable 1
         virtual void makeCavity( unsigned i, bool backup = false );
