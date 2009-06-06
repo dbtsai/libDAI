@@ -30,7 +30,6 @@
 
 #include <vector>
 #include <utility>
-#include <ext/hash_map>
 
 #include <dai/prob.h>
 #include <dai/daialg.h>
