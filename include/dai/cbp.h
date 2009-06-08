@@ -137,7 +137,7 @@ class CBP : public DAIAlgFG {
     virtual CBP* create() const { DAI_THROW(NOT_IMPLEMENTED); }
     virtual std::string identify() const { return std::string(Name) + props.toString(); }
     virtual Factor belief (const Var &n) const { return _beliefsV[findVar(n)]; }
-    virtual Factor belief (const VarSet &) const { assert(0); }
+    virtual Factor belief (const VarSet &) const { DAI_THROW(NOT_IMPLEMENTED); }
     virtual std::vector<Factor> beliefs() const { return concat(_beliefsV, _beliefsF); }
     virtual Real logZ() const { return _logZ; }
     virtual void init() {};
