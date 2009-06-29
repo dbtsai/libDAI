@@ -195,6 +195,10 @@ class Diffs : public std::vector<double> {
         size_t maxSize() { return _maxsize; }
 };
 
+/// Split a string into tokens
+void tokenizeString(const std::string& s,
+		    std::vector<std::string>& outTokens,
+		    const std::string& delim="\t\n");
 
 } // end of namespace dai
 

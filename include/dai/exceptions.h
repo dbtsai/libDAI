@@ -72,6 +72,12 @@ class Exception : public std::runtime_error {
                    IMPOSSIBLE_TYPECAST,
                    INTERNAL_ERROR,
                    NOT_NORMALIZABLE,
+		   INVALID_EVIDENCE_FILE,
+		   INVALID_EVIDENCE_LINE,
+		   INVALID_EVIDENCE_OBSERVATION,
+		   INVALID_SHARED_PARAMETERS_ORDER,
+		   INVALID_SHARED_PARAMETERS_INPUT_LINE,
+		   UNKNOWN_PARAMETER_ESTIMATION_METHOD,
                    NUM_ERRORS};  // NUM_ERRORS should be the last entry
 
         /// Constructor

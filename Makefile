@@ -45,7 +45,7 @@ ifdef WITH_MATLAB
 endif
 
 # Define conditional build targets
-OBJECTS:=exactinf$(OE)
+OBJECTS:=exactinf$(OE) evidence$(OE) emalg$(OE)
 ifdef WITH_BP
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP
   OBJECTS:=$(OBJECTS) bp$(OE)
@@ -104,7 +104,7 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-tests : tests/testdai$(EE)
+tests : tests/testdai$(EE) tests/testem/testem$(EE)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
@@ -162,6 +162,12 @@ mr$(OE) : $(SRC)/mr.cpp $(INC)/mr.h $(HEADERS)
 gibbs$(OE) : $(SRC)/gibbs.cpp $(INC)/gibbs.h $(HEADERS)
 	$(CC) -c $(SRC)/gibbs.cpp
 
+evidence$(OE) : $(SRC)/evidence.cpp $(INC)/evidence.h $(HEADERS)
+	$(CC) -c $(SRC)/evidence.cpp
+
+emalg$(OE) : $(SRC)/emalg.cpp $(INC)/emalg.h $(INC)/evidence.h $(HEADERS)
+	$(CC) -c $(SRC)/emalg.cpp
+
 properties$(OE) : $(SRC)/properties.cpp $(HEADERS)
 	$(CC) -c $(SRC)/properties.cpp
 
@@ -193,7 +199,8 @@ examples/example_sprinkler$(EE) : examples/example_sprinkler.cpp $(HEADERS) $(LI
 
 tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
-
+tests/testem/testem$(EE): tests/testem/testem.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS)
 
 # MATLAB INTERFACE
 ###################

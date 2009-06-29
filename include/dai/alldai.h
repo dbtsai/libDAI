@@ -33,6 +33,8 @@
 #include <dai/daialg.h>
 #include <dai/properties.h>
 #include <dai/exactinf.h>
+#include <dai/evidence.h>
+#include <dai/emalg.h>
 #ifdef DAI_WITH_BP
     #include <dai/bp.h>
 #endif

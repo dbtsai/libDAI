@@ -40,8 +40,15 @@ namespace dai {
         "FactorGraph is not connected",
         "Impossible typecast",
         "Internal error",
-        "Quantity not normalizable"
+        "Quantity not normalizable",
+	"Can't parse Evidence file",
+	"Can't parse Evidence line",
+	"Invalid observation in Evidence file",
+	"Invalid variable order in SharedParameters",
+	"Input line in variable order invalid",
+	"Unrecognized parameter estimation method"
     }; 
 
 
 }
+
