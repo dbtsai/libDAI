@@ -45,7 +45,7 @@ namespace dai {
 	"Can't parse Evidence line",
 	"Invalid observation in Evidence file",
 	"Invalid variable order in SharedParameters",
-	"Input line in variable order invalid",
+	"Variable order line in EM file is invalid",
 	"Unrecognized parameter estimation method"
     }; 
 

@@ -31,7 +31,7 @@ SRC=src
 LIB=lib
 
 # Define build targets
-TARGETS=tests utils lib examples testregression
+TARGETS=tests utils lib examples testregression testem
 ifdef WITH_DOC
   TARGETS:=$(TARGETS) doc 
 endif
@@ -261,6 +261,9 @@ testregression : tests/testdai$(EE)
 	cd tests && testregression.bat && cd ..
 endif
 
+testem: tests/testem/testem$(EE)
+	@echo Starting EM tests
+	cd tests/testem && ./runtests && cd ../..
 
 # DOCUMENTATION
 ################

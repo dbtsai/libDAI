@@ -210,28 +210,68 @@ private:
 
   /// The maximization steps to take
   std::vector<MaximizationStep> _msteps;
-
   size_t _iters;
   std::vector<Real> _lastLogZ;
+  
+  size_t _max_iters;
+  Real _log_z_tol;
 
 public:
+  /// Key for setting maximum iterations @see setTermConditions
+  static const std::string MAX_ITERS_KEY;//("max_iters");
+  /// Default maximum iterations
+  static const size_t MAX_ITERS_DEFAULT;
+  /// Key for setting likelihood termination condition @see setTermConditions
+  static const std::string LOG_Z_TOL_KEY;
+  /// Default log_z_tol
+  static const Real LOG_Z_TOL_DEFAULT;
+
   /// Construct an EMAlg from all these objects
   EMAlg(const Evidence& evidence, InfAlg& estep, 
-	std::vector<MaximizationStep>& msteps) 
+	std::vector<MaximizationStep>& msteps, 
+	PropertySet* termconditions=NULL) 
     : _evidence(evidence),
       _estep(estep),
       _msteps(msteps),
       _iters(0),
-      _lastLogZ() 
-  {}
+      _lastLogZ(),
+      _max_iters(MAX_ITERS_DEFAULT),
+      _log_z_tol(LOG_Z_TOL_DEFAULT) {
+    setTermConditions(termconditions);
+  }
   
   /// Construct an EMAlg from an input stream
   EMAlg(const Evidence& evidence, InfAlg& estep, std::istream& mstep_file);
 
+  /// Change the coditions for termination
+  /** There are two possible parameters in the PropertySety
+   *    - max_iters  maximum number of iterations (default 30)
+   *    - log_z_tol proportion of increase in logZ (default 0.01)
+   *
+   *  \see hasSatisifiedTermConditions()
+   */
+  void setTermConditions(const PropertySet* p);
+
+  /// Determine if the termination conditions have been met.
+  /** There are two sufficient termination conditions:
+   *    -# the maximum number of iterations has been performed
+   *    -# the ratio of logZ increase over previous logZ is less than the 
+   *       tolerance.  I.e.
+           \f$ \frac{\log(Z_{current}) - \log(Z_{previous})}
+	            {| \log(Z_{previous}) | } < tol \f$.
+   */
+  bool hasSatisfiedTermConditions() const;
+
+  size_t getCurrentIters() const { return _iters; }
+
   /// Perform an iteration over all maximization steps
   Real iterate();
+
   /// Performs an iteration over a single MaximizationStep
-  Real iterate(const MaximizationStep& mstep);
+  Real iterate(MaximizationStep& mstep);
+
+  /// Iterate until termination conditions satisfied
+  void run();
 
 };
 

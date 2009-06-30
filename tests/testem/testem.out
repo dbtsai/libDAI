@@ -1,0 +1,184 @@
+Number of samples: 20
+Sample sample.0 has 2 observations.
+Sample sample.1 has 2 observations.
+Sample sample.2 has 2 observations.
+Sample sample.3 has 2 observations.
+Sample sample.4 has 2 observations.
+Sample sample.5 has 2 observations.
+Sample sample.6 has 2 observations.
+Sample sample.7 has 2 observations.
+Sample sample.8 has 2 observations.
+Sample sample.9 has 2 observations.
+Sample sample_0 has 2 observations.
+Sample sample_1 has 2 observations.
+Sample sample_2 has 2 observations.
+Sample sample_3 has 2 observations.
+Sample sample_4 has 2 observations.
+Sample sample_5 has 2 observations.
+Sample sample_6 has 2 observations.
+Sample sample_7 has 2 observations.
+Sample sample_8 has 2 observations.
+Sample sample_9 has 2 observations.
+Iteration 1 likelihood: -13.8629
+Iteration 2 likelihood: -9.56675
+Iteration 3 likelihood: -9.56675
+
+Inferred Factor Graph:
+######################
+1
+
+2
+0 1 
+2 2 
+4
+0   0.16666666666667
+1   0.66666666666667
+2   0.83333333333333
+3   0.33333333333333
+Number of samples: 20
+Sample sample.0 has 2 observations.
+Sample sample.1 has 2 observations.
+Sample sample.2 has 2 observations.
+Sample sample.3 has 2 observations.
+Sample sample.4 has 2 observations.
+Sample sample.5 has 2 observations.
+Sample sample.6 has 2 observations.
+Sample sample.7 has 2 observations.
+Sample sample.8 has 2 observations.
+Sample sample.9 has 2 observations.
+Sample sample_0 has 2 observations.
+Sample sample_1 has 2 observations.
+Sample sample_2 has 2 observations.
+Sample sample_3 has 2 observations.
+Sample sample_4 has 2 observations.
+Sample sample_5 has 2 observations.
+Sample sample_6 has 2 observations.
+Sample sample_7 has 2 observations.
+Sample sample_8 has 2 observations.
+Sample sample_9 has 2 observations.
+Iteration 1 likelihood: 0
+Iteration 2 likelihood: 3.97035
+Iteration 3 likelihood: 3.97035
+
+Inferred Factor Graph:
+######################
+1
+
+3
+0 1 2 
+2 2 2 
+8
+0   0.21428571428571
+1   0.64285714285714
+2   0.78571428571429
+3   0.35714285714286
+4   0.21428571428571
+5   0.64285714285714
+6   0.78571428571429
+7   0.35714285714286
+Number of samples: 5
+Sample sample_0 has 5 observations.
+Sample sample_1 has 4 observations.
+Sample sample_2 has 6 observations.
+Sample sample_3 has 6 observations.
+Sample sample_4 has 5 observations.
+Iteration 1 likelihood: 11.1646
+Iteration 2 likelihood: 1.53723
+Iteration 3 likelihood: 1.64691
+Iteration 4 likelihood: 1.67497
+Iteration 5 likelihood: 1.68191
+
+Inferred Factor Graph:
+######################
+3
+
+3
+2 6 7 
+2 2 2 
+8
+0   0.39834336080566
+1   0.35146414656547
+2   0.60165663919434
+3   0.64853585343454
+4   0.80484468795651
+5   0.67374245802992
+6   0.19515531204349
+7   0.32625754197008
+
+3
+0 1 6 
+2 2 2 
+8
+0    1.0352133626924
+1     1.547478952122
+2    2.3176521897449
+3    1.2804190071868
+4    4.9220798130027
+5    2.5272557501946
+6   0.83127929631575
+7   0.26280563080263
+
+3
+1 2 4 
+2 2 2 
+8
+0   0.39834336080566
+1   0.60165663919434
+2   0.35146414656547
+3   0.64853585343454
+4   0.80484468795651
+5   0.19515531204349
+6   0.67374245802992
+7   0.32625754197008
+Number of samples: 5
+Sample sample_0 has 5 observations.
+Sample sample_1 has 4 observations.
+Sample sample_2 has 6 observations.
+Sample sample_3 has 6 observations.
+Sample sample_4 has 5 observations.
+Iteration 1 likelihood: 11.1646
+Iteration 2 likelihood: -7.29331
+Iteration 3 likelihood: -7.261
+
+Inferred Factor Graph:
+######################
+3
+
+3
+2 6 7 
+2 2 2 
+8
+0   0.49531219972645
+1   0.49910794290825
+2   0.50468780027355
+3   0.50089205709175
+4   0.64041654995841
+5   0.49512229392399
+6   0.35958345004159
+7   0.50487770607601
+
+3
+0 1 6 
+2 2 2 
+8
+0   0.49531219972645
+1   0.50468780027355
+2   0.49910794290825
+3   0.50089205709175
+4   0.64041654995841
+5   0.35958345004159
+6   0.49512229392399
+7   0.50487770607601
+
+3
+1 2 4 
+2 2 2 
+8
+0   0.49531219972645
+1   0.50468780027355
+2   0.49910794290825
+3   0.50089205709175
+4   0.64041654995841
+5   0.35958345004159
+6   0.49512229392399
+7   0.50487770607601

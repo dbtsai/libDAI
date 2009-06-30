@@ -263,14 +263,23 @@ void MaximizationStep::maximize(FactorGraph& fg) {
   }
 }
 
+const std::string EMAlg::MAX_ITERS_KEY("max_iters");
+const std::string EMAlg::LOG_Z_TOL_KEY("log_z_tol");
+const size_t EMAlg::MAX_ITERS_DEFAULT = 30;
+const Real EMAlg::LOG_Z_TOL_DEFAULT = 0.01;
+
 EMAlg::EMAlg(const Evidence& evidence, InfAlg& estep, std::istream& msteps_file)
-   : _evidence(evidence),
+  : _evidence(evidence),
     _estep(estep),
     _msteps(),
     _iters(0),
-    _lastLogZ()
+    _lastLogZ(),
+    _max_iters(MAX_ITERS_DEFAULT),
+    _log_z_tol(LOG_Z_TOL_DEFAULT)
 {
-  size_t num_msteps;
+  msteps_file.exceptions( std::istream::eofbit | std::istream::failbit 
+			  | std::istream::badbit );
+  size_t num_msteps = -1;
   msteps_file >> num_msteps;
   _msteps.reserve(num_msteps);
   for (size_t i = 0; i < num_msteps; ++i) {
@@ -279,7 +288,41 @@ EMAlg::EMAlg(const Evidence& evidence, InfAlg& estep, std::istream& msteps_file)
   }
 }	
 
-Real EMAlg::iterate(const MaximizationStep& mstep) {
+void EMAlg::setTermConditions(const PropertySet* p) {
+  if (NULL == p) {
+    return;
+  }
+  if (p->hasKey(MAX_ITERS_KEY)) {
+    _max_iters = p->getStringAs<size_t>(MAX_ITERS_KEY);
+  }
+  if (p->hasKey(LOG_Z_TOL_KEY)) {
+    _log_z_tol = p->getStringAs<Real>(LOG_Z_TOL_KEY);
+  }
+}
+
+bool EMAlg::hasSatisfiedTermConditions() const {
+  if (_iters >= _max_iters) {
+    return 1;
+  } else if (_lastLogZ.size() < 3) { 
+    // need at least 2 to calculate ratio
+    // Also, throw away first iteration, as the parameters may not
+    // have been normalized according to the estimation method
+    return 0;
+  } else {
+    Real current = _lastLogZ[_lastLogZ.size() - 1];
+    Real previous = _lastLogZ[_lastLogZ.size() - 2];
+    if (previous == 0) return 0;
+    Real diff = current - previous;
+    if (diff < 0) {
+      std::cerr << "Error: in EM log-likehood decreased from " << previous 
+		<< " to " << current << std::endl;
+      return 1;
+    }
+    return diff / abs(previous) <= _log_z_tol;
+  }
+}
+
+Real EMAlg::iterate(MaximizationStep& mstep) {
   Evidence::const_iterator e = _evidence.begin();
   Real logZ = 0;
 
@@ -310,6 +353,12 @@ Real EMAlg::iterate() {
   _lastLogZ.push_back(likelihood);
   ++_iters;
   return likelihood;
+}
+
+void EMAlg::run() {
+  while(!hasSatisfiedTermConditions()) {
+    iterate();
+  }
 }
 
 }

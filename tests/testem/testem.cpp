@@ -45,10 +45,15 @@ int main(int argc, char** argv) {
   ifstream emstream(argv[3]);
   EMAlg em(e, *inf, emstream);
 
-  for (size_t i = 0; i < 10; ++i) {
+  while(!em.hasSatisfiedTermConditions()) {
     Real l = em.iterate();
-    cout << "Iteration " << i << " likelihood: " << l <<endl;
+    cout << "Iteration " << em.getCurrentIters() << " likelihood: " << l <<endl;
   }
+
+  cout << endl
+       << "Inferred Factor Graph:" << endl
+       << "######################" << endl
+       << inf->fg();
 
   return 0;
 }
