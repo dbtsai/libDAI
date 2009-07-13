@@ -106,18 +106,17 @@ int rnd_int( int min, int max ) {
 }
 
 void tokenizeString(const std::string& s,
-		    std::vector<std::string>& outTokens,
-		    const std::string& delim)
+                    std::vector<std::string>& outTokens,
+                    const std::string& delim)
 {
-  size_t start = 0;
-  while (start < s.size()) {
-    size_t end = s.find_first_of(delim, start);
-    if (end > s.size()) {
-      end = s.size();
+    size_t start = 0;
+    while (start < s.size()) {
+        size_t end = s.find_first_of(delim, start);
+        if (end > s.size())
+            end = s.size();
+        outTokens.push_back(s.substr(start, end - start));
+        start = end + 1;
     }
-    outTokens.push_back(s.substr(start, end - start));
-    start = end + 1;
-  }
 }
 
 } // end of namespace dai

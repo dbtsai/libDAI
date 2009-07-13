@@ -199,7 +199,7 @@ examples/example_sprinkler$(EE) : examples/example_sprinkler.cpp $(HEADERS) $(LI
 
 tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
-tests/testem/testem$(EE): tests/testem/testem.cpp $(HEADERS) $(LIB)/libdai$(LE)
+tests/testem/testem$(EE) : tests/testem/testem.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS)
 
 # MATLAB INTERFACE
@@ -261,9 +261,10 @@ testregression : tests/testdai$(EE)
 	cd tests && testregression.bat && cd ..
 endif
 
-testem: tests/testem/testem$(EE)
+testem : tests/testem/testem$(EE)
 	@echo Starting EM tests
 	cd tests/testem && ./runtests && cd ../..
+
 
 # DOCUMENTATION
 ################

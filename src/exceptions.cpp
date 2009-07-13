@@ -41,14 +41,13 @@ namespace dai {
         "Impossible typecast",
         "Internal error",
         "Quantity not normalizable",
-	"Can't parse Evidence file",
-	"Can't parse Evidence line",
-	"Invalid observation in Evidence file",
-	"Invalid variable order in SharedParameters",
-	"Variable order line in EM file is invalid",
-	"Unrecognized parameter estimation method"
+        "Cannot parse Evidence file",
+        "Cannot parse Evidence line",
+        "Invalid observation in Evidence file",
+        "Invalid variable order in SharedParameters",
+        "Variable order line in EM file is invalid",
+        "Unrecognized parameter estimation method"
     }; 
 
 
 }
-
