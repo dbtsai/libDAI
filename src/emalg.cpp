@@ -319,7 +319,7 @@ Real EMAlg::iterate(MaximizationStep& mstep) {
     // Expectation calculation
     for ( ; e != _evidence.end(); ++e) {
         InfAlg* clamped = _estep.clone();
-        e->second.applyEvidence(*clamped);
+        e->applyEvidence(*clamped);
         clamped->run();
       
         logZ += clamped->logZ();

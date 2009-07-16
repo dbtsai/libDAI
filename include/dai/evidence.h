@@ -20,7 +20,7 @@
 
 
 /// \file
-/// \brief Defines classes Evidence and SampleData
+/// \brief Defines classes Evidence and Observation
 /// \todo Improve documentation
 
 
@@ -35,59 +35,57 @@
 namespace dai {
 
 
-/// Stores a set of observations on a graphical model.
-class SampleData {
+/// Stores observed values of a subset of variables
+class Observation {
     private:
-        std::string _name;
         std::map<Var, size_t> _obs;
+
     public:
-        /// Construct an empty object
-        SampleData() : _name(), _obs() {}
-        /// Set the name of the sample
-        void name(const std::string& name) { _name = name; }
-        /// Get the name of the sample
-        const std::string& name() const { return _name; }
-        /// Read from the observation map
+        /// Default constructor
+        Observation() : _obs() {}
+        /// Get all observations
         const std::map<Var, size_t>& observations() const { return _obs; }
         /// Add an observation
-        void addObservation(Var node, size_t setting);
-        /// Add evidence by clamping variables to observed values.
-        void applyEvidence(InfAlg& alg) const;
+        void addObservation( Var node, size_t setting );
+        /// Clamp variables to observed values
+        void applyEvidence( InfAlg& alg ) const;
 };
 
 
-/// Store observations from a graphical model.
+/// Stores multiple observations of variables
 class Evidence {
     private:
-        std::map<std::string, SampleData> _samples;
-public:
-    /// Start with empty obects, then fill with calls to addEvidenceTabFile()
-    Evidence() : _samples() {}
-  
-    /** Read in tab-data from a stream. Each line contains one sample, and
-     *  the first line is a header line with names. The first column contains
-     *  names for each of the samples.
-     */
-    void addEvidenceTabFile(std::istream& is, std::map< std::string, Var >& varMap);
+        std::vector<Observation> _samples;
 
-    /** Read in tab-data from a stream. Each line contains one sample,
-     *  and the first line is a header line with variable IDs. The first
-     *  column contains names for each of the samples.
-     */
-    void addEvidenceTabFile(std::istream& is, FactorGraph& fg);
-  
-    /// Total number of samples in this evidence file
-    size_t nrSamples() const { return _samples.size(); }
+    public:
+        /// Default constructor
+        Evidence() : _samples() {}
+      
+        /** Read in tab-data from a stream. Each line contains one sample, and
+         *  the first line is a header line with names. The first column contains
+         *  names for each of the samples.
+         */
+        void addEvidenceTabFile(std::istream& is, std::map<std::string, Var>& varMap);
 
-    /// @name iterator interface
-    //@{
-    typedef std::map< std::string, SampleData >::iterator iterator;
-    typedef std::map< std::string, SampleData >::const_iterator const_iterator;
-    iterator begin() { return _samples.begin(); }
-    const_iterator begin() const { return _samples.begin(); }
-    iterator end() { return _samples.end(); }
-    const_iterator end() const { return _samples.end(); }
-    //@}
+        /** Read in tab-data from a stream. Each line contains one sample,
+         *  and the first line is a header line with variable IDs. The first
+         *  column contains names for each of the samples.
+         */
+        void addEvidenceTabFile(std::istream& is, FactorGraph& fg);
+      
+        /// Total number of samples in this evidence file
+        size_t nrSamples() const { return _samples.size(); }
+
+        /// @name iterator interface
+        //@{
+        typedef std::vector<Observation>::iterator iterator;
+        typedef std::vector<Observation>::const_iterator const_iterator;
+
+        iterator begin() { return _samples.begin(); }
+        const_iterator begin() const { return _samples.begin(); }
+        iterator end() { return _samples.end(); }
+        const_iterator end() const { return _samples.end(); }
+        //@}
 };
 
 

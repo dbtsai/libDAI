@@ -106,7 +106,7 @@ class CondProbEstimation : private ParameterEstimation {
     virtual ~CondProbEstimation() {}
     /// Returns an estimate of the conditional probability distribution.
     /** The format of the resulting Prob keeps all the values for 
-     *  \f$ P(X | Y=a) \f$ sequential in teh array.
+     *  \f$ P(X | Y=a) \f$ sequential in the array.
      */
     virtual Prob estimate();
     /// Accumulate sufficient statistics from the expectations in p.
@@ -205,7 +205,7 @@ class MaximizationStep {
  *     - InfAlg for performing the E-step, which includes the factor graph
  *     - a vector of MaximizationSteps steps to be performed
  *
- *  This implementation can peform incremental EM by using multiple 
+ *  This implementation can perform incremental EM by using multiple 
  *  MaximizationSteps.  An expectation step is performed between execution
  *  of each MaximizationStep.  A call to iterate() will cycle through all
  *  MaximizationSteps.

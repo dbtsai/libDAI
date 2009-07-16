@@ -30,12 +30,12 @@
 namespace dai {
 
 
-void SampleData::addObservation( Var node, size_t setting ) {
+void Observation::addObservation( Var node, size_t setting ) {
     _obs[node] = setting;
 }
 
 
-void SampleData::applyEvidence( InfAlg& alg ) const {
+void Observation::applyEvidence( InfAlg& alg ) const {
     std::map<Var, size_t>::const_iterator i = _obs.begin();
     for( ; i != _obs.end(); ++i )
         alg.clamp( i->first, i->second );
@@ -68,7 +68,6 @@ void Evidence::addEvidenceTabFile( std::istream& is, std::map<std::string, Var>&
     if( p_field == header_fields.end() ) 
         DAI_THROW(INVALID_EVIDENCE_LINE);
 
-    ++p_field; // first column are sample labels
     for( ; p_field != header_fields.end(); ++p_field ) {
         std::map<std::string, Var>::iterator elem = varMap.find( *p_field );
         if( elem == varMap.end() )
@@ -82,21 +81,21 @@ void Evidence::addEvidenceTabFile( std::istream& is, std::map<std::string, Var>&
 
         tokenizeString( line, fields );
         
-        if( fields.size() != vars.size() + 1 ) 
+        if( fields.size() != vars.size() ) 
             DAI_THROW(INVALID_EVIDENCE_LINE);
         
-        SampleData& sampleData = _samples[fields[0]];
-        sampleData.name( fields[0] ); // in case of a new sample
+        Observation sampleData;
         for( size_t i = 0; i < vars.size(); ++i ) {
-            if( fields[i+1].size() > 0 ) { // skip if missing observation
-                if( fields[i+1].find_first_not_of("0123456789") != std::string::npos )
+            if( fields[i].size() > 0 ) { // skip if missing observation
+                if( fields[i].find_first_not_of("0123456789") != std::string::npos )
                     DAI_THROW(INVALID_EVIDENCE_OBSERVATION);
-                size_t state = atoi( fields[i+1].c_str() );
+                size_t state = atoi( fields[i].c_str() );
                 if( state >= vars[i].states() )
                     DAI_THROW(INVALID_EVIDENCE_OBSERVATION);
                 sampleData.addObservation( vars[i], state );
             }
         }
+        _samples.push_back( sampleData );
     } // finished sample line
 }
 
