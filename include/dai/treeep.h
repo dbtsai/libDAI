@@ -151,7 +151,6 @@ class TreeEP : public JTree {
         /// @name General InfAlg interface
         //@{
         virtual TreeEP* clone() const { return new TreeEP(*this); }
-        virtual TreeEP* create() const { return new TreeEP(); }
         virtual std::string identify() const;
         virtual Real logZ() const;
         virtual void init();

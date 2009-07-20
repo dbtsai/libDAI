@@ -74,7 +74,6 @@ class Gibbs : public DAIAlgFG {
         /// @name General InfAlg interface
         //@{
         virtual Gibbs* clone() const { return new Gibbs(*this); }
-        virtual Gibbs* create() const { return new Gibbs(); }
         virtual std::string identify() const { return std::string(Name) + printProperties(); }
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &ns ) const;

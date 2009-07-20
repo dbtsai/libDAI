@@ -127,7 +127,6 @@ class BP : public DAIAlgFG {
         /// @name General InfAlg interface
         //@{
         virtual BP* clone() const { return new BP(*this); }
-        virtual BP* create() const { return new BP(); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &ns ) const;

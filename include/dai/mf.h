@@ -80,7 +80,6 @@ class MF : public DAIAlgFG {
         /// @name General InfAlg interface
         //@{
         virtual MF* clone() const { return new MF(*this); }
-        virtual MF* create() const { return new MF(); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &ns ) const;

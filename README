@@ -164,7 +164,7 @@ from http://www.boost.org/ and compile/install it with:
 To build the libDAI source, first copy a template Makefile.* to Makefile.conf
 (for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). 
 Then, edit the Makefile.conf template to adapt it to your local setup.
-Especially directories may change from system to system. Finally, run
+Especially directories may differ from system to system. Finally, run
     
     make
 

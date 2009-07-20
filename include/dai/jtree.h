@@ -86,7 +86,6 @@ class JTree : public DAIAlgRG {
         /// @name General InfAlg interface
         //@{
         virtual JTree* clone() const { return new JTree(*this); }
-        virtual JTree* create() const { return new JTree(); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &ns ) const;

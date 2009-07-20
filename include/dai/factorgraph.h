@@ -113,9 +113,6 @@ class FactorGraph {
         /// Clone *this (virtual copy constructor)
         virtual FactorGraph* clone() const { return new FactorGraph(); }
 
-        /// Create (virtual default constructor)
-        virtual FactorGraph* create() const { return new FactorGraph(*this); }
-
         /// Returns const reference to i'th variable
         const Var & var(size_t i) const { return _vars[i]; }
         /// Returns const reference to all factors

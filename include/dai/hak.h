@@ -98,7 +98,6 @@ class HAK : public DAIAlgRG {
         /// @name General InfAlg interface
         //@{
         virtual HAK* clone() const { return new HAK(*this); }
-        virtual HAK* create() const { return new HAK(); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &ns ) const;

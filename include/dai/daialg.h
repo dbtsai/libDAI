@@ -54,9 +54,6 @@ class InfAlg {
         /// Returns a pointer to a new, cloned copy of *this (i.e., virtual copy constructor)
         virtual InfAlg* clone() const = 0;
 
-        /// Returns a pointer to a newly constructed object *this (i.e., virtual default constructor)
-        virtual InfAlg* create() const = 0;
-        
         /// Identifies itself for logging purposes
         virtual std::string identify() const = 0;
 

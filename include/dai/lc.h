@@ -107,7 +107,6 @@ class LC : public DAIAlgFG {
         /// @name General InfAlg interface
         //@{
         virtual LC* clone() const { return new LC(*this); }
-        virtual LC* create() const { return new LC(); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const { return( _beliefs[findVar(n)] ); }
         virtual Factor belief( const VarSet &/*ns*/ ) const { DAI_THROW(NOT_IMPLEMENTED); return Factor(); }

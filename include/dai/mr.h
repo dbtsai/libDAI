@@ -104,7 +104,6 @@ class MR : public DAIAlgFG {
         /// @name General InfAlg interface
         //@{
         virtual MR* clone() const { return new MR(*this); }
-        virtual MR* create() const { return new MR(); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &/*ns*/ ) const { DAI_THROW(NOT_IMPLEMENTED); return Factor(); }
