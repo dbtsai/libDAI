@@ -258,6 +258,22 @@ class BipartiteGraph {
         /// Removes node n2 of type 2 and all incident edges.
         void erase2( size_t n2 );
 
+        /// Removes edge between node n1 of type 1 and node n2 of type 2.
+        void eraseEdge( size_t n1, size_t n2 ) {
+            assert( n1 < nr1() );
+            assert( n2 < nr2() );
+            for( Neighbors::iterator i1 = _nb1[n1].begin(); i1 != _nb1[n1].end(); i1++ )
+                if( i1->node == n2 ) {
+                    _nb1[n1].erase( i1 );
+                    break;
+                }
+            for( Neighbors::iterator i2 = _nb2[n2].begin(); i2 != _nb2[n2].end(); i2++ )
+                if( i2->node == n1 ) {
+                    _nb2[n2].erase( i2 );
+                    break;
+                }
+        }
+
         /// Adds an edge between node n1 of type 1 and node n2 of type 2.
         /** If check == true, only adds the edge if it does not exist already.
          */

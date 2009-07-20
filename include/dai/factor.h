@@ -562,7 +562,7 @@ template<typename T> Real MutualInfo(const TFactor<T> &f) {
     VarSet::const_iterator it = f.vars().begin();
     Var i = *it; it++; Var j = *it;
     TFactor<T> projection = f.marginal(i) * f.marginal(j);
-    return real( dist( f.normalized(), projection, Prob::DISTKL ) );
+    return dist( f.normalized(), projection, Prob::DISTKL );
 }
 
 
