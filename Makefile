@@ -202,6 +202,7 @@ tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
 tests/testem/testem$(EE) : tests/testem/testem.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS)
 
+
 # MATLAB INTERFACE
 ###################
 

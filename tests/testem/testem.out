@@ -1,24 +1,24 @@
 Number of samples: 20
-Sample sample.0 has 2 observations.
-Sample sample.1 has 2 observations.
-Sample sample.2 has 2 observations.
-Sample sample.3 has 2 observations.
-Sample sample.4 has 2 observations.
-Sample sample.5 has 2 observations.
-Sample sample.6 has 2 observations.
-Sample sample.7 has 2 observations.
-Sample sample.8 has 2 observations.
-Sample sample.9 has 2 observations.
-Sample sample_0 has 2 observations.
-Sample sample_1 has 2 observations.
-Sample sample_2 has 2 observations.
-Sample sample_3 has 2 observations.
-Sample sample_4 has 2 observations.
-Sample sample_5 has 2 observations.
-Sample sample_6 has 2 observations.
-Sample sample_7 has 2 observations.
-Sample sample_8 has 2 observations.
-Sample sample_9 has 2 observations.
+Sample #0 has 2 observations.
+Sample #1 has 2 observations.
+Sample #2 has 2 observations.
+Sample #3 has 2 observations.
+Sample #4 has 2 observations.
+Sample #5 has 2 observations.
+Sample #6 has 2 observations.
+Sample #7 has 2 observations.
+Sample #8 has 2 observations.
+Sample #9 has 2 observations.
+Sample #10 has 2 observations.
+Sample #11 has 2 observations.
+Sample #12 has 2 observations.
+Sample #13 has 2 observations.
+Sample #14 has 2 observations.
+Sample #15 has 2 observations.
+Sample #16 has 2 observations.
+Sample #17 has 2 observations.
+Sample #18 has 2 observations.
+Sample #19 has 2 observations.
 Iteration 1 likelihood: -13.8629
 Iteration 2 likelihood: -9.56675
 Iteration 3 likelihood: -9.56675
@@ -31,31 +31,31 @@ Inferred Factor Graph:
 0 1 
 2 2 
 4
-0   0.16666666666667
-1   0.66666666666667
-2   0.83333333333333
-3   0.33333333333333
+0   0.166666666667
+1   0.666666666667
+2   0.833333333333
+3   0.333333333333
 Number of samples: 20
-Sample sample.0 has 2 observations.
-Sample sample.1 has 2 observations.
-Sample sample.2 has 2 observations.
-Sample sample.3 has 2 observations.
-Sample sample.4 has 2 observations.
-Sample sample.5 has 2 observations.
-Sample sample.6 has 2 observations.
-Sample sample.7 has 2 observations.
-Sample sample.8 has 2 observations.
-Sample sample.9 has 2 observations.
-Sample sample_0 has 2 observations.
-Sample sample_1 has 2 observations.
-Sample sample_2 has 2 observations.
-Sample sample_3 has 2 observations.
-Sample sample_4 has 2 observations.
-Sample sample_5 has 2 observations.
-Sample sample_6 has 2 observations.
-Sample sample_7 has 2 observations.
-Sample sample_8 has 2 observations.
-Sample sample_9 has 2 observations.
+Sample #0 has 2 observations.
+Sample #1 has 2 observations.
+Sample #2 has 2 observations.
+Sample #3 has 2 observations.
+Sample #4 has 2 observations.
+Sample #5 has 2 observations.
+Sample #6 has 2 observations.
+Sample #7 has 2 observations.
+Sample #8 has 2 observations.
+Sample #9 has 2 observations.
+Sample #10 has 2 observations.
+Sample #11 has 2 observations.
+Sample #12 has 2 observations.
+Sample #13 has 2 observations.
+Sample #14 has 2 observations.
+Sample #15 has 2 observations.
+Sample #16 has 2 observations.
+Sample #17 has 2 observations.
+Sample #18 has 2 observations.
+Sample #19 has 2 observations.
 Iteration 1 likelihood: 0
 Iteration 2 likelihood: 3.97035
 Iteration 3 likelihood: 3.97035
@@ -68,20 +68,20 @@ Inferred Factor Graph:
 0 1 2 
 2 2 2 
 8
-0   0.21428571428571
-1   0.64285714285714
-2   0.78571428571429
-3   0.35714285714286
-4   0.21428571428571
-5   0.64285714285714
-6   0.78571428571429
-7   0.35714285714286
+0   0.214285714286
+1   0.642857142857
+2   0.785714285714
+3   0.357142857143
+4   0.214285714286
+5   0.642857142857
+6   0.785714285714
+7   0.357142857143
 Number of samples: 5
-Sample sample_0 has 5 observations.
-Sample sample_1 has 4 observations.
-Sample sample_2 has 6 observations.
-Sample sample_3 has 6 observations.
-Sample sample_4 has 5 observations.
+Sample #0 has 5 observations.
+Sample #1 has 4 observations.
+Sample #2 has 6 observations.
+Sample #3 has 6 observations.
+Sample #4 has 5 observations.
 Iteration 1 likelihood: 11.1646
 Iteration 2 likelihood: 1.53723
 Iteration 3 likelihood: 1.64691
@@ -96,46 +96,46 @@ Inferred Factor Graph:
 2 6 7 
 2 2 2 
 8
-0   0.39834336080566
-1   0.35146414656547
-2   0.60165663919434
-3   0.64853585343454
-4   0.80484468795651
-5   0.67374245802992
-6   0.19515531204349
-7   0.32625754197008
+0   0.398343360806
+1   0.351464146565
+2   0.601656639194
+3   0.648535853435
+4   0.804844687957
+5    0.67374245803
+6   0.195155312043
+7    0.32625754197
 
 3
 0 1 6 
 2 2 2 
 8
-0    1.0352133626924
-1     1.547478952122
-2    2.3176521897449
-3    1.2804190071868
-4    4.9220798130027
-5    2.5272557501946
-6   0.83127929631575
-7   0.26280563080263
+0    1.03521336269
+1    1.54747895212
+2    2.31765218974
+3    1.28041900719
+4      4.922079813
+5    2.52725575019
+6   0.831279296316
+7   0.262805630803
 
 3
 1 2 4 
 2 2 2 
 8
-0   0.39834336080566
-1   0.60165663919434
-2   0.35146414656547
-3   0.64853585343454
-4   0.80484468795651
-5   0.19515531204349
-6   0.67374245802992
-7   0.32625754197008
+0   0.398343360806
+1   0.601656639194
+2   0.351464146565
+3   0.648535853435
+4   0.804844687957
+5   0.195155312043
+6    0.67374245803
+7    0.32625754197
 Number of samples: 5
-Sample sample_0 has 5 observations.
-Sample sample_1 has 4 observations.
-Sample sample_2 has 6 observations.
-Sample sample_3 has 6 observations.
-Sample sample_4 has 5 observations.
+Sample #0 has 5 observations.
+Sample #1 has 4 observations.
+Sample #2 has 6 observations.
+Sample #3 has 6 observations.
+Sample #4 has 5 observations.
 Iteration 1 likelihood: 11.1646
 Iteration 2 likelihood: -7.29331
 Iteration 3 likelihood: -7.261
@@ -148,37 +148,37 @@ Inferred Factor Graph:
 2 6 7 
 2 2 2 
 8
-0   0.49531219972645
-1   0.49910794290825
-2   0.50468780027355
-3   0.50089205709175
-4   0.64041654995841
-5   0.49512229392399
-6   0.35958345004159
-7   0.50487770607601
+0   0.495312199726
+1   0.499107942908
+2   0.504687800274
+3   0.500892057092
+4   0.640416549958
+5   0.495122293924
+6   0.359583450042
+7   0.504877706076
 
 3
 0 1 6 
 2 2 2 
 8
-0   0.49531219972645
-1   0.50468780027355
-2   0.49910794290825
-3   0.50089205709175
-4   0.64041654995841
-5   0.35958345004159
-6   0.49512229392399
-7   0.50487770607601
+0   0.495312199726
+1   0.504687800274
+2   0.499107942908
+3   0.500892057092
+4   0.640416549958
+5   0.359583450042
+6   0.495122293924
+7   0.504877706076
 
 3
 1 2 4 
 2 2 2 
 8
-0   0.49531219972645
-1   0.50468780027355
-2   0.49910794290825
-3   0.50089205709175
-4   0.64041654995841
-5   0.35958345004159
-6   0.49512229392399
-7   0.50487770607601
+0   0.495312199726
+1   0.504687800274
+2   0.499107942908
+3   0.500892057092
+4   0.640416549958
+5   0.359583450042
+6   0.495122293924
+7   0.504877706076

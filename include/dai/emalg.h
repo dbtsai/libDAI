@@ -127,7 +127,7 @@ class CondProbEstimation : private ParameterEstimation {
  *  canonical variable ordering.  This canonical variable ordering
  *  will likely not be the order of variables required to make two
  *  factors parameters isomorphic.  Therefore, this ordering of the
- *  variables must be specified for ever factor to ensure that
+ *  variables must be specified for ever factory to ensure that
  *  parameters can be shared between different factors during EM.
  */
 class SharedParameters {
@@ -181,7 +181,7 @@ class MaximizationStep {
     public:
         MaximizationStep() : _params() {}
 
-        /// Construct an step object taht contains all these estimation probelms
+        /// Construct an step object that contains all these estimation problems
         MaximizationStep( std::vector<SharedParameters>& maximizations ) : _params(maximizations) {}  
 
         /// Construct a step from an input stream

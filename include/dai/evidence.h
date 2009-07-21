@@ -62,18 +62,16 @@ class Evidence {
         Evidence() : _samples() {}
       
         /** Read in tab-data from a stream. Each line contains one sample, and
-         *  the first line is a header line with names. The first column contains
-         *  names for each of the samples.
+         *  the first line is a header line with names.
          */
         void addEvidenceTabFile(std::istream& is, std::map<std::string, Var>& varMap);
 
         /** Read in tab-data from a stream. Each line contains one sample,
-         *  and the first line is a header line with variable IDs. The first
-         *  column contains names for each of the samples.
+         *  and the first line is a header line with variable labels. 
          */
         void addEvidenceTabFile(std::istream& is, FactorGraph& fg);
       
-        /// Total number of samples in this evidence file
+        /// Returns total number of samples
         size_t nrSamples() const { return _samples.size(); }
 
         /// @name iterator interface
