@@ -35,7 +35,7 @@
 
 /// \file 
 /** \brief Defines classes related to Expectation Maximization:
- *  EMAlg, ParameterEstimate, and FactorOrientations
+ *  EMAlg, ParameterEstimation, CondProbEstimation and SharedParameters
  */
 
 
@@ -87,38 +87,38 @@ class CondProbEstimation : private ParameterEstimation {
         Prob _stats;
         Prob _initial_stats;
     public:
-    /** For a conditional probability \f$ Pr( X | Y ) \f$, 
-     *  \param target_dimension should equal \f$ | X | \f$
-     *  \param pseudocounts has length \f$ |X| \cdot |Y| \f$
-     */
-    CondProbEstimation( size_t target_dimension, Prob pseudocounts );
+        /** For a conditional probability \f$ Pr( X | Y ) \f$, 
+         *  \param target_dimension should equal \f$ | X | \f$
+         *  \param pseudocounts has length \f$ |X| \cdot |Y| \f$
+         */
+        CondProbEstimation( size_t target_dimension, Prob pseudocounts );
 
-    /// Virtual constructor, using a PropertySet.
-    /** Some keys in the PropertySet are required:
-     *     - target_dimension, which should be equal to \f$ | X | \f$
-     *     - total_dimension, which sholud be equal to \f$ |X| \cdot |Y| \f$
-     *  
-     *  An optional key is:
-     *     - pseudo_count which specifies the initial counts (defaults to 1)
-     */
-    static ParameterEstimation* factory( const PropertySet& p );
-    /// Virtual destructor
-    virtual ~CondProbEstimation() {}
-    /// Returns an estimate of the conditional probability distribution.
-    /** The format of the resulting Prob keeps all the values for 
-     *  \f$ P(X | Y=a) \f$ sequential in the array.
-     */
-    virtual Prob estimate();
-    /// Accumulate sufficient statistics from the expectations in p.
-    virtual void addSufficientStatistics( Prob& p );
-    /// Returns the required size for arguments to addSufficientStatistics
-    virtual size_t probSize() const { 
-        return _stats.size(); 
-    }
-    /// Virtual copy constructor.
-    virtual ParameterEstimation* clone() const {
-        return new CondProbEstimation( _target_dim, _initial_stats );
-    }
+        /// Virtual constructor, using a PropertySet.
+        /** Some keys in the PropertySet are required:
+         *     - target_dimension, which should be equal to \f$ | X | \f$
+         *     - total_dimension, which should be equal to \f$ |X| \cdot |Y| \f$
+         *  
+         *  An optional key is:
+         *     - pseudo_count, which specifies the initial counts (defaults to 1)
+         */
+        static ParameterEstimation* factory( const PropertySet& p );
+        /// Virtual destructor
+        virtual ~CondProbEstimation() {}
+        /// Returns an estimate of the conditional probability distribution.
+        /** The format of the resulting Prob keeps all the values for 
+         *  \f$ P(X | Y=a) \f$ sequential in the array.
+         */
+        virtual Prob estimate();
+        /// Accumulate sufficient statistics from the expectations in p.
+        virtual void addSufficientStatistics( Prob& p );
+        /// Returns the required size for arguments to addSufficientStatistics
+        virtual size_t probSize() const { 
+            return _stats.size(); 
+        }
+        /// Virtual copy constructor.
+        virtual ParameterEstimation* clone() const {
+            return new CondProbEstimation( _target_dim, _initial_stats );
+        }
 };
 
 
@@ -127,7 +127,7 @@ class CondProbEstimation : private ParameterEstimation {
  *  canonical variable ordering.  This canonical variable ordering
  *  will likely not be the order of variables required to make two
  *  factors parameters isomorphic.  Therefore, this ordering of the
- *  variables must be specified for ever factory to ensure that
+ *  variables must be specified for each factory to ensure that
  *  parameters can be shared between different factors during EM.
  */
 class SharedParameters {
@@ -143,7 +143,9 @@ class SharedParameters {
         ParameterEstimation* _estimation;
         bool _deleteEstimation;
 
-        static Permute calculatePermutation( const std::vector<Var>& varorder, const std::vector<size_t>& dims, VarSet& outVS );
+        /// Calculates the permutation that permutes the variables in varorder into the canonical ordering
+        static Permute calculatePermutation( const std::vector<Var>& varorder, VarSet& outVS );
+        /// Initializes _varsets and _perms from _varorders
         void setPermsAndVarSetsFromVarOrders();
 
     public:
@@ -179,9 +181,10 @@ class MaximizationStep {
     private:
         std::vector<SharedParameters> _params;
     public:
+        /// Default constructor
         MaximizationStep() : _params() {}
 
-        /// Construct an step object that contains all these estimation problems
+        /// Construct a step object that contains all these estimation problems
         MaximizationStep( std::vector<SharedParameters>& maximizations ) : _params(maximizations) {}  
 
         /// Construct a step from an input stream
@@ -209,6 +212,10 @@ class MaximizationStep {
  *  MaximizationSteps.  An expectation step is performed between execution
  *  of each MaximizationStep.  A call to iterate() will cycle through all
  *  MaximizationSteps.
+ *
+ *  Having multiple and separate maximization steps allows for maximizing some
+ *  parameters, performing another E step, and then maximizing separate
+ *  parameters, which may result in faster convergence in some cases.
  */  
 class EMAlg {
     private:
@@ -220,10 +227,17 @@ class EMAlg {
 
         /// The maximization steps to take
         std::vector<MaximizationStep> _msteps;
+
+        /// Number of iterations done
         size_t _iters;
+
+        /// History of likelihoods
         std::vector<Real> _lastLogZ;
 
+        /// Maximum number of iterations
         size_t _max_iters;
+
+        /// Convergence tolerance
         Real _log_z_tol;
 
     public:
@@ -237,7 +251,7 @@ class EMAlg {
         static const Real LOG_Z_TOL_DEFAULT;
 
         /// Construct an EMAlg from all these objects
-        EMAlg( const Evidence& evidence, InfAlg& estep, std::vector<MaximizationStep>& msteps, PropertySet* termconditions = NULL) :
+        EMAlg( const Evidence& evidence, InfAlg& estep, std::vector<MaximizationStep>& msteps, const PropertySet &termconditions ) :
           _evidence(evidence), _estep(estep), _msteps(msteps), _iters(0), _lastLogZ(), _max_iters(MAX_ITERS_DEFAULT), _log_z_tol(LOG_Z_TOL_DEFAULT) { 
               setTermConditions( termconditions );
         }
@@ -245,14 +259,14 @@ class EMAlg {
         /// Construct an EMAlg from an input stream
         EMAlg( const Evidence& evidence, InfAlg& estep, std::istream& mstep_file );
 
-        /// Change the coditions for termination
-        /** There are two possible parameters in the PropertySety
+        /// Change the conditions for termination
+        /** There are two possible parameters in the PropertySet
          *    - max_iters  maximum number of iterations (default 30)
          *    - log_z_tol proportion of increase in logZ (default 0.01)
          *
          *  \see hasSatisifiedTermConditions()
          */
-        void setTermConditions( const PropertySet* p );
+        void setTermConditions( const PropertySet &p );
 
         /// Determine if the termination conditions have been met.
         /** There are two sufficient termination conditions:
@@ -264,6 +278,7 @@ class EMAlg {
          */
         bool hasSatisfiedTermConditions() const;
 
+        /// Returns number of iterations done so far
         size_t getCurrentIters() const { 
             return _iters; 
         }

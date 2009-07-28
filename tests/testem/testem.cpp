@@ -42,7 +42,7 @@ void usage( const string& msg ) {
 
 int main( int argc, char** argv ) {
     if( argc != 4 )
-      usage("Incorrect number of arguments.");
+        usage("Incorrect number of arguments.");
     
     FactorGraph fg;
     fg.ReadFromFile( argv[1] );
@@ -58,8 +58,7 @@ int main( int argc, char** argv ) {
     e.addEvidenceTabFile( estream, fg );
 
     cout << "Number of samples: " << e.nrSamples() << endl;
-    Evidence::iterator ps = e.begin();
-    for( ; ps != e.end(); ps++ )
+    for( Evidence::iterator ps = e.begin(); ps != e.end(); ps++ )
         cout << "Sample #" << (ps - e.begin()) << " has " << ps->observations().size() << " observations." << endl;
 
     ifstream emstream( argv[3] );

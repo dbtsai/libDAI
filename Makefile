@@ -252,19 +252,21 @@ endif
 # REGRESSION TESTS
 ###################
 
-ifneq ($(OS),WINDOWS)
 testregression : tests/testdai$(EE)
 	@echo Starting regression test...this can take a minute or so!
+ifneq ($(OS),WINDOWS)
 	cd tests && ./testregression && cd ..
 else
-testregression : tests/testdai$(EE)
-	@echo Starting regression test...this can take a minute or so!
 	cd tests && testregression.bat && cd ..
 endif
 
 testem : tests/testem/testem$(EE)
 	@echo Starting EM tests
+ifneq ($(OS),WINDOWS)
 	cd tests/testem && ./runtests && cd ../..
+else
+	cd tests\testem && runtests && cd ..\..
+endif
 
 
 # DOCUMENTATION
@@ -288,11 +290,12 @@ clean :
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_sprinkler$(EE)
 	-rm tests/testdai$(EE)
+	-rm tests/testem/testem$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib
 else
 .PHONY : clean
 clean :
-	-del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) examples\*.ilk examples\*.pdb tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
+	-del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) examples\*.ilk examples\*.pdb tests\testdai$(EE) tests\testem\testem$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
 endif

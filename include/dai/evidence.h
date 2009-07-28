@@ -53,6 +53,9 @@ class Observation {
 
 
 /// Stores multiple observations of variables
+/** The Evidence class contains multiple samples, where a sample is the joint
+ *  observation of the states of some variables.
+ */
 class Evidence {
     private:
         std::vector<Observation> _samples;

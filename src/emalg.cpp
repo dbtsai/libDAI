@@ -87,28 +87,24 @@ Prob CondProbEstimation::estimate() {
 }
 
 
-Permute SharedParameters::calculatePermutation(const std::vector< Var >& varorder, const std::vector< size_t >& dims, VarSet& outVS) {
-    std::vector<long> labels(dims.size());
+Permute SharedParameters::calculatePermutation( const std::vector< Var >& varorder, VarSet& outVS ) {
+    std::vector<size_t> dims;
+    std::vector<long> labels;
   
-    // Check that the variable set is compatible
-    if (varorder.size() != dims.size())
-        DAI_THROW(INVALID_SHARED_PARAMETERS_ORDER);
-  
-    // Collect all labels, and order them in vs
-    for (size_t di = 0; di < dims.size(); ++di) {
-        if (dims[di] != varorder[di].states())
-            DAI_THROW(INVALID_SHARED_PARAMETERS_ORDER);
-        outVS |= varorder[di];
-        labels[di] = varorder[di].label();
+    // Collect all labels and dimensions, and order them in vs
+    dims.reserve( varorder.size() );
+    labels.reserve( varorder.size() );
+    for( size_t i = 0; i < varorder.size(); i++ ) {
+        dims.push_back( varorder[i].states() );
+        labels.push_back( varorder[i].label() );
+        outVS |= varorder[i];
     }
   
     // Construct the sigma array for the permutation object
-    std::vector<size_t> sigma(dims.size(), 0);
-    VarSet::iterator set_iterator = outVS.begin();
-    for (size_t vs_i = 0; vs_i < dims.size(); ++vs_i, ++set_iterator) {
-        std::vector< long >::iterator location = find(labels.begin(), labels.end(), set_iterator->label());
-        sigma[vs_i] = location - labels.begin();
-    }
+    std::vector<size_t> sigma;
+    sigma.reserve( dims.size() );
+    for (VarSet::iterator set_iterator = outVS.begin(); sigma.size() < dims.size(); ++set_iterator)
+        sigma.push_back( find(labels.begin(), labels.end(), set_iterator->label()) - labels.begin() );
   
     return Permute(dims, sigma);
 }
@@ -117,28 +113,22 @@ Permute SharedParameters::calculatePermutation(const std::vector< Var >& varorde
 void SharedParameters::setPermsAndVarSetsFromVarOrders() {
     if (_varorders.size() == 0)
         return;
-    FactorOrientations::const_iterator foi = _varorders.begin();
-    std::vector< size_t > dims(foi->second.size());
-    size_t total_dim = 1;
-    for (size_t i = 0; i < dims.size(); ++i) {
-        dims[i] = foi->second[i].states();
-        total_dim *= dims[i];
-    }
-  
-    // Construct the permutation objects
-    for ( ; foi != _varorders.end(); ++foi) {
-        VarSet vs;
-        _perms[foi->first] = calculatePermutation(foi->second, dims, vs);
-        _varsets[foi->first] = vs;
-    }
-  
-    if (_estimation == NULL || _estimation->probSize() != total_dim)
+    if( _estimation == NULL )
         DAI_THROW(INVALID_SHARED_PARAMETERS_ORDER);
+
+    // Construct the permutation objects and the varsets
+    for( FactorOrientations::const_iterator foi = _varorders.begin(); foi != _varorders.end(); ++foi ) {
+        VarSet vs;
+        _perms[foi->first] = calculatePermutation(foi->second, vs);
+        _varsets[foi->first] = vs;
+        if( _estimation->probSize() != vs.nrStates() )
+            DAI_THROW(INVALID_SHARED_PARAMETERS_ORDER);
+    }
 }
 
 
 SharedParameters::SharedParameters(std::istream& is, const FactorGraph& fg_varlookup)
-  : _varsets(), _perms(), _varorders(), _estimation(NULL), _deleteEstimation(1) 
+  : _varsets(), _perms(), _varorders(), _estimation(NULL), _deleteEstimation(true) 
 {
     std::string est_method;
     PropertySet props;
@@ -149,27 +139,28 @@ SharedParameters::SharedParameters(std::istream& is, const FactorGraph& fg_varlo
 
     size_t num_factors;
     is >> num_factors;
-    for (size_t sp_i = 0; sp_i < num_factors; ++sp_i) {
+    for( size_t sp_i = 0; sp_i < num_factors; ++sp_i ) {
         std::string line;
-        std::vector< std::string > fields;
-        size_t factor;
-        std::vector< Var > var_order;
-        std::istringstream iss;
-
         while(line.size() == 0 && getline(is, line))
             ;
+
+        std::vector< std::string > fields;
         tokenizeString(line, fields, " \t");
 
         // Lookup the factor in the factorgraph
         if (fields.size() < 1)
             DAI_THROW(INVALID_SHARED_PARAMETERS_INPUT_LINE);
+        std::istringstream iss;
         iss.str(fields[0]);
+        size_t factor;
         iss >> factor;
         const VarSet& vs = fg_varlookup.factor(factor).vars();
         if (fields.size() != vs.size() + 1)
             DAI_THROW(INVALID_SHARED_PARAMETERS_INPUT_LINE);
 
         // Construct the vector of Vars
+        std::vector< Var > var_order;
+        var_order.reserve( vs.size() );
         for (size_t fi = 1; fi < fields.size(); ++fi) {
             // Lookup a single variable by label
             long label;
@@ -192,21 +183,20 @@ SharedParameters::SharedParameters(std::istream& is, const FactorGraph& fg_varlo
 SharedParameters::SharedParameters( const SharedParameters& sp ) 
   : _varsets(sp._varsets), _perms(sp._perms), _varorders(sp._varorders), _estimation(sp._estimation), _deleteEstimation(sp._deleteEstimation)
 {
-  if (_deleteEstimation)
-      _estimation = _estimation->clone();
+    if (_deleteEstimation)
+        _estimation = _estimation->clone();
 }
 
 
 SharedParameters::SharedParameters( const FactorOrientations& varorders, ParameterEstimation* estimation )
-  : _varsets(), _perms(), _varorders(varorders), _estimation(estimation), _deleteEstimation(0) 
+  : _varsets(), _perms(), _varorders(varorders), _estimation(estimation), _deleteEstimation(false) 
 {
-  setPermsAndVarSetsFromVarOrders();
+    setPermsAndVarSetsFromVarOrders();
 }
 
 
 void SharedParameters::collectSufficientStatistics(InfAlg& alg) {
-    std::map< FactorIndex, Permute >::iterator i = _perms.begin();
-    for ( ; i != _perms.end(); ++i) {
+    for ( std::map< FactorIndex, Permute >::iterator i = _perms.begin(); i != _perms.end(); ++i) {
         Permute& perm = i->second;
         VarSet& vs = _varsets[i->first];
         
@@ -221,8 +211,7 @@ void SharedParameters::collectSufficientStatistics(InfAlg& alg) {
 
 void SharedParameters::setParameters(FactorGraph& fg) {
     Prob p = _estimation->estimate();
-    std::map< FactorIndex, Permute >::iterator i = _perms.begin();
-    for ( ; i != _perms.end(); ++i) {
+    for ( std::map< FactorIndex, Permute >::iterator i = _perms.begin(); i != _perms.end(); ++i) {
         Permute& perm = i->second;
         VarSet& vs = _varsets[i->first];
         
@@ -280,46 +269,45 @@ EMAlg::EMAlg(const Evidence& evidence, InfAlg& estep, std::istream& msteps_file)
 }	
 
 
-void EMAlg::setTermConditions(const PropertySet* p) {
-    if (NULL == p)
-        return;
-    if (p->hasKey(MAX_ITERS_KEY))
-        _max_iters = p->getStringAs<size_t>(MAX_ITERS_KEY);
-    if (p->hasKey(LOG_Z_TOL_KEY))
-        _log_z_tol = p->getStringAs<Real>(LOG_Z_TOL_KEY);
+void EMAlg::setTermConditions(const PropertySet &p) {
+    if (p.hasKey(MAX_ITERS_KEY))
+        _max_iters = p.getStringAs<size_t>(MAX_ITERS_KEY);
+    if (p.hasKey(LOG_Z_TOL_KEY))
+        _log_z_tol = p.getStringAs<Real>(LOG_Z_TOL_KEY);
 }
 
 
 bool EMAlg::hasSatisfiedTermConditions() const {
     if (_iters >= _max_iters) {
-        return 1;
+        return true;
     } else if (_lastLogZ.size() < 3) { 
         // need at least 2 to calculate ratio
         // Also, throw away first iteration, as the parameters may not
         // have been normalized according to the estimation method
-        return 0;
+        return false;
     } else {
         Real current = _lastLogZ[_lastLogZ.size() - 1];
         Real previous = _lastLogZ[_lastLogZ.size() - 2];
-        if (previous == 0) return 0;
+        if (previous == 0) 
+            return false;
         Real diff = current - previous;
         if (diff < 0) {
             std::cerr << "Error: in EM log-likehood decreased from " << previous << " to " << current << std::endl;
-            return 1;
+            return true;
         }
         return diff / abs(previous) <= _log_z_tol;
     }
 }
 
 
-Real EMAlg::iterate(MaximizationStep& mstep) {
-    Evidence::const_iterator e = _evidence.begin();
+Real EMAlg::iterate( MaximizationStep& mstep ) {
     Real logZ = 0;
 
     // Expectation calculation
-    for ( ; e != _evidence.end(); ++e) {
+    for( Evidence::const_iterator e = _evidence.begin(); e != _evidence.end(); ++e ) {
         InfAlg* clamped = _estep.clone();
         e->applyEvidence(*clamped);
+        clamped->init();
         clamped->run();
       
         logZ += clamped->logZ();
