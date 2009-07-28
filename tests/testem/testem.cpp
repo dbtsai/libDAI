@@ -73,5 +73,7 @@ int main( int argc, char** argv ) {
     cout.precision(12);
     cout << inf->fg();
 
+    delete inf;
+
     return 0;
 }

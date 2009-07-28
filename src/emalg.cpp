@@ -224,16 +224,14 @@ void SharedParameters::setParameters(FactorGraph& fg) {
 }
 
 
-MaximizationStep::MaximizationStep (std::istream& is, const FactorGraph& fg_varlookup ) 
+MaximizationStep::MaximizationStep( std::istream& is, const FactorGraph& fg_varlookup ) 
   : _params()
 {
     size_t num_params = -1;
     is >> num_params;
     _params.reserve(num_params);
-    for (size_t i = 0; i < num_params; ++i) {
-        SharedParameters p(is, fg_varlookup);
-        _params.push_back(p);
-    }
+    for (size_t i = 0; i < num_params; ++i)
+        _params.push_back( SharedParameters( is, fg_varlookup ) );
 }
 
 
@@ -262,10 +260,8 @@ EMAlg::EMAlg(const Evidence& evidence, InfAlg& estep, std::istream& msteps_file)
     size_t num_msteps = -1;
     msteps_file >> num_msteps;
     _msteps.reserve(num_msteps);
-    for (size_t i = 0; i < num_msteps; ++i) {
-        MaximizationStep m(msteps_file, estep.fg());
-        _msteps.push_back(m);
-    }
+    for (size_t i = 0; i < num_msteps; ++i)
+        _msteps.push_back( MaximizationStep( msteps_file, estep.fg() ) );
 }	
 
 
