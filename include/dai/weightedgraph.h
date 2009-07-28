@@ -204,17 +204,21 @@ template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> &G ) 
 /** Uses implementation in Boost Graph Library.
  */
 template<typename T> DEdgeVec MaxSpanningTreePrims( const WeightedGraph<T> & Graph ) {
-    T maxweight = Graph.begin()->second;
-    for( typename WeightedGraph<T>::const_iterator it = Graph.begin(); it != Graph.end(); it++ )
-        if( it->second > maxweight )
-            maxweight = it->second;
-    // make a copy of the graph
-    WeightedGraph<T> gr( Graph );
-    // invoke MinSpanningTreePrims with negative weights
-    // (which have to be shifted to satisfy positivity criterion)
-    for( typename WeightedGraph<T>::iterator it = gr.begin(); it != gr.end(); it++ )
-        it->second = maxweight - it->second;
-    return MinSpanningTreePrims( gr );
+    if( Graph.size() == 0 )
+        return DEdgeVec();
+    else {
+        T maxweight = Graph.begin()->second;
+        for( typename WeightedGraph<T>::const_iterator it = Graph.begin(); it != Graph.end(); it++ )
+            if( it->second > maxweight )
+                maxweight = it->second;
+        // make a copy of the graph
+        WeightedGraph<T> gr( Graph );
+        // invoke MinSpanningTreePrims with negative weights
+        // (which have to be shifted to satisfy positivity criterion)
+        for( typename WeightedGraph<T>::iterator it = gr.begin(); it != gr.end(); it++ )
+            it->second = maxweight - it->second;
+        return MinSpanningTreePrims( gr );
+    }
 }
 
 
