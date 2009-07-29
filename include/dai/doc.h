@@ -146,6 +146,9 @@
  *    [\ref MoK07, \ref MoR05];
  *  - Gibbs sampler.
  *
+ *  In addition, libDAI supports parameter learning of conditional probability
+ *  tables by Expectation Maximization.
+ *
  *  \section language Why C++?
  *  Because libDAI is implemented in C++, it is very fast compared with
  *  implementations in MatLab (a factor 1000 faster is not uncommon).
@@ -162,7 +165,7 @@
  */
 
 
-/** \page biboliography Bibliography
+/** \page bibliography Bibliography
  *  \section Bibliograpy
  *  \anchor KFL01 \ref KFL01
  *  F. R. Kschischang and B. J. Frey and H.-A. Loeliger (2001):

@@ -35,17 +35,15 @@ void Observation::addObservation( Var node, size_t setting ) {
 }
 
 
-void Observation::applyEvidence( InfAlg& alg ) const {
-    std::map<Var, size_t>::const_iterator i = _obs.begin();
-    for( ; i != _obs.end(); ++i )
+void Observation::applyEvidence( InfAlg &alg ) const {
+    for( std::map<Var, size_t>::const_iterator i = _obs.begin(); i != _obs.end(); ++i )
         alg.clamp( i->first, i->second );
 }
   
 
-void Evidence::addEvidenceTabFile( std::istream& is, FactorGraph& fg ) {
+void Evidence::addEvidenceTabFile( std::istream &is, FactorGraph &fg ) {
     std::map<std::string, Var> varMap;
-    std::vector<Var>::const_iterator v = fg.vars().begin();
-    for( ; v != fg.vars().end(); ++v ) {
+    for( std::vector<Var>::const_iterator v = fg.vars().begin(); v != fg.vars().end(); ++v ) {
         std::stringstream s;
         s << v->label();
         varMap[s.str()] = *v;
@@ -55,19 +53,18 @@ void Evidence::addEvidenceTabFile( std::istream& is, FactorGraph& fg ) {
 }
 
 
-void Evidence::addEvidenceTabFile( std::istream& is, std::map<std::string, Var>& varMap ) {
-    std::vector<std::string> header_fields;
-    std::vector<Var> vars;
+void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> &varMap ) {
     std::string line;
     getline( is, line );
     
     // Parse header
+    std::vector<std::string> header_fields;
     tokenizeString( line, header_fields );
     std::vector<std::string>::const_iterator p_field = header_fields.begin();
-
     if( p_field == header_fields.end() ) 
         DAI_THROW(INVALID_EVIDENCE_LINE);
 
+    std::vector<Var> vars;
     for( ; p_field != header_fields.end(); ++p_field ) {
         std::map<std::string, Var>::iterator elem = varMap.find( *p_field );
         if( elem == varMap.end() )
@@ -78,9 +75,7 @@ void Evidence::addEvidenceTabFile( std::istream& is, std::map<std::string, Var>&
     // Read samples
     while( getline(is, line) ) {
         std::vector<std::string> fields;
-
         tokenizeString( line, fields );
-        
         if( fields.size() != vars.size() ) 
             DAI_THROW(INVALID_EVIDENCE_LINE);
         

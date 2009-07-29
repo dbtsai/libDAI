@@ -33,10 +33,9 @@
 #include <dai/properties.h>
 
 
-/// \file 
-/** \brief Defines classes related to Expectation Maximization:
- *  EMAlg, ParameterEstimation, CondProbEstimation and SharedParameters
- */
+/// \file
+/// \brief Defines classes related to Expectation Maximization: EMAlg, ParameterEstimation, CondProbEstimation and SharedParameters
+/// \todo Describe EM file format
 
 
 namespace dai {
@@ -49,116 +48,142 @@ namespace dai {
  *
  *  Implementations of this interface should register a factory function
  *  via the static ParameterEstimation::registerMethod function.
+ *  The default registry only contains CondProbEstimation, named
+ *  "ConditionalProbEstimation".
  */
 class ParameterEstimation {
     public:  
         /// A pointer to a factory function.
-        typedef ParameterEstimation* (*ParamEstFactory)(const PropertySet&);
+        typedef ParameterEstimation* (*ParamEstFactory)( const PropertySet& );
+
+        /// Virtual destructor for deleting pointers to derived classes.
+        virtual ~ParameterEstimation() {}
+        /// Virtual copy constructor.
+        virtual ParameterEstimation* clone() const = 0;
 
         /// General factory method for construction of ParameterEstimation subclasses.
-        static ParameterEstimation* construct( const std::string& method, const PropertySet& p );
-        /// Register a subclass with ParameterEstimation::construct.
-        static void registerMethod( const std::string method, const ParamEstFactory f ) {
+        static ParameterEstimation* construct( const std::string &method, const PropertySet &p );
+
+        /// Register a subclass so that it can be used with ParameterEstimation::construct.
+        static void registerMethod( const std::string &method, const ParamEstFactory &f ) {
             if( _registry == NULL )
                 loadDefaultRegistry();
             (*_registry)[method] = f;
         }
-        /// Virtual destructor for deleting pointers to derived classes.
-        virtual ~ParameterEstimation() {}
+
         /// Estimate the factor using the accumulated sufficient statistics and reset.
         virtual Prob estimate() = 0;
+
         /// Accumulate the sufficient statistics for p.
-        virtual void addSufficientStatistics( Prob& p ) = 0;
-        /// Returns the size of the Prob that is passed to addSufficientStatistics.
+        virtual void addSufficientStatistics( const Prob &p ) = 0;
+
+        /// Returns the size of the Prob that should be passed to addSufficientStatistics.
         virtual size_t probSize() const = 0;
-        /// A virtual copy constructor.
-        virtual ParameterEstimation* clone() const = 0;
 
     private:
-        static std::map<std::string, ParamEstFactory>* _registry;
+        /// A static registry containing all methods registered so far.
+        static std::map<std::string, ParamEstFactory> *_registry;
+
+        /// Registers default ParameterEstimation subclasses (currently, only CondProbEstimation).
         static void loadDefaultRegistry();
 };
 
 
-/// Estimates the parameters of a conditional probability, using pseudocounts.
+/// Estimates the parameters of a conditional probability table, using pseudocounts.
 class CondProbEstimation : private ParameterEstimation {
     private:
+        /// Number of states of the variable of interest
         size_t _target_dim;
+        /// Current pseudocounts
         Prob _stats;
+        /// Initial pseudocounts
         Prob _initial_stats;
+
     public:
-        /** For a conditional probability \f$ Pr( X | Y ) \f$, 
+        /// Constructor
+        /** For a conditional probability \f$ P( X | Y ) \f$, 
          *  \param target_dimension should equal \f$ | X | \f$
          *  \param pseudocounts has length \f$ |X| \cdot |Y| \f$
          */
-        CondProbEstimation( size_t target_dimension, Prob pseudocounts );
+        CondProbEstimation( size_t target_dimension, const Prob &pseudocounts );
 
         /// Virtual constructor, using a PropertySet.
-        /** Some keys in the PropertySet are required:
-         *     - target_dimension, which should be equal to \f$ | X | \f$
-         *     - total_dimension, which should be equal to \f$ |X| \cdot |Y| \f$
+        /** Some keys in the PropertySet are required.
+         *  For a conditional probability \f$ P( X | Y ) \f$, 
+         *     - target_dimension should be equal to \f$ | X | \f$
+         *     - total_dimension should be equal to \f$ |X| \cdot |Y| \f$
          *  
          *  An optional key is:
          *     - pseudo_count, which specifies the initial counts (defaults to 1)
          */
-        static ParameterEstimation* factory( const PropertySet& p );
+        static ParameterEstimation* factory( const PropertySet &p );
+        
+        /// Virtual copy constructor
+        virtual ParameterEstimation* clone() const { return new CondProbEstimation( _target_dim, _initial_stats ); }
+
         /// Virtual destructor
         virtual ~CondProbEstimation() {}
+        
         /// Returns an estimate of the conditional probability distribution.
         /** The format of the resulting Prob keeps all the values for 
-         *  \f$ P(X | Y=a) \f$ sequential in the array.
+         *  \f$ P(X | Y=y) \f$ in sequential order in the array.
          */
         virtual Prob estimate();
+        
         /// Accumulate sufficient statistics from the expectations in p.
-        virtual void addSufficientStatistics( Prob& p );
-        /// Returns the required size for arguments to addSufficientStatistics
-        virtual size_t probSize() const { 
-            return _stats.size(); 
-        }
-        /// Virtual copy constructor.
-        virtual ParameterEstimation* clone() const {
-            return new CondProbEstimation( _target_dim, _initial_stats );
-        }
+        virtual void addSufficientStatistics( const Prob &p );
+        
+        /// Returns the required size for arguments to addSufficientStatistics.
+        virtual size_t probSize() const { return _stats.size(); }
 };
 
 
-/** A single factor or set of factors whose parameters should be
- *  estimated.  Each factor's values are reordered to match a
- *  canonical variable ordering.  This canonical variable ordering
- *  will likely not be the order of variables required to make two
- *  factors parameters isomorphic.  Therefore, this ordering of the
- *  variables must be specified for each factory to ensure that
- *  parameters can be shared between different factors during EM.
+/// A single factor or set of factors whose parameters should be estimated.
+/** To ensure that parameters can be shared between different factors during
+ *  EM learning, each factor's values are reordered to match a desired variable 
+ *  ordering. The ordering of the variables in a factor may therefore differ 
+ *  from the canonical ordering used in libDAI. The SharedParameters
+ *  class couples one or more factors (together with the specified orderings
+ *  of the variables) with a ParameterEstimation object, taking care of the
+ *  necessary permutations of the factor entries / parameters.
  */
 class SharedParameters {
     public:
-        /// Convenience label for an index into a FactorGraph to a factor.
+        /// Convenience label for an index into a factor in a FactorGraph.
         typedef size_t FactorIndex;
         /// Convenience label for a grouping of factor orientations.
-        typedef std::map< FactorIndex, std::vector< Var > > FactorOrientations;
+        typedef std::map<FactorIndex, std::vector<Var> > FactorOrientations;
+
     private:
+        /// Maps factor indices to the corresponding VarSets
         std::map<FactorIndex, VarSet> _varsets;
+        /// Maps factor indices to the corresponding Permute objects that permute the desired ordering into the canonical ordering
         std::map<FactorIndex, Permute> _perms;
+        /// Maps factor indices to the corresponding desired variable orderings
         FactorOrientations _varorders;
-        ParameterEstimation* _estimation;
+        /// Parameter estimation method to be used
+        ParameterEstimation *_estimation;
+        /// Indicates whether the object pointed to by _estimation should be deleted upon destruction
         bool _deleteEstimation;
 
         /// Calculates the permutation that permutes the variables in varorder into the canonical ordering
-        static Permute calculatePermutation( const std::vector<Var>& varorder, VarSet& outVS );
+        static Permute calculatePermutation( const std::vector<Var> &varorder, VarSet &outVS );
+
         /// Initializes _varsets and _perms from _varorders
         void setPermsAndVarSetsFromVarOrders();
 
     public:
         /// Copy constructor
-        SharedParameters( const SharedParameters& sp );
-        /// Constructor useful in programmatic settings 
+        SharedParameters( const SharedParameters &sp );
+
+        /// Constructor 
         /** \param varorders  all the factor orientations for this parameter
          *  \param estimation a pointer to the parameter estimation method
          */ 
-        SharedParameters( const FactorOrientations& varorders, ParameterEstimation* estimation );
+        SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation );
 
-        /// Constructor for making an object from a stream
-        SharedParameters( std::istream& is, const FactorGraph& fg_varlookup );
+        /// Constructor for making an object from a stream and a factor graph
+        SharedParameters( std::istream &is, const FactorGraph &fg_varlookup );
 
         /// Destructor
         ~SharedParameters() { 
@@ -167,46 +192,41 @@ class SharedParameters {
         }
 
         /// Collect the necessary statistics from expected values
-        void collectSufficientStatistics( InfAlg& alg );
+        void collectSufficientStatistics( InfAlg &alg );
 
         /// Estimate and set the shared parameters
-        void setParameters( FactorGraph& fg );
+        void setParameters( FactorGraph &fg );
 };
 
 
-/** A maximization step groups together several parameter estimation
- *  tasks into a single unit.
- */
+/// A MaximizationStep groups together several parameter estimation tasks into a single unit.
 class MaximizationStep { 
     private:
         std::vector<SharedParameters> _params;
+
     public:
         /// Default constructor
         MaximizationStep() : _params() {}
 
-        /// Construct a step object that contains all these estimation problems
-        MaximizationStep( std::vector<SharedParameters>& maximizations ) : _params(maximizations) {}  
+        /// Constructor from a vector of SharedParameters objects
+        MaximizationStep( std::vector<SharedParameters> &maximizations ) : _params(maximizations) {}  
 
-        /// Construct a step from an input stream
-        MaximizationStep( std::istream& is, const FactorGraph& fg_varlookup );
+        /// Constructor from an input stream and a corresponding factor graph
+        MaximizationStep( std::istream &is, const FactorGraph &fg_varlookup );
 
-        /** Collect the beliefs from this InfAlg as expectations for
-         *  the next Maximization step.
-         */
-        void addExpectations( InfAlg& alg );
+        /// Collect the beliefs from this InfAlg as expectations for the next Maximization step.
+        void addExpectations( InfAlg &alg );
 
-        /** Using all of the currently added expectations, make new factors 
-         *  with maximized parameters and set them in the FactorGraph.
-         */
-        void maximize( FactorGraph& fg );
+        /// Using all of the currently added expectations, make new factors with maximized parameters and set them in the FactorGraph.
+        void maximize( FactorGraph &fg );
 };
 
 
 /// EMAlg performs Expectation Maximization to learn factor parameters.
 /** This requires specifying:
  *     - Evidence (instances of observations from the graphical model),
- *     - InfAlg for performing the E-step, which includes the factor graph
- *     - a vector of MaximizationSteps steps to be performed
+ *     - InfAlg for performing the E-step, which includes the factor graph,
+ *     - a vector of MaximizationSteps steps to be performed.
  *
  *  This implementation can perform incremental EM by using multiple 
  *  MaximizationSteps.  An expectation step is performed between execution
@@ -220,10 +240,10 @@ class MaximizationStep {
 class EMAlg {
     private:
         /// All the data samples used during learning
-        const Evidence& _evidence;
+        const Evidence &_evidence;
 
         /// How to do the expectation step
-        InfAlg& _estep;
+        InfAlg &_estep;
 
         /// The maximization steps to take
         std::vector<MaximizationStep> _msteps;
@@ -242,27 +262,28 @@ class EMAlg {
 
     public:
         /// Key for setting maximum iterations @see setTermConditions
-        static const std::string MAX_ITERS_KEY; //("max_iters");
-        /// Default maximum iterations
+        static const std::string MAX_ITERS_KEY;
+        /// Default maximum iterations @see setTermConditions
         static const size_t MAX_ITERS_DEFAULT;
         /// Key for setting likelihood termination condition @see setTermConditions
         static const std::string LOG_Z_TOL_KEY;
-        /// Default log_z_tol
+        /// Default likelihood tolerance @see setTermConditions
         static const Real LOG_Z_TOL_DEFAULT;
 
         /// Construct an EMAlg from all these objects
-        EMAlg( const Evidence& evidence, InfAlg& estep, std::vector<MaximizationStep>& msteps, const PropertySet &termconditions ) :
-          _evidence(evidence), _estep(estep), _msteps(msteps), _iters(0), _lastLogZ(), _max_iters(MAX_ITERS_DEFAULT), _log_z_tol(LOG_Z_TOL_DEFAULT) { 
+        EMAlg( const Evidence &evidence, InfAlg &estep, std::vector<MaximizationStep> &msteps, const PropertySet &termconditions ) 
+          : _evidence(evidence), _estep(estep), _msteps(msteps), _iters(0), _lastLogZ(), _max_iters(MAX_ITERS_DEFAULT), _log_z_tol(LOG_Z_TOL_DEFAULT)
+        { 
               setTermConditions( termconditions );
         }
   
-        /// Construct an EMAlg from an input stream
-        EMAlg( const Evidence& evidence, InfAlg& estep, std::istream& mstep_file );
+        /// Construct an EMAlg from an Evidence object, an InfAlg object, and an input stream
+        EMAlg( const Evidence &evidence, InfAlg &estep, std::istream &mstep_file );
 
         /// Change the conditions for termination
         /** There are two possible parameters in the PropertySet
-         *    - max_iters  maximum number of iterations (default 30)
-         *    - log_z_tol proportion of increase in logZ (default 0.01)
+         *    - max_iters maximum number of iterations
+         *    - log_z_tol proportion of increase in logZ
          *
          *  \see hasSatisifiedTermConditions()
          */
@@ -272,24 +293,21 @@ class EMAlg {
         /** There are two sufficient termination conditions:
          *    -# the maximum number of iterations has been performed
          *    -# the ratio of logZ increase over previous logZ is less than the 
-         *       tolerance.  I.e.
-                 \f$ \frac{\log(Z_{current}) - \log(Z_{previous})}
-                      {| \log(Z_{previous}) | } < tol \f$.
+         *       tolerance, i.e.,
+         *       \f$ \frac{\log(Z_t) - \log(Z_{t-1})}{| \log(Z_{t-1}) | } < \mathrm{tol} \f$.
          */
         bool hasSatisfiedTermConditions() const;
 
         /// Returns number of iterations done so far
-        size_t getCurrentIters() const { 
-            return _iters; 
-        }
+        size_t getCurrentIters() const { return _iters; }
 
         /// Perform an iteration over all maximization steps
         Real iterate();
 
-        /// Performs an iteration over a single MaximizationStep
-        Real iterate( MaximizationStep& mstep );
+        /// Perform an iteration over a single MaximizationStep
+        Real iterate( MaximizationStep &mstep );
 
-        /// Iterate until termination conditions satisfied
+        /// Iterate until termination conditions are satisfied
         void run();
 };
 

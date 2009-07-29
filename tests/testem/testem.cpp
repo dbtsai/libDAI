@@ -32,7 +32,7 @@ using namespace std;
 using namespace dai;
 
 
-void usage( const string& msg ) {
+void usage( const string &msg ) {
     cerr << msg << endl;
     cerr << "Usage:" << endl;
     cerr << " testem factorgraph.fg evidence.tab emconfig.em" << endl;
