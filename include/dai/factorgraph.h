@@ -241,7 +241,7 @@ class FactorGraph {
         void ReadFromFile(const char *filename);
 
         /// Writes a FactorGraph to a file
-        void WriteToFile(const char *filename) const;
+        void WriteToFile(const char *filename, size_t precision=15) const;
 
         /// Writes a FactorGraph to a GraphViz .dot file
         void printDot( std::ostream& os ) const;

@@ -21,6 +21,7 @@
 
 
 #include <iostream>
+#include <iomanip>
 #include <iterator>
 #include <map>
 #include <set>
@@ -100,11 +101,8 @@ ostream& operator << (ostream& os, const FactorGraph& fg) {
                 nr_nonzeros++;
         os << nr_nonzeros << endl;
         for( size_t k = 0; k < fg.factor(I).states(); k++ )
-            if( fg.factor(I)[k] != 0.0 ) {
-                char buf[20];
-                sprintf(buf,"%18.14g", fg.factor(I)[k]);
-                os << k << " " << buf << endl;
-            }
+            if( fg.factor(I)[k] != 0.0 )
+                os << k << " " << setw(os.precision()+4) << fg.factor(I)[k] << endl;
     }
 
     return(os);
@@ -268,10 +266,11 @@ void FactorGraph::ReadFromFile( const char *filename ) {
 }
 
 
-void FactorGraph::WriteToFile( const char *filename ) const {
+void FactorGraph::WriteToFile( const char *filename, size_t precision ) const {
     ofstream outfile;
     outfile.open( filename );
     if( outfile.is_open() ) {
+        outfile.precision( precision );
         outfile << *this;
         outfile.close();
     } else

@@ -31,7 +31,7 @@ SRC=src
 LIB=lib
 
 # Define build targets
-TARGETS=tests utils lib examples testregression
+TARGETS=tests utils lib examples testregression testem
 ifdef WITH_DOC
   TARGETS:=$(TARGETS) doc 
 endif
@@ -45,7 +45,7 @@ ifdef WITH_MATLAB
 endif
 
 # Define conditional build targets
-OBJECTS:=exactinf$(OE)
+OBJECTS:=exactinf$(OE) evidence$(OE) emalg$(OE)
 ifdef WITH_BP
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP
   OBJECTS:=$(OBJECTS) bp$(OE)
@@ -104,7 +104,7 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-tests : tests/testdai$(EE)
+tests : tests/testdai$(EE) tests/testem/testem$(EE)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
@@ -162,6 +162,12 @@ mr$(OE) : $(SRC)/mr.cpp $(INC)/mr.h $(HEADERS)
 gibbs$(OE) : $(SRC)/gibbs.cpp $(INC)/gibbs.h $(HEADERS)
 	$(CC) -c $(SRC)/gibbs.cpp
 
+evidence$(OE) : $(SRC)/evidence.cpp $(INC)/evidence.h $(HEADERS)
+	$(CC) -c $(SRC)/evidence.cpp
+
+emalg$(OE) : $(SRC)/emalg.cpp $(INC)/emalg.h $(INC)/evidence.h $(HEADERS)
+	$(CC) -c $(SRC)/emalg.cpp
+
 properties$(OE) : $(SRC)/properties.cpp $(HEADERS)
 	$(CC) -c $(SRC)/properties.cpp
 
@@ -193,6 +199,8 @@ examples/example_sprinkler$(EE) : examples/example_sprinkler.cpp $(HEADERS) $(LI
 
 tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
+tests/testem/testem$(EE) : tests/testem/testem.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS)
 
 
 # MATLAB INTERFACE
@@ -244,14 +252,20 @@ endif
 # REGRESSION TESTS
 ###################
 
-ifneq ($(OS),WINDOWS)
 testregression : tests/testdai$(EE)
 	@echo Starting regression test...this can take a minute or so!
+ifneq ($(OS),WINDOWS)
 	cd tests && ./testregression && cd ..
 else
-testregression : tests/testdai$(EE)
-	@echo Starting regression test...this can take a minute or so!
 	cd tests && testregression.bat && cd ..
+endif
+
+testem : tests/testem/testem$(EE)
+	@echo Starting EM tests
+ifneq ($(OS),WINDOWS)
+	cd tests/testem && ./runtests && cd ../..
+else
+	cd tests\testem && runtests && cd ..\..
 endif
 
 
@@ -276,11 +290,12 @@ clean :
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_sprinkler$(EE)
 	-rm tests/testdai$(EE)
+	-rm tests/testem/testem$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib
 else
 .PHONY : clean
 clean :
-	-del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) examples\*.ilk examples\*.pdb tests\testdai$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
+	-del *$(OE) *.ilk *.pdb *$(EE) matlab\*$(ME) examples\*$(EE) examples\*.ilk examples\*.pdb tests\testdai$(EE) tests\testem\testem$(EE) tests\*.pdb tests\*.ilk utils\*$(EE) utils\*.pdb utils\*.ilk $(LIB)\libdai$(LE)
 endif
