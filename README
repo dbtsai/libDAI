@@ -90,12 +90,15 @@ Currently, libDAI supports the following (approximate) inference methods:
     * Various variants of Loop Corrected Belief Propagation [MoK07, MoR05];
     * Gibbs sampler.
 
+In addition, libDAI supports parameter learning of conditional probability
+tables by Expectation Maximization.
+
 
 Why C++?
 --------
 Because libDAI is implemented in C++, it is very fast compared with
 implementations in MatLab (a factor 1000 faster is not uncommon). libDAI does
-provide a MatLab interface for easy integration with MatLab.
+provide a (limited) MatLab interface for easy integration with MatLab.
 
 
 Releases
@@ -199,3 +202,42 @@ If the build was successful, you can test the example program:
 or the more elaborate test program:
 
     tests\testdai --aliases tests\aliases.conf --filename tests\alarm.fg --methods JTREE_HUGIN BP_SEQMAX
+
+
+Quick start (MatLab)
+--------------------
+You need:
+- MatLab
+- The platform-dependent requirements described above
+
+First, you need to build the libDAI source as described above for your
+platform. By default, the MatLab interface is disabled, so before compiling the
+source, you have to enable it in the Makefile.conf by setting
+"WITH_MATLAB=true". Also, you have to configure the MatLab-specific parts of
+Makefile.conf to match your system (in particular, the Makefile variables ME,
+MATLABDIR and MEX). The MEX file extension depends on your platform; for a
+64-bit linux x86_64 system this would be "ME=.mexa64", for a 32-bit linux x86
+system this would be "ME=.mexglx". If you are unsure about your MEX file
+extension: it needs to be the same as what the MatLab command "mexext" returns.
+The required MEX files are built by issuing
+
+    make
+
+from the command line. The MatLab interface is much less powerful than using
+libDAI from C++. There are two reasons for this: (i) it is boring to write MEX
+files; (ii) the large performance penalty paid when large data structures (like
+factor graphs) have to be converted between their native C++ data structure to
+something that MatLab understands.
+
+A simple example of how to use the MatLab interface is the following (entered
+at the MatLab prompt), which performs exact inference by the junction tree
+algorithm and approximate inference by belief propagation on the ALARM network:
+
+    cd path_to_libdai/matlab
+    [psi] = dai_readfg ('../examples/alarm.fg');
+    [logZ,marginals,md] = dai (psi, 'JTREE', '[updates=HUGIN,verbose=0]')
+    [logZ,marginals,md] = dai (psi, 'BP', '[updates=SEQMAX,tol=1e-9,maxiter=10000,logdomain=0]')
+
+where "path_to_libdai" has to be replaced with the directory in which libDAI
+was installed. For other algorithms and their parameters, see
+tests/aliases.conf.
