@@ -20,8 +20,7 @@
 
 /// \file
 /// \brief Defines class BP_dual
-/// \todo Improve documentation
-/// \todo Clean up
+/// \todo This replicates a large part of the functionality of BP; would it not be shorter to adapt BP instead?
 
 
 #ifndef __defined_libdai_bp_dual_h
@@ -36,7 +35,9 @@
 namespace dai {
 
 
-/** Class to estimate "dual" versions of BP messages, and normalizers, given an InfAlg. 
+/// Calculates both types of BP messages and their normalizers from an InfAlg.
+/** BP_dual calculates "dual" versions of BP messages (both messages from factors
+ *  to variables and messages from variables to factors), and normalizers, given an InfAlg. 
  *  These are computed from the variable and factor beliefs of the InfAlg.
  *  This class is used primarily by BBP.
  */
@@ -48,39 +49,56 @@ class BP_dual {
         struct _edges_t : public std::vector<std::vector<T> > {};
 
         /// Groups together the data structures for storing the two types of messages and their normalizers
-        struct messages {
+        struct messages {            
+            /// Unnormalized variable->factor messages
             _edges_t<Prob> n;
+            /// Normalizers of variable->factor messages
             _edges_t<Real> Zn;
+            /// Unnormalized Factor->variable messages
             _edges_t<Prob> m;
+            /// Normalizers of factor->variable messages
             _edges_t<Real> Zm;
         };
+        /// Stores all messages
         messages _msgs;
 
         /// Groups together the data structures for storing the two types of beliefs and their normalizers
         struct beliefs {
-            // indexed by node
+            /// Unnormalized variable beliefs
             std::vector<Prob> b1;
+            /// Normalizers of variable beliefs
             std::vector<Real> Zb1;
-            // indexed by factor
+            /// Unnormalized factor beliefs
             std::vector<Prob> b2;
+            /// Normalizers of factor beliefs
             std::vector<Real> Zb2;
         };
+        /// Stores all beliefs
         beliefs _beliefs;
 
+        /// Pointer to the InfAlg object
         const InfAlg *_ia;
-            
+        
+        /// Does all necessary preprocessing
         void init();
-
+        /// Allocates space for _msgs
         void regenerateMessages();
+        /// Allocates space for _beliefs
         void regenerateBeliefs();
 
+        /// Calculate all messages from InfAlg beliefs
         void calcMessages();
-        void calcBeliefV(size_t i);
-        void calcBeliefF(size_t I);
-        void calcBeliefs();
-
+        /// Update factor->variable message (i->I)
         void calcNewM(size_t i, size_t _I);
+        /// Update variable->factor message (I->i)
         void calcNewN(size_t i, size_t _I);
+
+        /// Calculate all variable and factor beliefs from messages
+        void calcBeliefs();
+        /// Calculate variable belief
+        void calcBeliefV(size_t i);
+        /// Calculate factor belief
+        void calcBeliefF(size_t I);
 
     public:
         /// Construct BP_dual object from (converged) InfAlg object's beliefs and factors. 
@@ -89,27 +107,27 @@ class BP_dual {
          */
         BP_dual( const InfAlg *ia ) : _ia(ia) { init(); }
 
+        /// Returns the underlying FactorGraph
         const FactorGraph& fg() const { return _ia->fg(); }
 
-        /// factor -> var message
-        DAI_ACCMUT(Prob & msgM(size_t i, size_t _I), { return _msgs.m[i][_I]; });
-        /// var -> factor message
-        DAI_ACCMUT(Prob & msgN(size_t i, size_t _I), { return _msgs.n[i][_I]; });
-        /// Normalizer for msgM
-        DAI_ACCMUT(Real & zM(size_t i, size_t _I), { return _msgs.Zm[i][_I]; });
-        /// Normalizer for msgN
-        DAI_ACCMUT(Real & zN(size_t i, size_t _I), { return _msgs.Zn[i][_I]; });
+        /// Returns factor -> var message (I->i)
+        DAI_ACCMUT(Prob & msgM( size_t i, size_t _I ), { return _msgs.m[i][_I]; });
+        /// Returns var -> factor message (i->I)
+        DAI_ACCMUT(Prob & msgN( size_t i, size_t _I ), { return _msgs.n[i][_I]; });
+        /// Returns normalizer for msgM
+        DAI_ACCMUT(Real & zM( size_t i, size_t _I ), { return _msgs.Zm[i][_I]; });
+        /// Returns normalizer for msgN
+        DAI_ACCMUT(Real & zN( size_t i, size_t _I ), { return _msgs.Zn[i][_I]; });
 
-        /// Variable belief
-        Factor beliefV(size_t i) const { return Factor(_ia->fg().var(i), _beliefs.b1[i]); }
-        /// Factor belief
-        Factor beliefF(size_t I) const { return Factor(_ia->fg().factor(I).vars(), _beliefs.b2[I]); }
+        /// Returns variable belief
+        Factor beliefV( size_t i ) const { return Factor( _ia->fg().var(i), _beliefs.b1[i] ); }
+        /// Returns factor belief
+        Factor beliefF( size_t I ) const { return Factor( _ia->fg().factor(I).vars(), _beliefs.b2[I] ); }
 
-        /// Normalizer for variable belief
-        Real beliefVZ(size_t i) const { return _beliefs.Zb1[i]; }
-        /// Normalizer for factor belief
-        Real beliefFZ(size_t I) const { return _beliefs.Zb2[I]; }
-
+        /// Returns normalizer for variable belief
+        Real beliefVZ( size_t i ) const { return _beliefs.Zb1[i]; }
+        /// Returns normalizer for factor belief
+        Real beliefFZ( size_t I ) const { return _beliefs.Zb2[I]; }
 };
 
 

@@ -76,17 +76,17 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
 
 
 /// \todo Make alias file non-testdai-specific, and use it in newInfAlgFromString
-InfAlg *newInfAlgFromString( const std::string &s, const FactorGraph &fg ) {
-    string::size_type pos = s.find_first_of('[');
+InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg ) {
+    string::size_type pos = nameOpts.find_first_of('[');
     string name;
     PropertySet opts;
     if( pos == string::npos ) {
-        name = s;
+        name = nameOpts;
     } else {
-        name = s.substr(0,pos);
+        name = nameOpts.substr(0,pos);
 
         stringstream ss;
-        ss << s.substr(pos,s.length());
+        ss << nameOpts.substr(pos,nameOpts.length());
         ss >> opts;
     }
     return newInfAlg(name,fg,opts);
