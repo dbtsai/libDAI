@@ -360,6 +360,7 @@ class BipartiteGraph {
         /// @name Backwards compatibility layer (to be removed soon)
         //@{
         void indexEdges() {
+            std::cerr << "Warning: this BipartiteGraph edge interface is obsolete!" << std::endl;
             _edges.clear();
             _vv2e.clear();
             size_t i=0;

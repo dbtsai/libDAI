@@ -43,8 +43,6 @@ const char *CBP::Name = "CBP";
 
 
 void CBP::construct() {
-    indexEdges();
-
     _beliefsV.clear(); _beliefsV.reserve(nrVars());
     for( size_t i = 0; i < nrVars(); i++ )
         _beliefsV.push_back( Factor(var(i)).normalized() );
