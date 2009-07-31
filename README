@@ -235,8 +235,8 @@ algorithm and approximate inference by belief propagation on the ALARM network:
 
     cd path_to_libdai/matlab
     [psi] = dai_readfg ('../examples/alarm.fg');
-    [logZ,marginals,md] = dai (psi, 'JTREE', '[updates=HUGIN,verbose=0]')
-    [logZ,marginals,md] = dai (psi, 'BP', '[updates=SEQMAX,tol=1e-9,maxiter=10000,logdomain=0]')
+    [logZ,q,md,qv,qf] = dai (psi, 'JTREE', '[updates=HUGIN,verbose=0]')
+    [logZ,q,md,qv,qf] = dai (psi, 'BP', '[updates=SEQMAX,tol=1e-9,maxiter=10000,logdomain=0]')
 
 where "path_to_libdai" has to be replaced with the directory in which libDAI
 was installed. For other algorithms and their parameters, see

@@ -22,7 +22,7 @@ WITH_DOC=true
 DEBUG=true
 # Build matlab interface?
 WITH_MATLAB=
-# New/old matlab version?
+# MatLab version 7.3 (R2006b) or newer?
 NEW_MATLAB=true
 
 # OPERATING SYSTEM
