@@ -42,74 +42,73 @@ namespace dai {
  */
 class BP_dual {
 
-protected:
-    template<class T>
-    struct _edges_t : public std::vector<std::vector<T> > {};
+    protected:
+        /// Convenience label for storing edge properties
+        template<class T>
+        struct _edges_t : public std::vector<std::vector<T> > {};
 
-    struct messages {
-        // messages:
-        _edges_t<Prob> n;
-        _edges_t<Real> Zn;
-        _edges_t<Prob> m;
-        _edges_t<Real> Zm;
-    };
-    messages _msgs;
+        /// Groups together the data structures for storing the two types of messages and their normalizers
+        struct messages {
+            _edges_t<Prob> n;
+            _edges_t<Real> Zn;
+            _edges_t<Prob> m;
+            _edges_t<Real> Zm;
+        };
+        messages _msgs;
 
-    struct beliefs {
-        // beliefs:
-        // indexed by node
-        std::vector<Prob> b1;
-        std::vector<Real> Zb1;
-        // indexed by factor
-        std::vector<Prob> b2;
-        std::vector<Real> Zb2;
-    };
-    beliefs _beliefs;
+        /// Groups together the data structures for storing the two types of beliefs and their normalizers
+        struct beliefs {
+            // indexed by node
+            std::vector<Prob> b1;
+            std::vector<Real> Zb1;
+            // indexed by factor
+            std::vector<Prob> b2;
+            std::vector<Real> Zb2;
+        };
+        beliefs _beliefs;
 
-    const InfAlg *_ia;
-        
-    void Init();
+        const InfAlg *_ia;
+            
+        void init();
 
-    void RegenerateMessages();
-    void RegenerateBeliefs();
+        void regenerateMessages();
+        void regenerateBeliefs();
 
-    void CalcMessages();
-    void CalcBeliefV(size_t i);
-    void CalcBeliefF(size_t I);
-    void CalcBeliefs();
+        void calcMessages();
+        void calcBeliefV(size_t i);
+        void calcBeliefF(size_t I);
+        void calcBeliefs();
 
-    void calcNewM(size_t i, size_t _I);
-    void calcNewN(size_t i, size_t _I);
-public:
+        void calcNewM(size_t i, size_t _I);
+        void calcNewN(size_t i, size_t _I);
 
-    /// Construct BP_dual object from (converged) InfAlg object's beliefs and factors. 
-    /*  A pointer to the the InfAlg object is
-     *  stored, so the object must not be destroyed before the BP_dual
-     */
-    BP_dual(const InfAlg *ia) : _ia(ia) {
-        Init();
-    }
+    public:
+        /// Construct BP_dual object from (converged) InfAlg object's beliefs and factors. 
+        /*  A pointer to the the InfAlg object is stored, 
+         *  so the object must not be destroyed before the BP_dual is destroyed.
+         */
+        BP_dual( const InfAlg *ia ) : _ia(ia) { init(); }
 
-    const FactorGraph& fg() const { return _ia->fg(); }
+        const FactorGraph& fg() const { return _ia->fg(); }
 
-    /// msgM: factor -> var messages
-    DAI_ACCMUT(Prob & msgM(size_t i, size_t _I), { return _msgs.m[i][_I]; });
-    /// msgN: var -> factor messages
-    DAI_ACCMUT(Prob & msgN(size_t i, size_t _I), { return _msgs.n[i][_I]; });
-    /// Normalizer for msgM
-    DAI_ACCMUT(Real & zM(size_t i, size_t _I), { return _msgs.Zm[i][_I]; });
-    /// Normalizer for msgN
-    DAI_ACCMUT(Real & zN(size_t i, size_t _I), { return _msgs.Zn[i][_I]; });
+        /// factor -> var message
+        DAI_ACCMUT(Prob & msgM(size_t i, size_t _I), { return _msgs.m[i][_I]; });
+        /// var -> factor message
+        DAI_ACCMUT(Prob & msgN(size_t i, size_t _I), { return _msgs.n[i][_I]; });
+        /// Normalizer for msgM
+        DAI_ACCMUT(Real & zM(size_t i, size_t _I), { return _msgs.Zm[i][_I]; });
+        /// Normalizer for msgN
+        DAI_ACCMUT(Real & zN(size_t i, size_t _I), { return _msgs.Zn[i][_I]; });
 
-    /// Variable beliefs
-    Factor beliefV(size_t i) const { return Factor(_ia->fg().var(i), _beliefs.b1[i]); }
-    /// Factor beliefs
-    Factor beliefF(size_t I) const { return Factor(_ia->fg().factor(I).vars(), _beliefs.b2[I]); }
+        /// Variable belief
+        Factor beliefV(size_t i) const { return Factor(_ia->fg().var(i), _beliefs.b1[i]); }
+        /// Factor belief
+        Factor beliefF(size_t I) const { return Factor(_ia->fg().factor(I).vars(), _beliefs.b2[I]); }
 
-    /// Normalizer for variable beliefs
-    Real beliefVZ(size_t i) const { return _beliefs.Zb1[i]; }
-    /// Normalizer for factor beliefs
-    Real beliefFZ(size_t I) const { return _beliefs.Zb2[I]; }
+        /// Normalizer for variable belief
+        Real beliefVZ(size_t i) const { return _beliefs.Zb1[i]; }
+        /// Normalizer for factor belief
+        Real beliefFZ(size_t I) const { return _beliefs.Zb2[I]; }
 
 };
 

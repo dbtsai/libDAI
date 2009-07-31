@@ -146,12 +146,15 @@ class BipartiteGraph {
             std::vector<size_t> ind2;       // indices of nodes of type 2
         };
 
-        /// Support for some backwards compatibility with old interface
-        /** Call indexEdges() first to initialize these members
-         */
+        /// @name Backwards compatibility layer (to be removed soon)
+        //@{
+        /// Enable backwards compatibility layer?
         bool _edge_indexed;
+        /// Call indexEdges() first to initialize these members
         std::vector<Edge> _edges;
+        /// Call indexEdges() first to initialize these members
         hash_map<Edge,size_t> _vv2e;
+        //}@
 
     public:
         /// Default constructor (creates an empty bipartite graph)
@@ -354,8 +357,8 @@ class BipartiteGraph {
         /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
 
-        // ----------------------------------------------------------------
-        // backwards compatibility layer
+        /// @name Backwards compatibility layer (to be removed soon)
+        //@{
         void indexEdges() {
             _edges.clear();
             _vv2e.clear();
@@ -398,6 +401,7 @@ class BipartiteGraph {
             assert(_edge_indexed);
             return _edges.size();
         }
+        //}@
 
     private:
         /// Checks internal consistency

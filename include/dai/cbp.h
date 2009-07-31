@@ -153,6 +153,7 @@ class CBP : public DAIAlgFG {
     //----------------------------------------------------------------
 
  public:
+    /// Parameters of this inference algorithm
 /* PROPERTIES(props,CBP) {
         typedef BP::Properties::UpdateType UpdateType;
         DAI_ENUM(RecurseType,REC_FIXED,REC_LOGZ,REC_BDIFF);

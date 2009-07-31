@@ -193,6 +193,7 @@ public:
     DAI_ACCMUT(Prob& adj_m(size_t i, size_t _I), { return _adj_m[i][_I]; });
  public: 
 
+    /// Parameters of this inference algorithm
 /* PROPERTIES(props,BBP) {
        DAI_ENUM(UpdateType,SEQ_FIX,SEQ_MAX,SEQ_BP_REV,SEQ_BP_FWD,PAR);
        size_t verbose;

@@ -57,9 +57,6 @@
 #ifdef DAI_WITH_GIBBS
     #include <dai/gibbs.h>
 #endif
-#ifdef DAI_WITH_BP_DUAL
-    #include <dai/bp_dual.h>
-#endif
 #ifdef DAI_WITH_CBP
     #include <dai/cbp.h>
 #endif

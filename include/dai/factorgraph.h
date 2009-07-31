@@ -287,11 +287,14 @@ class FactorGraph {
         friend std::ostream& operator << (std::ostream& os, const FactorGraph& fg);
         friend std::istream& operator >> (std::istream& is, FactorGraph& fg);
 
+        /// @name Backwards compatibility layer (to be removed soon)
+        //@{
         size_t VV2E(size_t n1, size_t n2) const { return G.VV2E(n1,n2); }
         const Edge& edge(size_t e) const { return G.edge(e); }
         void indexEdges() { G.indexEdges(); }
         size_t nr_edges() const { return G.nr_edges(); }
         const std::vector<Edge>& edges() const { return G.edges(); }
+        //}@
 
     private:
         /// Part of constructors (creates edges, neighbors and adjacency matrix)

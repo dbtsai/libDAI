@@ -36,13 +36,13 @@ using namespace std;
 typedef BipartiteGraph::Neighbor Neighbor;
 
 
-void BP_dual::RegenerateMessages() {
+void BP_dual::regenerateMessages() {
     size_t nv = fg().nrVars();
     _msgs.Zn.resize(nv);
     _msgs.Zm.resize(nv);
     _msgs.m.resize(nv);
     _msgs.n.resize(nv);
-    for(size_t i=0; i<nv; i++) {
+    for( size_t i = 0; i < nv; i++ ) {
         size_t nvf = fg().nbV(i).size();
         _msgs.Zn[i].resize(nvf, 1.0);
         _msgs.Zm[i].resize(nvf, 1.0);
@@ -53,7 +53,7 @@ void BP_dual::RegenerateMessages() {
 }
 
 
-void BP_dual::RegenerateBeliefs() {
+void BP_dual::regenerateBeliefs() {
     _beliefs.b1.clear();
     _beliefs.b1.reserve(fg().nrVars());
     _beliefs.Zb1.resize(fg().nrVars(), 1.0);
@@ -61,24 +61,22 @@ void BP_dual::RegenerateBeliefs() {
     _beliefs.b2.reserve(fg().nrFactors());
     _beliefs.Zb2.resize(fg().nrFactors(), 1.0);
 
-    for(size_t i=0; i<fg().nrVars(); i++) {
+    for( size_t i = 0; i < fg().nrVars(); i++ )
         _beliefs.b1.push_back( Prob( fg().var(i).states() ) );
-    }
-    for(size_t I=0; I<fg().nrFactors(); I++) {
+    for( size_t I = 0; I < fg().nrFactors(); I++ )
         _beliefs.b2.push_back( Prob( fg().factor(I).states() ) );
-    }
 }
 
 
-void BP_dual::Init() {
-    RegenerateMessages();
-    RegenerateBeliefs();
-    CalcMessages();
-    CalcBeliefs();
+void BP_dual::init() {
+    regenerateMessages();
+    regenerateBeliefs();
+    calcMessages();
+    calcBeliefs();
 }
 
 
-void BP_dual::CalcMessages() {
+void BP_dual::calcMessages() {
     // calculate 'n' messages from "factor marginal / factor"
     vector<Factor> bs;
     size_t nf = fg().nrFactors();
@@ -88,9 +86,8 @@ void BP_dual::CalcMessages() {
     for( size_t I = 0; I < nf; I++ ) {
         Factor f = bs[I];
         f /= fg().factor(I);
-        foreach(const Neighbor &i, fg().nbF(I)) {
+        foreach(const Neighbor &i, fg().nbF(I))
             msgN(i, i.dual) = f.marginal(fg().var(i)).p();
-        }
     }
     // calculate 'm' messages and normalizers from 'n' messages
     for( size_t i = 0; i < fg().nrVars(); i++ )
@@ -116,24 +113,22 @@ void BP_dual::CalcMessages() {
 }
 
 
-void BP_dual::CalcBeliefV(size_t i) {
+void BP_dual::calcBeliefV(size_t i) {
     Prob prod( fg().var(i).states(), 1.0 );
-    foreach(const Neighbor &I, fg().nbV(i)) {
+    foreach(const Neighbor &I, fg().nbV(i))
         prod *= msgM(i,I.iter);
-    }
     _beliefs.Zb1[i] = prod.normalize();
     _beliefs.b1[i] = prod;
 }
 
 
-void BP_dual::CalcBeliefF(size_t I) {
+void BP_dual::calcBeliefF(size_t I) {
     Prob prod( fg().factor(I).p() );
     foreach(const Neighbor &j, fg().nbF(I)) {
         IndexFor ind (fg().var(j), fg().factor(I).vars() );
         Prob n(msgN(j,j.dual));
-        for(size_t x=0; ind >= 0; x++, ++ind) {
+        for(size_t x=0; ind >= 0; x++, ++ind)
             prod[x] *= n[ind];
-        }
     }
     _beliefs.Zb2[I] = prod.normalize();
     _beliefs.b2[I] = prod;
@@ -141,11 +136,11 @@ void BP_dual::CalcBeliefF(size_t I) {
 
 
 // called after run()
-void BP_dual::CalcBeliefs() {
+void BP_dual::calcBeliefs() {
     for( size_t i = 0; i < fg().nrVars(); i++ )
-        CalcBeliefV(i);  // calculate b_i
+        calcBeliefV(i);  // calculate b_i
     for( size_t I = 0; I < fg().nrFactors(); I++ )
-        CalcBeliefF(I);  // calculate b_I
+        calcBeliefF(I);  // calculate b_I
 }
 
 
@@ -178,9 +173,8 @@ void BP_dual::calcNewN(size_t i, size_t _I) {
     const Neighbor &I = fg().nbV(i)[_I];
     Prob prod(fg().var(i).states(), 1.0);
     foreach(const Neighbor &J, fg().nbV(i)) {
-        if(J.node != I.node) { // for all J in i \ I
+        if(J.node != I.node) // for all J in i \ I
             prod *= msgM(i,J.iter);
-        }
     }
     _msgs.Zn[i][_I] = prod.normalize();
     _msgs.n[i][_I] = prod;

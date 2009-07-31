@@ -32,7 +32,7 @@ namespace dai {
 using namespace std;
 
 
-InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const PropertySet &opts ) {
+InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts ) {
     if( name == ExactInf::Name )
         return new ExactInf (fg, opts);
 #ifdef DAI_WITH_BP
