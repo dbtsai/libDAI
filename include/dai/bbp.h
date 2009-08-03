@@ -22,6 +22,7 @@
 /// \brief Defines class BBP [\ref EaG09]
 /// \todo Improve documentation
 /// \todo Clean up
+/// \todo Debug clean_updates
 
 
 #ifndef ___defined_libdai_bbp_h
@@ -35,198 +36,284 @@
 #include <dai/daialg.h>
 #include <dai/factorgraph.h>
 #include <dai/enum.h>
-
 #include <dai/bp_dual.h>
 
 
 namespace dai {
 
 
-std::vector<Prob> get_zero_adj_F(const FactorGraph&);
-std::vector<Prob> get_zero_adj_V(const FactorGraph&);
+/// Returns a vector of Probs (filled with zeroes) with state spaces corresponding to the factors in the factor graph fg
+std::vector<Prob> get_zero_adj_F( const FactorGraph& fg );
+
+/// Returns a vector of Probs (filled with zeroes) with state spaces corresponding to the variables in the factor graph fg
+std::vector<Prob> get_zero_adj_V( const FactorGraph& fg );
 
 
-/// Implements BBP (Back-belief-propagation) [\ref EaG09]
+/// Implements BBP (Back-Belief-Propagation) [\ref EaG09]
 class BBP {
-protected:
-    // ----------------------------------------------------------------
-    // inputs
-    BP_dual _bp_dual;
-    const FactorGraph* _fg;
-    const InfAlg *_ia;
+    protected:
+        /// @name Inputs
+        //@{
+        BP_dual _bp_dual;
+        const FactorGraph *_fg;
+        const InfAlg *_ia;
+        //@}
 
-    // iterations
-    size_t _iters;
+        /// Number of iterations done
+        size_t _iters;
 
-    // ----------------------------------------------------------------
-    // Outputs
-    std::vector<Prob> _adj_psi_V, _adj_psi_F;
-    // The following vectors are indexed [i][_I]
-    std::vector<std::vector<Prob> > _adj_n, _adj_m; 
-    std::vector<Prob> _adj_b_V, _adj_b_F;
+        /// @name Outputs
+        //@{
+        /// Variable factor adjoints
+        std::vector<Prob> _adj_psi_V;
+        /// Factor adjoints
+        std::vector<Prob> _adj_psi_F;
+        /// Variable->factor message adjoints (indexed [i][_I])
+        std::vector<std::vector<Prob> > _adj_n;
+        /// Factor->variable message adjoints (indexed [i][_I])
+        std::vector<std::vector<Prob> > _adj_m;
+        /// Normalized variable belief adjoints
+        std::vector<Prob> _adj_b_V;
+        /// Normalized factor belief adjoints
+        std::vector<Prob> _adj_b_F;
+        //@}
 
-    // Helper quantities computed from the BP messages:
-    // _T[i][_I]
-    std::vector<std::vector<Prob > > _T;
-    // _U[I][_i]
-    std::vector<std::vector<Prob > > _U;
-    // _S[i][_I][_j]
-    std::vector<std::vector<std::vector<Prob > > > _S;
-    // _R[I][_i][_J]
-    std::vector<std::vector<std::vector<Prob > > > _R;
+        /// @name Helper quantities computed from the BP messages
+        //@{
+        /// _T[i][_I] (see eqn. (41) in [\ref EaG09])
+        std::vector<std::vector<Prob > > _T;
+        /// _U[I][_i] (see eqn. (42) in [\ref EaG09])
+        std::vector<std::vector<Prob > > _U;
+        /// _S[i][_I][_j] (see eqn. (43) in [\ref EaG09])
+        std::vector<std::vector<std::vector<Prob > > > _S;
+        /// _R[I][_i][_J] (see eqn. (44) in [\ref EaG09])
+        std::vector<std::vector<std::vector<Prob > > > _R;
+        //@}
 
-    std::vector<Prob> _adj_b_V_unnorm, _adj_b_F_unnorm;
-    std::vector<Prob> _init_adj_psi_V;
-    std::vector<Prob> _init_adj_psi_F;
+        /// Unnormalized variable belief adjoints
+        std::vector<Prob> _adj_b_V_unnorm;
+        /// Unnormalized factor belief adjoints
+        std::vector<Prob> _adj_b_F_unnorm;
 
-    std::vector<std::vector<Prob> > _adj_n_unnorm, _adj_m_unnorm;
-    std::vector<std::vector<Prob> > _new_adj_n, _new_adj_m;
+        /// Initial variable factor adjoints
+        std::vector<Prob> _init_adj_psi_V;
+        /// Initial factor adjoints
+        std::vector<Prob> _init_adj_psi_F;
 
-    // ----------------------------------------------------------------
-    // Indexing for performance
-  
-    /// Calculates _indices, which is a cache of IndexFor (see bp.cpp)
-    void RegenerateInds();
-    
-    typedef std::vector<size_t>  _ind_t;
-    std::vector<std::vector<_ind_t> >  _indices; 
-    const _ind_t& _index(size_t i, size_t _I) const { return _indices[i][_I]; }
+        /// Unnormalized variable->factor message adjoint (indexed [i][_I])
+        std::vector<std::vector<Prob> > _adj_n_unnorm;
+        /// Unnormalized factor->variable message adjoint (indexed [i][_I])
+        std::vector<std::vector<Prob> > _adj_m_unnorm;
+        /// Updated normalized variable->factor message adjoint (indexed [i][_I])
+        std::vector<std::vector<Prob> > _new_adj_n;
+        /// Updated normalized factor->variable message adjoint (indexed [i][_I])
+        std::vector<std::vector<Prob> > _new_adj_m;
 
-    // ----------------------------------------------------------------
-    // Initialization
+        /// @name Optimized indexing (for performance)
+        //@{
+        /// Calculates _indices, which is a cache of IndexFor @see bp.cpp
+        void RegenerateInds();
+        
+        /// Index type
+        typedef std::vector<size_t>  _ind_t;
+        /// Cached indices (indexed [i][_I])
+        std::vector<std::vector<_ind_t> >  _indices; 
+        /// Returns an index from the cache
+        const _ind_t& _index(size_t i, size_t _I) const { return _indices[i][_I]; }
+        //@}
 
-    /// Calculate T values (see paper)
-    void RegenerateT();
-    /// Calculate U values (see paper)
-    void RegenerateU();
-    /// Calculate S values (see paper)
-    void RegenerateS();
-    /// Calculate R values (see paper)
-    void RegenerateR();
-    /// Calculate _adj_b_V_unnorm and _adj_b_F_unnorm from _adj_b_V and _adj_b_F
-    void RegenerateInputs();
-    /// Initialise members for factor adjoints (call after RegenerateInputs)
-    void RegeneratePsiAdjoints();
-    /// Initialise members for messages adjoints (call after RegenerateInputs)
-    void RegenerateParMessageAdjoints();
-    /** Same as RegenerateMessageAdjoints, but calls sendSeqMsgN rather
-     *  than updating _adj_n (and friends) which are unused in sequential algorithm
-     */
-    void RegenerateSeqMessageAdjoints(); 
+        /// @name Initialization
+        //@{
+        /// Calculate T values; see eqn. (41) in [\ref EaG09]
+        void RegenerateT();
+        /// Calculate U values; see eqn. (42) in [\ref EaG09]
+        void RegenerateU();
+        /// Calculate S values; see eqn. (43) in [\ref EaG09]
+        void RegenerateS();
+        /// Calculate R values; see eqn. (44) in [\ref EaG09]
+        void RegenerateR();
+        /// Calculate _adj_b_V_unnorm and _adj_b_F_unnorm from _adj_b_V and _adj_b_F
+        void RegenerateInputs();
+        /// Initialise members for factor adjoints (call after RegenerateInputs)
+        void RegeneratePsiAdjoints();
+        /// Initialise members for message adjoints (call after RegenerateInputs) for parallel algorithm
+        void RegenerateParMessageAdjoints();
+        /// Initialise members for message adjoints (call after RegenerateInputs) for sequential algorithm
+        /** Same as RegenerateMessageAdjoints, but calls sendSeqMsgN rather
+         *  than updating _adj_n (and friends) which are unused in the sequential algorithm.
+         */
+        void RegenerateSeqMessageAdjoints();
+        //@}
 
-    DAI_ACCMUT(Prob & T(size_t i, size_t _I), { return _T[i][_I]; });
-    DAI_ACCMUT(Prob & U(size_t I, size_t _i), { return _U[I][_i]; });
-    DAI_ACCMUT(Prob & S(size_t i, size_t _I, size_t _j), { return _S[i][_I][_j]; });
-    DAI_ACCMUT(Prob & R(size_t I, size_t _i, size_t _J), { return _R[I][_i][_J]; });
+        /// Returns T value; see eqn. (41) in [\ref EaG09]
+        DAI_ACCMUT(Prob & T(size_t i, size_t _I), { return _T[i][_I]; });
+        /// Retunrs U value; see eqn. (42) in [\ref EaG09]
+        DAI_ACCMUT(Prob & U(size_t I, size_t _i), { return _U[I][_i]; });
+        /// Returns S value; see eqn. (43) in [\ref EaG09]
+        DAI_ACCMUT(Prob & S(size_t i, size_t _I, size_t _j), { return _S[i][_I][_j]; });
+        /// Returns R value; see eqn. (44) in [\ref EaG09]
+        DAI_ACCMUT(Prob & R(size_t I, size_t _i, size_t _J), { return _R[I][_i][_J]; });
 
-    void calcNewN(size_t i, size_t _I);
-    void calcNewM(size_t i, size_t _I);
-    void calcUnnormMsgM(size_t i, size_t _I);
-    void calcUnnormMsgN(size_t i, size_t _I);
-    void upMsgM(size_t i, size_t _I);
-    void upMsgN(size_t i, size_t _I);
-    void doParUpdate();
-    Real getUnMsgMag();
-    void getMsgMags(Real &s, Real &new_s);
+        /// @name Parallel algorithm
+        //@{
+        /// Calculates new variable->factor message adjoint
+        /** Increases variable factor adjoint according to eqn. (27) in [\ref EaG09] and
+         *  calculates the new variable->factor message adjoint according to eqn. (29) in [\ref EaG09].
+         */
+        void calcNewN( size_t i, size_t _I );
+        /// Calculates new factor->variable message adjoint
+        /** Increases factor adjoint according to eqn. (28) in [\ref EaG09] and
+         *  calculates the new factor->variable message adjoint according to the r.h.s. of eqn. (30) in [\ref EaG09].
+         */
+        void calcNewM( size_t i, size_t _I );
+        /// Calculates unnormalized variable->factor message adjoint from the normalized one
+        void calcUnnormMsgN( size_t i, size_t _I );
+        /// Calculates unnormalized factor->variable message adjoint from the normalized one
+        void calcUnnormMsgM( size_t i, size_t _I );
+        /// Updates (un)normalized variable->factor message adjoints
+        void upMsgN( size_t i, size_t _I );
+        /// Updates (un)normalized factor->variable message adjoints
+        void upMsgM( size_t i, size_t _I );
+        /// Do one parallel update of all message adjoints
+        void doParUpdate();
+        //@}
 
-    void zero_adj_b_F() {
-        _adj_b_F.clear();
-        _adj_b_F.reserve(_fg->nrFactors());
-        for(size_t I=0; I<_fg->nrFactors(); I++) {
-            _adj_b_F.push_back(Prob(_fg->factor(I).states(),Real(0.0)));
+        /// Calculates averaged L-1 norm of unnormalized message adjoints
+        Real getUnMsgMag();
+        /// Calculates averaged L-1 norms of current and new normalized message adjoints
+        void getMsgMags( Real &s, Real &new_s );
+
+        /// Sets all vectors _adj_b_F to zero
+        void zero_adj_b_F() {
+            _adj_b_F.clear();
+            _adj_b_F.reserve( _fg->nrFactors() );
+            for( size_t I = 0; I < _fg->nrFactors(); I++ )
+                _adj_b_F.push_back( Prob( _fg->factor(I).states(), Real( 0.0 ) ) );
         }
-    }
 
-    //----------------------------------------------------------------
-    // new interface
+        /// @name Sequential algorithm
+        //@{
+        /// Helper function for sendSeqMsgM: increases factor->variable message adjoint by p and calculates the corresponding unnormalized adjoint
+        void incrSeqMsgM( size_t i, size_t _I, const Prob& p );
+        void updateSeqMsgM( size_t i, size_t _I );
+        /// Implements routine Send-n in Figure 5 in [\ref EaG09]
+        void sendSeqMsgN( size_t i, size_t _I, const Prob &f );
+        /// Implements routine Send-m in Figure 5 in [\ref EaG09]
+        void sendSeqMsgM( size_t i, size_t _I );
+        /// Sets normalized factor->variable message adjoint and calculates the corresponding unnormalized adjoint
+        void setSeqMsgM( size_t i, size_t _I, const Prob &p ); 
+        //@}
 
-    void incrSeqMsgM(size_t i, size_t _I, const Prob& p);
-    void updateSeqMsgM(size_t i, size_t _I);
-    void sendSeqMsgN(size_t i, size_t _I, const Prob &f);
-    void sendSeqMsgM(size_t i, size_t _I);
-    /// used instead of upMsgM / calcNewM, calculates adj_m_unnorm as well
-    void setSeqMsgM(size_t i, size_t _I, const Prob &p); 
+        /// Returns indices and magnitude of the largest normalized factor->variable message adjoint
+        void getArgmaxMsgM( size_t &i, size_t &_I, Real &mag );
 
-    Real getMaxMsgM();
-    Real getTotalMsgM();
-    Real getTotalNewMsgM();
-    Real getTotalMsgN();
+        /// Returns magnitude of the largest (in L1-norm) normalized factor->variable message adjoint
+        Real getMaxMsgM();
+        /// Calculates sum of L1 norms of all normalized factor->variable message adjoints
+        Real getTotalMsgM();
+        /// Calculates sum of L1 norms of all updated normalized factor->variable message adjoints
+        Real getTotalNewMsgM();
+        /// Calculates sum of L1 norms of all normalized variable->factor message adjoints
+        Real getTotalMsgN();
 
-    void getArgmaxMsgM(size_t &i, size_t &_I, Real &mag);
+    public:
+        /// Called by \a init, recalculates intermediate values
+        void Regenerate();
 
-public:
-    /// Called by 'init', recalculates intermediate values
-    void Regenerate();
+        /// Constructor
+        BBP( const InfAlg *ia, const PropertySet &opts ) : _bp_dual(ia), _fg(&(ia->fg())), _ia(ia) {
+            props.set(opts);
+        }
 
-    BBP(const InfAlg *ia, const PropertySet &opts) :
-        _bp_dual(ia), _fg(&(ia->fg())), _ia(ia)
-    {
-        props.set(opts);
-    }
+        /// Initializes belief adjoints and initial factor adjoints and regenerates
+        void init( const std::vector<Prob> &adj_b_V, const std::vector<Prob> &adj_b_F, const std::vector<Prob> &adj_psi_V, const std::vector<Prob> &adj_psi_F ) {
+            _adj_b_V = adj_b_V;
+            _adj_b_F = adj_b_F;
+            _init_adj_psi_V = adj_psi_V;
+            _init_adj_psi_F = adj_psi_F;
+            Regenerate(); 
+        }
 
-    void init(const std::vector<Prob> &adj_b_V, const std::vector<Prob> &adj_b_F,
-              const std::vector<Prob> &adj_psi_V, const std::vector<Prob> &adj_psi_F) {
-        _adj_b_V = adj_b_V;
-        _adj_b_F = adj_b_F;
-        _init_adj_psi_V = adj_psi_V;
-        _init_adj_psi_F = adj_psi_F;
-        Regenerate(); 
-    }
-    void init(const std::vector<Prob> &adj_b_V, const std::vector<Prob> &adj_b_F) {
-        init(adj_b_V, adj_b_F, get_zero_adj_V(*_fg), get_zero_adj_F(*_fg));
-    }
-    void init(const std::vector<Prob> &adj_b_V) {
-        init(adj_b_V, get_zero_adj_F(*_fg));
-    }
+        /// Initializes belief adjoints and with zero initial factor adjoints and regenerates
+        void init( const std::vector<Prob> &adj_b_V, const std::vector<Prob> &adj_b_F ) {
+            init( adj_b_V, adj_b_F, get_zero_adj_V(*_fg), get_zero_adj_F(*_fg) );
+        }
 
-    /// run until change is less than given tolerance
-    void run();
+        /// Initializes variable belief adjoints (and sets factor belief adjoints to zero) and with zero initial factor adjoints and regenerates
+        void init( const std::vector<Prob> &adj_b_V ) {
+            init(adj_b_V, get_zero_adj_F(*_fg));
+        }
 
-    size_t doneIters() { return _iters; }
+        /// Run until change is less than given tolerance
+        void run();
 
-    DAI_ACCMUT(Prob& adj_psi_V(size_t i), { return _adj_psi_V[i]; });
-    DAI_ACCMUT(Prob& adj_psi_F(size_t I), { return _adj_psi_F[I]; });
-    DAI_ACCMUT(Prob& adj_b_V(size_t i), { return _adj_b_V[i]; });
-    DAI_ACCMUT(Prob& adj_b_F(size_t I), { return _adj_b_F[I]; });
- protected:
-    DAI_ACCMUT(Prob& adj_n(size_t i, size_t _I), { return _adj_n[i][_I]; });
-    DAI_ACCMUT(Prob& adj_m(size_t i, size_t _I), { return _adj_m[i][_I]; });
- public: 
+        /// Return number of iterations done so far
+        size_t doneIters() { return _iters; }
 
-    /// Parameters of this inference algorithm
-/* PROPERTIES(props,BBP) {
-       DAI_ENUM(UpdateType,SEQ_FIX,SEQ_MAX,SEQ_BP_REV,SEQ_BP_FWD,PAR);
-       size_t verbose;
-       /// tolerance (not used for updates=SEQ_BP_{REV,FWD})
-       double tol;
-       size_t maxiter;
-       /// damping (0 for none)
-       double damping;
-       UpdateType updates;
-       bool clean_updates;
-    }
-*/
+        /// Returns variable factor adjoint
+        DAI_ACCMUT(Prob& adj_psi_V(size_t i), { return _adj_psi_V[i]; });
+        /// Returns factor adjoint
+        DAI_ACCMUT(Prob& adj_psi_F(size_t I), { return _adj_psi_F[I]; });
+        /// Returns variable belief adjoint
+        DAI_ACCMUT(Prob& adj_b_V(size_t i), { return _adj_b_V[i]; });
+        /// Returns factor belief adjoint
+        DAI_ACCMUT(Prob& adj_b_F(size_t I), { return _adj_b_F[I]; });
+
+     protected:
+        /// Returns variable->factor message adjoint
+        DAI_ACCMUT(Prob& adj_n(size_t i, size_t _I), { return _adj_n[i][_I]; });
+        /// Returns factor->variable message adjoint
+        DAI_ACCMUT(Prob& adj_m(size_t i, size_t _I), { return _adj_m[i][_I]; });
+
+     public: 
+        /// Parameters of this algorithm
+        /* PROPERTIES(props,BBP) {
+           /// Enumeration of possible update schedules
+           DAI_ENUM(UpdateType,SEQ_FIX,SEQ_MAX,SEQ_BP_REV,SEQ_BP_FWD,PAR);
+
+           /// Verbosity
+           size_t verbose;
+
+           /// Maximum number of iterations
+           size_t maxiter;
+
+           /// Tolerance (not used for updates = SEQ_BP_REV, SEQ_BP_FWD)
+           double tol;
+
+           /// Damping constant (0 for none); damping = 1 - lambda where lambda is the damping constant used in [\ref EaG09]
+           double damping;
+
+           /// Update schedule
+           UpdateType updates;
+
+           bool clean_updates;
+        } 
+        */
 /* {{{ GENERATED CODE: DO NOT EDIT. Created by 
     ./scripts/regenerate-properties include/dai/bbp.h src/bbp.cpp 
 */
-    struct Properties {
-        DAI_ENUM(UpdateType,SEQ_FIX,SEQ_MAX,SEQ_BP_REV,SEQ_BP_FWD,PAR);
-        size_t verbose;
-        /// tolerance (not used for updates=SEQ_BP_{REV,FWD})
-        double tol;
-        size_t maxiter;
-        /// damping (0 for none)
-        double damping;
-        UpdateType updates;
-        bool clean_updates;
+        struct Properties {
+            /// Enumeration of possible update schedules
+            DAI_ENUM(UpdateType,SEQ_FIX,SEQ_MAX,SEQ_BP_REV,SEQ_BP_FWD,PAR);
+            /// Verbosity
+            size_t verbose;
+            /// Maximum number of iterations
+            size_t maxiter;
+            /// Tolerance (not used for updates = SEQ_BP_REV, SEQ_BP_FWD)
+            double tol;
+            /// Damping constant (0 for none); damping = 1 - lambda where lambda is the damping constant used in [\ref EaG09]
+            double damping;
+            /// Update schedule
+            UpdateType updates;
+            bool clean_updates;
 
-        /// Set members from PropertySet
-        void set(const PropertySet &opts);
-        /// Get members into PropertySet
-        PropertySet get() const;
-        /// Convert to a string which can be parsed as a PropertySet
-        std::string toString() const;
-    } props;
+            /// Set members from PropertySet
+            void set(const PropertySet &opts);
+            /// Get members into PropertySet
+            PropertySet get() const;
+            /// Convert to a string which can be parsed as a PropertySet
+            std::string toString() const;
+        } props;
 /* }}} END OF GENERATED CODE */
 };
 
@@ -262,11 +349,8 @@ double numericBBPTest(const InfAlg& bp, const std::vector<size_t> *state, const 
 // ----------------------------------------------------------------
 // Utility functions, some of which are used elsewhere
 
-/// Subtract 1 from a size_t, or return 0 if the argument is 0
-inline size_t oneLess(size_t v) { return v==0?v:v-1; }
-
-/// function to compute adj_w_unnorm from w, Z_w, adj_w
-Prob unnormAdjoint(const Prob &w, Real Z_w, const Prob &adj_w);
+/// Computes the adjoint of the unnormed probability vector from the normalizer and the adjoint of the normalized probability vector @see eqn. (13) in [\ref EaG09]
+Prob unnormAdjoint( const Prob &w, Real Z_w, const Prob &adj_w );
 
 /// Runs Gibbs sampling for 'iters' iterations on ia.fg(), and returns state
 std::vector<size_t> getGibbsState(const InfAlg& ia, size_t iters);

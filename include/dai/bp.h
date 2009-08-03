@@ -64,10 +64,10 @@ class BP : public DAIAlgFG {
         /// Parameters of this inference algorithm
         struct Properties {
             /// Enumeration of possible update schedules
-            DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL)
+            DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL);
 
             /// Enumeration of inference variants
-            DAI_ENUM(InfType,SUMPROD,MAXPROD)
+            DAI_ENUM(InfType,SUMPROD,MAXPROD);
         
             /// Verbosity
             size_t verbose;

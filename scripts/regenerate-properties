@@ -158,9 +158,9 @@ sub process_properties ($$$) {
   
   my ($stext) = "";
   my ($text) = <<EOF;
-    struct Properties {
+        struct Properties {
 EOF
-  my $indent = (' 'x8);
+  my $indent = (' 'x12);
   for my $d (@typedecls) {
     my ($decl,$cmt) = @$d;
     if($cmt ne '') {
@@ -178,13 +178,13 @@ EOF
 
   $text .= <<EOF;
 
-        /// Set members from PropertySet
-        void set(const PropertySet &opts);
-        /// Get members into PropertySet
-        PropertySet get() const;
-        /// Convert to a string which can be parsed as a PropertySet
-        std::string toString() const;
-    } $struct_name;
+            /// Set members from PropertySet
+            void set(const PropertySet &opts);
+            /// Get members into PropertySet
+            PropertySet get() const;
+            /// Convert to a string which can be parsed as a PropertySet
+            std::string toString() const;
+        } $struct_name;
 EOF
 
   $stext .= <<EOF;

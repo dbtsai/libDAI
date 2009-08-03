@@ -72,10 +72,10 @@ class MR : public DAIAlgFG {
         /// Parameters of this inference algorithm
         struct Properties {
             /// Enumeration of different types of update equations
-            DAI_ENUM(UpdateType,FULL,LINEAR)
+            DAI_ENUM(UpdateType,FULL,LINEAR);
 
             /// Enumeration of different ways of initializing the cavity correlations
-            DAI_ENUM(InitType,RESPPROP,CLAMPING,EXACT)
+            DAI_ENUM(InitType,RESPPROP,CLAMPING,EXACT);
 
             /// Verbosity
             size_t verbose;

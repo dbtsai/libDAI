@@ -109,7 +109,7 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-tests : tests/testdai$(EE)
+tests : tests/testdai$(EE) tests/testbbp$(EE)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
@@ -208,6 +208,9 @@ examples/example_sprinkler$(EE) : examples/example_sprinkler.cpp $(HEADERS) $(LI
 tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
 
+tests/testbbp$(EE) : tests/testbbp.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)tests/testbbp$(EE) tests/testbbp.cpp $(LIBS)
+
 
 # MATLAB INTERFACE
 ###################
@@ -289,7 +292,7 @@ clean :
 	-rm *$(OE)
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_sprinkler$(EE)
-	-rm tests/testdai$(EE)
+	-rm tests/testdai$(EE) tests/testbbp$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib

@@ -60,10 +60,10 @@ class LC : public DAIAlgFG {
         /// Parameters of this inference algorithm
         struct Properties {
             /// Enumeration of possible ways to initialize the cavities
-            DAI_ENUM(CavityType,FULL,PAIR,PAIR2,UNIFORM)
+            DAI_ENUM(CavityType,FULL,PAIR,PAIR2,UNIFORM);
 
             /// Enumeration of different update schedules
-            DAI_ENUM(UpdateType,SEQFIX,SEQRND,NONE)
+            DAI_ENUM(UpdateType,SEQFIX,SEQRND,NONE);
 
             /// Verbosity
             size_t verbose;
