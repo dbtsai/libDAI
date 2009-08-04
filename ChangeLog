@@ -1,4 +1,15 @@
+Branch master:
 * Added work-around for bug in Boost Graph Library
+* Improvements of TFactor<T>:
+  - Extended functionality of TFactor<T>::operators +,-,+=,-= to handle different VarSets
+  - Added TFactor<T>::maxMarginal (similar to marginal but with max instead of sum)
+* Added BipartiteGraph::eraseEdge
+* Removed all the virtual default constructors *::create(), as they are not used.
+* Fixed bug in MaxSpanningTree (it wrongly assumed that the tree was not empty).
+* [Charlie Vaske] Added Expectation Maximization code.
+* Added MatLab QuickStart to README.
+* MEX file dai now also returns variable and factor beliefs.
+
 * [Frederik Eaton] Added Gibbs::state() accessors/mutators
 * [Frederik Eaton] Fixed Gibbs::getVarDist(size_t) to return uniform 
   distribution if no state is allowed
