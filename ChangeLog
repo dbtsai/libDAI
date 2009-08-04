@@ -1,3 +1,5 @@
+git ae0fc30e10be6683cbfc209dcee56f34234a6cb8
+--------------------------------------------
 * Added work-around for bug in Boost Graph Library
 * Improvements of TFactor<T>:
   - Extended functionality of TFactor<T>::operators +,-,+=,-= to handle different VarSets
@@ -66,10 +68,6 @@
 * toc() now returns POSIX system time with maximum accuracy of microseconds
 * Exception objects now remember their error code
 * Added examples/example_sprinkler.cpp
-
-
-git 065eae35cbfcc36f1a945ae3053c80c23f366306
---------------------------------------------
 * [Peter Gober] Made libDAI build out-of-the-box on Cygwin.
 * [Frederik Eaton] Added Gibbs sampler to algorithms
 * Improved documentation of include/dai/{bipgraph.h, prob.h, smallset.h,
