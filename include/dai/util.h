@@ -177,7 +177,7 @@ std::ostream& operator << (std::ostream& os, const std::pair<T1,T2> & x) {
 
 /// Concatenate two vectors
 template<class T>
-std::vector<T> concat (const std::vector<T>& u, const std::vector<T>& v ) {
+std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
     std::vector<T> w;
     w.reserve( u.size() + v.size() );
     for( size_t i = 0; i < u.size(); i++ )

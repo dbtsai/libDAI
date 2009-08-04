@@ -1,3 +1,25 @@
+git b6efbfd9e4e76de65c44e4060a9b56f99543b70a (head of branch eaton before merge)
+--------------------------------------------------------------------------------
+* Cleanups and extra documentation of the code contributed by Frederik Eaton
+* Removed erroneous 'inline' directives in gibbs.cpp
+* [Frederik Eaton] Added script for automatically generating properties code (used by CBP and BBP)
+* [Frederik Eaton] Updated doxygen.conf to version 1.5.9
+* [Frederik Eaton] Added newInfAlgFromString to alldai.h/cpp
+* [Frederik Eaton] Added FactorGraph::clampVar and FactorGraph::clampFactor
+* [Frederik Eaton] Changed BP to be able to record order in which messages are sent (for use by BBP)
+* [Frederik Eaton] Improved documentation of BipartiteGraph::Neighbor
+* [Frederik Eaton]: Extended InfAlg interface with beliefV() and beliefF() methods;
+* [Frederik Eaton]: Improved PropertySet class:
+  - Added default constructor
+  - Allow construction from string
+  - Added method allKeys() to produce list of keys
+  - In getStringAs(), check for typeid(ValueType) before typeid(std::string)
+    (this fixes a strange bug for empty string property)
+* [Frederik Eaton]: Added some utility macros (DAI_PV, DAI_DMSG, DAI_ACCMUT, DAI_IFVERB)
+  and functions (concat(),rnd()) to include/dai/util.h
+* [Frederik Eaton] Added backwards compatibility layer for edge interface to
+  BipartiteGraph and FactorGraph (which will be obsoleted soon)
+* [Frederik Eaton] Added BP_dual, BBP and CBP algorithms
 * [Frederik Eaton] Added Gibbs::state() accessors/mutators
 * [Frederik Eaton] Fixed Gibbs::getVarDist(size_t) to return uniform 
   distribution if no state is allowed
