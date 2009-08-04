@@ -85,31 +85,31 @@ int main( int argc, char *argv[] ) {
             bbp_cfn_t cfn;
             switch( (t / 10) % 9 ) {
                 case 0:
-                    cfn = bbp_cfn_t::cfn_gibbs_b;
+                    cfn = bbp_cfn_t::CFN_GIBBS_B;
                     break;
                 case 1:
-                    cfn = bbp_cfn_t::cfn_gibbs_b2;
+                    cfn = bbp_cfn_t::CFN_GIBBS_B2;
                     break;
                 case 2:
-                    cfn = bbp_cfn_t::cfn_gibbs_exp;
+                    cfn = bbp_cfn_t::CFN_GIBBS_EXP;
                     break;
                 case 3:
-                    cfn = bbp_cfn_t::cfn_gibbs_b_factor;
+                    cfn = bbp_cfn_t::CFN_GIBBS_B_FACTOR;
                     break;
                 case 4:
-                    cfn = bbp_cfn_t::cfn_gibbs_b2_factor;
+                    cfn = bbp_cfn_t::CFN_GIBBS_B2_FACTOR;
                     break;
                 case 5:
-                    cfn = bbp_cfn_t::cfn_gibbs_exp_factor;
+                    cfn = bbp_cfn_t::CFN_GIBBS_EXP_FACTOR;
                     break;
                 case 6:
-                    cfn = bbp_cfn_t::cfn_var_ent;
+                    cfn = bbp_cfn_t::CFN_VAR_ENT;
                     break;
                 case 7:
-                    cfn = bbp_cfn_t::cfn_factor_ent;
+                    cfn = bbp_cfn_t::CFN_FACTOR_ENT;
                     break;
                 case 8:
-                    cfn = bbp_cfn_t::cfn_bethe_ent;
+                    cfn = bbp_cfn_t::CFN_BETHE_ENT;
                     break;
             }
 
