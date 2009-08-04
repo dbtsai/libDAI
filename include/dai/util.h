@@ -35,6 +35,7 @@
 #include <iostream>
 #include <cstdio>
 #include <boost/foreach.hpp>
+#include <boost/functional/hash.hpp>
 #include <algorithm>
 
 
@@ -49,6 +50,33 @@
 
 /// An alias to the BOOST_FOREACH macro from the boost::foreach library
 #define foreach BOOST_FOREACH
+
+#ifdef DAI_DEBUG
+/// \brief "Print variable". Prints the text of an expression, followed by its value (only if DAI_DEBUG is defined)
+/**
+ *  Useful debugging macro to see what your code is doing. 
+ *  Example: \code DAI_PV(3+4) \endcode
+ *  Output: \code 3+4= 7 \endcode
+ */
+#define DAI_PV(x) do {std::cerr << #x "= " << (x) << std::endl;} while(0)
+/// "Debugging message": Prints a message (only if DAI_DEBUG is defined)
+#define DAI_DMSG(str) do {std::cerr << str << std::endl;} while(0)
+#else
+#define DAI_PV(x) do {} while(0)
+#define DAI_DMSG(str) do {} while(0)
+#endif
+
+/// Produces accessor and mutator methods according to the common pattern.
+/** Example:
+ *  \code DAI_ACCMUT(size_t& maxIter(), { return props.maxiter; }); \endcode
+ *  \todo At the moment, only the mutator appears in doxygen documentation.
+ */
+#define DAI_ACCMUT(x,y)                     \
+      x y;                                  \
+      const x const y;
+
+/// Macro to give error message \a stmt if props.verbose>=\a n
+#define DAI_IFVERB(n, stmt) if(props.verbose>=n) { cerr << stmt; }
 
 
 /// Real number (alias for double, which could be changed to long double if necessary)
@@ -77,14 +105,14 @@ namespace dai {
     /// hash_map is an alias for std::map.
     /** Since there is no TR1 unordered_map implementation available yet, we fall back on std::map.
      */
-    template <typename T, typename U>
+    template <typename T, typename U, typename H = boost::hash<T> >
         class hash_map : public std::map<T,U> {};
 #else
     /// hash_map is an alias for std::tr1::unordered_map.
     /** We use the (experimental) TR1 unordered_map implementation included in modern GCC distributions.
      */
-    template <typename T, typename U>
-        class hash_map : public std::tr1::unordered_map<T,U> {};
+    template <typename T, typename U, typename H = boost::hash<T> >
+        class hash_map : public std::tr1::unordered_map<T,U,H> {};
 #endif
 
 
@@ -103,6 +131,11 @@ double rnd_stdnormal();
 
 /// Returns a random integer in interval [min, max]
 int rnd_int( int min, int max );
+
+/// Returns a random integer in the half-open interval \f$[0,n)\f$
+inline int rnd( int n) {
+    return rnd_int( 0, n-1 );
+}
 
 
 /// Writes a std::vector to a std::ostream
@@ -142,6 +175,17 @@ std::ostream& operator << (std::ostream& os, const std::pair<T1,T2> & x) {
     return os;
 }
 
+/// Concatenate two vectors
+template<class T>
+std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
+    std::vector<T> w;
+    w.reserve( u.size() + v.size() );
+    for( size_t i = 0; i < u.size(); i++ )
+        w.push_back( u[i] );
+    for( size_t i = 0; i < v.size(); i++ )
+        w.push_back( v[i] );
+    return w;
+}
 
 /// Used to keep track of the progress made by iterative algorithms
 class Diffs : public std::vector<double> {

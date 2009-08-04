@@ -197,7 +197,7 @@ pair<string, PropertySet> parseMethod( const string &_s, const map<string,string
         if( ps.first == DAINames[n] )
             break;
     if( strlen( DAINames[n] ) == 0 && (ps.first != "LDPC") )
-        throw string("Unknown DAI algorithm \"") + ps.first + string("\" in \"") + _s + string("\"");
+        throw std::runtime_error(string("Unknown DAI algorithm \"") + ps.first + string("\" in \"") + _s + string("\""));
 
     return ps;
 }

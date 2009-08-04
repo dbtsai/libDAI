@@ -78,9 +78,14 @@ ifdef WITH_GIBBS
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_GIBBS
   OBJECTS:=$(OBJECTS) gibbs$(OE)
 endif
+ifdef WITH_CBP
+  CCFLAGS:=$(CCFLAGS) -DDAI_WITH_CBP
+  OBJECTS:=$(OBJECTS) bbp$(OE) cbp$(OE) bp_dual$(OE)
+endif
+
 
 # Define standard libDAI header dependencies
-HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h
+HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h $(INC)/util.h
 
 # Setup final command for C++ compiler and MEX
 ifdef DEBUG
@@ -104,7 +109,7 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-tests : tests/testdai$(EE) tests/testem/testem$(EE)
+tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
@@ -125,6 +130,15 @@ exactinf$(OE) : $(SRC)/exactinf.cpp $(INC)/exactinf.h $(HEADERS)
 
 bp$(OE) : $(SRC)/bp.cpp $(INC)/bp.h $(HEADERS)
 	$(CC) -c $(SRC)/bp.cpp
+
+bp_dual$(OE) : $(SRC)/bp_dual.cpp $(INC)/bp_dual.h $(HEADERS)
+	$(CC) -c $(SRC)/bp_dual.cpp
+
+bbp$(OE) : $(SRC)/bbp.cpp $(INC)/bbp.h $(INC)/bp_dual.h $(HEADERS)
+	$(CC) -c $(SRC)/bbp.cpp
+
+cbp$(OE) : $(SRC)/cbp.cpp $(INC)/cbp.h $(INC)/bbp.h $(INC)/bp_dual.h $(HEADERS)
+	$(CC) -c $(SRC)/cbp.cpp
 
 lc$(OE) : $(SRC)/lc.cpp $(INC)/lc.h $(HEADERS)
 	$(CC) -c $(SRC)/lc.cpp
@@ -201,6 +215,9 @@ tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
 tests/testem/testem$(EE) : tests/testem/testem.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS)
+
+tests/testbbp$(EE) : tests/testbbp.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)tests/testbbp$(EE) tests/testbbp.cpp $(LIBS)
 
 
 # MATLAB INTERFACE
@@ -289,8 +306,7 @@ clean :
 	-rm *$(OE)
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_sprinkler$(EE)
-	-rm tests/testdai$(EE)
-	-rm tests/testem/testem$(EE)
+	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib

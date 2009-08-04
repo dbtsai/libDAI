@@ -56,14 +56,59 @@ namespace dai {
  */
 class BipartiteGraph {
     public:
-        /// Describes a neighboring node of some other node in a BipartiteGraph.
-        /** A Neighbor structure has three members: \a iter, \a node and \a dual. The \a 
-         *  node member is the most important member: it contains the index of the neighboring node. The \a iter 
-         *  member is useful for iterating over neighbors, and contains the index of this Neighbor entry in the
-         *  corresponding BipartiteGraph::Neighbors variable. The \a dual member is useful to find the dual Neighbor 
-         *  element: a pair of neighboring nodes can be either specified as a node of type 1 and a neighbor of type 
-         *  2, or as a node of type 2 and a neighbor of type 1; the \a dual member contains the index of the dual 
-         *  Neighbor element (see the example for another explanation of the dual member).
+        /// Describes the neighbor relationship of two nodes in a BipartiteGraph.
+        /** Sometimes we want to do an action, such as sending a
+         *  message, for all edges in a graph. However, most graphs
+         *  will be sparse, so we need some way of storing a set of
+         *  the neighbors of a node, which is both fast and
+         *  memory-efficient. We also need to be able to go between
+         *  viewing node \a A as a neighbor of node \a B, and node \a
+         *  B as a neighbor of node \a A. The Neighbor struct solves
+         *  both of these problems. Each node has a list of neighbors,
+         *  stored as a vector<Neighbor>, and extra information is
+         *  included in the Neighbor struct which allows us to access
+         *  a node as a neighbor of its neighbor (the \a dual member).
+         *
+         *  By convention, variable identifiers naming indices into a
+         *  vector of neighbors are prefixed with an underscore ("_"). 
+         *  The neighbor list which they point into is then understood
+         *  from context. For example:
+         *
+         *  \code
+         *  void BP::calcNewMessage( size_t i, size_t _I )
+         *  \endcode
+         *
+         *  Here, \a i is the "absolute" index of node i, but \a _I is
+         *  understood as a "relative" index, giving node I's entry in
+         *  nb1(i). The corresponding Neighbor structure can be
+         *  accessed as nb1(i,_I) or nb1(i)[_I]. The absolute index of
+         *  \a _I, which would be called \a I, can be recovered from
+         *  the \a node member: nb1(i,_I).node. The \a iter member
+         *  gives the relative index \a _I, and the \a dual member
+         *  gives the "dual" relative index, i.e. the index of \a i in
+         *  \a I's neighbor list.
+         *
+         *  \code
+         *  Neighbor n = nb1(i,_I);
+         *  n.node == I &&
+         *  n.iter == _I &&
+         *  nb2(n.node,n.dual).node == i
+         *  \endcode
+         *
+         *  In a FactorGraph, nb1 is called nbV, and nb2 is called
+         *  nbF.
+         *
+         *  There is no easy way to transform a pair of absolute node
+         *  indices \a i and \a I into a Neighbor structure relative
+         *  to one of the nodes. Such a feature has never yet been
+         *  found to be necessary. Iteration over edges can always be
+         *  accomplished using the Neighbor lists, and by writing
+         *  functions that accept relative indices:
+         *  \code
+         *  for( size_t i = 0; i < nrVars(); ++i )
+         *      foreach( const Neighbor &I, nbV(i) )
+         *          calcNewMessage( i, I.iter );
+         *  \endcode
          */
         struct Neighbor {
             /// Corresponds to the index of this Neighbor entry in the vector of neighbors
@@ -101,9 +146,19 @@ class BipartiteGraph {
             std::vector<size_t> ind2;       // indices of nodes of type 2
         };
 
+        /// @name Backwards compatibility layer (to be removed soon)
+        //@{
+        /// Enable backwards compatibility layer?
+        bool _edge_indexed;
+        /// Call indexEdges() first to initialize these members
+        std::vector<Edge> _edges;
+        /// Call indexEdges() first to initialize these members
+        hash_map<Edge,size_t> _vv2e;
+        //}@
+
     public:
         /// Default constructor (creates an empty bipartite graph)
-        BipartiteGraph() : _nb1(), _nb2() {}
+        BipartiteGraph() : _nb1(), _nb2(), _edge_indexed(false) {}
 
         /// Constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
@@ -113,7 +168,7 @@ class BipartiteGraph {
          *  \param end Points just beyond the last edge.
          */
         template<typename EdgeInputIterator>
-        BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ) {
+        BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ), _edge_indexed(false) {
             construct( nr1, nr2, begin, end );
         }
 
@@ -317,6 +372,53 @@ class BipartiteGraph {
 
         /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
+
+        /// @name Backwards compatibility layer (to be removed soon)
+        //@{
+        void indexEdges() {
+            std::cerr << "Warning: this BipartiteGraph edge interface is obsolete!" << std::endl;
+            _edges.clear();
+            _vv2e.clear();
+            size_t i=0;
+            foreach(const Neighbors &nb1s, _nb1) {
+                foreach(const Neighbor &n2, nb1s) {
+                    Edge e(i, n2.node);
+                    _edges.push_back(e);
+                }
+                i++;
+            }
+            sort(_edges.begin(), _edges.end()); // unnecessary?
+
+            i=0;
+            foreach(const Edge& e, _edges) {
+                _vv2e[e] = i++;
+            }
+
+            _edge_indexed = true;
+        }
+        
+        const Edge& edge(size_t e) const {
+            assert(_edge_indexed);
+            return _edges[e];
+        }
+        
+        const std::vector<Edge>& edges() const {
+            return _edges;
+        }
+        
+        size_t VV2E(size_t n1, size_t n2) const {
+            assert(_edge_indexed);
+            Edge e(n1,n2);
+            hash_map<Edge,size_t>::const_iterator i = _vv2e.find(e);
+            assert(i != _vv2e.end());
+            return i->second;
+        }
+
+        size_t nr_edges() const {
+            assert(_edge_indexed);
+            return _edges.size();
+        }
+        //}@
 
     private:
         /// Checks internal consistency

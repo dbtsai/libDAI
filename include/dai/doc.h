@@ -144,7 +144,8 @@
  *  - Double-loop GBP [\ref HAK03];
  *  - Various variants of Loop Corrected Belief Propagation
  *    [\ref MoK07, \ref MoR05];
- *  - Gibbs sampler.
+ *  - Gibbs sampler;
+ *  - Conditioned BP [\ref EaG09];
  *
  *  In addition, libDAI supports parameter learning of conditional probability
  *  tables by Expectation Maximization.
@@ -210,6 +211,12 @@
  *  "Sufficient Conditions for Convergence of the Sum-Product Algorithm",
  *  <em>IEEE Transactions on Information Theory</em> 53(12):4422-4437.
  *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=4385778
+ *
+ *  \anchor EaG09 \ref EaG09
+ *  F. Eaton and Z. Ghahramani (2009):
+ *  "Choosing a Variable to Clamp",
+ *  <em>Proceedings of the Twelfth International Conference on Artificial Intelligence and Statistics (AISTATS 2009)</em> 5:145-152
+ *  http://jmlr.csail.mit.edu/proceedings/papers/v5/eaton09a/eaton09a.pdf
  */
 
 

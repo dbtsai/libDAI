@@ -32,7 +32,7 @@ namespace dai {
 using namespace std;
 
 
-InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const PropertySet &opts ) {
+InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts ) {
     if( name == ExactInf::Name )
         return new ExactInf (fg, opts);
 #ifdef DAI_WITH_BP
@@ -67,7 +67,29 @@ InfAlg *newInfAlg( const string &name, const FactorGraph &fg, const PropertySet 
     if( name == Gibbs::Name )
         return new Gibbs (fg, opts);
 #endif
+#ifdef DAI_WITH_CBP
+    if( name == CBP::Name )
+        return new CBP (fg, opts);
+#endif
     DAI_THROW(UNKNOWN_DAI_ALGORITHM);
+}
+
+
+/// \todo Make alias file non-testdai-specific, and use it in newInfAlgFromString
+InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg ) {
+    string::size_type pos = nameOpts.find_first_of('[');
+    string name;
+    PropertySet opts;
+    if( pos == string::npos ) {
+        name = nameOpts;
+    } else {
+        name = nameOpts.substr(0,pos);
+
+        stringstream ss;
+        ss << nameOpts.substr(pos,nameOpts.length());
+        ss >> opts;
+    }
+    return newInfAlg(name,fg,opts);
 }
 
 

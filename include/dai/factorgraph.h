@@ -212,9 +212,20 @@ class FactorGraph {
             }
         }
 
-        /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$);
-        /// If backup == true, make a backup of all factors that are changed
+        /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$)
+        /** If backup == true, make a backup of all factors that are changed
+         */
         virtual void clamp( const Var & n, size_t i, bool backup = false );
+
+        /// Clamp a variable in a factor graph to have one out of a list of values
+        /** If backup == true, make a backup of all factors that are changed
+         */
+        void clampVar( size_t i, const std::vector<size_t> &xis, bool backup = false );
+
+        /// Clamp a factor in a factor graph to have one out of a list of values
+        /** If backup == true, make a backup of all factors that are changed
+         */
+        void clampFactor( size_t I, const std::vector<size_t> &xIs, bool backup = false );
 
         /// Set all factors interacting with the i'th variable 1
         virtual void makeCavity( unsigned i, bool backup = false );
@@ -272,6 +283,15 @@ class FactorGraph {
         // Friends
         friend std::ostream& operator << (std::ostream& os, const FactorGraph& fg);
         friend std::istream& operator >> (std::istream& is, FactorGraph& fg);
+
+        /// @name Backwards compatibility layer (to be removed soon)
+        //@{
+        size_t VV2E(size_t n1, size_t n2) const { return G.VV2E(n1,n2); }
+        const Edge& edge(size_t e) const { return G.edge(e); }
+        void indexEdges() { G.indexEdges(); }
+        size_t nr_edges() const { return G.nr_edges(); }
+        const std::vector<Edge>& edges() const { return G.edges(); }
+        //}@
 
     private:
         /// Part of constructors (creates edges, neighbors and adjacency matrix)

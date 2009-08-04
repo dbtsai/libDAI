@@ -59,6 +59,9 @@
 #ifdef DAI_WITH_GIBBS
     #include <dai/gibbs.h>
 #endif
+#ifdef DAI_WITH_CBP
+    #include <dai/cbp.h>
+#endif
 
 
 /// Namespace for libDAI
@@ -72,6 +75,14 @@ namespace dai {
  *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
  */
 InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts );
+
+
+/// Constructs a new approximate inference algorithm.
+/** \param nameOpts The name and options of the approximate inference algorithm (should be in the format "name[opts]").
+ *  \param fg The FactorGraph that the algorithm should be applied to.
+ *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
+ */
+InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg );
 
 
 /// Contains the names of all approximate inference algorithms compiled into libDAI.
@@ -100,6 +111,9 @@ static const char* DAINames[] = {
 #endif
 #ifdef DAI_WITH_GIBBS
     Gibbs::Name,
+#endif
+#ifdef DAI_WITH_CBP
+    CBP::Name,
 #endif
     ""
 };

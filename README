@@ -88,7 +88,8 @@ Currently, libDAI supports the following (approximate) inference methods:
     * Generalized Belief Propagation [YFW05];
     * Double-loop GBP [HAK03];
     * Various variants of Loop Corrected Belief Propagation [MoK07, MoR05];
-    * Gibbs sampler.
+    * Gibbs sampler;
+    * Conditioned BP [EaG09].
 
 In addition, libDAI supports parameter learning of conditional probability
 tables by Expectation Maximization.

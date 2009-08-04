@@ -15,6 +15,7 @@ WITH_TREEEP=true
 WITH_JTREE=true
 WITH_MR=true
 WITH_GIBBS=true
+WITH_CBP=true
 # Build doxygen documentation?
 WITH_DOC=true
 # Build with debug info?

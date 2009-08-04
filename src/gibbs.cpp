@@ -198,12 +198,12 @@ double Gibbs::run() {
 }
 
 
-inline Factor Gibbs::beliefV( size_t i ) const {
+Factor Gibbs::beliefV( size_t i ) const {
     return Factor( var(i), _var_counts[i].begin() ).normalized();
 }
 
 
-inline Factor Gibbs::beliefF( size_t I ) const {
+Factor Gibbs::beliefF( size_t I ) const {
     return Factor( factor(I).vars(), _factor_counts[I].begin() ).normalized();
 }
 

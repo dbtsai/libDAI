@@ -330,6 +330,37 @@ void FactorGraph::clamp( const Var & n, size_t i, bool backup ) {
 }
 
 
+void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
+    Var n = var(i);
+    Factor mask_n( n, 0.0 );
+
+    foreach( size_t i, is ) {
+        assert( i <= n.states() );
+        mask_n[i] = 1.0;
+    }
+
+    map<size_t, Factor> newFacs;
+    for( size_t I = 0; I < nrFactors(); I++ ) 
+        if( factor(I).vars().contains( n ) ) {
+            newFacs[I] = factor(I) * mask_n;
+        }
+    setFactors( newFacs, backup );
+}
+
+
+void FactorGraph::clampFactor( size_t I, const vector<size_t> &is, bool backup ) {
+    size_t st = factor(I).states();
+    Factor newF( factor(I).vars(), 0.0 );
+
+    foreach( size_t i, is ) { 
+        assert( i <= st ); 
+        newF[i] = factor(I)[i];
+    }
+
+    setFactor( I, newF, backup );
+}
+
+
 void FactorGraph::backupFactor( size_t I ) {
     map<size_t,Factor>::iterator it = _backup.find( I );
     if( it != _backup.end() )
@@ -371,6 +402,7 @@ void FactorGraph::restoreFactors() {
     setFactors( _backup );
     _backup.clear();
 }
+
 
 void FactorGraph::backupFactors( const std::set<size_t> & facs ) {
     for( std::set<size_t>::const_iterator fac = facs.begin(); fac != facs.end(); fac++ )
