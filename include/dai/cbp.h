@@ -21,7 +21,6 @@
 /// \file
 /// \brief Defines class CBP [\ref EaG09]
 /// \todo Improve documentation
-/// \todo Clean up
 
 
 #ifndef __defined_libdai_cbp_h
@@ -29,11 +28,9 @@
 
 
 #include <fstream>
-
 #include <boost/shared_ptr.hpp>
 
 #include <dai/daialg.h>
-
 #include <dai/cbp.h>
 #include <dai/bbp.h>
 
@@ -43,37 +40,40 @@ namespace dai {
 
 /// Find a variable to clamp using BBP (goes with maximum adjoint) 
 /// \see BBP
-std::pair<size_t, size_t> bbpFindClampVar(const InfAlg &in_bp, bool clampingVar,
-            const PropertySet &bbp_props, bbp_cfn_t cfn, 
-            Real *maxVarOut);
+std::pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, bbp_cfn_t cfn, Real *maxVarOut );
 
 
 /// Class for CBP (Clamped Belief Propagation)
 /** This algorithm uses configurable heuristics to choose a variable
  *  x_i and a state x_i*. Inference is done with x_i "clamped" to x_i*
- *  (e.g. conditional on x_i==x_i*), and also with the negation of this
+ *  (i.e., conditional on x_i == x_i*), and also with the negation of this
  *  condition. Clamping is done recursively up to a fixed number of
  *  levels (other stopping criteria are also implemented, see
- *  "recursion" property). The resulting approximate marginals are
+ *  \a recursion property). The resulting approximate marginals are
  *  combined using logZ estimates.
  */
 class CBP : public DAIAlgFG {
     private:
+        /// Variable beliefs
         std::vector<Factor> _beliefsV;
+        /// Factor beliefs
         std::vector<Factor> _beliefsF;
+        /// Log-partition sum
         double _logZ;
-        double _est_logZ;
-        double _old_est_logZ;
 
+        /// Counts number of clampings at each leaf node
         double _sum_level;
+
+        /// Number of leaves of recursion tree
         size_t _num_leaves;
 
+        /// Output stream where information about the clampings is written
         boost::shared_ptr<std::ofstream> _clamp_ofstream;
 
-        bbp_cfn_t BBP_cost_function() {
-          return props.bbp_cfn;
-        }
+        /// Returns BBP cost function used
+        bbp_cfn_t BBP_cost_function() { return props.bbp_cfn; }
 
+        /// Prints beliefs, variables and partition sum, in case of a debugging build
         void printDebugInfo();
 
         /// Called by 'run', and by itself. Implements the main algorithm. 
@@ -81,14 +81,8 @@ class CBP : public DAIAlgFG {
          *  beliefs estimates of the children, and returns the improved
          *  estimates in \a lz_out and \a beliefs_out to its parent
          */
-        void runRecurse(InfAlg *bp,
-                        double orig_logZ,
-                        std::vector<size_t> clamped_vars_list,
-                        size_t &num_leaves,
-                        size_t &choose_count,
-                        double &sum_level,
-                        Real &lz_out,
-                        std::vector<Factor>& beliefs_out);
+        void runRecurse( InfAlg *bp, double orig_logZ, std::vector<size_t> clamped_vars_list, size_t &num_leaves,
+                         size_t &choose_count, double &sum_level, Real &lz_out, std::vector<Factor> &beliefs_out );
 
         /// Choose the next variable to clamp
         /** Choose the next variable to clamp, given a converged InfAlg (\a bp),
@@ -98,35 +92,29 @@ class CBP : public DAIAlgFG {
          *  props.choose==CHOOSE_BBP then it is used to store the
          *  adjoint of the chosen variable
          */
-        virtual bool chooseNextClampVar(InfAlg* bp,
-                                        std::vector<size_t> &clamped_vars_list,
-                                        size_t &i, std::vector<size_t> &xis, Real *maxVarOut);
+        virtual bool chooseNextClampVar( InfAlg* bp, std::vector<size_t> &clamped_vars_list, size_t &i, std::vector<size_t> &xis, Real *maxVarOut );
 
         /// Return the InfAlg to use at each step of the recursion. 
         /// \todo At present, only returns a BP instance
         InfAlg* getInfAlg();
 
+        /// Numer of iterations needed
         size_t _iters;
+        /// Maximum difference encountered so far
         double _maxdiff;
 
-        void setBeliefs(const std::vector<Factor>& bs, double logZ) {
-            size_t i=0;
-            _beliefsV.clear(); _beliefsV.reserve(nrVars());
-            _beliefsF.clear(); _beliefsF.reserve(nrFactors());
-            for(i=0; i<nrVars(); i++) _beliefsV.push_back(bs[i]);
-            for(; i<nrVars()+nrFactors(); i++) _beliefsF.push_back(bs[i]);
-            _logZ = logZ;
-        }
+        /// Sets variable beliefs, factor beliefs and logZ
+        /** \param bs should be a concatenation of the variable beliefs followed by the factor beliefs
+         */
+        void setBeliefs( const std::vector<Factor> &bs, double logZ );
 
+        /// Constructor helper function
         void construct();
 
     public:
-
-        //----------------------------------------------------------------
-
-        /// construct CBP object from FactorGraph
-        CBP(const FactorGraph &fg, const PropertySet &opts) : DAIAlgFG(fg) {
-            props.set(opts);
+        /// Construct CBP object from FactorGraph fg and PropertySet opts
+        CBP( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg) {
+            props.set( opts );
             construct();
         }
 
@@ -136,7 +124,6 @@ class CBP : public DAIAlgFG {
         /// @name General InfAlg interface
         //@{
         virtual CBP* clone() const { return new CBP(*this); }
-        virtual CBP* create() const { DAI_THROW(NOT_IMPLEMENTED); }
         virtual std::string identify() const { return std::string(Name) + props.toString(); }
         virtual Factor belief (const Var &n) const { return _beliefsV[findVar(n)]; }
         virtual Factor belief (const VarSet &) const { DAI_THROW(NOT_IMPLEMENTED); }
@@ -149,8 +136,8 @@ class CBP : public DAIAlgFG {
         virtual size_t Iterations() const { return _iters; }
         //@}
 
-        Factor beliefV (size_t i) const { return _beliefsV[i]; }
-        Factor beliefF (size_t I) const { return _beliefsF[I]; }
+        Factor beliefV( size_t i ) const { return _beliefsV[i]; }
+        Factor beliefF( size_t I ) const { return _beliefsF[I]; }
 
         //----------------------------------------------------------------
 
@@ -179,7 +166,7 @@ class CBP : public DAIAlgFG {
             double rec_tol;
             /// Maximum number of levels of recursion (\a recurse is REC_FIXED)
             size_t max_levels = 10;
-            /// If choose=CHOOSE_BBP and maximum adjoint is less than this value, don't recurse
+            /// If choose==CHOOSE_BBP and maximum adjoint is less than this value, don't recurse
             double min_max_adj;
             /// Heuristic for choosing clamping variable
             ChooseMethodType choose;
@@ -248,21 +235,20 @@ class CBP : public DAIAlgFG {
         } props;
 /* }}} END OF GENERATED CODE */
 
-    /// Returns heuristic used for clamping variable
-    Properties::ChooseMethodType ChooseMethod() { return props.choose; }
-
-    /// Returns method used for deciding when to stop recursing
-    Properties::RecurseType Recursion() { return props.recursion; }
-
-    /// Returns clamping type used
-    Properties::ClampType Clamping() { return props.clamp; }
-    /// Returns maximum number of levels of recursion
-    size_t maxClampLevel() { return props.max_levels; }
-    /// Returns props.min_max_adj @see CBP::Properties::min_max_adj
-    double minMaxAdj() { return props.min_max_adj; }
-    /// Returns tolerance used for controlling recursion depth
-    double recTol() { return props.rec_tol; }
+        /// Returns heuristic used for clamping variable
+        Properties::ChooseMethodType ChooseMethod() { return props.choose; }
+        /// Returns method used for deciding when to stop recursing
+        Properties::RecurseType Recursion() { return props.recursion; }
+        /// Returns clamping type used
+        Properties::ClampType Clamping() { return props.clamp; }
+        /// Returns maximum number of levels of recursion
+        size_t maxClampLevel() { return props.max_levels; }
+        /// Returns props.min_max_adj @see CBP::Properties::min_max_adj
+        double minMaxAdj() { return props.min_max_adj; }
+        /// Returns tolerance used for controlling recursion depth
+        double recTol() { return props.rec_tol; }
 };
+
 
 /// Given a sorted vector of states \a xis and total state count \a n_states, return a vector of states not in \a xis
 std::vector<size_t> complement( std::vector<size_t>& xis, size_t n_states );
