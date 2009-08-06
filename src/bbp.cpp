@@ -411,12 +411,12 @@ void BBP::doParUpdate() {
 
 
 void BBP::incrSeqMsgM( size_t i, size_t _I, const Prob &p ) {
-    if( props.clean_updates )
+/*    if( props.clean_updates )
         _new_adj_m[i][_I] += p;
-    else {
+    else {*/
         _adj_m[i][_I] += p;
         calcUnnormMsgM(i, _I);
-    }
+//    }
 }
 
 
@@ -425,6 +425,7 @@ Real pv_thresh=1000;
 #endif
 
 
+/*
 void BBP::updateSeqMsgM( size_t i, size_t _I ) {
     if( props.clean_updates ) {
 #if 0
@@ -443,7 +444,7 @@ void BBP::updateSeqMsgM( size_t i, size_t _I ) {
         _new_adj_m[i][_I].fill( 0.0 );
     }
 }
-
+*/
 
 void BBP::setSeqMsgM( size_t i, size_t _I, const Prob &p ) {
     _adj_m[i][_I] = p;
@@ -714,9 +715,9 @@ void BBP::run() {
                 for( size_t i = 0; i < _fg->nrVars(); i++ )
                     foreach( const Neighbor &I, _fg->nbV(i) )
                         sendSeqMsgM( i, I.iter );
-                for( size_t i = 0; i < _fg->nrVars(); i++ )
+/*                for( size_t i = 0; i < _fg->nrVars(); i++ )
                     foreach( const Neighbor &I, _fg->nbV(i) )
-                        updateSeqMsgM( i, I.iter );
+                        updateSeqMsgM( i, I.iter );*/
             } while( mag > tol && _iters < props.maxiter );
 
             if( _iters >= props.maxiter )
@@ -1170,7 +1171,6 @@ void BBP::Properties::set(const PropertySet &opts)
         if(*i == "tol") continue;
         if(*i == "damping") continue;
         if(*i == "updates") continue;
-        if(*i == "clean_updates") continue;
         cerr << "BBP: Unknown property " << *i << endl;
         die=true;
     }
@@ -1197,10 +1197,6 @@ void BBP::Properties::set(const PropertySet &opts)
         cerr << "BBP: Missing property \"updates\" for method \"BBP\"" << endl;
         die=true;
     }
-    if(!opts.hasKey("clean_updates")) {
-        cerr << "BBP: Missing property \"clean_updates\" for method \"BBP\"" << endl;
-        die=true;
-    }
     if(die) {
         DAI_THROW(NOT_ALL_PROPERTIES_SPECIFIED);
     }
@@ -1209,7 +1205,6 @@ void BBP::Properties::set(const PropertySet &opts)
     tol = opts.getStringAs<double>("tol");
     damping = opts.getStringAs<double>("damping");
     updates = opts.getStringAs<UpdateType>("updates");
-    clean_updates = opts.getStringAs<bool>("clean_updates");
 }
 PropertySet BBP::Properties::get() const {
     PropertySet opts;
@@ -1218,7 +1213,6 @@ PropertySet BBP::Properties::get() const {
     opts.Set("tol", tol);
     opts.Set("damping", damping);
     opts.Set("updates", updates);
-    opts.Set("clean_updates", clean_updates);
     return opts;
 }
 string BBP::Properties::toString() const {
@@ -1229,7 +1223,6 @@ string BBP::Properties::toString() const {
     s << "tol=" << tol << ",";
     s << "damping=" << damping << ",";
     s << "updates=" << updates << ",";
-    s << "clean_updates=" << clean_updates;
     s << "]";
     return s.str();
 }

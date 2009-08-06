@@ -21,7 +21,6 @@
 /// \file
 /// \brief Defines class BBP [\ref EaG09]
 /// \todo Improve documentation
-/// \todo Debug clean_updates
 
 
 #ifndef ___defined_libdai_bbp_h
@@ -181,7 +180,8 @@ class BBP {
         //@{
         /// Helper function for sendSeqMsgM: increases factor->variable message adjoint by p and calculates the corresponding unnormalized adjoint
         void incrSeqMsgM( size_t i, size_t _I, const Prob& p );
-        void updateSeqMsgM( size_t i, size_t _I );
+        //  DISABLED BECAUSE IT IS BUGGY:
+        //  void updateSeqMsgM( size_t i, size_t _I );
         /// Sets normalized factor->variable message adjoint and calculates the corresponding unnormalized adjoint
         void setSeqMsgM( size_t i, size_t _I, const Prob &p ); 
         /// Implements routine Send-n in Figure 5 in [\ref EaG09]
@@ -289,7 +289,8 @@ class BBP {
            /// Update schedule
            UpdateType updates;
 
-           bool clean_updates;
+           // DISABLED BECAUSE IT IS BUGGY:
+           // bool clean_updates;
         } 
         */
 /* {{{ GENERATED CODE: DO NOT EDIT. Created by 
@@ -308,7 +309,6 @@ class BBP {
             double damping;
             /// Update schedule
             UpdateType updates;
-            bool clean_updates;
 
             /// Set members from PropertySet
             void set(const PropertySet &opts);

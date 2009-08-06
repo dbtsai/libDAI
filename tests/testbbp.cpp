@@ -45,7 +45,6 @@ int main( int argc, char *argv[] ) {
         size_t maxiter = 10000;
         double damping = 0.0;
         BBP::Properties::UpdateType updates = BBP::Properties::UpdateType::PAR;
-        bool   clean_updates = false;
 
         // Store the constants in a PropertySet object
         PropertySet opts;
@@ -62,10 +61,9 @@ int main( int argc, char *argv[] ) {
 
         vector<size_t> state( fg.nrVars(), 0 );
 
-        for( size_t t = 0; t < 90; t++ ) {
-            clean_updates = t % 2;
+        for( size_t t = 0; t < 45; t++ ) {
             BBP::Properties::UpdateType updates;
-            switch( (t / 2) % 5 ) {
+            switch( t % 5 ) {
                 case BBP::Properties::UpdateType::SEQ_FIX:
                     updates = BBP::Properties::UpdateType::SEQ_FIX;
                     break;
@@ -83,7 +81,7 @@ int main( int argc, char *argv[] ) {
                     break;
             }
             bbp_cfn_t cfn;
-            switch( (t / 10) % 9 ) {
+            switch( (t / 5) % 9 ) {
                 case 0:
                     cfn = bbp_cfn_t::CFN_GIBBS_B;
                     break;
@@ -114,8 +112,8 @@ int main( int argc, char *argv[] ) {
             }
 
             double h = 1e-4;
-            double result = numericBBPTest( bp, &state, opts("updates",updates)("clean_updates",clean_updates), cfn, h );
-            cout << "clean_updates=" << clean_updates << ", updates=" << updates << ", cfn=" << cfn << ", result: " << result << endl;
+            double result = numericBBPTest( bp, &state, opts("updates",updates), cfn, h );
+            cout << "result: " << result << ",\tupdates=" << updates << ", cfn=" << cfn << endl;
         }
     }
 
