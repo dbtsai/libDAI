@@ -140,6 +140,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
             qf.push_back( obj->belief( fg.factor(I).vars() ) );
         QF_OUT = Factors2mx( qf );
     }
+    delete obj;
     
     return;
 }
