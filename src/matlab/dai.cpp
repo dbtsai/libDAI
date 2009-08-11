@@ -25,6 +25,8 @@
  * This is a MEX-file for MATLAB.                                  *
  *                                                                 * 
  *   [logZ,q,md,qv,qf] = dai(psi,method,opts);                     *
+ * or                                                              *
+ *   [logZ,q,md,qv,qf,qmap] = dai(psi,method,opts);                *
  *                                                                 * 
  *=================================================================*/
 
@@ -33,6 +35,7 @@
 #include <dai/matlab/matlab.h>
 #include "mex.h"
 #include <dai/alldai.h>
+#include <dai/bp.h>
 
 
 using namespace std;
@@ -55,8 +58,9 @@ using namespace dai;
 #define MD_OUT          plhs[2]
 #define QV_OUT          plhs[3]
 #define QF_OUT          plhs[4]
+#define QMAP_OUT        plhs[5]
 #define NR_OUT          3
-#define NR_OUT_OPT      2
+#define NR_OUT_OPT      3
 
 
 void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
@@ -65,7 +69,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     
     // Check for proper number of arguments
     if( ((nrhs < NR_IN) || (nrhs > NR_IN + NR_IN_OPT)) || ((nlhs < NR_OUT) || (nlhs > NR_OUT + NR_OUT_OPT)) ) {
-        mexErrMsgTxt("Usage: [logZ,q,md,qv,qf] = dai(psi,method,opts)\n\n"
+        mexErrMsgTxt("Usage: [logZ,q,md,qv,qf,qmap] = dai(psi,method,opts)\n\n"
         "\n"
         "INPUT:  psi        = linear cell array containing the factors \n"
         "                     psi{i} should be a structure with a Member field\n"
@@ -77,7 +81,8 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
         "        q          = linear cell array containing all final beliefs.\n"
         "        md         = maxdiff (final linf-dist between new and old single node beliefs).\n"
         "        qv         = linear cell array containing all variable beliefs.\n"
-        "        qf         = linear cell array containing all factor beliefs.\n");
+        "        qf         = linear cell array containing all factor beliefs.\n"
+        "        qmap       = (V,1) array containing the MAP labeling (only for BP).\n");
     } 
     
     char *method;
@@ -139,6 +144,21 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
         for( size_t I = 0; I < fg.nrFactors(); I++ )
             qf.push_back( obj->belief( fg.factor(I).vars() ) );
         QF_OUT = Factors2mx( qf );
+    }
+
+    if( nlhs >= 6 ) {
+        BP* obj_bp = dynamic_cast<BP *>(obj);
+        if (obj_bp == 0) {
+            mexErrMsgTxt("MAP state assignment works only for BP.\n");
+            delete obj;
+
+            return;
+        }
+        std::vector<std::size_t> map_state = obj_bp->findMaximum();
+        QMAP_OUT = mxCreateNumericMatrix(map_state.size(), 1, mxUINT32_CLASS, mxREAL);
+        uint32_T* qmap_p = reinterpret_cast<uint32_T *>(mxGetPr(QMAP_OUT));
+        for (size_t n = 0; n < map_state.size(); ++n)
+            qmap_p[n] = map_state[n];
     }
     delete obj;
     

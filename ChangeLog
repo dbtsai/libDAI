@@ -1,3 +1,7 @@
+* [Sebastian Nowozin] MEX file dai now also optionally returns the MAP state
+  (only for BP)
+* [Sebastian Nowozin] Fixed memory leak in MEX file dai
+
 git ae0fc30e10be6683cbfc209dcee56f34234a6cb8
 --------------------------------------------
 * Added work-around for bug in Boost Graph Library
