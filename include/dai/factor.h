@@ -113,6 +113,12 @@ template <typename T> class TFactor {
             assert( _vs.nrStates() == _p.size() );
 #endif
         }
+        TFactor( const std::vector< Var >& vars, const std::vector< T >& p ) : _vs(vars.begin(), vars.end(), vars.size()), _p(p.size()) {
+            Permute permindex(vars);
+            for (size_t li = 0; li < p.size(); ++li) {
+                _p[permindex.convert_linear_index(li)] = p[li];
+            }
+        }
         
         /// Constructs TFactor depending on the variable n, with uniform distribution
         TFactor( const Var& n ) : _vs(n), _p(n.states()) {}
