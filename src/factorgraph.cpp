@@ -319,11 +319,9 @@ void FactorGraph::clamp( const Var & n, size_t i, bool backup ) {
     delta_n_i[i] = 1.0;
 
     map<size_t, Factor> newFacs;
-    // For all factors that contain n
-    for( size_t I = 0; I < nrFactors(); I++ ) 
-        if( factor(I).vars().contains( n ) )
-            // Multiply it with a delta function
-            newFacs[I] = factor(I) * delta_n_i;
+    size_t n_index = findVar(n);
+	foreach( const BipartiteGraph::Neighbor &I, nbV(n_index) )
+        newFacs[I] = factor(I) * delta_n_i;
     setFactors( newFacs, backup );
 
     return;
@@ -340,10 +338,9 @@ void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
     }
 
     map<size_t, Factor> newFacs;
-    for( size_t I = 0; I < nrFactors(); I++ ) 
-        if( factor(I).vars().contains( n ) ) {
-            newFacs[I] = factor(I) * mask_n;
-        }
+    size_t n_index = findVar(n);
+	foreach( const BipartiteGraph::Neighbor &I, nbV(n_index) )
+        newFacs[I] = factor(I) * mask_n;
     setFactors( newFacs, backup );
 }
 
