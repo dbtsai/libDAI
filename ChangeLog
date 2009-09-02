@@ -1,3 +1,7 @@
+* Changed FactorGraph::clamp and DAIAlg::clamp interfaces (the variable to be
+  clamped is now indicated by its index, not as a Var) and marked the old
+  interface as obsolete
+* [Patrick Pletscher] Fixed performance issue in FactorGraph::clamp
 * [Sebastian Nowozin] MEX file dai now also optionally returns the MAP state
   (only for BP)
 * [Sebastian Nowozin] Fixed memory leak in MEX file dai

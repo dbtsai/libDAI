@@ -349,7 +349,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                 if( bp->beliefV(k)[xk] < tiny ) 
                     continue;
                 InfAlg *bp1 = bp->clone();
-                bp1->clamp( var(k), xk );
+                bp1->clamp( k, xk );
                 bp1->init( var(k) );
                 bp1->run();
                 Real cost = 0;

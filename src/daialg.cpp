@@ -33,12 +33,16 @@ using namespace std;
 /// Calculates the marginal of obj on ns by clamping all variables in ns and calculating logZ for each joined state.
 /*  reInit should be set to true if at least one of the possible clamped states would be invalid (leading to a factor graph with zero partition sum).
  */
-Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
+Factor calcMarginal( const InfAlg &obj, const VarSet &ns, bool reInit ) {
     Factor Pns (ns);
     
     InfAlg *clamped = obj.clone();
     if( !reInit )
         clamped->init();
+
+    map<Var,size_t> varindices;
+    for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
+        varindices[*n] = obj.fg().findVar( *n );
 
     Real logZ0 = -INFINITY;
     for( State s(ns); s.valid(); s++ ) {
@@ -47,7 +51,7 @@ Factor calcMarginal( const InfAlg & obj, const VarSet & ns, bool reInit ) {
 
         // set clamping Factors to delta functions
         for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
-            clamped->clamp( *n, s(*n) );
+            clamped->clamp( varindices[*n], s(*n) );
         
         // run DAIAlg, calc logZ, store in Pns
         if( reInit )
@@ -93,8 +97,11 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
     size_t N = ns.size();
     vector<Var> vns;
     vns.reserve( N );
-    for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
+    map<Var,size_t> varindices;
+    for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ ) {
         vns.push_back( *n );
+        varindices[*n] = obj.fg().findVar( *n );
+    }
 
     vector<Factor> pairbeliefs;
     pairbeliefs.reserve( N * N );
@@ -113,7 +120,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
     for( size_t j = 0; j < N; j++ ) {
         // clamp Var j to its possible values
         for( size_t j_val = 0; j_val < vns[j].states(); j_val++ ) {
-            clamped->clamp( vns[j], j_val, true );
+            clamped->clamp( varindices[vns[j]], j_val, true );
             if( reInit )
                 clamped->init();
             else
@@ -195,6 +202,10 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
     if( !reInit )
         clamped->init();
 
+    map<Var,size_t> varindices;
+    for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
+        varindices[*n] = obj.fg().findVar( *n );
+
     Real logZ0 = 0.0;
     VarSet::const_iterator nj = ns.begin();
     for( long j = 0; j < (long)ns.size() - 1; j++, nj++ ) {
@@ -207,9 +218,9 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
                 for( size_t k_val = 0; k_val < nk->states(); k_val++ ) {
                     // save unclamped factors connected to ns
                     clamped->backupFactors( ns );
-            
-                    clamped->clamp( *nj, j_val );
-                    clamped->clamp( *nk, k_val );
+
+                    clamped->clamp( varindices[*nj], j_val );
+                    clamped->clamp( varindices[*nk], k_val );
                     if( reInit )
                         clamped->init();
                     else

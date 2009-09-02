@@ -146,6 +146,7 @@ class BipartiteGraph {
             std::vector<size_t> ind2;       // indices of nodes of type 2
         };
 
+        // OBSOLETE
         /// @name Backwards compatibility layer (to be removed soon)
         //@{
         /// Enable backwards compatibility layer?
@@ -373,6 +374,7 @@ class BipartiteGraph {
         /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
 
+        // OBSOLETE
         /// @name Backwards compatibility layer (to be removed soon)
         //@{
         void indexEdges() {

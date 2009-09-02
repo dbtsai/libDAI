@@ -157,7 +157,7 @@ class FactorGraph {
         Neighbor & nbF( size_t I, size_t _i ) { return G.nb2(I)[_i]; }
 
         /// Returns the index of a particular variable
-        size_t findVar( const Var & n ) const {
+        size_t findVar( const Var &n ) const {
             size_t i = find( vars().begin(), vars().end(), n ) - vars().begin();
             assert( i != nrVars() );
             return i;
@@ -212,10 +212,17 @@ class FactorGraph {
             }
         }
 
-        /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$)
+        /// Clamp variable with index i to value x (i.e. multiply with a Kronecker delta \f$\delta_{x_i, x}\f$)
         /** If backup == true, make a backup of all factors that are changed
          */
-        virtual void clamp( const Var & n, size_t i, bool backup = false );
+        virtual void clamp( size_t i, size_t x, bool backup = false );
+
+        // OBSOLETE
+        /// Only for backwards compatibility (to be removed soon)
+        virtual void clamp( const Var &v, size_t x, bool backup = false ) { 
+            std::cerr << "Warning: this FactorGraph::clamp(const Var&,...) interface is obsolete!" << std::endl;
+            clamp( findVar(v), x, backup );
+        }
 
         /// Clamp a variable in a factor graph to have one out of a list of values
         /** If backup == true, make a backup of all factors that are changed
@@ -249,10 +256,10 @@ class FactorGraph {
         bool isBinary() const;
 
         /// Reads a FactorGraph from a file
-        void ReadFromFile(const char *filename);
+        void ReadFromFile( const char *filename );
 
         /// Writes a FactorGraph to a file
-        void WriteToFile(const char *filename, size_t precision=15) const;
+        void WriteToFile( const char *filename, size_t precision=15 ) const;
 
         /// Writes a FactorGraph to a GraphViz .dot file
         void printDot( std::ostream& os ) const;
@@ -260,11 +267,11 @@ class FactorGraph {
         /// Returns the cliques in this FactorGraph
         std::vector<VarSet> Cliques() const;
 
-        /// Clamp variable v_i to value state (i.e. multiply with a Kronecker delta \f$\delta_{x_{v_i},x}\f$);
+        /// Clamp variable v to value x (i.e. multiply with a Kronecker delta \f$\delta_{x_v,x}\f$);
         /** This version changes the factor graph structure and thus returns a newly constructed FactorGraph
          *  and keeps the current one constant, contrary to clamp()
          */
-        FactorGraph clamped( const Var & v_i, size_t x ) const;
+        FactorGraph clamped( const Var &v, size_t x ) const;
 
         /// Returns a copy of *this, where all factors that are subsumed by some larger factor are merged with the larger factors.
         FactorGraph maximalFactors() const;
@@ -284,6 +291,7 @@ class FactorGraph {
         friend std::ostream& operator << (std::ostream& os, const FactorGraph& fg);
         friend std::istream& operator >> (std::istream& is, FactorGraph& fg);
 
+        // OBSOLETE
         /// @name Backwards compatibility layer (to be removed soon)
         //@{
         size_t VV2E(size_t n1, size_t n2) const { return G.VV2E(n1,n2); }

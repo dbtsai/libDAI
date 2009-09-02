@@ -37,7 +37,7 @@ void Observation::addObservation( Var node, size_t setting ) {
 
 void Observation::applyEvidence( InfAlg &alg ) const {
     for( std::map<Var, size_t>::const_iterator i = _obs.begin(); i != _obs.end(); ++i )
-        alg.clamp( i->first, i->second );
+        alg.clamp( alg.fg().findVar(i->first), i->second );
 }
   
 

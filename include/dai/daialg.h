@@ -98,8 +98,14 @@ class InfAlg {
          */
         virtual double run() = 0;
 
-        /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$)
-        virtual void clamp( const Var & n, size_t i, bool backup = false ) = 0;
+        /// Clamp variable with index i to value x (i.e. multiply with a Kronecker delta \f$\delta_{x_i, x}\f$)
+        /** If backup == true, make a backup of all factors that are changed
+         */
+        virtual void clamp( size_t i, size_t x, bool backup = false ) = 0;
+
+        // OBSOLETE
+        /// Only for backwards compatibility (to be removed soon)
+        virtual void clamp( const Var &v, size_t x, bool backup = false ) = 0;
 
         /// Set all factors interacting with var(i) to 1
         virtual void makeCavity( size_t i, bool backup = false ) = 0;
@@ -158,8 +164,15 @@ class DAIAlg : public InfAlg, public GRM {
         /// Restore Factors involving ns
         void restoreFactors( const VarSet &ns ) { GRM::restoreFactors( ns ); }
 
-        /// Clamp variable n to value i (i.e. multiply with a Kronecker delta \f$\delta_{x_n, i}\f$)
-        void clamp( const Var & n, size_t i, bool backup = false ) { GRM::clamp( n, i, backup ); }
+        /// Clamp variable with index i to value x (i.e. multiply with a Kronecker delta \f$\delta_{x_i, x}\f$)
+        void clamp( size_t i, size_t x, bool backup = false ) { GRM::clamp( i, x, backup ); }
+
+        // OBSOLETE
+        /// Only for backwards compatibility (to be removed soon)
+        void clamp( const Var &v, size_t x, bool backup = false ) { 
+            GRM::clamp( v, x, backup );
+            std::cerr << "Warning: this DAIAlg<...>::clamp(const Var&,...) interface is obsolete!" << std::endl;
+        }
 
         /// Set all factors interacting with var(i) to 1
         void makeCavity( size_t i, bool backup = false ) { GRM::makeCavity( i, backup ); }

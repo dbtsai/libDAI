@@ -310,18 +310,14 @@ vector<VarSet> FactorGraph::Cliques() const {
 }
 
 
-void FactorGraph::clamp( const Var & n, size_t i, bool backup ) {
-    assert( i <= n.states() );
-
-    // Multiply each factor that contains the variable with a delta function
-
-    Factor delta_n_i(n,0.0);
-    delta_n_i[i] = 1.0;
+void FactorGraph::clamp( size_t i, size_t x, bool backup ) {
+    assert( x <= var(i).states() );
+    Factor mask( var(i), 0.0 );
+    mask[x] = 1.0;
 
     map<size_t, Factor> newFacs;
-    size_t n_index = findVar(n);
-	foreach( const BipartiteGraph::Neighbor &I, nbV(n_index) )
-        newFacs[I] = factor(I) * delta_n_i;
+	foreach( const BipartiteGraph::Neighbor &I, nbV(i) )
+        newFacs[I] = factor(I) * mask;
     setFactors( newFacs, backup );
 
     return;
@@ -338,8 +334,7 @@ void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
     }
 
     map<size_t, Factor> newFacs;
-    size_t n_index = findVar(n);
-	foreach( const BipartiteGraph::Neighbor &I, nbV(n_index) )
+	foreach( const BipartiteGraph::Neighbor &I, nbV(i) )
         newFacs[I] = factor(I) * mask_n;
     setFactors( newFacs, backup );
 }
@@ -425,14 +420,14 @@ bool FactorGraph::isBinary() const {
 }
 
 
-FactorGraph FactorGraph::clamped( const Var & v_i, size_t state ) const {
+FactorGraph FactorGraph::clamped( const Var &v, size_t state ) const {
     Real zeroth_order = 1.0;
     vector<Factor> clamped_facs;
     for( size_t I = 0; I < nrFactors(); I++ ) {
         VarSet v_I = factor(I).vars();
         Factor new_factor;
-        if( v_I.intersects( v_i ) )
-            new_factor = factor(I).slice( v_i, state );
+        if( v_I.intersects( v ) )
+            new_factor = factor(I).slice( v, state );
         else
             new_factor = factor(I);
 

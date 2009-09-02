@@ -119,6 +119,7 @@ class LC : public DAIAlgFG {
         virtual size_t Iterations() const { return _iters; }
         //@}
 
+        Factor beliefV( size_t i ) const { return _beliefs[i]; }
 
         /// @name Additional interface specific for LC
         //@{ 
