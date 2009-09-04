@@ -185,65 +185,49 @@ class BipartiteGraph {
 
         /// Returns constant reference to the _i2'th neighbor of node i1 of type 1
         const Neighbor & nb1( size_t i1, size_t _i2 ) const { 
-#ifdef DAI_DEBUG
-            assert( i1 < _nb1.size() );
-            assert( _i2 < _nb1[i1].size() );
-#endif
+            DAI_DEBASSERT( i1 < _nb1.size() );
+            DAI_DEBASSERT( _i2 < _nb1[i1].size() );
             return _nb1[i1][_i2]; 
         }
         /// Returns reference to the _i2'th neighbor of node i1 of type 1
         Neighbor & nb1( size_t i1, size_t _i2 ) {
-#ifdef DAI_DEBUG
-            assert( i1 < _nb1.size() );
-            assert( _i2 < _nb1[i1].size() );
-#endif
+            DAI_DEBASSERT( i1 < _nb1.size() );
+            DAI_DEBASSERT( _i2 < _nb1[i1].size() );
             return _nb1[i1][_i2]; 
         }
 
         /// Returns constant reference to the _i1'th neighbor of node i2 of type 2
         const Neighbor & nb2( size_t i2, size_t _i1 ) const { 
-#ifdef DAI_DEBUG
-            assert( i2 < _nb2.size() );
-            assert( _i1 < _nb2[i2].size() );
-#endif
+            DAI_DEBASSERT( i2 < _nb2.size() );
+            DAI_DEBASSERT( _i1 < _nb2[i2].size() );
             return _nb2[i2][_i1]; 
         }
         /// Returns reference to the _i1'th neighbor of node i2 of type 2
         Neighbor & nb2( size_t i2, size_t _i1 ) { 
-#ifdef DAI_DEBUG
-            assert( i2 < _nb2.size() );
-            assert( _i1 < _nb2[i2].size() );
-#endif
+            DAI_DEBASSERT( i2 < _nb2.size() );
+            DAI_DEBASSERT( _i1 < _nb2[i2].size() );
             return _nb2[i2][_i1]; 
         }
 
         /// Returns constant reference to all neighbors of node i1 of type 1
         const Neighbors & nb1( size_t i1 ) const { 
-#ifdef DAI_DEBUG
-            assert( i1 < _nb1.size() );
-#endif
+            DAI_DEBASSERT( i1 < _nb1.size() );
             return _nb1[i1]; 
         }
         /// Returns reference to all neighbors of node of i1 type 1
         Neighbors & nb1( size_t i1 ) { 
-#ifdef DAI_DEBUG
-            assert( i1 < _nb1.size() );
-#endif
+            DAI_DEBASSERT( i1 < _nb1.size() );
             return _nb1[i1]; 
         }
 
         /// Returns constant reference to all neighbors of node i2 of type 2
         const Neighbors & nb2( size_t i2 ) const { 
-#ifdef DAI_DEBUG
-            assert( i2 < _nb2.size() );
-#endif
+            DAI_DEBASSERT( i2 < _nb2.size() );
             return _nb2[i2]; 
         }
         /// Returns reference to all neighbors of node i2 of type 2
         Neighbors & nb2( size_t i2 ) { 
-#ifdef DAI_DEBUG
-            assert( i2 < _nb2.size() );
-#endif
+            DAI_DEBASSERT( i2 < _nb2.size() );
             return _nb2[i2]; 
         }
 

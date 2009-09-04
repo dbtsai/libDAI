@@ -180,9 +180,7 @@ template <typename T> class TProb {
 
         /// Divides each entry by scalar x
         TProb<T>& operator/= (T x) {
-#ifdef DAI_DEBUG
-            assert( x != 0.0 );
-#endif
+            DAI_DEBASSERT( x != 0.0 );
             std::transform( _p.begin(), _p.end(), _p.begin(), std::bind2nd( std::divides<T>(), x ) );
             return *this;
         }
@@ -222,9 +220,7 @@ template <typename T> class TProb {
 
         /// Lexicographical comparison (sizes should be identical)
         bool operator<= (const TProb<T> & q) const {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             for( size_t i = 0; i < size(); i++ )
                 if( !(_p[i] <= q[i]) )
                     return false;
@@ -233,18 +229,14 @@ template <typename T> class TProb {
 
         /// Pointwise multiplication with q (sizes should be identical)
         TProb<T>& operator*= (const TProb<T> & q) {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             std::transform( _p.begin(), _p.end(), q._p.begin(), _p.begin(), std::multiplies<T>() );
             return *this;
         }
         
         /// Return product of *this with q (sizes should be identical)
         TProb<T> operator* (const TProb<T> & q) const {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             TProb<T> prod( *this );
             prod *= q;
             return prod;
@@ -252,18 +244,14 @@ template <typename T> class TProb {
 
         /// Pointwise addition with q (sizes should be identical)
         TProb<T>& operator+= (const TProb<T> & q) {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             std::transform( _p.begin(), _p.end(), q._p.begin(), _p.begin(), std::plus<T>() );
             return *this;
         }
         
         /// Returns sum of *this and q (sizes should be identical)
         TProb<T> operator+ (const TProb<T> & q) const {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             TProb<T> sum( *this );
             sum += q;
             return sum;
@@ -271,18 +259,9 @@ template <typename T> class TProb {
         
         /// Pointwise subtraction of q (sizes should be identical)
         TProb<T>& operator-= (const TProb<T> & q) {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             std::transform( _p.begin(), _p.end(), q._p.begin(), _p.begin(), std::minus<T>() );
-            return *this;
-        }
-        
-        /// Return *this minus q (sizes should be identical)
-        TProb<T> operator- (const TProb<T> & q) const {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             TProb<T> diff( *this );
             diff -= q;
             return diff;
@@ -290,9 +269,7 @@ template <typename T> class TProb {
 
         /// Pointwise division by q, where division by 0 yields 0 (sizes should be identical)
         TProb<T>& operator/= (const TProb<T> & q) {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             for( size_t i = 0; i < size(); i++ ) {
                 if( q[i] == 0.0 )
                     _p[i] = 0.0;
@@ -304,18 +281,14 @@ template <typename T> class TProb {
         
         /// Pointwise division by q, where division by 0 yields +Inf (sizes should be identical)
         TProb<T>& divide (const TProb<T> & q) {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             std::transform( _p.begin(), _p.end(), q._p.begin(), _p.begin(), std::divides<T>() );
             return *this;
         }
         
         /// Returns quotient of *this with q (sizes should be identical)
         TProb<T> operator/ (const TProb<T> & q) const {
-#ifdef DAI_DEBUG
-            assert( size() == q.size() );
-#endif
+            DAI_DEBASSERT( size() == q.size() );
             TProb<T> quot( *this );
             quot /= q;
             return quot;
@@ -521,9 +494,7 @@ template <typename T> class TProb {
 /** \relates TProb
  */
 template<typename T> Real dist( const TProb<T> &p, const TProb<T> &q, typename TProb<T>::DistType dt ) {
-#ifdef DAI_DEBUG
-    assert( p.size() == q.size() );
-#endif
+    DAI_DEBASSERT( p.size() == q.size() );
     Real result = 0.0;
     switch( dt ) {
         case TProb<T>::DISTL1:

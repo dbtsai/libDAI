@@ -68,9 +68,7 @@ namespace dai {
             
             /// Returns true if cluster I is not contained in a larger cluster
             bool isMaximal( size_t I ) const {
-#ifdef DAI_DEBUG
-                assert( I < G.nr2() );
-#endif
+                DAI_DEBASSERT( I < G.nr2() );
                 const VarSet & clI = clusters[I];
                 bool maximal = true;
                 // The following may not be optimal, since it may repeatedly test the same cluster *J

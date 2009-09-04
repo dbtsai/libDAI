@@ -37,6 +37,7 @@
 #include <dai/prob.h>
 #include <dai/varset.h>
 #include <dai/index.h>
+#include <dai/util.h>
 
 
 namespace dai {
@@ -109,9 +110,7 @@ template <typename T> class TFactor {
 
         /// Constructs TFactor depending on variables in ns, with values set to the TProb p
         TFactor( const VarSet& ns, const TProb<T>& p ) : _vs(ns), _p(p) {
-#ifdef DAI_DEBUG
-            assert( _vs.nrStates() == _p.size() );
-#endif
+            DAI_DEBASSERT( _vs.nrStates() == _p.size() );
         }
         
         /// Constructs TFactor depending on the variable n, with uniform distribution
@@ -454,6 +453,7 @@ template<typename T> TFactor<T> TFactor<T>::maxMarginal(const VarSet & ns, bool 
 }
 
 
+/// Apply binary operator pointwise on two factors
 template<typename T, typename binaryOp> TFactor<T> pointwiseOp( const TFactor<T> &f, const TFactor<T> &g, binaryOp op ) {
     if( f.vars() == g.vars() ) { // optimizate special case
         TFactor<T> result(f); 
@@ -475,11 +475,9 @@ template<typename T, typename binaryOp> TFactor<T> pointwiseOp( const TFactor<T>
 
 
 template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const {
-#ifdef DAI_DEBUG
-    assert( _vs.contains( i ) );
-    assert( _vs.contains( j ) );
-    assert( i != j );
-#endif
+    DAI_DEBASSERT( _vs.contains( i ) );
+    DAI_DEBASSERT( _vs.contains( j ) );
+    DAI_DEBASSERT( i != j );
     VarSet ij(i, j);
 
     T max = 0.0;
@@ -525,9 +523,7 @@ template<typename T> Real dist( const TFactor<T> &f, const TFactor<T> &g, Prob::
     if( f.vars().empty() || g.vars().empty() )
         return -1;
     else {
-#ifdef DAI_DEBUG
-        assert( f.vars() == g.vars() );
-#endif
+        DAI_DEBASSERT( f.vars() == g.vars() );
         return dist( f.p(), g.p(), dt );
     }
 }
