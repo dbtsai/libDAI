@@ -32,6 +32,7 @@
 #include <dai/factorgraph.h>
 #include <dai/util.h>
 #include <dai/exceptions.h>
+#include <boost/lexical_cast.hpp>
 
 
 namespace dai {
@@ -121,7 +122,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
         getline(is,line);
     is >> nr_Factors;
     if( is.fail() )
-        DAI_THROW(INVALID_FACTORGRAPH_FILE);
+        DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read number of factors");
     if( verbose >= 2 )
         cerr << "Reading " << nr_Factors << " factors..." << endl;
 
@@ -169,7 +170,7 @@ istream& operator >> (istream& is, FactorGraph& fg) {
             if( vdi != vardims.end() ) {
                 // check whether dimensions are consistent
                 if( vdi->second != dims[mi] )
-                    DAI_THROW(INVALID_FACTORGRAPH_FILE);
+                    DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Variable with label " + boost::lexical_cast<string>(labels[mi]) + " has inconsistent dimensions.");
             } else
                 vardims[labels[mi]] = dims[mi];
             I_vars |= Var(labels[mi], dims[mi]);
@@ -262,7 +263,7 @@ void FactorGraph::ReadFromFile( const char *filename ) {
         infile >> *this;
         infile.close();
     } else
-        DAI_THROW(CANNOT_READ_FILE);
+        DAI_THROWE(CANNOT_READ_FILE,"Cannot read from file " + std::string(filename));
 }
 
 
@@ -274,7 +275,7 @@ void FactorGraph::WriteToFile( const char *filename, size_t precision ) const {
         outfile << *this;
         outfile.close();
     } else
-        DAI_THROW(CANNOT_WRITE_FILE);
+        DAI_THROWE(CANNOT_WRITE_FILE,"Cannot write to file " + std::string(filename));
 }
 
 
@@ -356,7 +357,7 @@ void FactorGraph::clampFactor( size_t I, const vector<size_t> &is, bool backup )
 void FactorGraph::backupFactor( size_t I ) {
     map<size_t,Factor>::iterator it = _backup.find( I );
     if( it != _backup.end() )
-        DAI_THROW( MULTIPLE_UNDO );
+        DAI_THROW(MULTIPLE_UNDO);
     _backup[I] = factor(I);
 }
 

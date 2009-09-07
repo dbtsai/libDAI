@@ -405,7 +405,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
             assert(/*0<=xi &&*/ xi < factor(i).states() );
         DAI_IFVERB(2, "CHOOSE_BBP (num clamped = " << clamped_vars_list.size() << ") chose " << i << " state " << xi << endl);
     } else
-        DAI_THROW(INTERNAL_ERROR);
+        DAI_THROW(UNKNOWN_ENUM_VALUE);
     clamped_vars_list.push_back( i );
     return true;
 }
@@ -535,7 +535,6 @@ void CBP::Properties::set(const PropertySet &opts)
 {
     const std::set<PropertyKey> &keys = opts.allKeys();
     std::set<PropertyKey>::const_iterator i;
-    bool die=false;
     for(i=keys.begin(); i!=keys.end(); i++) {
         if(*i == "verbose") continue;
         if(*i == "tol") continue;
@@ -551,55 +550,28 @@ void CBP::Properties::set(const PropertySet &opts)
         if(*i == "bbp_cfn") continue;
         if(*i == "rand_seed") continue;
         if(*i == "clamp_outfile") continue;
-        cerr << "CBP: Unknown property " << *i << endl;
-        die=true;
+        DAI_THROWE(UNKNOWN_PROPERTY_TYPE, "CBP: Unknown property " + *i);
     }
-    if(die) {
-        DAI_THROW(UNKNOWN_PROPERTY_TYPE);
-    }
-    if(!opts.hasKey("tol")) {
-        cerr << "CBP: Missing property \"tol\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("updates")) {
-        cerr << "CBP: Missing property \"updates\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("maxiter")) {
-        cerr << "CBP: Missing property \"maxiter\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("rec_tol")) {
-        cerr << "CBP: Missing property \"rec_tol\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("min_max_adj")) {
-        cerr << "CBP: Missing property \"min_max_adj\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("choose")) {
-        cerr << "CBP: Missing property \"choose\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("recursion")) {
-        cerr << "CBP: Missing property \"recursion\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("clamp")) {
-        cerr << "CBP: Missing property \"clamp\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("bbp_props")) {
-        cerr << "CBP: Missing property \"bbp_props\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("bbp_cfn")) {
-        cerr << "CBP: Missing property \"bbp_cfn\" for method \"CBP\"" << endl;
-        die=true;
-    }
-    if(die) {
-        DAI_THROW(NOT_ALL_PROPERTIES_SPECIFIED);
-    }
+    if(!opts.hasKey("tol"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"tol\" for method \"CBP\"");
+    if(!opts.hasKey("updates"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"updates\" for method \"CBP\"");
+    if(!opts.hasKey("maxiter"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"maxiter\" for method \"CBP\"");
+    if(!opts.hasKey("rec_tol"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"rec_tol\" for method \"CBP\"");
+    if(!opts.hasKey("min_max_adj"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"min_max_adj\" for method \"CBP\"");
+    if(!opts.hasKey("choose"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"choose\" for method \"CBP\"");
+    if(!opts.hasKey("recursion"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"recursion\" for method \"CBP\"");
+    if(!opts.hasKey("clamp"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"clamp\" for method \"CBP\"");
+    if(!opts.hasKey("bbp_props"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"bbp_props\" for method \"CBP\"");
+    if(!opts.hasKey("bbp_cfn"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"bbp_cfn\" for method \"CBP\"");
     if(opts.hasKey("verbose")) {
         verbose = opts.getStringAs<size_t>("verbose");
     } else {

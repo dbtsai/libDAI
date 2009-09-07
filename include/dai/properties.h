@@ -37,6 +37,7 @@
 #include <typeinfo>
 #include <dai/exceptions.h>
 #include <dai/util.h>
+#include <boost/lexical_cast.hpp>
 
 
 namespace dai {
@@ -86,9 +87,8 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
         /// Set properties according to those in newProps, overriding properties that already exist with new values
         PropertySet & Set( const PropertySet &newProps ) {
             const std::map<PropertyKey, PropertyValue> *m = &newProps;
-            foreach(value_type i, *m) {
-                Set(i.first, i.second);
-            }
+            foreach(value_type i, *m)
+                Set( i.first, i.second );
             return *this;
         }
 
@@ -98,9 +98,8 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
             try {
                 return boost::any_cast<ValueType>(Get(key));
             } catch( const boost::bad_any_cast & ) {
-                std::cerr << "Cannot cast property " << key << " to ";
-                std::cerr << typeid(ValueType).name() << std::endl;
-                return boost::any_cast<ValueType>(Get(key));
+                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " to desired type.");
+                return ValueType();
             }
         }
 
@@ -110,13 +109,11 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
             PropertyValue val = Get(key);
             if( val.type() != typeid(ValueType) ) {
                 assert( val.type() == typeid(std::string) );
-
-                std::stringstream ss;
-                ss << GetAs<std::string>(key);
-                ValueType result;
-                ss >> result;
-
-                Set(key, result);
+                try {
+                    Set(key, boost::lexical_cast<ValueType>(GetAs<std::string>(key)));
+                } catch(boost::bad_lexical_cast &) {
+                    DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " from string to desired type.");
+                }
             }
         }
 
@@ -127,26 +124,23 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
             if( val.type() == typeid(ValueType) ) {
                 return boost::any_cast<ValueType>(val);
             } else if( val.type() == typeid(std::string) ) {
-                std::stringstream ss;
-                ss << GetAs<std::string>(key);
-                ValueType result;
-                ss >> result;
-                return result;
-            } else {
-                DAI_THROW(IMPOSSIBLE_TYPECAST);
-                return ValueType();
-            }
+                try {
+                    return boost::lexical_cast<ValueType>(GetAs<std::string>(key));
+                } catch(boost::bad_lexical_cast &) {
+                    DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " from string to desired type.");
+                }
+            } else
+                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " from string to desired type.");
+            return ValueType();
         }
 
         /// Converts a property from ValueType to string (if necessary)
         template<typename ValueType>
         PropertySet & setAsString(const PropertyKey &key, ValueType &val) { 
-            if( val.type() == typeid(std::string) ) {
-                return Set(key, val);
-            } else {
-                std::stringstream ss (std::stringstream::out);
-                ss << val;
-                return Set(key, ss.str());
+            try {
+                return Set( key, boost::lexical_cast<std::string>(val) );
+            } catch( boost::bad_lexical_cast & ) {
+                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " to string.");
             }
         }
 

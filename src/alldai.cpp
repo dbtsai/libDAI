@@ -71,7 +71,7 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
     if( name == CBP::Name )
         return new CBP (fg, opts);
 #endif
-    DAI_THROW(UNKNOWN_DAI_ALGORITHM);
+    DAI_THROWE(UNKNOWN_DAI_ALGORITHM,"Unknown libDAI algorithm: " + name);
 }
 
 

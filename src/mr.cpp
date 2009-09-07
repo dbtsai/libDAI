@@ -499,11 +499,11 @@ void MR::init_cor() {
     for( size_t i = 0; i < nrVars(); i++ ) {
         vector<Factor> pairq;
         if( props.inits == Properties::InitType::CLAMPING ) {
-            BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", string("1e-9"))("maxiter", string("10000UL"))("verbose", string("0UL"))("logdomain", string("0")));
+            BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", 1.0e-9)("maxiter", 10000UL)("verbose", 0UL)("logdomain", false));
             bpcav.makeCavity( i );
             pairq = calcPairBeliefs( bpcav, delta(i), false );
         } else if( props.inits == Properties::InitType::EXACT ) {
-            JTree jtcav(*this, PropertySet()("updates", string("HUGIN"))("verbose", string("0UL")) );
+            JTree jtcav(*this, PropertySet()("updates", string("HUGIN"))("verbose", 0UL) );
             jtcav.makeCavity( i );
             pairq = calcPairBeliefs( jtcav, delta(i), false );
         }

@@ -161,7 +161,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
                 cerr << *cli << endl;
         }
     } else
-        DAI_THROW(INTERNAL_ERROR);
+        DAI_THROW(UNKNOWN_ENUM_VALUE);
 
     RegionGraph rg(fg,cl);
     RegionGraph::operator=(rg);

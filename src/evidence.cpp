@@ -62,7 +62,7 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
     tokenizeString( line, header_fields );
     std::vector<std::string>::const_iterator p_field = header_fields.begin();
     if( p_field == header_fields.end() ) 
-        DAI_THROW(INVALID_EVIDENCE_LINE);
+        DAI_THROW(INVALID_EVIDENCE_FILE);
 
     std::vector<Var> vars;
     for( ; p_field != header_fields.end(); ++p_field ) {
@@ -77,16 +77,16 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
         std::vector<std::string> fields;
         tokenizeString( line, fields );
         if( fields.size() != vars.size() ) 
-            DAI_THROW(INVALID_EVIDENCE_LINE);
+            DAI_THROW(INVALID_EVIDENCE_FILE);
         
         Observation sampleData;
         for( size_t i = 0; i < vars.size(); ++i ) {
             if( fields[i].size() > 0 ) { // skip if missing observation
                 if( fields[i].find_first_not_of("0123456789") != std::string::npos )
-                    DAI_THROW(INVALID_EVIDENCE_OBSERVATION);
+                    DAI_THROW(INVALID_EVIDENCE_FILE);
                 size_t state = atoi( fields[i].c_str() );
                 if( state >= vars[i].states() )
-                    DAI_THROW(INVALID_EVIDENCE_OBSERVATION);
+                    DAI_THROW(INVALID_EVIDENCE_FILE);
                 sampleData.addObservation( vars[i], state );
             }
         }

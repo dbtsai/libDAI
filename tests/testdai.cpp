@@ -197,7 +197,7 @@ pair<string, PropertySet> parseMethod( const string &_s, const map<string,string
         if( ps.first == DAINames[n] )
             break;
     if( strlen( DAINames[n] ) == 0 && (ps.first != "LDPC") )
-        throw std::runtime_error(string("Unknown DAI algorithm \"") + ps.first + string("\" in \"") + _s + string("\""));
+        DAI_THROWE(UNKNOWN_DAI_ALGORITHM,string("Unknown DAI algorithm \"") + ps.first + string("\" in \"") + _s + string("\""));
 
     return ps;
 }
@@ -274,7 +274,7 @@ int main( int argc, char *argv[] ) {
                     if( (!line.empty()) && (line[0] != '#') ) {
                         string::size_type pos = line.find(':',0);
                         if( pos == string::npos )
-                            throw string("Invalid alias");
+                            DAI_THROWE(RUNTIME_ERROR,"Invalid alias");
                         else {
                             string::size_type posl = line.substr(0, pos).find_last_not_of(" \t");
                             string key = line.substr(0, posl + 1);
@@ -286,7 +286,7 @@ int main( int argc, char *argv[] ) {
                 }
                 infile.close();
             } else
-                throw string("Error opening aliases file");
+                DAI_THROWE(RUNTIME_ERROR,"Error opening aliases file");
         }
 
         FactorGraph fg;

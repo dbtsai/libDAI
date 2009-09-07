@@ -194,7 +194,6 @@ void ${class}::Properties::set(const PropertySet &opts)
 {
     const std::set<PropertyKey> &keys = opts.allKeys();
     std::set<PropertyKey>::const_iterator i;
-    bool die=false;
     for(i=keys.begin(); i!=keys.end(); i++) {
 EOF
   for my $v (@vars) {
@@ -204,29 +203,20 @@ EOF
 EOF
   }
   $stext .= <<EOF;
-        cerr << "$class: Unknown property " << *i << endl;
-        die=true;
-    }
-    if(die) {
-        DAI_THROW(UNKNOWN_PROPERTY_TYPE);
+        DAI_THROWE(UNKNOWN_PROPERTY_TYPE, "$class: Unknown property " + *i);
     }
 EOF
   for my $v (@vars) {
     my ($type,$name,$default,$cmt) = @$v;
     if(!defined $default) {
       $stext .= <<EOF;
-    if(!opts.hasKey("$name")) {
-        cerr << "$class: Missing property \\\"$name\\\" for method \\\"\Q$class\E\\\"" << endl;
-        die=true;
-    }
+    if(!opts.hasKey("$name"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"$class: Missing property \\\"$name\\\" for method \\\"\Q$class\E\\\"");
 EOF
     }
 
   }
   $stext .= <<EOF;
-    if(die) {
-        DAI_THROW(NOT_ALL_PROPERTIES_SPECIFIED);
-    }
 EOF
   for my $v (@vars) {
     my ($type,$name,$default,$cmt) = @$v;

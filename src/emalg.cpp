@@ -40,7 +40,7 @@ ParameterEstimation* ParameterEstimation::construct( const std::string &method, 
         loadDefaultRegistry();
     std::map<std::string, ParamEstFactory>::iterator i = _registry->find(method);
     if( i == _registry->end() )
-        DAI_THROW(UNKNOWN_PARAMETER_ESTIMATION_METHOD);
+        DAI_THROWE(UNKNOWN_PARAMETER_ESTIMATION_METHOD, "Unknown parameter estimation method: " + method);
     ParamEstFactory factory = i->second;
     return factory(p);
 }
@@ -59,8 +59,7 @@ ParameterEstimation* CondProbEstimation::factory( const PropertySet &p ) {
 CondProbEstimation::CondProbEstimation( size_t target_dimension, const Prob &pseudocounts ) 
   : _target_dim(target_dimension), _stats(pseudocounts), _initial_stats(pseudocounts) 
 {
-    if( _stats.size() % _target_dim )
-        DAI_THROW(MALFORMED_PROPERTY);
+    assert( !(_stats.size() % _target_dim) );
 }
 
 
@@ -115,16 +114,14 @@ Permute SharedParameters::calculatePermutation( const std::vector<Var> &varorder
 void SharedParameters::setPermsAndVarSetsFromVarOrders() {
     if( _varorders.size() == 0 )
         return;
-    if( _estimation == NULL )
-        DAI_THROW(INVALID_SHARED_PARAMETERS_ORDER);
+    assert( _estimation != NULL );
 
     // Construct the permutation objects and the varsets
     for( FactorOrientations::const_iterator foi = _varorders.begin(); foi != _varorders.end(); ++foi ) {
         VarSet vs;
         _perms[foi->first] = calculatePermutation( foi->second, vs );
         _varsets[foi->first] = vs;
-        if( _estimation->probSize() != vs.nrStates() )
-            DAI_THROW(INVALID_SHARED_PARAMETERS_ORDER);
+        assert( _estimation->probSize() == vs.nrStates() );
     }
 }
 
@@ -154,14 +151,14 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg_varl
 
         // Lookup the factor in the factorgraph
         if( fields.size() < 1 )
-            DAI_THROW(INVALID_SHARED_PARAMETERS_INPUT_LINE);
+            DAI_THROW(INVALID_EMALG_FILE);
         std::istringstream iss;
         iss.str( fields[0] );
         size_t factor;
         iss >> factor;
         const VarSet &vs = fg_varlookup.factor(factor).vars();
         if( fields.size() != vs.size() + 1 )
-            DAI_THROW(INVALID_SHARED_PARAMETERS_INPUT_LINE);
+            DAI_THROW(INVALID_EMALG_FILE);
 
         // Construct the vector of Vars
         std::vector<Var> var_order;
@@ -176,7 +173,7 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg_varl
                 if( vsi->label() == label ) 
                     break;
             if( vsi == vs.end() )
-                DAI_THROW(INVALID_SHARED_PARAMETERS_INPUT_LINE);
+                DAI_THROW(INVALID_EMALG_FILE);
             var_order.push_back( *vsi );
         }
         _varorders[factor] = var_order;

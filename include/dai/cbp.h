@@ -209,7 +209,7 @@ class CBP : public DAIAlgFG {
             double rec_tol;
             /// Maximum number of levels of recursion (\a recurse is REC_FIXED)
             size_t max_levels;
-            /// If choose=CHOOSE_BBP and maximum adjoint is less than this value, don't recurse
+            /// If choose==CHOOSE_BBP and maximum adjoint is less than this value, don't recurse
             double min_max_adj;
             /// Heuristic for choosing clamping variable
             ChooseMethodType choose;

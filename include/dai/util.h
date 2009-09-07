@@ -29,11 +29,11 @@
 #define __defined_libdai_util_h
 
 
+#include <string>
 #include <vector>
 #include <set>
 #include <map>
 #include <iostream>
-#include <cstdio>
 #include <boost/foreach.hpp>
 #include <boost/functional/hash.hpp>
 #include <algorithm>
@@ -190,6 +190,9 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
     return w;
 }
 
+/// Split a string into tokens
+void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
+
 /// Used to keep track of the progress made by iterative algorithms
 class Diffs : public std::vector<double> {
     private:
@@ -224,8 +227,7 @@ class Diffs : public std::vector<double> {
                 } else {
                     _maxpos = begin();
                 }
-            }
-            else {
+            } else {
                 if( _pos == end() )
                     _pos = begin();
                 if( _maxpos == _pos ) {
@@ -241,12 +243,6 @@ class Diffs : public std::vector<double> {
         /// Return maximum number of differences stored
         size_t maxSize() { return _maxsize; }
 };
-
-
-/// Split a string into tokens
-void tokenizeString( const std::string& s,
-		    std::vector<std::string>& outTokens,
-		    const std::string& delim="\t\n" );
 
 
 } // end of namespace dai

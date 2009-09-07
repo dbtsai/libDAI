@@ -729,10 +729,8 @@ void BBP::run() {
             const BP *bp = static_cast<const BP*>(_ia);
             vector<pair<size_t, size_t> > sentMessages = bp->getSentMessages();
             size_t totalMessages = sentMessages.size();
-            if( totalMessages == 0 ) {
-                cerr << "Asked for updates = " << updates << " but no BP messages; did you forget to set recordSentMessages?" << endl;
-                DAI_THROW(INTERNAL_ERROR);
-            }
+            if( totalMessages == 0 )
+                DAI_THROWE(INTERNAL_ERROR, "Asked for updates=" + std::string(updates) + " but no BP messages; did you forget to set recordSentMessages?");
             if( updates==UT::SEQ_BP_FWD )
                 reverse( sentMessages.begin(), sentMessages.end() );
 //          DAI_PV(sentMessages.size());
@@ -1031,7 +1029,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                         delta[state[i]] = exp(b); 
                         break;
                     default: 
-                        DAI_THROW(INTERNAL_ERROR);
+                        DAI_THROW(UNKNOWN_ENUM_VALUE);
                 }
                 b1_adj.push_back( delta );
             }
@@ -1069,7 +1067,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                         delta[x_I] = exp( b );
                         break;
                     default: 
-                        DAI_THROW(INTERNAL_ERROR);
+                        DAI_THROW(UNKNOWN_ENUM_VALUE);
                 }
                 b2_adj.push_back( delta );
             }
@@ -1116,7 +1114,7 @@ Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stat
                         cf += exp( b );
                         break;
                     default:
-                        DAI_THROW(INTERNAL_ERROR);
+                        DAI_THROW(UNKNOWN_ENUM_VALUE);
                 }
             }
             break;
@@ -1140,13 +1138,12 @@ Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stat
                         cf += exp( b );
                         break;
                     default:
-                        DAI_THROW(INTERNAL_ERROR);
+                        DAI_THROW(UNKNOWN_ENUM_VALUE);
                 }
             }
             break;
         } default: 
-            cerr << "Unknown cost function " << cfn_type << endl;
-            DAI_THROW(UNKNOWN_ENUM_VALUE);
+            DAI_THROWE(UNKNOWN_ENUM_VALUE, "Unknown cost function " + std::string(cfn_type));
     }
     return cf;
 }
@@ -1164,42 +1161,24 @@ void BBP::Properties::set(const PropertySet &opts)
 {
     const std::set<PropertyKey> &keys = opts.allKeys();
     std::set<PropertyKey>::const_iterator i;
-    bool die=false;
     for(i=keys.begin(); i!=keys.end(); i++) {
         if(*i == "verbose") continue;
         if(*i == "maxiter") continue;
         if(*i == "tol") continue;
         if(*i == "damping") continue;
         if(*i == "updates") continue;
-        cerr << "BBP: Unknown property " << *i << endl;
-        die=true;
+        DAI_THROWE(UNKNOWN_PROPERTY_TYPE, "BBP: Unknown property " + *i);
     }
-    if(die) {
-        DAI_THROW(UNKNOWN_PROPERTY_TYPE);
-    }
-    if(!opts.hasKey("verbose")) {
-        cerr << "BBP: Missing property \"verbose\" for method \"BBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("maxiter")) {
-        cerr << "BBP: Missing property \"maxiter\" for method \"BBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("tol")) {
-        cerr << "BBP: Missing property \"tol\" for method \"BBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("damping")) {
-        cerr << "BBP: Missing property \"damping\" for method \"BBP\"" << endl;
-        die=true;
-    }
-    if(!opts.hasKey("updates")) {
-        cerr << "BBP: Missing property \"updates\" for method \"BBP\"" << endl;
-        die=true;
-    }
-    if(die) {
-        DAI_THROW(NOT_ALL_PROPERTIES_SPECIFIED);
-    }
+    if(!opts.hasKey("verbose"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"verbose\" for method \"BBP\"");
+    if(!opts.hasKey("maxiter"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"maxiter\" for method \"BBP\"");
+    if(!opts.hasKey("tol"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"tol\" for method \"BBP\"");
+    if(!opts.hasKey("damping"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"damping\" for method \"BBP\"");
+    if(!opts.hasKey("updates"))
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"updates\" for method \"BBP\"");
     verbose = opts.getStringAs<size_t>("verbose");
     maxiter = opts.getStringAs<size_t>("maxiter");
     tol = opts.getStringAs<double>("tol");
@@ -1222,7 +1201,7 @@ string BBP::Properties::toString() const {
     s << "maxiter=" << maxiter << ",";
     s << "tol=" << tol << ",";
     s << "damping=" << damping << ",";
-    s << "updates=" << updates << ",";
+    s << "updates=" << updates;
     s << "]";
     return s.str();
 }

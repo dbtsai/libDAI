@@ -55,11 +55,11 @@
         x(value w) : v(w) {}\
 \
         x(char const *w) {\
-            static char const* labelstring = #val0 "," #__VA_ARGS__ ",";\
+            static char const* labelstring = #val0 "," #__VA_ARGS__;\
             size_t pos_begin = 0;\
             size_t i = 0;\
-            for( size_t pos_end = 0; labelstring[pos_end] != '\0'; pos_end++ )\
-                if( (labelstring[pos_end] == ',') ) {\
+            for( size_t pos_end = 0; ; pos_end++ ) {\
+                if( (labelstring[pos_end] == ',') || (labelstring[pos_end] == '\0') ) {\
                     if( (strlen( w ) == pos_end - pos_begin) && (strncmp( labelstring + pos_begin, w, pos_end - pos_begin ) == 0) ) {\
                         v = (value)i;\
                         return;\
@@ -68,7 +68,10 @@
                         pos_begin = pos_end + 1;\
                     }\
                 }\
-            DAI_THROW(UNKNOWN_ENUM_VALUE);\
+                if( labelstring[pos_end] == '\0' )\
+                    break;\
+            }\
+            DAI_THROWE(UNKNOWN_ENUM_VALUE,"'" + std::string(w) + "' is not in [" + std::string(labelstring) + "]");\
         }\
 \
         operator value() const { return v; }\

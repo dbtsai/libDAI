@@ -68,7 +68,7 @@ std::istream& operator >> (std::istream& is, PropertySet & ps) {
 
     // Check whether s is of the form "[.*]"
     if( (s.length() < 2) || (s.at(0) != '[') || (s.at(s.length()-1)) != ']' )
-        DAI_THROW(MALFORMED_PROPERTY);
+        DAI_THROWE(MALFORMED_PROPERTY,"Malformed PropertySet: " + s);
 
     size_t N = s.length() - 1;
     for( size_t token_start = 1; token_start < N; ) {
@@ -78,10 +78,10 @@ std::istream& operator >> (std::istream& is, PropertySet & ps) {
         for( token_end = token_start + 1; token_end < N; token_end++ )
             if( s[token_end] == '=' )
                 break;
-        if( token_end == N )
-            DAI_THROW(MALFORMED_PROPERTY);
         // we found a key
         std::string key = s.substr(token_start, token_end - token_start);
+        if( token_end == N )
+            DAI_THROWE(MALFORMED_PROPERTY,"Malformed Property: " + key);
 
         token_start = token_end + 1;
         // scan until matching ',' is found
@@ -95,7 +95,7 @@ std::istream& operator >> (std::istream& is, PropertySet & ps) {
                 break;
         }
         if( !(level == 0) )
-            DAI_THROW(MALFORMED_PROPERTY);
+            DAI_THROWE(MALFORMED_PROPERTY,"Malformed Property: " + s.substr(token_start, token_end - token_start));
         // we found a vlue
         std::string value = s.substr(token_start, token_end - token_start);
 
