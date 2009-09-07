@@ -44,7 +44,8 @@ namespace dai {
         "Quantity not normalizable",
         "Invalid Evidence file",
         "Invalid Expectation-Maximization file",
-        "Unrecognized parameter estimation method"
+        "Unrecognized parameter estimation method",
+        "Requested object not found"
     }; 
 
 

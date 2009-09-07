@@ -159,7 +159,8 @@ class FactorGraph {
         /// Returns the index of a particular variable
         size_t findVar( const Var &n ) const {
             size_t i = find( vars().begin(), vars().end(), n ) - vars().begin();
-            assert( i != nrVars() );
+            if( i == nrVars() )
+                DAI_THROW(OBJECT_NOT_FOUND);
             return i;
         }
 
@@ -172,12 +173,13 @@ class FactorGraph {
         }
 
         /// Returns index of the first factor that depends on the variables
-        size_t findFactor(const VarSet &ns) const {
+        size_t findFactor( const VarSet &ns ) const {
             size_t I;
             for( I = 0; I < nrFactors(); I++ )
                 if( factor(I).vars() == ns )
                     break;
-            assert( I != nrFactors() );
+            if( I == nrFactors() )
+                DAI_THROW(OBJECT_NOT_FOUND);
             return I;
         }
 

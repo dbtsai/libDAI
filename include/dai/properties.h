@@ -98,7 +98,7 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
             try {
                 return boost::any_cast<ValueType>(Get(key));
             } catch( const boost::bad_any_cast & ) {
-                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " to desired type.");
+                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to desired type.");
                 return ValueType();
             }
         }
@@ -112,7 +112,7 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
                 try {
                     Set(key, boost::lexical_cast<ValueType>(GetAs<std::string>(key)));
                 } catch(boost::bad_lexical_cast &) {
-                    DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " from string to desired type.");
+                    DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' from string to desired type.");
                 }
             }
         }
@@ -127,10 +127,10 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
                 try {
                     return boost::lexical_cast<ValueType>(GetAs<std::string>(key));
                 } catch(boost::bad_lexical_cast &) {
-                    DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " from string to desired type.");
+                    DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' from string to desired type.");
                 }
             } else
-                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " from string to desired type.");
+                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' from string to desired type.");
             return ValueType();
         }
 
@@ -140,7 +140,7 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
             try {
                 return Set( key, boost::lexical_cast<std::string>(val) );
             } catch( boost::bad_lexical_cast & ) {
-                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property " + key + " to string.");
+                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to string.");
             }
         }
 

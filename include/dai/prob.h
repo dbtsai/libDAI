@@ -261,6 +261,11 @@ template <typename T> class TProb {
         TProb<T>& operator-= (const TProb<T> & q) {
             DAI_DEBASSERT( size() == q.size() );
             std::transform( _p.begin(), _p.end(), q._p.begin(), _p.begin(), std::minus<T>() );
+            return *this;
+        }
+
+        /// Return *this minus q (sizes should be identical)
+        Prob<T> operator- (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
             TProb<T> diff( *this );
             diff -= q;

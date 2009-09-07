@@ -88,12 +88,13 @@ class Exception : public std::runtime_error {
                    INVALID_EVIDENCE_FILE,
                    INVALID_EMALG_FILE,
                    UNKNOWN_PARAMETER_ESTIMATION_METHOD,
+                   OBJECT_NOT_FOUND,
                    NUM_ERRORS};  // NUM_ERRORS should be the last entry
 
         /// Constructor
         Exception( Code _code, const std::string& msg="", const std::string& detailedMsg="" ) : std::runtime_error(ErrorStrings[_code] + " [" +  msg + "]"), errorcode(_code) { 
             if( !detailedMsg.empty() ) 
-                std::cerr << "EXCEPTION: " << detailedMsg << std::endl; 
+                std::cerr << "ERROR: " << detailedMsg << std::endl; 
         }
         
         /// Copy constructor
