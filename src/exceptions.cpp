@@ -46,7 +46,7 @@ namespace dai {
         "Invalid Expectation-Maximization file",
         "Unrecognized parameter estimation method",
         "Requested object not found"
-    }; 
+    };
 
 
 }

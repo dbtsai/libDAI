@@ -36,7 +36,7 @@ const char *JTree::Name = "JTREE";
 void JTree::setProperties( const PropertySet &opts ) {
     assert( opts.hasKey("verbose") );
     assert( opts.hasKey("updates") );
-    
+
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.updates = opts.getStringAs<Properties::UpdateType>("updates");
 }
@@ -62,8 +62,8 @@ string JTree::printProperties() const {
 JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) : DAIAlgRG(fg), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {
     setProperties( opts );
 
-    if( !isConnected() ) 
-       DAI_THROW(FACTORGRAPH_NOT_CONNECTED); 
+    if( !isConnected() )
+       DAI_THROW(FACTORGRAPH_NOT_CONNECTED);
 
     if( automatic ) {
         // Create ClusterGraph which contains factors as clusters
@@ -91,17 +91,17 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
 
 
 void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
-    // Construct a weighted graph (each edge is weighted with the cardinality 
+    // Construct a weighted graph (each edge is weighted with the cardinality
     // of the intersection of the nodes, where the nodes are the elements of
     // Cliques).
     WeightedGraph<int> JuncGraph;
     for( size_t i = 0; i < Cliques.size(); i++ )
         for( size_t j = i+1; j < Cliques.size(); j++ ) {
             size_t w = (Cliques[i] & Cliques[j]).size();
-            if( w ) 
+            if( w )
                 JuncGraph[UEdge(i,j)] = w;
         }
-    
+
     // Construct maximal spanning tree using Prim's algorithm
     RTree = MaxSpanningTreePrims( JuncGraph );
 
@@ -147,7 +147,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
 
     Qb.clear();
     Qb.reserve( nrIRs() );
-    for( size_t beta = 0; beta < nrIRs(); beta++ ) 
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         Qb.push_back( Factor( IR(beta), 1.0 ) );
 
     _mes.clear();
@@ -221,7 +221,7 @@ void JTree::runHUGIN() {
 //      IR(i) = seperator OR(RTree[i].n1) && OR(RTree[i].n2)
         Factor new_Qb = Qa[RTree[i].n2].marginal( IR( i ), false );
         _logZ += log(new_Qb.normalize());
-        Qa[RTree[i].n1] *= new_Qb / Qb[i]; 
+        Qa[RTree[i].n1] *= new_Qb / Qb[i];
         Qb[i] = new_Qb;
     }
     if( RTree.empty() )
@@ -234,7 +234,7 @@ void JTree::runHUGIN() {
 //      Make outer region RTree[i].n2 consistent with outer region RTree[i].n1
 //      IR(i) = seperator OR(RTree[i].n1) && OR(RTree[i].n2)
         Factor new_Qb = Qa[RTree[i].n1].marginal( IR( i ) );
-        Qa[RTree[i].n2] *= new_Qb / Qb[i]; 
+        Qa[RTree[i].n2] *= new_Qb / Qb[i];
         Qb[i] = new_Qb;
     }
 
@@ -255,10 +255,10 @@ void JTree::runShaferShenoy() {
         size_t i = nbIR(e)[1].node; // = RTree[e].n2
         size_t j = nbIR(e)[0].node; // = RTree[e].n1
         size_t _e = nbIR(e)[0].dual;
-        
+
         Factor piet = OR(i);
         foreach( const Neighbor &k, nbOR(i) )
-            if( k != e ) 
+            if( k != e )
                 piet *= message( i, k.iter );
         message( j, _e ) = piet.marginal( IR(e), false );
         _logZ += log( message(j,_e).normalize() );
@@ -269,7 +269,7 @@ void JTree::runShaferShenoy() {
         size_t i = nbIR(e)[0].node; // = RTree[e].n1
         size_t j = nbIR(e)[1].node; // = RTree[e].n2
         size_t _e = nbIR(e)[1].dual;
-        
+
         Factor piet = OR(i);
         foreach( const Neighbor &k, nbOR(i) )
             if( k != e )
@@ -293,7 +293,7 @@ void JTree::runShaferShenoy() {
     }
 
     // Only for logZ (and for belief)...
-    for( size_t beta = 0; beta < nrIRs(); beta++ ) 
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         Qb[beta] = Qa[nbIR(beta)[0].node].marginal( IR(beta) );
 }
 
@@ -336,7 +336,7 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
     for( DEdgeVec::const_iterator e = RTree.begin(); e != RTree.end(); e++ )
         oldTree.insert( UEdge(e->n1, e->n2) );
     DEdgeVec newTree = GrowRootedTree( oldTree, maxalpha );
-    
+
     // identify subtree that contains variables of ns which are not in the new root
     VarSet nsrem = ns / OR(maxalpha).vars();
     set<DEdge> subTree;
@@ -442,7 +442,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
             // Find remaining variables (which are not in the new root)
             VarSet nsrem = ns / OR(T.front().n1).vars();
             Factor Pns (ns, 0.0);
-            
+
             // Save Qa and Qb on the subtree
             map<size_t,Factor> Qa_old;
             map<size_t,Factor> Qb_old;
@@ -464,7 +464,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                 if( !Qb_old.count( beta ) )
                     Qb_old[beta] = Qb[beta];
             }
-                
+
             // For all states of nsrem
             for( State s(nsrem); s.valid(); s++ ) {
                 // CollectEvidence
@@ -477,12 +477,12 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                         if( Qa[T[i].n2].vars() >> *n ) {
                             Factor piet( *n, 0.0 );
                             piet[s(*n)] = 1.0;
-                            Qa[T[i].n2] *= piet; 
+                            Qa[T[i].n2] *= piet;
                         }
 
                     Factor new_Qb = Qa[T[i].n2].marginal( IR( b[i] ), false );
                     logZ += log(new_Qb.normalize());
-                    Qa[T[i].n1] *= new_Qb / Qb[b[i]]; 
+                    Qa[T[i].n1] *= new_Qb / Qb[b[i]];
                     Qb[b[i]] = new_Qb;
                 }
                 logZ += log(Qa[T[0].n1].normalize());

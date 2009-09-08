@@ -45,7 +45,7 @@ DEdgeVec GrowRootedTree( const Graph & T, size_t Root ) {
 
         // Start with the root
         treeV.insert( Root );
-        
+
         // Keep adding edges until done
         while( !(Gr.empty()) )
             for( Graph::iterator e = Gr.begin(); e != Gr.end(); ) {
@@ -80,7 +80,7 @@ UEdgeVec RandomDRegularGraph( size_t N, size_t d ) {
     // from an almost uniform probability distribution over these graphs
     // (which becomes uniform in the limit that d is small and N goes
     // to infinity).
-    
+
     assert( (N * d) % 2 == 0 );
 
     bool ready = false;

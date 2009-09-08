@@ -21,13 +21,13 @@
 
 
 /*=================================================================*
- *                                                                 * 
+ *                                                                 *
  * This is a MEX-file for MATLAB.                                  *
- *                                                                 * 
+ *                                                                 *
  *   [logZ,q,md,qv,qf] = dai(psi,method,opts);                     *
  * or                                                              *
  *   [logZ,q,md,qv,qf,qmap] = dai(psi,method,opts);                *
- *                                                                 * 
+ *                                                                 *
  *=================================================================*/
 
 
@@ -63,10 +63,9 @@ using namespace dai;
 #define NR_OUT_OPT      3
 
 
-void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
-{ 
+void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
     size_t buflen;
-    
+
     // Check for proper number of arguments
     if( ((nrhs < NR_IN) || (nrhs > NR_IN + NR_IN_OPT)) || ((nlhs < NR_OUT) || (nlhs > NR_OUT + NR_OUT_OPT)) ) {
         mexErrMsgTxt("Usage: [logZ,q,md,qv,qf,qmap] = dai(psi,method,opts)\n\n"
@@ -83,8 +82,8 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
         "        qv         = linear cell array containing all variable beliefs.\n"
         "        qf         = linear cell array containing all factor beliefs.\n"
         "        qmap       = (V,1) array containing the MAP labeling (only for BP).\n");
-    } 
-    
+    }
+
     char *method;
     char *opts;
 
@@ -107,7 +106,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     ss << opts;
     PropertySet props;
     ss >> props;
-    
+
     // Construct InfAlg object, init and run
     InfAlg *obj = newInfAlg( method, fg, props );
     obj->init();
@@ -124,9 +123,9 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     // Hand over results to MATLAB
     LOGZ_OUT = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(LOGZ_OUT)) = logZ;
-    
+
     Q_OUT = Factors2mx(obj->beliefs());
-    
+
     MD_OUT = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(MD_OUT)) = maxdiff;
 
@@ -161,6 +160,6 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
             qmap_p[n] = map_state[n];
     }
     delete obj;
-    
+
     return;
 }

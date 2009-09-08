@@ -21,11 +21,11 @@
 
 
 /*=================================================================*
- *                                                                 * 
+ *                                                                 *
  * This is a MEX-file for MATLAB.                                  *
- *                                                                 * 
+ *                                                                 *
  *   dai_writefg(psi, filename);                                   *
- *                                                                 * 
+ *                                                                 *
  *=================================================================*/
 
 
@@ -51,11 +51,9 @@ using namespace dai;
 #define NR_OUT          0
 
 
-void mexFunction( int nlhs, mxArray * /*plhs*/[], int nrhs, const mxArray*prhs[] )
-{ 
+void mexFunction( int nlhs, mxArray * /*plhs*/[], int nrhs, const mxArray*prhs[] ) {
     char *filename;
 
-    
     // Check for proper number of arguments
     if ((nrhs != NR_IN) || (nlhs != NR_OUT)) { 
         mexErrMsgTxt("Usage: dai_writefg(psi,filename);\n\n"
@@ -64,16 +62,16 @@ void mexFunction( int nlhs, mxArray * /*plhs*/[], int nrhs, const mxArray*prhs[]
         "                     (psi{i} should be a structure with a Member field\n"
         "                     and a P field, like a CPTAB).\n"
         "        filename   = filename of a .fg file\n");
-    } 
-    
+    }
+
     // Get input parameters
     vector<Factor> factors = mx2Factors(PSI_IN,0);
-    
+
     size_t buflen;
     buflen = mxGetN( FILENAME_IN ) + 1;
     filename = (char *)mxCalloc( buflen, sizeof(char) );
     mxGetString( FILENAME_IN, filename, buflen );
-    
+
     // Construct factorgraph
     FactorGraph fg(factors);
 

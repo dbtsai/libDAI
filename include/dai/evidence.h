@@ -47,10 +47,10 @@ class Observation {
 
         /// Get all observations
         const std::map<Var, size_t>& observations() const { return _obs; }
-        
+
         /// Add an observation
         void addObservation( Var node, size_t setting );
-        
+
         /// Clamp variables in the graphical model to their observed values
         void applyEvidence( InfAlg& alg ) const;
 };
@@ -68,21 +68,21 @@ class Evidence {
     public:
         /// Default constructor
         Evidence() : _samples() {}
-      
+
         /// Construct from existing samples
         Evidence( std::vector<Observation> &samples ) : _samples(samples) {}
 
-        /// Read in tabular data from a stream. 
+        /// Read in tabular data from a stream.
         /** Each line contains one sample, and the first line is a header line with names.
          */
         void addEvidenceTabFile( std::istream& is, std::map<std::string, Var> &varMap );
-    
-        /// Read in tabular data from a stream. 
-        /** Each line contains one sample, and the first line is a header line with 
+
+        /// Read in tabular data from a stream.
+        /** Each line contains one sample, and the first line is a header line with
          *  variable labels which should correspond with a subset of the variables in fg.
          */
         void addEvidenceTabFile( std::istream& is, FactorGraph& fg );
-      
+
         /// Returns number of stored samples
         size_t nrSamples() const { return _samples.size(); }
 

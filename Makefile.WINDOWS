@@ -1,6 +1,6 @@
 # This template contains configurations for compiling libDAI with Visual C++
 # under Windows (and GNU Make)
-# 
+#
 # To use it, simply copy this file to 'Makefile.conf' and adapt 'Makefile.conf'
 # to your local setup
 #
@@ -54,7 +54,7 @@ CCINC=/Iinclude /IC:\boost_1_36_0
 
 # LINKER
 # Standard libraries to include
-LIBS=/link $(LIB)/libdai$(LE) 
+LIBS=/link $(LIB)/libdai$(LE)
 # For linking with the BOOST Program Options library
 BOOSTLIBS=/LIBPATH:C:\boost_1_36_0\stage\lib
 # Additional library search paths for linker

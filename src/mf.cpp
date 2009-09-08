@@ -84,7 +84,7 @@ void MF::construct() {
 }
 
 
-string MF::identify() const { 
+string MF::identify() const {
     return string(Name) + printProperties();
 }
 
@@ -120,7 +120,7 @@ double MF::run() {
             piet *= henk;
             piet = piet.marginal(var(i), false);
             piet = piet.exp();
-            jan *= piet; 
+            jan *= piet;
         }
 
         jan.normalize();
@@ -190,7 +190,7 @@ vector<Factor> MF::beliefs() const {
 
 Real MF::logZ() const {
     Real s = 0.0;
-    
+
     for(size_t i=0; i < nrVars(); i++ )
         s -= beliefV(i).entropy();
     for(size_t I=0; I < nrFactors(); I++ ) {

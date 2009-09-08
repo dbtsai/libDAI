@@ -112,7 +112,7 @@ class HAK : public DAIAlgRG {
 
 
         /// @name Additional interface specific for HAK
-        //@{ 
+        //@{
         Factor & muab( size_t alpha, size_t _beta ) { return _muab[alpha][_beta]; }
         Factor & muba( size_t alpha, size_t _beta ) { return _muba[alpha][_beta]; }
         const Factor& Qa( size_t alpha ) const { return _Qa[alpha]; };

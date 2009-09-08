@@ -41,15 +41,15 @@ namespace dai {
 /// Represents the neighborhood structure of nodes in a bipartite graph.
 /** A bipartite graph has two types of nodes: type 1 and type 2. Edges can occur only between
  *  nodes of different type. Nodes are indexed by an unsigned integer. If there are nr1()
- *  nodes of type 1 and nr2() nodes of type 2, the nodes of type 1 are numbered 
+ *  nodes of type 1 and nr2() nodes of type 2, the nodes of type 1 are numbered
  *  0,1,2,...,nr1()-1 and the nodes of type 2 are numbered 0,1,2,...,nr2()-1. An edge
  *  between node \a n1 of type 1 and node \a n2 of type 2 is represented by a BipartiteGraph::Edge(\a n1,\a n2).
  *
  *  A BipartiteGraph is implemented as a sparse adjacency list, i.e., it stores for each node a list of
  *  its neighboring nodes. In particular, it stores for each node of type 1 a vector of Neighbor structures
- *  (accessible by the nb1() method) describing the neighboring nodes of type 2; similarly, for each node 
- *  of type 2 it stores a vector of Neighbor structures (accessibly by the nb2() method) describing the 
- *  neighboring nodes of type 1. 
+ *  (accessible by the nb1() method) describing the neighboring nodes of type 2; similarly, for each node
+ *  of type 2 it stores a vector of Neighbor structures (accessibly by the nb2() method) describing the
+ *  neighboring nodes of type 1.
  *  Thus, each node has an associated variable of type BipartiteGraph::Neighbors, which is a vector of
  *  Neighbor structures, describing its neighboring nodes of the other type.
  *  \idea Cache second-order neighborhoods in BipartiteGraph.
@@ -70,7 +70,7 @@ class BipartiteGraph {
          *  a node as a neighbor of its neighbor (the \a dual member).
          *
          *  By convention, variable identifiers naming indices into a
-         *  vector of neighbors are prefixed with an underscore ("_"). 
+         *  vector of neighbors are prefixed with an underscore ("_").
          *  The neighbor list which they point into is then understood
          *  from context. For example:
          *
@@ -164,7 +164,7 @@ class BipartiteGraph {
         /// Constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
          *  \param nr1 The number of nodes of type 1.
-         *  \param nr2 The number of nodes of type 2. 
+         *  \param nr2 The number of nodes of type 2.
          *  \param begin Points to the first edge.
          *  \param end Points just beyond the last edge.
          */
@@ -176,7 +176,7 @@ class BipartiteGraph {
         /// (Re)constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
          *  \param nr1 The number of nodes of type 1.
-         *  \param nr2 The number of nodes of type 2. 
+         *  \param nr2 The number of nodes of type 2.
          *  \param begin Points to the first edge.
          *  \param end Points just beyond the last edge.
          */
@@ -184,58 +184,58 @@ class BipartiteGraph {
         void construct( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end );
 
         /// Returns constant reference to the _i2'th neighbor of node i1 of type 1
-        const Neighbor & nb1( size_t i1, size_t _i2 ) const { 
+        const Neighbor & nb1( size_t i1, size_t _i2 ) const {
             DAI_DEBASSERT( i1 < _nb1.size() );
             DAI_DEBASSERT( _i2 < _nb1[i1].size() );
-            return _nb1[i1][_i2]; 
+            return _nb1[i1][_i2];
         }
         /// Returns reference to the _i2'th neighbor of node i1 of type 1
         Neighbor & nb1( size_t i1, size_t _i2 ) {
             DAI_DEBASSERT( i1 < _nb1.size() );
             DAI_DEBASSERT( _i2 < _nb1[i1].size() );
-            return _nb1[i1][_i2]; 
+            return _nb1[i1][_i2];
         }
 
         /// Returns constant reference to the _i1'th neighbor of node i2 of type 2
-        const Neighbor & nb2( size_t i2, size_t _i1 ) const { 
+        const Neighbor & nb2( size_t i2, size_t _i1 ) const {
             DAI_DEBASSERT( i2 < _nb2.size() );
             DAI_DEBASSERT( _i1 < _nb2[i2].size() );
-            return _nb2[i2][_i1]; 
+            return _nb2[i2][_i1];
         }
         /// Returns reference to the _i1'th neighbor of node i2 of type 2
-        Neighbor & nb2( size_t i2, size_t _i1 ) { 
+        Neighbor & nb2( size_t i2, size_t _i1 ) {
             DAI_DEBASSERT( i2 < _nb2.size() );
             DAI_DEBASSERT( _i1 < _nb2[i2].size() );
-            return _nb2[i2][_i1]; 
+            return _nb2[i2][_i1];
         }
 
         /// Returns constant reference to all neighbors of node i1 of type 1
-        const Neighbors & nb1( size_t i1 ) const { 
+        const Neighbors & nb1( size_t i1 ) const {
             DAI_DEBASSERT( i1 < _nb1.size() );
-            return _nb1[i1]; 
+            return _nb1[i1];
         }
         /// Returns reference to all neighbors of node of i1 type 1
-        Neighbors & nb1( size_t i1 ) { 
+        Neighbors & nb1( size_t i1 ) {
             DAI_DEBASSERT( i1 < _nb1.size() );
-            return _nb1[i1]; 
+            return _nb1[i1];
         }
 
         /// Returns constant reference to all neighbors of node i2 of type 2
-        const Neighbors & nb2( size_t i2 ) const { 
+        const Neighbors & nb2( size_t i2 ) const {
             DAI_DEBASSERT( i2 < _nb2.size() );
-            return _nb2[i2]; 
+            return _nb2[i2];
         }
         /// Returns reference to all neighbors of node i2 of type 2
-        Neighbors & nb2( size_t i2 ) { 
+        Neighbors & nb2( size_t i2 ) {
             DAI_DEBASSERT( i2 < _nb2.size() );
-            return _nb2[i2]; 
+            return _nb2[i2];
         }
 
         /// Returns number of nodes of type 1
         size_t nr1() const { return _nb1.size(); }
         /// Returns number of nodes of type 2
         size_t nr2() const { return _nb2.size(); }
-        
+
         /// Calculates the number of edges, time complexity: O(nr1())
         size_t nrEdges() const {
             size_t sum = 0;
@@ -243,10 +243,10 @@ class BipartiteGraph {
                 sum += nb1(i1).size();
             return sum;
         }
-        
+
         /// Adds a node of type 1 without neighbors.
         void add1() { _nb1.push_back( Neighbors() ); }
-        
+
         /// Adds a node of type 2 without neighbors.
         void add2() { _nb2.push_back( Neighbors() ); }
 
@@ -382,16 +382,16 @@ class BipartiteGraph {
 
             _edge_indexed = true;
         }
-        
+
         const Edge& edge(size_t e) const {
             assert(_edge_indexed);
             return _edges[e];
         }
-        
+
         const std::vector<Edge>& edges() const {
             return _edges;
         }
-        
+
         size_t VV2E(size_t n1, size_t n2) const {
             assert(_edge_indexed);
             Edge e(n1,n2);
@@ -455,7 +455,7 @@ void BipartiteGraph::construct( size_t nr1, size_t nr2, EdgeInputIterator begin,
  *    12 -- 21;
  *  }
  *  \enddot
- *  It has three nodes of type 1 (drawn as circles) and two nodes of type 2 (drawn as rectangles). 
+ *  It has three nodes of type 1 (drawn as circles) and two nodes of type 2 (drawn as rectangles).
  *  Node 0 of type 1 has only one neighbor (node 0 of type 2), but node 0 of type 2 has three neighbors (nodes 0,1,2 of type 1).
  *  The example code shows how to construct a BipartiteGraph object representing this bipartite graph and
  *  how to iterate over nodes and their neighbors.

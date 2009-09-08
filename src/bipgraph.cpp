@@ -217,7 +217,7 @@ bool BipartiteGraph::isTree() const {
                     }
                     if( foundCycle )
                         break;
-                } 
+                }
             }
             levels.push_back( newLevel );
             nr_1 += newLevel.ind1.size();

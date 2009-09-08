@@ -71,14 +71,14 @@ class TestDAI {
             time += toc() - tic;
         }
 
-        ~TestDAI() { 
+        ~TestDAI() {
             if( obj != NULL )
                 delete obj;
         }
 
         string identify() const {
             if( obj != NULL )
-                return obj->identify(); 
+                return obj->identify();
             else
                 return "NULL";
         }
@@ -96,7 +96,7 @@ class TestDAI {
                 obj->init();
                 obj->run();
                 time += toc() - tic;
-                
+
                 try {
                     logZ = obj->logZ();
                     has_logZ = true;
@@ -116,7 +116,7 @@ class TestDAI {
                     else
                         throw;
                 }
-                
+
                 try {
                     iters = obj->Iterations();
                     has_iters = true;
@@ -126,7 +126,7 @@ class TestDAI {
                     else
                         throw;
                 }
-                
+
                 q = allBeliefs();
             };
         }
@@ -145,11 +145,11 @@ class TestDAI {
                 err.push_back( dist( q[i], x[i], Prob::DISTTV ) );
         }
 
-        double maxErr() { 
+        double maxErr() {
             return( *max_element( err.begin(), err.end() ) );
         }
-        
-        double avgErr() { 
+
+        double avgErr() {
             return( accumulate( err.begin(), err.end(), 0.0 ) / err.size() );
         }
 };
@@ -190,7 +190,7 @@ pair<string, PropertySet> parseMethod( const string &_s, const map<string,string
         // repeat until method name == alias name ('looped'), or
         // there is no longer an alias 'method'
     }
-    
+
     // check whether name is valid
     size_t n = 0;
     for( ; strlen( DAINames[n] ) != 0; n++ )
@@ -343,13 +343,13 @@ int main( int argc, char *argv[] ) {
             if( m > 0 ) {
                 cout.setf( ios_base::scientific );
                 cout.precision( 3 );
-                
+
                 double me = clipdouble( piet.maxErr(), 1e-9 );
                 cout << me << "\t";
-                
+
                 double ae = clipdouble( piet.avgErr(), 1e-9 );
                 cout << ae << "\t";
-                
+
                 if( piet.has_logZ ) {
                     cout.setf( ios::showpos );
                     double le = clipdouble( piet.logZ / logZ0 - 1.0, 1e-9 );

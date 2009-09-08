@@ -71,7 +71,7 @@ void Gibbs::construct() {
     _var_counts.reserve( nrVars() );
     for( size_t i = 0; i < nrVars(); i++ )
         _var_counts.push_back( _count_t( var(i).states(), 0 ) );
-    
+
     _factor_counts.clear();
     _factor_counts.reserve( nrFactors() );
     for( size_t I = 0; I < nrFactors(); I++ )
@@ -175,7 +175,7 @@ double Gibbs::run() {
         cerr << endl;
 
     double tic = toc();
-    
+
     randomizeState();
 
     for( size_t iter = 0; iter < props.iters; iter++ ) {
@@ -190,7 +190,7 @@ double Gibbs::run() {
             cerr << "counts for variable " << var(i) << ": " << Prob( _var_counts[i].begin(), _var_counts[i].end() ) << endl;
         }
     }
-    
+
     if( props.verbose >= 3 )
         cerr << Name << "::run:  ran " << props.iters << " passes (" << toc() - tic << " clocks)." << endl;
 

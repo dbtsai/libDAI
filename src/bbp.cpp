@@ -98,7 +98,7 @@ size_t getFactorEntryForState( const FactorGraph &fg, size_t I, const vector<siz
 void BBP::RegenerateInds() {
     // initialise _indices
     //     typedef std::vector<size_t>        _ind_t;
-    //     std::vector<std::vector<_ind_t> >  _indices; 
+    //     std::vector<std::vector<_ind_t> >  _indices;
     _indices.resize( _fg->nrVars() );
     for( size_t i = 0; i < _fg->nrVars(); i++ ) {
         _indices[i].clear();
@@ -190,7 +190,7 @@ void BBP::RegenerateR() {
                 if( I != J ) {
                     Prob prod( _fg->var(i).states(), 1.0 );
                     foreach( const Neighbor &K, _fg->nbV(i) )
-                        if( K.node != I && K.node != J.node ) 
+                        if( K.node != I && K.node != J.node )
                             prod *= _bp_dual.msgM( i, K.iter );
                     _R[I][i.iter][J.iter] = prod;
                 }
@@ -506,7 +506,7 @@ void BBP::sendSeqMsgM( size_t j, size_t _I ) {
         um[x_I] *= _adj_m_unnorm_jI[ind[x_I]];
     um *= 1 - props.damping;
     _adj_psi_F[I] += um;
-    
+
     /* THE FOLLOWING WOULD BE SLIGHTLY SLOWER:
     _adj_psi_F[I] += (Factor( _fg->factor(I).vars(), U(I, _j) ) * Factor( _fg->var(j), _adj_m_unnorm[j][_I] )).p() * (1.0 - props.damping);
     */
@@ -568,7 +568,7 @@ Real BBP::getUnMsgMag() {
 
 
 void BBP::getMsgMags( Real &s, Real &new_s ) {
-    s = 0.0; 
+    s = 0.0;
     new_s = 0.0;
     size_t e = 0;
     for( size_t i = 0; i < _fg->nrVars(); i++ )
@@ -579,7 +579,7 @@ void BBP::getMsgMags( Real &s, Real &new_s ) {
             new_s += _new_adj_n[i][I.iter].sumAbs();
             e++;
         }
-    s /= e; 
+    s /= e;
     new_s /= e;
 }
 
@@ -711,7 +711,7 @@ void BBP::run() {
             do {
                 _iters++;
                 mag = getTotalMsgM();
-                if( mag < tol ) 
+                if( mag < tol )
                     break;
 
                 for( size_t i = 0; i < _fg->nrVars(); i++ )
@@ -800,10 +800,10 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
 //                 psi_1_prb.normalize();
                 size_t I = bp_prb->fg().nbV(i)[0]; // use first factor in list of neighbors of i
                 bp_prb->fg().factor(I) *= Factor( bp_prb->fg().var(i), psi_1_prb );
-                
+
                 // call 'init' on the perturbed variables
                 bp_prb->init( bp_prb->fg().var(i) );
-                
+
                 // run copy to convergence
                 bp_prb->run();
 
@@ -812,7 +812,7 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
 
                 // use to estimate adjoint for i
                 adj_est.push_back( (cf_prb - cf0) / h );
-                
+
                 // free cloned InfAlg
                 delete bp_prb;
             }
@@ -851,7 +851,7 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
                     // add it to list of adjoints
                     adj_n_est.push_back((cf_prb-cf0)/h);
                 }
-        
+
                 vector<double> adj_m_est;
                 // for each value xi
                 for(size_t xi=0; xi<bp_dual.var(i).states(); xi++) {
@@ -932,7 +932,7 @@ bool needGibbsState( bbp_cfn_t cfn ) {
 
 void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stateP ) {
     const FactorGraph &fg = ia.fg();
-    
+
     switch( (size_t)cfn_type ) {
         case bbp_cfn_t::CFN_BETHE_ENT: {
             vector<Prob> b1_adj;
@@ -1022,15 +1022,15 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 double b = ia.beliefV(i)[state[i]];
                 switch( (size_t)cfn_type ) {
                     case bbp_cfn_t::CFN_GIBBS_B:
-                        delta[state[i]] = 1.0; 
+                        delta[state[i]] = 1.0;
                         break;
                     case bbp_cfn_t::CFN_GIBBS_B2:
-                        delta[state[i]] = b; 
+                        delta[state[i]] = b;
                         break;
                     case bbp_cfn_t::CFN_GIBBS_EXP:
-                        delta[state[i]] = exp(b); 
+                        delta[state[i]] = exp(b);
                         break;
-                    default: 
+                    default:
                         DAI_THROW(UNKNOWN_ENUM_VALUE);
                 }
                 b1_adj.push_back( delta );
@@ -1060,22 +1060,22 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 double b = ia.beliefF(I)[x_I];
                 switch( (size_t)cfn_type ) {
                     case bbp_cfn_t::CFN_GIBBS_B_FACTOR:
-                        delta[x_I] = 1.0; 
+                        delta[x_I] = 1.0;
                         break;
                     case bbp_cfn_t::CFN_GIBBS_B2_FACTOR:
-                        delta[x_I] = b; 
+                        delta[x_I] = b;
                         break;
                     case bbp_cfn_t::CFN_GIBBS_EXP_FACTOR:
                         delta[x_I] = exp( b );
                         break;
-                    default: 
+                    default:
                         DAI_THROW(UNKNOWN_ENUM_VALUE);
                 }
                 b2_adj.push_back( delta );
             }
             bbp.init( bbp.getZeroAdjV(fg), b2_adj );
             break;
-        } default: 
+        } default:
             DAI_THROW(UNKNOWN_ENUM_VALUE);
     }
 }
@@ -1144,7 +1144,7 @@ Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stat
                 }
             }
             break;
-        } default: 
+        } default:
             DAI_THROWE(UNKNOWN_ENUM_VALUE, "Unknown cost function " + std::string(cfn_type));
     }
     return cf;
@@ -1154,8 +1154,8 @@ Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stat
 } // end of namespace dai
 
 
-/* {{{ GENERATED CODE: DO NOT EDIT. Created by 
-    ./scripts/regenerate-properties include/dai/bbp.h src/bbp.cpp 
+/* {{{ GENERATED CODE: DO NOT EDIT. Created by
+    ./scripts/regenerate-properties include/dai/bbp.h src/bbp.cpp
 */
 namespace dai {
 

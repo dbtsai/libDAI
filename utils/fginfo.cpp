@@ -134,7 +134,7 @@ int main( int argc, char *argv[] ) {
         cout << "LCBP with full cavities needs " << cavsum_lcbp << " BP runs" << endl;
         cout << "LCBP with only pairinteractions needs " << cavsum_lcbp2 << " BP runs" << endl;
         cout << "Cavity sizes: ";
-        for( map<size_t,size_t>::const_iterator it = cavsizes.begin(); it != cavsizes.end(); it++ ) 
+        for( map<size_t,size_t>::const_iterator it = cavsizes.begin(); it != cavsizes.end(); it++ )
             cout << it->first << "(" << it->second << ") ";
         cout << endl;
 
@@ -164,7 +164,7 @@ int main( int argc, char *argv[] ) {
                 facsizes[Isize] = 1;
         }
         cout << "Factor sizes: ";
-        for( map<size_t,size_t>::const_iterator it = facsizes.begin(); it != facsizes.end(); it++ ) 
+        for( map<size_t,size_t>::const_iterator it = facsizes.begin(); it != facsizes.end(); it++ )
             cout << it->first << "(" << it->second << ") ";
         cout << endl;
 

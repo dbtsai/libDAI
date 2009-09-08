@@ -65,10 +65,10 @@ FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _backup() {
 void FactorGraph::constructGraph( size_t nrEdges ) {
     // create a mapping for indices
     hash_map<size_t, size_t> hashmap;
-    
+
     for( size_t i = 0; i < vars().size(); i++ )
         hashmap[var(i).label()] = i;
-    
+
     // create edge list
     vector<Edge> edges;
     edges.reserve( nrEdges );
@@ -117,7 +117,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
     vector<Factor> facs;
     size_t nr_Factors;
     string line;
-    
+
     while( (is.peek()) == '#' )
         getline(is,line);
     is >> nr_Factors;
@@ -176,7 +176,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
             I_vars |= Var(labels[mi], dims[mi]);
         }
         facs.push_back( Factor( I_vars, 0.0 ) );
-        
+
         // calculate permutation sigma (internally, members are sorted)
         vector<size_t> sigma(nr_members,0);
         VarSet::iterator j = I_vars.begin();
@@ -190,13 +190,13 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
 
         // calculate multindices
         Permute permindex( dims, sigma );
-        
+
         // read values
         size_t nr_nonzeros;
         while( (is.peek()) == '#' )
             getline(is,line);
         is >> nr_nonzeros;
-        if( verbose >= 3 ) 
+        if( verbose >= 3 )
             cerr << "  nonzeroes: " << nr_nonzeros << endl;
         for( size_t k = 0; k < nr_nonzeros; k++ ) {
             size_t li;
@@ -241,7 +241,7 @@ VarSet FactorGraph::Delta( unsigned i ) const {
 
 VarSet FactorGraph::Delta( const VarSet &ns ) const {
     VarSet result;
-    for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ ) 
+    for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
         result |= Delta(findVar(*n));
     return result;
 }
@@ -296,13 +296,13 @@ void FactorGraph::printDot( std::ostream &os ) const {
 
 vector<VarSet> FactorGraph::Cliques() const {
     vector<VarSet> result;
-    
+
     for( size_t I = 0; I < nrFactors(); I++ ) {
         bool maximal = true;
         for( size_t J = 0; (J < nrFactors()) && maximal; J++ )
             if( (factor(J).vars() >> factor(I).vars()) && (factor(J).vars() != factor(I).vars()) )
                 maximal = false;
-        
+
         if( maximal )
             result.push_back( factor(I).vars() );
     }
@@ -317,7 +317,7 @@ void FactorGraph::clamp( size_t i, size_t x, bool backup ) {
     mask[x] = 1.0;
 
     map<size_t, Factor> newFacs;
-	foreach( const BipartiteGraph::Neighbor &I, nbV(i) )
+    foreach( const BipartiteGraph::Neighbor &I, nbV(i) )
         newFacs[I] = factor(I) * mask;
     setFactors( newFacs, backup );
 
@@ -335,7 +335,7 @@ void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
     }
 
     map<size_t, Factor> newFacs;
-	foreach( const BipartiteGraph::Neighbor &I, nbV(i) )
+    foreach( const BipartiteGraph::Neighbor &I, nbV(i) )
         newFacs[I] = factor(I) * mask_n;
     setFactors( newFacs, backup );
 }
@@ -345,8 +345,8 @@ void FactorGraph::clampFactor( size_t I, const vector<size_t> &is, bool backup )
     size_t st = factor(I).states();
     Factor newF( factor(I).vars(), 0.0 );
 
-    foreach( size_t i, is ) { 
-        assert( i <= st ); 
+    foreach( size_t i, is ) {
+        assert( i <= st );
         newF[i] = factor(I)[i];
     }
 

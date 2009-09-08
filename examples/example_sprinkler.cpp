@@ -13,7 +13,7 @@ int main() {
     Var S(1, 2);  // Define binary variable Sprinkler (with label 1)
     Var R(2, 2);  // Define binary variable Rain (with label 2)
     Var W(3, 2);  // Define binary variable Wetgrass (with label 3)
- 
+
     // Define probability distribution for C
     Factor P_C( C );
     P_C[0] = 0.5;   // C = 0
@@ -75,5 +75,5 @@ int main() {
     cout << "P(S=1 | W=1) = " << P.marginal( VarSet( S, W ) )[3] / denom << endl;
     cout << "P(R=1 | W=1) = " << P.marginal( VarSet( R, W ) )[3] / denom << endl;
 
-	return 0;
+    return 0;
 }

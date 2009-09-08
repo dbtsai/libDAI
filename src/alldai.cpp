@@ -36,15 +36,15 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
     if( name == ExactInf::Name )
         return new ExactInf (fg, opts);
 #ifdef DAI_WITH_BP
-    if( name == BP::Name ) 
+    if( name == BP::Name )
         return new BP (fg, opts);
 #endif
 #ifdef DAI_WITH_MF
-    if( name == MF::Name ) 
+    if( name == MF::Name )
         return new MF (fg, opts);
 #endif
 #ifdef DAI_WITH_HAK
-    if( name == HAK::Name ) 
+    if( name == HAK::Name )
         return new HAK (fg, opts);
 #endif
 #ifdef DAI_WITH_LC

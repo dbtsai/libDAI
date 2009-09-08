@@ -43,7 +43,7 @@ namespace dai {
 class BP : public DAIAlgFG {
     private:
         typedef std::vector<size_t> ind_t;
-	    typedef std::multimap<double, std::pair<std::size_t, std::size_t> > LutType;
+        typedef std::multimap<double, std::pair<std::size_t, std::size_t> > LutType;
         struct EdgeProp {
             ind_t  index;
             Prob   message;
@@ -59,7 +59,7 @@ class BP : public DAIAlgFG {
         size_t _iters;
         /// The history of message updates (only recorded if recordSentMessages is true)
         std::vector<std::pair<std::size_t, std::size_t> > _sentMessages;
-    
+
     public:
         /// Parameters of this inference algorithm
         struct Properties {
@@ -68,7 +68,7 @@ class BP : public DAIAlgFG {
 
             /// Enumeration of inference variants
             DAI_ENUM(InfType,SUMPROD,MAXPROD);
-        
+
             /// Verbosity
             size_t verbose;
 
@@ -103,8 +103,8 @@ class BP : public DAIAlgFG {
 
         /// Copy constructor
         BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _edge2lut(x._edge2lut),
-            _lut(x._lut), _maxdiff(x._maxdiff), _iters(x._iters), _sentMessages(x._sentMessages), 
-            props(x.props), recordSentMessages(x.recordSentMessages) 
+            _lut(x._lut), _maxdiff(x._maxdiff), _iters(x._iters), _sentMessages(x._sentMessages),
+            props(x.props), recordSentMessages(x.recordSentMessages)
         {
             for( LutType::iterator l = _lut.begin(); l != _lut.end(); ++l )
                 _edge2lut[l->second.first][l->second.second] = l;

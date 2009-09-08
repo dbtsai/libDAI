@@ -72,14 +72,11 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
         }
 
         /// Gets a property
-        const PropertyValue & Get(const PropertyKey &key) const { 
-            PropertySet::const_iterator x = find(key); 
-#ifdef DAI_DEBUG            
+        const PropertyValue & Get(const PropertyKey &key) const {
+            PropertySet::const_iterator x = find(key);
             if( x == this->end() )
-                std::cerr << "PropertySet::Get cannot find property " << key << std::endl;
-#endif
-            assert( x != this->end() ); 
-            return x->second; 
+                DAI_THROWE(NOT_FOUND,"PropertySet::Get cannot find property '" + key + "'");
+            return x->second;
         }
 
         /// Sets a property
@@ -137,7 +134,7 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
 
         /// Converts a property from ValueType to string (if necessary)
         template<typename ValueType>
-        PropertySet & setAsString(const PropertyKey &key, ValueType &val) { 
+        PropertySet & setAsString(const PropertyKey &key, ValueType &val) {
             try {
                 return Set( key, boost::lexical_cast<std::string>(val) );
             } catch( boost::bad_lexical_cast & ) {
@@ -147,7 +144,7 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
 
         /// Shorthand for (temporarily) adding properties, e.g. PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
         PropertySet operator()(const PropertyKey &key, const PropertyValue &val) const { PropertySet copy = *this; return copy.Set(key,val); }
-		
+
         /// Check if a property with the given key exists
         bool hasKey(const PropertyKey &key) const { PropertySet::const_iterator x = find(key); return (x != this->end()); }
 

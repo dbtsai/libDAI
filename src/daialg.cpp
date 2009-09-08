@@ -35,7 +35,7 @@ using namespace std;
  */
 Factor calcMarginal( const InfAlg &obj, const VarSet &ns, bool reInit ) {
     Factor Pns (ns);
-    
+
     InfAlg *clamped = obj.clone();
     if( !reInit )
         clamped->init();
@@ -52,7 +52,7 @@ Factor calcMarginal( const InfAlg &obj, const VarSet &ns, bool reInit ) {
         // set clamping Factors to delta functions
         for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
             clamped->clamp( varindices[*n], s(*n) );
-        
+
         // run DAIAlg, calc logZ, store in Pns
         if( reInit )
             clamped->init();
@@ -78,7 +78,7 @@ Factor calcMarginal( const InfAlg &obj, const VarSet &ns, bool reInit ) {
             Pns[s] = 0;
         else
             Pns[s] = exp(logZ - logZ0); // subtract logZ0 to avoid very large numbers
-        
+
         // restore clamped factors
         clamped->restoreFactors( ns );
     }
@@ -147,10 +147,10 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
             else
                 Z_xj = exp(logZ - logZ0); // subtract logZ0 to avoid very large numbers
 
-            for( size_t k = 0; k < N; k++ ) 
+            for( size_t k = 0; k < N; k++ )
                 if( k != j ) {
                     Factor b_k = clamped->belief(vns[k]);
-                    for( size_t k_val = 0; k_val < vns[k].states(); k_val++ ) 
+                    for( size_t k_val = 0; k_val < vns[k].states(); k_val++ )
                         if( vns[j].label() < vns[k].label() )
                             pairbeliefs[j * N + k][j_val + (k_val * vns[j].states())] = Z_xj * b_k[k_val];
                         else
@@ -161,7 +161,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
             clamped->restoreFactors( ns );
         }
     }
-    
+
     delete clamped;
 
     // Calculate result by taking the geometric average
@@ -180,7 +180,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
  */
 Factor calcMarginal2ndO( const InfAlg & obj, const VarSet& ns, bool reInit ) {
     // returns a a probability distribution whose 1st order interactions
-    // are unspecified, whose 2nd order interactions approximate those of 
+    // are unspecified, whose 2nd order interactions approximate those of
     // the marginal on ns, and whose higher order interactions are absent.
 
     vector<Factor> pairbeliefs = calcPairBeliefs( obj, ns, reInit );
@@ -188,7 +188,7 @@ Factor calcMarginal2ndO( const InfAlg & obj, const VarSet& ns, bool reInit ) {
     Factor Pns (ns);
     for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
         Pns *= pairbeliefs[ij];
-    
+
     return( Pns.normalized() );
 }
 
@@ -214,7 +214,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
             Factor pairbelief( VarSet(*nj, *nk) );
 
             // clamp Vars j and k to their possible values
-            for( size_t j_val = 0; j_val < nj->states(); j_val++ ) 
+            for( size_t j_val = 0; j_val < nj->states(); j_val++ )
                 for( size_t k_val = 0; k_val < nk->states(); k_val++ ) {
                     // save unclamped factors connected to ns
                     clamped->backupFactors( ns );
@@ -254,11 +254,11 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
                     // restore clamped factors
                     clamped->restoreFactors( ns );
                 }
-        
+
             result.push_back( pairbelief.normalized() );
         }
     }
-    
+
     delete clamped;
 
     assert( result.size() == (ns.size() * (ns.size() - 1) / 2) );

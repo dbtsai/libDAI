@@ -7,7 +7,7 @@ using namespace dai;
 int main() {
     Var x0(0, 2);   // Define binary variable x0 (with label 0)
     Var x1(1, 3);   // Define ternary variable x1 (with label 1)
- 
+
     // Define set X = {x0, x1}
     VarSet X; // empty
     X |= x1;  // X = {x1}
@@ -48,5 +48,5 @@ int main() {
         assert( X.calcState(X.calcStates(S)) == S );
     }
 
-	return 0;
+    return 0;
 }

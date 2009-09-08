@@ -46,7 +46,7 @@
  *  some sparse factors, some noisy-OR factors, some dense factors, some arbitrary
  *  precision factors, etc.
  *
- *  \idea Use Boost::uBLAS framework to deal with matrices, especially, with 2D sparse matrices. 
+ *  \idea Use Boost::uBLAS framework to deal with matrices, especially, with 2D sparse matrices.
  *  See http://www.boost.org/libs/numeric/ublas/doc/matrix_sparse.htm
  *
  *  \idea Introduce naming scheme:
@@ -68,15 +68,15 @@
  *  \code
  *  template <typename Node1Properties, typename Node2Properties, typename EdgeProperties>
  *  class ExtFactorGraph : public FactorGraph {
- *  	public:
- * 		std::vector<Node1Properties>              node1Props;
- * 		std::vector<Node2Properties>              node2Props;
- * 		std::vector<std::vector<EdgeProperties> > edgeProps;
- *	    // ...
+ *      public:
+ *          std::vector<Node1Properties>              node1Props;
+ *          std::vector<Node2Properties>              node2Props;
+ *          std::vector<std::vector<EdgeProperties> > edgeProps;
+ *         // ...
  *  }
  *  \endcode
  *
- *  Advantages: 
+ *  Advantages:
  *  - Less code duplication.
  *  - Easier maintainability.
  *  - Easier to write new inference algorithms.
@@ -85,26 +85,26 @@
  *  - Cachability may be worse.
  *  - A problem is the case where there are no properties for either type of nodes or for edges.
  *    Maybe this can be solved using specializations, or using variadac template arguments?
- *    Another possible solution would be to define a "class Empty {}", and add some code 
- *    that checks for the typeid, comparing it with Empty, and doing something special in that case 
+ *    Another possible solution would be to define a "class Empty {}", and add some code
+ *    that checks for the typeid, comparing it with Empty, and doing something special in that case
  *    (e.g., not allocating memory).
  *  - The main disadvantage of this approach seems to be that it leads to even more entanglement.
  *    Therefore this is probably a bad idea.
  *
  *  \section discuss_templates Polymorphism by template parameterization
- *  Instead of polymorphism by inheritance, use polymorphism by template parameterization. 
+ *  Instead of polymorphism by inheritance, use polymorphism by template parameterization.
  *  For example, the real reason for introducing the complicated inheritance scheme of dai::InfAlg
  *  was for functions like dai::calcMarginal. Instead, one could use a template function:
  *  \code
  *  template<typename InfAlg>
  *  Factor calcMarginal( const InfAlg &obj, const VarSet &ns, bool reInit );
  *  \endcode
- *  This would assume that the type InfAlg supports certain methods. Ideally, one would use 
- *  concepts to define different classes of inference algorithms with different capabilities, 
+ *  This would assume that the type InfAlg supports certain methods. Ideally, one would use
+ *  concepts to define different classes of inference algorithms with different capabilities,
  *  for example the ability to calculate logZ, the ability to calculate marginals, the ability to
- *  calculate bounds, the ability to calculate MAP states, etc. Then, one would use traits 
- *  classes in order to be able to query the capabilities of the model. For example, one would be 
- *  able to query whether the inference algorithm supports calculation of logZ.  Unfortunately, 
+ *  calculate bounds, the ability to calculate MAP states, etc. Then, one would use traits
+ *  classes in order to be able to query the capabilities of the model. For example, one would be
+ *  able to query whether the inference algorithm supports calculation of logZ.  Unfortunately,
  *  this is compile-time polymorphism, whereas tests/testdai needs runtime polymorphism.
  *  Therefore this is probably a bad idea.
  */
@@ -117,19 +117,19 @@
  *
  *  \section about About libDAI
  *  libDAI is a free/open source C++ library (licensed under GPLv2+) that provides
- *  implementations of various (approximate) inference methods for discrete 
- *  graphical models. libDAI supports arbitrary factor graphs with discrete 
- *  variables; this includes discrete Markov Random Fields and Bayesian 
+ *  implementations of various (approximate) inference methods for discrete
+ *  graphical models. libDAI supports arbitrary factor graphs with discrete
+ *  variables; this includes discrete Markov Random Fields and Bayesian
  *  Networks.
  *
- *  The library is targeted at researchers. To be able to use the library, a 
- *  good understanding of graphical models is needed. 
+ *  The library is targeted at researchers. To be able to use the library, a
+ *  good understanding of graphical models is needed.
  *
  *  \section limitations Limitations
- *  libDAI is not intended to be a complete package for approximate inference. 
- *  Instead, it should be considered as an "inference engine", providing 
- *  various inference methods. In particular, it contains no GUI, currently 
- *  only supports its own file format for input and output (although support 
+ *  libDAI is not intended to be a complete package for approximate inference.
+ *  Instead, it should be considered as an "inference engine", providing
+ *  various inference methods. In particular, it contains no GUI, currently
+ *  only supports its own file format for input and output (although support
  *  for standard file formats may be added later), and provides very limited
  *  visualization functionalities. The only learning method supported currently
  *  is EM for learning factor parameters.
@@ -154,7 +154,7 @@
  *  \section language Why C++?
  *  Because libDAI is implemented in C++, it is very fast compared with
  *  implementations in MatLab (a factor 1000 faster is not uncommon).
- *  libDAI does provide a MatLab interface for easy integration with MatLab. 
+ *  libDAI does provide a MatLab interface for easy integration with MatLab.
  */
 
 
@@ -222,7 +222,7 @@
 
 
 /** \page fileformat libDAI factorgraph file format
- *  
+ *
  *  This page describes the .fg fileformat used in libDAI to store factor graphs.
  *  Markov Random Fields are special cases of factor graphs, as are Bayesian
  *  networks. A factor graph can be specified as follows: for each factor, one has
@@ -235,7 +235,7 @@
  *  empty lines. Each variable occurring in the factor graph has a unique
  *  identifier, its index (which should be a nonnegative integer). Comment lines
  *  start with #.
- *  
+ *
  *  Each block starts with a line containing the number of variables in that
  *  factor. The second line contains the indices of these variables, seperated by
  *  spaces (indices are nonnegative integers and to avoid confusion, it is
@@ -250,7 +250,7 @@
  *  convention that is used is that the left-most variables cycle through their
  *  values the fastest (similar to MATLAB indexing of multidimensional arrays). An
  *  example block describing one factor is:
- *  
+ *
  *  3\n
  *  4 8 7\n
  *  3 2 2\n
@@ -267,9 +267,9 @@
  *  10 1.6\n
  *  12 6.4\n
  *  11 2.6\n
- *  
+ *
  *  which corresponds to the following factor:
- *  
+ *
  *  \f[
  *  \begin{array}{ccc|c}
  *  x_4 & x_8 & x_7 & \mbox{value}\\
@@ -295,13 +295,13 @@
  *  values, as described in the third line of the block ("3 2 2"). The table
  *  contains 11 non-zero entries (all except for the fifth entry). Note that the
  *  eleventh and twelveth entries are interchanged.
- *  
+ *
  *  A final note: the internal representation in libDAI of the factor above is
  *  different, because the variables are ordered according to their indices
  *  (i.e., the ordering would be x_4 x_7 x_8) and the values of the table are
  *  stored accordingly, with the variable having the smallest index changing
  *  fastest:
- *  
+ *
  *  \f[
  *  \begin{array}{ccc|c}
  *  x_4 & x_7 & x_8 & \mbox{value}\\

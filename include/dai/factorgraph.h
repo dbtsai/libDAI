@@ -39,11 +39,11 @@ namespace dai {
 
 
 /// Represents a factor graph.
-/** Both Bayesian Networks and Markov random fields can be represented in a 
- *  unifying representation, called <em>factor graph</em> [\ref KFL01], 
+/** Both Bayesian Networks and Markov random fields can be represented in a
+ *  unifying representation, called <em>factor graph</em> [\ref KFL01],
  *  implemented in libDAI by the FactorGraph class.
  *  
- *  Consider a probability distribution over \f$N\f$ discrete random variables 
+ *  Consider a probability distribution over \f$N\f$ discrete random variables
  *  \f$x_0,x_1,\dots,x_N\f$ that factorizes as a product of factors, each of
  *  which depends on some subset of the variables:
  *  \f[
@@ -54,8 +54,8 @@ namespace dai {
  *  of variables \f$X_I \subset \{x_0,x_1,\dots,x_N\}\f$ to the nonnegative
  *  real numbers.
  * 
- *  For a Bayesian network, each factor corresponds to a (conditional) 
- *  probability table, whereas for a Markov random field, each factor 
+ *  For a Bayesian network, each factor corresponds to a (conditional)
+ *  probability table, whereas for a Markov random field, each factor
  *  corresponds to a maximal clique of the undirected graph.
  *
  *  Factor graphs explicitly express the factorization structure of the
@@ -63,7 +63,7 @@ namespace dai {
  *
  *  \todo Alternative implementation of undo factor changes: the only things that have to be
  *  undone currently are setting a factor to 1 and setting a factor to a Kronecker delta. This
- *  could also be implemented in the TFactor itself, which could maintain its state 
+ *  could also be implemented in the TFactor itself, which could maintain its state
  *  (ones/delta/full) and act accordingly.
  */ 
 class FactorGraph {
@@ -79,13 +79,13 @@ class FactorGraph {
 
         /// Shorthand for BipartiteGraph::Edge
         typedef BipartiteGraph::Edge      Edge;
-        
+
         /// Iterator over factors
         typedef std::vector<Factor>::iterator iterator;
-        
+
         /// Const iterator over factors
         typedef std::vector<Factor>::const_iterator const_iterator;
-        
+
 
     private:
         std::vector<Var>         _vars;
@@ -107,7 +107,7 @@ class FactorGraph {
         template<typename FactorInputIterator, typename VarInputIterator>
         FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint = 0, size_t nr_var_hint = 0 );
 
-        /// Destructor        
+        /// Destructor
         virtual ~FactorGraph() {}
 
         /// Clone *this (virtual copy constructor)
@@ -199,10 +199,10 @@ class FactorGraph {
 
         /// Set the content of the I'th factor and make a backup of its old content if backup == true
         virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {
-            assert( newFactor.vars() == factor(I).vars() ); 
+            assert( newFactor.vars() == factor(I).vars() );
             if( backup )
                 backupFactor( I );
-            _factors[I] = newFactor; 
+            _factors[I] = newFactor;
         }
 
         /// Set the contents of all factors as specified by facs and make a backup of the old contents if backup == true
@@ -221,7 +221,7 @@ class FactorGraph {
 
         // OBSOLETE
         /// Only for backwards compatibility (to be removed soon)
-        virtual void clamp( const Var &v, size_t x, bool backup = false ) { 
+        virtual void clamp( const Var &v, size_t x, bool backup = false ) {
             std::cerr << "Warning: this FactorGraph::clamp(const Var&,...) interface is obsolete!" << std::endl;
             clamp( findVar(v), x, backup );
         }
@@ -265,7 +265,7 @@ class FactorGraph {
 
         /// Writes a FactorGraph to a GraphViz .dot file
         void printDot( std::ostream& os ) const;
-        
+
         /// Returns the cliques in this FactorGraph
         std::vector<VarSet> Cliques() const;
 

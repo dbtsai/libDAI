@@ -89,7 +89,7 @@ InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg 
 static const char* DAINames[] = {
     ExactInf::Name,
 #ifdef DAI_WITH_BP
-    BP::Name, 
+    BP::Name,
 #endif
 #ifdef DAI_WITH_MF
     MF::Name,

@@ -38,7 +38,7 @@
 namespace dai {
 
 
-/// Find a variable to clamp using BBP (goes with maximum adjoint) 
+/// Find a variable to clamp using BBP (goes with maximum adjoint)
 /// \see BBP
 std::pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, bbp_cfn_t cfn, Real *maxVarOut );
 
@@ -76,7 +76,7 @@ class CBP : public DAIAlgFG {
         /// Prints beliefs, variables and partition sum, in case of a debugging build
         void printDebugInfo();
 
-        /// Called by 'run', and by itself. Implements the main algorithm. 
+        /// Called by 'run', and by itself. Implements the main algorithm.
         /** Chooses a variable to clamp, recurses, combines the logZ and
          *  beliefs estimates of the children, and returns the improved
          *  estimates in \a lz_out and \a beliefs_out to its parent
@@ -94,7 +94,7 @@ class CBP : public DAIAlgFG {
          */
         virtual bool chooseNextClampVar( InfAlg* bp, std::vector<size_t> &clamped_vars_list, size_t &i, std::vector<size_t> &xis, Real *maxVarOut );
 
-        /// Return the InfAlg to use at each step of the recursion. 
+        /// Return the InfAlg to use at each step of the recursion.
         /// \todo At present, only returns a BP instance
         InfAlg* getInfAlg();
 
@@ -151,7 +151,7 @@ class CBP : public DAIAlgFG {
             DAI_ENUM(ChooseMethodType,CHOOSE_RANDOM,CHOOSE_MAXENT,CHOOSE_BBP,CHOOSE_BP_L1,CHOOSE_BP_CFN);
             /// Enumeration of possible clampings: variables or factors
             DAI_ENUM(ClampType,CLAMP_VAR,CLAMP_FACTOR);
-            
+
             /// Verbosity
             size_t verbose = 0;
 
@@ -185,8 +185,8 @@ class CBP : public DAIAlgFG {
             std::string clamp_outfile = "";
         }
         */
-/* {{{ GENERATED CODE: DO NOT EDIT. Created by 
-    ./scripts/regenerate-properties include/dai/cbp.h src/cbp.cpp 
+/* {{{ GENERATED CODE: DO NOT EDIT. Created by
+    ./scripts/regenerate-properties include/dai/cbp.h src/cbp.cpp
 */
         struct Properties {
             /// Enumeration of possible update schedules

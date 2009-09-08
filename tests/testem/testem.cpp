@@ -43,7 +43,7 @@ void usage( const string &msg ) {
 int main( int argc, char** argv ) {
     if( argc != 4 )
         usage("Incorrect number of arguments.");
-    
+
     FactorGraph fg;
     fg.ReadFromFile( argv[1] );
 

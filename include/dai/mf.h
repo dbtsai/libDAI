@@ -94,10 +94,10 @@ class MF : public DAIAlgFG {
 
 
         /// @name Additional interface specific for MF
-        //@{ 
+        //@{
         Factor beliefV( size_t i ) const;
         //@}
-        
+
     private:
         void construct();
         void setProperties( const PropertySet &opts );

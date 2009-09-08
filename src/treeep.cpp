@@ -42,7 +42,7 @@ void TreeEP::setProperties( const PropertySet &opts ) {
     assert( opts.hasKey("maxiter") );
     assert( opts.hasKey("verbose") );
     assert( opts.hasKey("type") );
-    
+
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.verbose = opts.getStringAs<size_t>("verbose");
@@ -91,14 +91,14 @@ TreeEP::TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &
         if( newalpha1 == _a.size() ) {
             _Qa.push_back( Factor( jt_Qa[alpha1].vars(), 1.0 ) );
             _a.push_back( alpha1 );         // save old index in index conversion table
-        } 
+        }
 
         size_t newalpha2 = find(_a.begin(), _a.end(), alpha2) - _a.begin();
         if( newalpha2 == _a.size() ) {
             _Qa.push_back( Factor( jt_Qa[alpha2].vars(), 1.0 ) );
             _a.push_back( alpha2 );         // save old index in index conversion table
         }
-        
+
         _RTree.push_back( DEdge( newalpha1, newalpha2 ) );
         _Qb.push_back( Factor( jt_Qb[beta].vars(), 1.0 ) );
         _b.push_back( beta );
@@ -109,7 +109,7 @@ TreeEP::TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &
 }
 
 
-void TreeEP::TreeEPSubTree::init() { 
+void TreeEP::TreeEPSubTree::init() {
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
         _Qa[alpha].fill( 1.0 );
     for( size_t beta = 0; beta < _Qb.size(); beta++ )
@@ -136,7 +136,7 @@ void TreeEP::TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<F
         Qa[_a[alpha]].fill( 0.0 );
     for( size_t beta = 0; beta < _Qb.size(); beta++ )
         Qb[_b[beta]].fill( 0.0 );
-    
+
     // For all states of _nsrem
     for( State s(_nsrem); s.valid(); s++ ) {
         // Multiply root with slice of I
@@ -152,14 +152,14 @@ void TreeEP::TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<F
                     _Qa[_RTree[i].n2] *= delta;
                 }
             Factor new_Qb = _Qa[_RTree[i].n2].marginal( _Qb[i].vars(), false );
-            _Qa[_RTree[i].n1] *= new_Qb / _Qb[i]; 
+            _Qa[_RTree[i].n1] *= new_Qb / _Qb[i];
             _Qb[i] = new_Qb;
         }
 
         // DistributeEvidence
         for( size_t i = 0; i < _RTree.size(); i++ ) {
             Factor new_Qb = _Qa[_RTree[i].n1].marginal( _Qb[i].vars(), false );
-            _Qa[_RTree[i].n2] *= new_Qb / _Qb[i]; 
+            _Qa[_RTree[i].n2] *= new_Qb / _Qb[i];
             _Qb[i] = new_Qb;
         }
 
@@ -210,7 +210,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
             // mutual information between the nodes
             // ALT: construct weighted graph with as weights an upper bound on the
             // effective interaction strength between pairs of nodes
-            
+
             WeightedGraph<double> wg;
             for( size_t i = 0; i < nrVars(); ++i ) {
                 Var v_i = var(i);
@@ -256,8 +256,8 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     vector<VarSet> Cliques;
     for( size_t i = 0; i < tree.size(); i++ )
         Cliques.push_back( VarSet( var(tree[i].n1), var(tree[i].n2) ) );
-    
-    // Construct a weighted graph (each edge is weighted with the cardinality 
+
+    // Construct a weighted graph (each edge is weighted with the cardinality
     // of the intersection of the nodes, where the nodes are the elements of
     // Cliques).
     WeightedGraph<int> JuncGraph;
@@ -267,7 +267,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
             if( w )
                 JuncGraph[UEdge(i,j)] = w;
         }
-    
+
     // Construct maximal spanning tree using Prim's algorithm
     RTree = MaxSpanningTreePrims( JuncGraph );
 
@@ -311,7 +311,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
 
     // Check counting numbers
     Check_Counting_Numbers();
-    
+
     // Create messages and beliefs
     Qa.clear();
     Qa.reserve( nrORs() );
@@ -320,11 +320,11 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
 
     Qb.clear();
     Qb.reserve( nrIRs() );
-    for( size_t beta = 0; beta < nrIRs(); beta++ ) 
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         Qb.push_back( Factor( IR(beta), 1.0 ) );
 
     // DIFF with JTree::GenerateJT:  no messages
-    
+
     // DIFF with JTree::GenerateJT:
     // Create factor approximations
     _Q.clear();
@@ -361,7 +361,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
 }
 
 
-string TreeEP::identify() const { 
+string TreeEP::identify() const {
     return string(Name) + printProperties();
 }
 
@@ -394,7 +394,7 @@ double TreeEP::run() {
     // been reached or until the maximum belief difference is smaller than tolerance
     for( _iters=0; _iters < props.maxiter && diffs.maxDiff() > props.tol; _iters++ ) {
         for( size_t I = 0; I < nrFactors(); I++ )
-            if( offtree(I) ) {  
+            if( offtree(I) ) {
                 _Q[I].InvertAndMultiply( Qa, Qb );
                 _Q[I].HUGIN_with_I( Qa, Qb );
                 _Q[I].InvertAndMultiply( Qa, Qb );
@@ -447,7 +447,7 @@ Real TreeEP::logZ() const {
     for( size_t I = 0; I < nrFactors(); I++ )
         if( offtree(I) )
             s += (_Q.find(I))->second.logZ( Qa, Qb );
-    
+
     return s;
 }
 

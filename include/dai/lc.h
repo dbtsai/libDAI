@@ -122,7 +122,7 @@ class LC : public DAIAlgFG {
         Factor beliefV( size_t i ) const { return _beliefs[i]; }
 
         /// @name Additional interface specific for LC
-        //@{ 
+        //@{
         double CalcCavityDist( size_t i, const std::string &name, const PropertySet &opts );
         double InitCavityDists( const std::string &name, const PropertySet &opts );
         long SetCavityDists( std::vector<Factor> &Q );

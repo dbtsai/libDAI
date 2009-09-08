@@ -21,8 +21,8 @@ my ($gen_code_start_pat, $gen_code_end_pat, $props_start_pat) =
    qr(/\*.*PROPERTIES));
 # Actual delimiters to use for generated code blocks
 my ($gen_code_start, $gen_code_end) =
-  ("/* {{{ GENERATED CODE: DO NOT EDIT. Created by \n".
-   "    $0 $header_file $source_file \n*/\n",
+  ("/* {{{ GENERATED CODE: DO NOT EDIT. Created by\n".
+   "    $0 $header_file $source_file\n*/\n",
    "/* }}} END OF GENERATED CODE */\n");
 
 # Strings to hold text of files
@@ -155,7 +155,7 @@ sub process_properties ($$$) {
       push @vars, [$type, $name, $default, $cmt];
     }
   }
-  
+
   my ($stext) = "";
   my ($text) = <<EOF;
         struct Properties {
@@ -282,7 +282,7 @@ EOF
 $source_buffer = process_file { return 0; } $source_file;
 $source_buffer =~ s/\n+$//s;
 
-$header_buffer = process_file { 
+$header_buffer = process_file {
   if (/$props_start_pat/) {
     # when we see something resembling properties, record it, and when we
     # get to the end, process and emit the generated code

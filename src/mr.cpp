@@ -47,7 +47,7 @@ void MR::setProperties( const PropertySet &opts ) {
     assert( opts.hasKey("verbose") );
     assert( opts.hasKey("updates") );
     assert( opts.hasKey("inits") );
-    
+
     props.tol = opts.getStringAs<double>("tol");
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.updates = opts.getStringAs<Properties::UpdateType>("updates");
@@ -79,7 +79,7 @@ string MR::printProperties() const {
 // init N, con, nb, tJ, theta
 void MR::init(size_t Nin, double *_w, double *_th) {
     size_t i,j;
-    
+
     N = Nin;
 
     con.resize(N);
@@ -96,7 +96,7 @@ void MR::init(size_t Nin, double *_w, double *_th) {
                 con[i]++;
             }
     }
-    
+
     theta.resize(N);
     for(i=0; i<N; i++)
       theta[i] = _th[i];
@@ -189,9 +189,9 @@ double MR::init_cor_resp() {
                 for(k=0; k<N; k++){
                     if(k!=cavity) {
                         for(size_t i=0; i<con[k]; i++)
-                            thbJsite[i] = tJ[k][i];       
+                            thbJsite[i] = tJ[k][i];
                         for(l=0; l<con[k]; l++){
-                            xinter = 1.;      
+                            xinter = 1.;
                             rinter = 0.;
                             if(k==s2) rinter += 1.;
                             for(j=0; j<con[k]; j++)
@@ -227,10 +227,10 @@ double MR::init_cor_resp() {
             // compute the observables (i.e. magnetizations and responses)******
 
             for(size_t i=0; i<concav; i++){
-                rinter = 0.; 
+                rinter = 0.;
                 xinter = 1.;
                 if(i!=i2)
-                    for(j=0; j<con[nb[cavity][i]]; j++){ 
+                    for(j=0; j<con[nb[cavity][i]]; j++){
                         variab2 = tanh(xfield[kmax*nb[nb[cavity][i]][j]+kindex[nb[cavity][i]][j]]);
                         variab1 = tJ[nb[cavity][i]][j]*variab2;
                         rinter +=  tJ[nb[cavity][i]][j]*rfield[kmax*nb[nb[cavity][i]][j]+kindex[nb[cavity][i]][j]]*(1-variab2*variab2)/(1-variab1*variab1);
@@ -266,7 +266,7 @@ double MR::T(size_t i, sub_nb A) {
     // A is a subset of nb[i]
     //
     // calculate T{(i)}_A as defined in Rizzo&Montanari e-print (2.17)
-    
+
     sub_nb _nbi_min_A(con[i]);
     _nbi_min_A.set();
     _nbi_min_A &= ~A;
@@ -323,7 +323,7 @@ double MR::_tJ(size_t i, sub_nb A) {
     // A is a subset of nb[i]
     //
     // calculate the product of all tJ[i][_j] for _j in A
-    
+
     sub_nb::size_type _j = A.find_first();
     if( _j == sub_nb::npos )
         return 1.0;
@@ -338,9 +338,9 @@ double MR::appM(size_t i, sub_nb A) {
     //
     // calculate the moment of variables in A from M and cors, neglecting higher order cumulants,
     // defined as the sum over all partitions of A into subsets of cardinality two at most of the
-    // product of the cumulants (either first order, i.e. M, or second order, i.e. cors) of the 
+    // product of the cumulants (either first order, i.e. M, or second order, i.e. cors) of the
     // entries of the partitions
-    
+
     sub_nb::size_type _j = A.find_first();
     if( _j == sub_nb::npos )
         return 1.0;
@@ -388,9 +388,9 @@ void MR::sum_subs(size_t j, sub_nb A, double *sum_even, double *sum_odd) {
             }
     } while (!B.none());
 }
-            
 
-void MR::solvemcav() { 
+
+void MR::solvemcav() {
     double sum_even, sum_odd;
     double maxdev;
     size_t maxruns = 1000;
@@ -467,8 +467,8 @@ void MR::solvemcav() {
     }
 }
 
- 
-void MR::solveM() { 
+
+void MR::solveM() {
     for(size_t i=0; i<N; i++) {
         if( props.updates == Properties::UpdateType::FULL ) {
             // find indices in nb[i]
@@ -523,7 +523,7 @@ void MR::init_cor() {
 }
 
 
-string MR::identify() const { 
+string MR::identify() const {
     return string(Name) + printProperties();
 }
 
@@ -619,10 +619,10 @@ MR::MR( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), support
             supported = false;
             break;
         }
-    
+
     if( !supported )
         return;
-    
+
     // check whether all interactions are pairwise or single
     for( size_t I = 0; I < fg.nrFactors(); I++ )
         if( fg.factor(I).vars().size() > 2 ) {
@@ -638,7 +638,7 @@ MR::MR( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), support
 
     double *w = new double[Nin*Nin];
     double *th = new double[Nin];
-    
+
     for( size_t i = 0; i < Nin; i++ ) {
         th[i] = 0.0;
         for( size_t j = 0; j < Nin; j++ )
@@ -655,14 +655,14 @@ MR::MR( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), support
             VarSet::const_iterator jit = psi.vars().begin();
             size_t j = fg.findVar( *(++jit) );
 
-            w[i*Nin+j] += 0.25 * log(psi[3] * psi[0] / (psi[2] * psi[1])); 
-            w[j*Nin+i] += 0.25 * log(psi[3] * psi[0] / (psi[2] * psi[1])); 
+            w[i*Nin+j] += 0.25 * log(psi[3] * psi[0] / (psi[2] * psi[1]));
+            w[j*Nin+i] += 0.25 * log(psi[3] * psi[0] / (psi[2] * psi[1]));
 
             th[i] += 0.25 * log(psi[3] / psi[2] * psi[1] / psi[0]);
             th[j] += 0.25 * log(psi[3] / psi[1] * psi[2] / psi[0]);
         }
     }
-    
+
     init(Nin, w, th);
 
     delete th;

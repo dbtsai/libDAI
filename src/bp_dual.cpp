@@ -111,7 +111,7 @@ void BP_dual::calcNewM( size_t i, size_t _I ) {
     IndexFor ind( fg().var(i), fg().factor(I).vars() );
     for( size_t x = 0; ind >= 0; x++, ++ind )
         marg[ind] += prod[x];
-    
+
     _msgs.Zm[i][_I] = marg.normalize();
     _msgs.m[i][_I] = marg;
 }

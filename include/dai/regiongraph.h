@@ -50,7 +50,7 @@ class Region : public VarSet {
 
         /// Construct Region from a VarSet and a counting number
         Region(const VarSet & x, double c) : VarSet(x), _c(c) {}
-        
+
         /// Provide read access to counting number
         const double & c() const { return _c; }
         /// Provide full access to counting number
@@ -70,7 +70,7 @@ class FRegion : public Factor {
 
         /// Constructs FRegion from a Factor and a counting number
         FRegion( const Factor & x, double c ) : Factor(x), _c(c) {}
-        
+
         /// Provide read access to counting number
         const double & c() const { return _c; }
         /// Provide full access to counting number
@@ -103,7 +103,7 @@ class RegionGraph : public FactorGraph {
 
         /// Constructs a RegionGraph from a FactorGraph, a vector of outer regions, a vector of inner regions and a vector of edges
         RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors, const std::vector<Region> &irs, const std::vector<std::pair<size_t,size_t> > &edges );
-        
+
         /// Constructs a RegionGraph from a FactorGraph and a vector of outer VarSets (CVM style)
         RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl );
 
@@ -112,8 +112,8 @@ class RegionGraph : public FactorGraph {
 
         /// Set the content of the I'th factor and make a backup of its old content if backup == true
         virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {
-            FactorGraph::setFactor( I, newFactor, backup ); 
-            RecomputeOR( I ); 
+            FactorGraph::setFactor( I, newFactor, backup );
+            RecomputeOR( I );
         }
 
         /// Set the contents of all factors as specified by facs and make a backup of the old contents if backup == true
@@ -122,7 +122,7 @@ class RegionGraph : public FactorGraph {
             VarSet ns;
             for( std::map<size_t, Factor>::const_iterator fac = facs.begin(); fac != facs.end(); fac++ )
                 ns |= fac->second.vars();
-            RecomputeORs( ns ); 
+            RecomputeORs( ns );
         }
 
 

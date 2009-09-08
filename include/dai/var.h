@@ -39,13 +39,13 @@ namespace dai {
 
 
 /// Represents a discrete random variable.
-/** A Var stores the \a label of the variable (an integer-valued unique ID) 
+/** A Var stores the \a label of the variable (an integer-valued unique ID)
  *  and the number of possible values (\a states) of that variable. Two
- *  Var objects with the same label are assumed to be identical (i.e., it 
+ *  Var objects with the same label are assumed to be identical (i.e., it
  *  is assumed that their states are also the same).
  *
  *  In this manual, we use the following notational conventions. The discrete
- *  random variable with label \f$l\f$ is denoted as \f$x_l\f$, and the number 
+ *  random variable with label \f$l\f$ is denoted as \f$x_l\f$, and the number
  *  of possible values of this variable as \f$S_l\f$; this is represented in
  *  code by the object Var(\f$l\f$,\f$S_l\f$). The set of possible values of
  *  variable \f$x_l\f$ is denoted \f$X_l := \{0,1,\dots,S_l-1\}\f$.
@@ -57,7 +57,7 @@ class Var {
 
         /// Number of possible values
         size_t  _states;
-        
+
     public:
         /// Default constructor
         Var() : _label(-1), _states(0) {}
@@ -79,36 +79,36 @@ class Var {
         /// Larger-than operator (compares only labels)
         bool operator > ( const Var& n ) const { return( _label >  n._label ); }
         /// Smaller-than-or-equal-to operator (only compares labels)
-        bool operator <= ( const Var& n ) const { 
+        bool operator <= ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 assert( _states == n._states );
 #endif
-            return( _label <= n._label ); 
+            return( _label <= n._label );
         }
         /// Larger-than-or-equal-to operator (only compares labels)
-        bool operator >= ( const Var& n ) const { 
+        bool operator >= ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 assert( _states == n._states );
 #endif
-            return( _label >= n._label ); 
+            return( _label >= n._label );
         }
         /// Not-equal-to operator (only compares labels)
-        bool operator != ( const Var& n ) const { 
+        bool operator != ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 assert( _states == n._states );
 #endif
-            return( _label != n._label ); 
+            return( _label != n._label );
         }
         /// Equal-to operator (only compares labels)
-        bool operator == ( const Var& n ) const { 
+        bool operator == ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 assert( _states == n._states );
-#endif            
-            return( _label == n._label ); 
+#endif
+            return( _label == n._label );
         }
 
         /// Writes a Var to an output stream

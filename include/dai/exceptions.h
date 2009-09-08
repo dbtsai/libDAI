@@ -92,11 +92,11 @@ class Exception : public std::runtime_error {
                    NUM_ERRORS};  // NUM_ERRORS should be the last entry
 
         /// Constructor
-        Exception( Code _code, const std::string& msg="", const std::string& detailedMsg="" ) : std::runtime_error(ErrorStrings[_code] + " [" +  msg + "]"), errorcode(_code) { 
-            if( !detailedMsg.empty() ) 
-                std::cerr << "ERROR: " << detailedMsg << std::endl; 
+        Exception( Code _code, const std::string& msg="", const std::string& detailedMsg="" ) : std::runtime_error(ErrorStrings[_code] + " [" +  msg + "]"), errorcode(_code) {
+            if( !detailedMsg.empty() )
+                std::cerr << "ERROR: " << detailedMsg << std::endl;
         }
-        
+
         /// Copy constructor
         Exception( const Exception &e ) : std::runtime_error(e), errorcode(e.errorcode) {}
 

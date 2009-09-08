@@ -40,8 +40,8 @@ namespace dai {
 
 
 /// InfAlg is an abstract base class, defining the common interface of all inference algorithms in libDAI.
-/** \todo General marginalization functions like calcMarginal now copy a complete InfAlg object. Instead, 
- *  it would make more sense that they construct a new object without copying the FactorGraph or RegionGraph. 
+/** \todo General marginalization functions like calcMarginal now copy a complete InfAlg object. Instead,
+ *  it would make more sense that they construct a new object without copying the FactorGraph or RegionGraph.
  *  Or they can simply be made methods of the general InfAlg class.
  *  \idea Use a PropertySet as output of an InfAlg, instead of functions like maxDiff() and Iterations().
  */
@@ -140,18 +140,18 @@ class InfAlg {
 /// Combines an InfAlg and a graphical model, e.g., a FactorGraph or RegionGraph
 /** \tparam GRM Should be castable to FactorGraph
  *  \todo A DAIAlg should not inherit from a FactorGraph or RegionGraph, but should
- *  store a reference to the graphical model object. This prevents needless copying 
- *  of (possibly large) data structures. Disadvantage: the caller must not change 
- *  the graphical model between calls to the inference algorithm (maybe a smart_ptr 
- *  or some locking mechanism would help here?). 
+ *  store a reference to the graphical model object. This prevents needless copying
+ *  of (possibly large) data structures. Disadvantage: the caller must not change
+ *  the graphical model between calls to the inference algorithm (maybe a smart_ptr
+ *  or some locking mechanism would help here?).
  */
 template <class GRM>
 class DAIAlg : public InfAlg, public GRM {
     public:
         /// Default constructor
         DAIAlg() : InfAlg(), GRM() {}
-        
-        /// Construct from GRM 
+
+        /// Construct from GRM
         DAIAlg( const GRM &grm ) : InfAlg(), GRM(grm) {}
 
         /// Save factor I
@@ -169,7 +169,7 @@ class DAIAlg : public InfAlg, public GRM {
 
         // OBSOLETE
         /// Only for backwards compatibility (to be removed soon)
-        void clamp( const Var &v, size_t x, bool backup = false ) { 
+        void clamp( const Var &v, size_t x, bool backup = false ) {
             GRM::clamp( v, x, backup );
             std::cerr << "Warning: this DAIAlg<...>::clamp(const Var&,...) interface is obsolete!" << std::endl;
         }

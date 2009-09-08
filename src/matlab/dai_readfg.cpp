@@ -21,11 +21,11 @@
 
 
 /*=================================================================*
- *                                                                 * 
+ *                                                                 *
  * This is a MEX-file for MATLAB.                                  *
- *                                                                 * 
+ *                                                                 *
  *   [psi] = dai_readfg(filename);                                 *
- *                                                                 * 
+ *                                                                 *
  *=================================================================*/
 
 
@@ -51,13 +51,12 @@ using namespace dai;
 #define NR_OUT          1
 
 
-void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
-{ 
+void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
     char *filename;
 
-    
+
     // Check for proper number of arguments
-    if ((nrhs != NR_IN) || (nlhs != NR_OUT)) { 
+    if ((nrhs != NR_IN) || (nlhs != NR_OUT)) {
         mexErrMsgTxt("Usage: [psi] = dai_readfg(filename);\n\n"
         "\n"
         "INPUT:  filename   = filename of a .fg file\n"
@@ -65,14 +64,14 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
         "OUTPUT: psi        = linear cell array containing the factors\n"
         "                     (psi{i} is a structure with a Member field\n"
         "                     and a P field, like a CPTAB).\n");
-    } 
-    
+    }
+
     // Get input parameters
     size_t buflen;
     buflen = mxGetN( FILENAME_IN ) + 1;
     filename = (char *)mxCalloc( buflen, sizeof(char) );
     mxGetString( FILENAME_IN, filename, buflen );
-    
+
 
     // Read factorgraph
     FactorGraph fg;
@@ -87,11 +86,11 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
     vector<Factor> psi;
     for( size_t I = 0; I < fg.nrFactors(); I++ )
         psi.push_back(fg.factor(I));
-    
+
 
     // Hand over results to MATLAB
     PSI_OUT = Factors2mx(psi);
 
-    
+
     return;
 }

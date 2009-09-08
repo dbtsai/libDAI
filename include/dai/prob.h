@@ -45,7 +45,7 @@ namespace dai {
 
 /// Represents a vector with entries of type \a T.
 /** A TProb<T> is a std::vector<T> with an interface designed for dealing with probability mass functions.
- *  It is mainly used for representing measures on a finite outcome space, e.g., the probability 
+ *  It is mainly used for representing measures on a finite outcome space, e.g., the probability
  *  distribution of a discrete random variable.
  *  \tparam T Should be a scalar that is castable from and to double and should support elementary arithmetic operations.
  */
@@ -56,34 +56,34 @@ template <typename T> class TProb {
 
     public:
         /// Iterator over entries
-    	typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::iterator iterator;
         /// Const iterator over entries
-    	typedef typename std::vector<T>::const_iterator const_iterator;
+        typedef typename std::vector<T>::const_iterator const_iterator;
 
         /// Enumerates different ways of normalizing a probability measure.
-        /** 
+        /**
          *  - NORMPROB means that the sum of all entries should be 1;
          *  - NORMLINF means that the maximum absolute value of all entries should be 1.
          */
         typedef enum { NORMPROB, NORMLINF } NormType;
         /// Enumerates different distance measures between probability measures.
-        /** 
+        /**
          *  - DISTL1 is the L-1 distance (sum of absolute values of pointwise difference);
          *  - DISTLINF is the L-inf distance (maximum absolute value of pointwise difference);
          *  - DISTTV is the Total Variation distance;
          *  - DISTKL is the Kullback-Leibler distance.
          */
         typedef enum { DISTL1, DISTLINF, DISTTV, DISTKL } DistType;
-        
+
         /// Default constructor
         TProb() : _p() {}
-        
+
         /// Construct uniform distribution over n outcomes, i.e., a vector of length n with each entry set to 1/n
         explicit TProb( size_t n ) : _p(std::vector<T>(n, 1.0 / n)) {}
-        
+
         /// Construct vector of length n with each entry set to p
         explicit TProb( size_t n, Real p ) : _p(n, (T)p) {}
-        
+
         /// Construct vector from a range
         /** \tparam Iterator Iterates over instances that can be cast to T.
          *  \param begin Points to first instance to be added.
@@ -95,25 +95,25 @@ template <typename T> class TProb {
             _p.reserve( sizeHint );
             _p.insert( _p.begin(), begin, end );
         }
-        
+
         /// Returns a const reference to the vector
         const std::vector<T> & p() const { return _p; }
 
         /// Returns a reference to the vector
         std::vector<T> & p() { return _p; }
-        
+
         /// Returns a copy of the i'th entry
-        T operator[]( size_t i ) const { 
+        T operator[]( size_t i ) const {
 #ifdef DAI_DEBUG
             return _p.at(i);
 #else
             return _p[i];
 #endif
         }
-        
+
         /// Returns reference to the i'th entry
         T& operator[]( size_t i ) { return _p[i]; }
-        
+
         /// Returns iterator pointing to first entry
         iterator begin() { return _p.begin(); }
 
@@ -127,13 +127,13 @@ template <typename T> class TProb {
         const_iterator end() const { return _p.end(); }
 
         /// Sets all entries to x
-        TProb<T> & fill(T x) { 
+        TProb<T> & fill(T x) {
             std::fill( _p.begin(), _p.end(), x );
             return *this;
         }
 
         /// Draws all entries i.i.d. from a uniform distribution on [0,1)
-        TProb<T> & randomize() { 
+        TProb<T> & randomize() {
             std::generate(_p.begin(), _p.end(), rnd_uniform);
             return *this;
         }
@@ -150,7 +150,7 @@ template <typename T> class TProb {
                     _p[i] = 0;
             return *this;
         }
-        
+
         /// Set all entries to 1.0/size()
         TProb<T>& setUniform () {
             fill(1.0/size());
@@ -233,7 +233,7 @@ template <typename T> class TProb {
             std::transform( _p.begin(), _p.end(), q._p.begin(), _p.begin(), std::multiplies<T>() );
             return *this;
         }
-        
+
         /// Return product of *this with q (sizes should be identical)
         TProb<T> operator* (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
@@ -248,7 +248,7 @@ template <typename T> class TProb {
             std::transform( _p.begin(), _p.end(), q._p.begin(), _p.begin(), std::plus<T>() );
             return *this;
         }
-        
+
         /// Returns sum of *this and q (sizes should be identical)
         TProb<T> operator+ (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
@@ -256,7 +256,7 @@ template <typename T> class TProb {
             sum += q;
             return sum;
         }
-        
+
         /// Pointwise subtraction of q (sizes should be identical)
         TProb<T>& operator-= (const TProb<T> & q) {
             DAI_DEBASSERT( size() == q.size() );
@@ -283,14 +283,14 @@ template <typename T> class TProb {
             }
             return *this;
         }
-        
+
         /// Pointwise division by q, where division by 0 yields +Inf (sizes should be identical)
         TProb<T>& divide (const TProb<T> & q) {
             DAI_DEBASSERT( size() == q.size() );
             std::transform( _p.begin(), _p.end(), q._p.begin(), _p.begin(), std::divides<T>() );
             return *this;
         }
-        
+
         /// Returns quotient of *this with q (sizes should be identical)
         TProb<T> operator/ (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
@@ -456,7 +456,7 @@ template <typename T> class TProb {
             result.normalize( norm );
             return result;
         }
-    
+
         /// Returns true if one or more entries are NaN
         bool hasNaNs() const {
             bool foundnan = false;
@@ -472,7 +472,7 @@ template <typename T> class TProb {
         bool hasNegatives() const {
             return (std::find_if( _p.begin(), _p.end(), std::bind2nd( std::less<Real>(), 0.0 ) ) != _p.end());
         }
-        
+
         /// Returns entropy of *this
         Real entropy() const {
             Real S = 0.0;
@@ -487,7 +487,7 @@ template <typename T> class TProb {
             T s = 0;
             for( size_t i = 0; i < size(); i++ ) {
                 s += _p[i];
-                if( s > x ) 
+                if( s > x )
                     return i;
             }
             return( size() - 1 );
@@ -506,7 +506,7 @@ template<typename T> Real dist( const TProb<T> &p, const TProb<T> &q, typename T
             for( size_t i = 0; i < p.size(); i++ )
                 result += fabs((Real)p[i] - (Real)q[i]);
             break;
-            
+
         case TProb<T>::DISTLINF:
             for( size_t i = 0; i < p.size(); i++ ) {
                 Real z = fabs((Real)p[i] - (Real)q[i]);

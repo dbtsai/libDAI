@@ -57,10 +57,10 @@ class MR : public DAIAlgFG {
         std::vector<std::vector<double> >               M;         // M[i][_j] is M^{(i)}_j
         std::vector<std::vector<size_t> >               kindex;    // the _j'th neighbour of spin i has spin i as its kindex[i][_j]'th neighbour
         std::vector<std::vector<std::vector<double> > > cors;
-    
+
         static const size_t kmax = 31;
         typedef boost::dynamic_bitset<> sub_nb;
-        
+
         size_t N;
 
         std::vector<double> Mag;
@@ -118,9 +118,9 @@ class MR : public DAIAlgFG {
 
 
         /// @name Additional interface specific for MR
-        //@{ 
+        //@{
         //@}
-        
+
     private:
         void init(size_t Nin, double *_w, double *_th);
         void makekindex();
@@ -141,11 +141,11 @@ class MR : public DAIAlgFG {
         void sum_subs(size_t j, sub_nb A, double *sum_even, double *sum_odd);
 
         double sign(double a) { return (a >= 0) ? 1.0 : -1.0; }
-        
+
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;
         std::string printProperties() const;
-}; 
+};
 
 
 } // end of namespace dai

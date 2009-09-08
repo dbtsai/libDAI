@@ -35,11 +35,11 @@ mxArray *Factors2mx(const vector<Factor> &Ps) {
     size_t nr = Ps.size();
 
     mxArray *psi = mxCreateCellMatrix(nr,1);
-    
+
     const char *fieldnames[2];
     fieldnames[0] = "Member";
     fieldnames[1] = "P";
-    
+
     size_t I_ind = 0;
     for( vector<Factor>::const_iterator I = Ps.begin(); I != Ps.end(); I++, I_ind++ ) {
         mxArray *Bi = mxCreateStructMatrix(1,1,2,fieldnames);
@@ -60,7 +60,7 @@ mxArray *Factors2mx(const vector<Factor> &Ps) {
 
         mxSetField(Bi,0,"Member",BiMember);
         mxSetField(Bi,0,"P",BiP);
-        
+
         mxSetCell(psi, I_ind, Bi);
     }
     return( psi );
@@ -74,8 +74,8 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
 
     int n1 = mxGetM(psi);
     int n2 = mxGetN(psi);
-    if( n2 != 1 && n1 != 1 ) 
-        mexErrMsgTxt("psi should be a Nx1 or 1xN cell matrix."); 
+    if( n2 != 1 && n1 != 1 )
+        mexErrMsgTxt("psi should be a Nx1 or 1xN cell matrix.");
     size_t nr_f = n1;
     if( n1 == 1 )
         nr_f = n2;
@@ -85,7 +85,7 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
         if( verbose >= 3 )
             cerr << "reading factor " << cellind << ": " << endl;
         mxArray *cell = mxGetCell(psi, cellind);
-        mxArray *mx_member = mxGetField(cell, 0, "Member"); 
+        mxArray *mx_member = mxGetField(cell, 0, "Member");
         size_t nr_mem = mxGetN(mx_member);
         double *members = mxGetPr(mx_member);
         const mwSize *dims = mxGetDimensions(mxGetField(cell,0,"P"));
@@ -144,7 +144,7 @@ vector<Factor> mx2Factors(const mxArray *psi, long verbose) {
 
 /* Convert CPTAB-like struct to Factor */
 Factor mx2Factor(const mxArray *psi) {
-    mxArray *mx_member = mxGetField(psi, 0, "Member");  
+    mxArray *mx_member = mxGetField(psi, 0, "Member");
     size_t nr_mem = mxGetN(mx_member);
     double *members = mxGetPr(mx_member);
     const mwSize *dims = mxGetDimensions(mxGetField(psi,0,"P"));

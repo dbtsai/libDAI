@@ -35,7 +35,7 @@ const char *ExactInf::Name = "EXACT";
 
 void ExactInf::setProperties( const PropertySet &opts ) {
     assert( opts.hasKey("verbose") );
-    
+
     props.verbose = opts.getStringAs<size_t>("verbose");
 }
 
@@ -123,7 +123,7 @@ Factor ExactInf::belief( const VarSet &ns ) const {
 }
 
 
-string ExactInf::identify() const { 
+string ExactInf::identify() const {
     return string(Name) + printProperties();
 }
 

@@ -111,11 +111,11 @@ class BBP {
         //@{
         /// Calculates _indices, which is a cache of IndexFor @see bp.cpp
         void RegenerateInds();
-        
+
         /// Index type
         typedef std::vector<size_t>  _ind_t;
         /// Cached indices (indexed [i][_I])
-        std::vector<std::vector<_ind_t> >  _indices; 
+        std::vector<std::vector<_ind_t> >  _indices;
         /// Returns an index from the cache
         const _ind_t& _index(size_t i, size_t _I) const { return _indices[i][_I]; }
         //@}
@@ -183,7 +183,7 @@ class BBP {
         //  DISABLED BECAUSE IT IS BUGGY:
         //  void updateSeqMsgM( size_t i, size_t _I );
         /// Sets normalized factor->variable message adjoint and calculates the corresponding unnormalized adjoint
-        void setSeqMsgM( size_t i, size_t _I, const Prob &p ); 
+        void setSeqMsgM( size_t i, size_t _I, const Prob &p );
         /// Implements routine Send-n in Figure 5 in [\ref EaG09]
         void sendSeqMsgN( size_t i, size_t _I, const Prob &f );
         /// Implements routine Send-m in Figure 5 in [\ref EaG09]
@@ -234,7 +234,7 @@ class BBP {
             _adj_b_F = adj_b_F;
             _init_adj_psi_V = adj_psi_V;
             _init_adj_psi_F = adj_psi_F;
-            Regenerate(); 
+            Regenerate();
         }
 
         /// Initializes belief adjoints and with zero initial factor adjoints and regenerates
@@ -268,7 +268,7 @@ class BBP {
         /// Returns factor->variable message adjoint
         DAI_ACCMUT(Prob& adj_m(size_t i, size_t _I), { return _adj_m[i][_I]; });
 
-     public: 
+     public:
         /// Parameters of this algorithm
         /* PROPERTIES(props,BBP) {
            /// Enumeration of possible update schedules
@@ -291,10 +291,10 @@ class BBP {
 
            // DISABLED BECAUSE IT IS BUGGY:
            // bool clean_updates;
-        } 
+        }
         */
-/* {{{ GENERATED CODE: DO NOT EDIT. Created by 
-    ./scripts/regenerate-properties include/dai/bbp.h src/bbp.cpp 
+/* {{{ GENERATED CODE: DO NOT EDIT. Created by
+    ./scripts/regenerate-properties include/dai/bbp.h src/bbp.cpp
 */
         struct Properties {
             /// Enumeration of possible update schedules

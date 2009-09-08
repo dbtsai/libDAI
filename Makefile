@@ -1,7 +1,7 @@
 # Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at tuebingen dot mpg dot de]
 # Radboud University Nijmegen, The Netherlands /
 # Max Planck Institute for Biological Cybernetics, Germany
-#   
+#
 # This file is part of libDAI.
 #
 # libDAI is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ LIB=lib
 # Define build targets
 TARGETS=tests utils lib examples testregression testem
 ifdef WITH_DOC
-  TARGETS:=$(TARGETS) doc 
+  TARGETS:=$(TARGETS) doc
 endif
 ifdef WITH_MATLAB
   TARGETS:=$(TARGETS) matlabs
@@ -113,7 +113,7 @@ tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
-lib: $(LIB)/libdai$(LE) 
+lib: $(LIB)/libdai$(LE)
 
 
 # OBJECTS

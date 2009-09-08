@@ -37,7 +37,7 @@ namespace dai {
 
 /// Calculates both types of BP messages and their normalizers from an InfAlg.
 /** BP_dual calculates "dual" versions of BP messages (both messages from factors
- *  to variables and messages from variables to factors), and normalizers, given an InfAlg. 
+ *  to variables and messages from variables to factors), and normalizers, given an InfAlg.
  *  These are computed from the variable and factor beliefs of the InfAlg.
  *  This class is used primarily by BBP.
  */
@@ -49,7 +49,7 @@ class BP_dual {
         struct _edges_t : public std::vector<std::vector<T> > {};
 
         /// Groups together the data structures for storing the two types of messages and their normalizers
-        struct messages {            
+        struct messages {
             /// Unnormalized variable->factor messages
             _edges_t<Prob> n;
             /// Normalizers of variable->factor messages
@@ -78,7 +78,7 @@ class BP_dual {
 
         /// Pointer to the InfAlg object
         const InfAlg *_ia;
-        
+
         /// Does all necessary preprocessing
         void init();
         /// Allocates space for _msgs
@@ -101,8 +101,8 @@ class BP_dual {
         void calcBeliefF(size_t I);
 
     public:
-        /// Construct BP_dual object from (converged) InfAlg object's beliefs and factors. 
-        /*  A pointer to the the InfAlg object is stored, 
+        /// Construct BP_dual object from (converged) InfAlg object's beliefs and factors.
+        /*  A pointer to the the InfAlg object is stored,
          *  so the object must not be destroyed before the BP_dual is destroyed.
          */
         BP_dual( const InfAlg *ia ) : _ia(ia) { init(); }

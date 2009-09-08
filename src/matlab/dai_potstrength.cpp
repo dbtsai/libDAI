@@ -21,11 +21,11 @@
 
 
 /*=================================================================*
- *                                                                 * 
+ *                                                                 *
  * This is a MEX-file for MATLAB.                                  *
- *                                                                 * 
+ *                                                                 *
  *   N = dai_potstrength(psi,i,j);                                 *
- *                                                                 * 
+ *                                                                 *
  *=================================================================*/
 
 
@@ -53,12 +53,11 @@ using namespace dai;
 #define NR_OUT          1
 
 
-void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
-{ 
+void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
     long ilabel, jlabel;
 
     // Check for proper number of arguments
-    if ((nrhs != NR_IN) || (nlhs != NR_OUT)) { 
+    if ((nrhs != NR_IN) || (nlhs != NR_OUT)) {
         mexErrMsgTxt("Usage: N = dai_potstrength(psi,i,j);\n\n"
         "\n"
         "INPUT:  psi        = structure with a Member field and a P field, like a CPTAB.\n"
@@ -66,8 +65,8 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
         "        j          = label of another variable in psi.\n"
         "\n"
         "OUTPUT: N          = strength of psi in direction i->j.\n");
-    } 
-    
+    }
+
     // Get input parameters
     Factor psi = mx2Factor(PSI_IN);
     ilabel = (long)*mxGetPr(I_IN);
@@ -93,10 +92,10 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] )
 
     // Calculate N(psi,i,j);
     double N = psi.strength( i, j );
-    
+
     // Hand over result to MATLAB
     N_OUT = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(N_OUT)) = N;
-    
+
     return;
 }

@@ -65,7 +65,7 @@ class ExactInf : public DAIAlgFG {
             construct();
         }
 
-        
+
         /// @name General InfAlg interface
         //@{
         virtual ExactInf* clone() const { return new ExactInf(*this); }
@@ -80,10 +80,10 @@ class ExactInf : public DAIAlgFG {
         virtual double maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual size_t Iterations() const { DAI_THROW(NOT_IMPLEMENTED); return 0; }
         //@}
-        
+
 
         /// @name Additional interface specific for ExactInf
-        //@{ 
+        //@{
         Factor beliefV( size_t i ) const { return _beliefsV[i]; }
         Factor beliefF( size_t I ) const { return _beliefsF[I]; }
         //@}

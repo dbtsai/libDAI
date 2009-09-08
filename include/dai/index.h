@@ -57,8 +57,8 @@ namespace dai {
  *  and (long)i is equal to the linear index of the corresponding
  *  state of indexVars, where the variables in indexVars that are
  *  not in forVars assume their zero'th value.
- *  \idea Optimize all indices as follows: keep a cache of all (or only 
- *  relatively small) indices that have been computed (use a hash). Then, 
+ *  \idea Optimize all indices as follows: keep a cache of all (or only
+ *  relatively small) indices that have been computed (use a hash). Then,
  *  instead of computing on the fly, use the precomputed ones.
  */
 class IndexFor {
@@ -71,14 +71,14 @@ class IndexFor {
 
         /// For each variable in forVars, the current state
         std::vector<size_t> _count;
-        
+
         /// For each variable in forVars, its number of possible values
         std::vector<size_t> _dims;
 
     public:
         /// Default constructor
-        IndexFor() { 
-            _index = -1; 
+        IndexFor() {
+            _index = -1;
         }
 
         /// Constructor
@@ -111,8 +111,8 @@ class IndexFor {
         }
 
         /// Conversion to long
-        operator long () const { 
-            return( _index ); 
+        operator long () const {
+            return( _index );
         }
 
         /// Pre-increment operator
@@ -129,7 +129,7 @@ class IndexFor {
                     i++;
                 }
 
-                if( i == _count.size() ) 
+                if( i == _count.size() )
                     _index = -1;
             }
             return( *this );
@@ -170,7 +170,7 @@ class MultiFor {
         MultiFor( const std::vector<size_t> &d ) : _dims(d), _states(d.size(),0), _state(0) {}
 
         /// Return linear state
-        operator size_t() const { 
+        operator size_t() const {
             assert( valid() );
             return( _state );
         }
@@ -224,7 +224,7 @@ class Permute {
         Permute( const std::vector<size_t> &d, const std::vector<size_t> &sigma ) : _dims(d), _sigma(sigma) {
             assert( _dims.size() == _sigma.size() );
         }
-  
+
         /// Construct from vector of variables
         Permute( const std::vector<Var> &vars ) : _dims(vars.size()), _sigma(vars.size()) {
             VarSet vs( vars.begin(), vars.end(), vars.size() );
@@ -237,7 +237,7 @@ class Permute {
 
         /// Calculates a permuted linear index.
         /** Converts the linear index li to a vector index
-         *  corresponding with the dimensions in _dims, permutes it according to sigma, 
+         *  corresponding with the dimensions in _dims, permutes it according to sigma,
          *  and converts it back to a linear index  according to the permuted dimensions.
          */
         size_t convert_linear_index( size_t li ) const {
@@ -275,7 +275,7 @@ class State {
 
         long                          state;
         states_type                   states;
-        
+
     public:
         /// Default constructor
         State() : state(0), states() {}
@@ -287,7 +287,7 @@ class State {
         }
 
         /// Return linear state
-        operator size_t() const { 
+        operator size_t() const {
             assert( valid() );
             return( state );
         }
@@ -310,7 +310,7 @@ class State {
             for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ ) {
                 states_type::const_iterator entry = states.find( *v );
                 if( entry != states.end() )
-                    vs_state += entry->second * prod; 
+                    vs_state += entry->second * prod;
                 prod *= v->states();
             }
             return vs_state;
@@ -331,10 +331,10 @@ class State {
                     state = -1;
             }
         }
-        
+
         /// Postfix increment operator
         void operator++( int ) {
-        	operator++();
+            operator++();
         }
 
         /// Returns true if the current state is valid

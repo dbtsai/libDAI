@@ -1,6 +1,6 @@
 # This template contains configurations for compiling libDAI under GNU/Linux
 # and other UNIX variants
-# 
+#
 # To use it, simply copy this file to 'Makefile.conf' and adapt 'Makefile.conf'
 # to your local setup
 #

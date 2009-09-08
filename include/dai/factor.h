@@ -60,19 +60,19 @@ template<typename T> struct divides0 : public std::binary_function<T, T, T> {
  *  variables to the nonnegative real numbers.
  *  More formally, denoting a discrete variable with label \f$l\f$ by
  *  \f$x_l\f$ and its state space by \f$X_l = \{0,1,\dots,S_l-1\}\f$,
- *  then a factor depending on the variables \f$\{x_l\}_{l\in L}\f$ is 
+ *  then a factor depending on the variables \f$\{x_l\}_{l\in L}\f$ is
  *  a function \f$f_L : \prod_{l\in L} X_l \to [0,\infty)\f$.
- *  
+ *
  *  In libDAI, a factor is represented by a TFactor<\a T> object, which has two
- *  components: 
- *  \arg a VarSet, corresponding with the set of variables \f$\{x_l\}_{l\in L}\f$ 
+ *  components:
+ *  \arg a VarSet, corresponding with the set of variables \f$\{x_l\}_{l\in L}\f$
  *  that the factor depends on;
- *  \arg a TProb<\a T>, a vector containing the value of the factor for each possible 
+ *  \arg a TProb<\a T>, a vector containing the value of the factor for each possible
  *  joint state of the variables.
  *
  *  The factor values are stored in the entries of the TProb<\a T> in a particular
- *  ordering, which is defined by the one-to-one correspondence of a joint state 
- *  in \f$\prod_{l\in L} X_l\f$ with a linear index in 
+ *  ordering, which is defined by the one-to-one correspondence of a joint state
+ *  in \f$\prod_{l\in L} X_l\f$ with a linear index in
  *  \f$\{0,1,\dots,\prod_{l\in L} S_l-1\}\f$ according to the mapping \f$\sigma\f$
  *  induced by VarSet::calcState(const std::map<Var,size_t> &).
  *
@@ -87,20 +87,20 @@ template <typename T> class TFactor {
 
     public:
         /// Iterator over factor entries
-		typedef typename TProb<T>::iterator iterator;
+        typedef typename TProb<T>::iterator iterator;
 
         /// Const iterator over factor entries
-		typedef typename TProb<T>::const_iterator const_iterator;
+        typedef typename TProb<T>::const_iterator const_iterator;
 
         /// Constructs TFactor depending on no variables, with value p
         TFactor ( Real p = 1.0 ) : _vs(), _p(1,p) {}
 
         /// Constructs TFactor depending on variables in vars, with uniform distribution
         TFactor( const VarSet& vars ) : _vs(vars), _p(_vs.nrStates()) {}
-        
+
         /// Constructs TFactor depending on variables in vars, with all values set to p
         TFactor( const VarSet& vars, Real p ) : _vs(vars), _p(_vs.nrStates(),p) {}
-        
+
         /// Constructs TFactor depending on variables in vars, copying the values from the range starting at begin
         /** \param vars contains the variables that the new TFactor should depend on.
          *  \tparam Iterator Iterates over instances of type T; should support addition of size_t.
@@ -120,7 +120,7 @@ template <typename T> class TFactor {
             for( size_t li = 0; li < p.size(); ++li )
                 _p[permindex.convert_linear_index(li)] = p[li];
         }
-        
+
         /// Constructs TFactor depending on the variable v, with uniform distribution
         TFactor( const Var &v ) : _vs(v), _p(v.states()) {}
 
@@ -142,15 +142,15 @@ template <typename T> class TFactor {
 
         /// Returns a reference to the i'th entry of the value vector
         T& operator[] (size_t i) { return _p[i]; }
-        
+
         /// Returns iterator pointing to first entry
         iterator begin() { return _p.begin(); }
         /// Returns const iterator pointing to first entry
-		const_iterator begin() const { return _p.begin(); }
-		/// Returns iterator pointing beyond last entry
-		iterator end() { return _p.end(); }
-		/// Returns const iterator pointing beyond last entry
-		const_iterator end() const { return _p.end(); }
+        const_iterator begin() const { return _p.begin(); }
+        /// Returns iterator pointing beyond last entry
+        iterator end() { return _p.end(); }
+        /// Returns const iterator pointing beyond last entry
+        const_iterator end() const { return _p.end(); }
 
         /// Sets all values to p
         TFactor<T> & fill (T p) { _p.fill( p ); return(*this); }
@@ -172,13 +172,13 @@ template <typename T> class TFactor {
         }
 
         /// Adds scalar t to *this
-        TFactor<T>& operator+= (T t) { 
+        TFactor<T>& operator+= (T t) {
             _p += t;
             return *this;
         }
 
         /// Subtracts scalar t from *this
-        TFactor<T>& operator-= (T t) { 
+        TFactor<T>& operator-= (T t) {
             _p -= t;
             return *this;
         }
@@ -203,64 +203,64 @@ template <typename T> class TFactor {
 
         /// Returns sum of *this and scalar t
         TFactor<T> operator+ (T t) const {
-            TFactor<T> result(*this); 
-            result._p += t; 
-            return result; 
+            TFactor<T> result(*this);
+            result._p += t;
+            return result;
         }
 
         /// Returns *this minus scalar t
         TFactor<T> operator- (T t) const {
-            TFactor<T> result(*this); 
-            result._p -= t; 
-            return result; 
+            TFactor<T> result(*this);
+            result._p -= t;
+            return result;
         }
 
         /// Returns *this raised to the power a
-        TFactor<T> operator^ (Real a) const { 
-            TFactor<T> x; 
-            x._vs = _vs; 
-            x._p = _p^a; 
-            return x; 
+        TFactor<T> operator^ (Real a) const {
+            TFactor<T> x;
+            x._vs = _vs;
+            x._p = _p^a;
+            return x;
         }
 
         /// Multiplies *this with the TFactor f
-        TFactor<T>& operator*= (const TFactor<T>& f) { 
+        TFactor<T>& operator*= (const TFactor<T>& f) {
             if( f._vs == _vs ) // optimize special case
                 _p *= f._p;
             else
-                *this = (*this * f); 
+                *this = (*this * f);
             return *this;
         }
 
         /// Divides *this by the TFactor f
-        TFactor<T>& operator/= (const TFactor<T>& f) { 
+        TFactor<T>& operator/= (const TFactor<T>& f) {
             if( f._vs == _vs ) // optimize special case
                 _p /= f._p;
             else
-                *this = (*this / f); 
+                *this = (*this / f);
             return *this;
         }
 
         /// Adds the TFactor f to *this
-        TFactor<T>& operator+= (const TFactor<T>& f) { 
+        TFactor<T>& operator+= (const TFactor<T>& f) {
             if( f._vs == _vs ) // optimize special case
                 _p += f._p;
             else
-                *this = (*this + f); 
+                *this = (*this + f);
             return *this;
         }
 
         /// Subtracts the TFactor f from *this
-        TFactor<T>& operator-= (const TFactor<T>& f) { 
+        TFactor<T>& operator-= (const TFactor<T>& f) {
             if( f._vs == _vs ) // optimize special case
                 _p -= f._p;
             else
-                *this = (*this - f); 
+                *this = (*this - f);
             return *this;
         }
 
         /// Returns product of *this with the TFactor f
-        /** The product of two factors is defined as follows: if 
+        /** The product of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[fg : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) g(x_M).\f]
          */
@@ -269,7 +269,7 @@ template <typename T> class TFactor {
         }
 
         /// Returns quotient of *this by the TFactor f
-        /** The quotient of two factors is defined as follows: if 
+        /** The quotient of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[\frac{f}{g} : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto \frac{f(x_L)}{g(x_M)}.\f]
          */
@@ -278,7 +278,7 @@ template <typename T> class TFactor {
         }
 
         /// Returns sum of *this and the TFactor f
-        /** The sum of two factors is defined as follows: if 
+        /** The sum of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[f+g : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) + g(x_M).\f]
          */
@@ -287,7 +287,7 @@ template <typename T> class TFactor {
         }
 
         /// Returns *this minus the TFactor f
-        /** The difference of two factors is defined as follows: if 
+        /** The difference of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[f-g : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) - g(x_M).\f]
          */
@@ -307,48 +307,48 @@ template <typename T> class TFactor {
             _p.makePositive( epsilon );
             return *this;
         }
-            
+
         /// Returns pointwise inverse of *this.
         /** If zero == true, uses 1 / 0 == 0; otherwise 1 / 0 == Inf.
          */
-        TFactor<T> inverse(bool zero=true) const { 
-            TFactor<T> inv; 
-            inv._vs = _vs; 
+        TFactor<T> inverse(bool zero=true) const {
+            TFactor<T> inv;
+            inv._vs = _vs;
             inv._p = _p.inverse(zero);
-            return inv; 
+            return inv;
         }
 
         /// Returns pointwise exp of *this
-        TFactor<T> exp() const { 
-            TFactor<T> e; 
-            e._vs = _vs; 
-            e._p = _p.exp(); 
-            return e; 
+        TFactor<T> exp() const {
+            TFactor<T> e;
+            e._vs = _vs;
+            e._p = _p.exp();
+            return e;
         }
 
         /// Returns pointwise logarithm of *this
         /** If zero==true, uses log(0)==0; otherwise, log(0)=-Inf.
          */
         TFactor<T> log(bool zero=false) const {
-            TFactor<T> l; 
-            l._vs = _vs; 
-            l._p = _p.log(zero); 
-            return l; 
+            TFactor<T> l;
+            l._vs = _vs;
+            l._p = _p.log(zero);
+            return l;
         }
 
         /// Returns pointwise absolute value of *this
-        TFactor<T> abs() const { 
-            TFactor<T> e; 
-            e._vs = _vs; 
-            e._p = _p.abs(); 
-            return e; 
+        TFactor<T> abs() const {
+            TFactor<T> e;
+            e._vs = _vs;
+            e._p = _p.abs();
+            return e;
         }
 
         /// Normalizes *this TFactor according to the specified norm
         T normalize( typename Prob::NormType norm=Prob::NORMPROB ) { return _p.normalize( norm ); }
 
         /// Returns a normalized copy of *this, according to the specified norm
-        TFactor<T> normalized( typename Prob::NormType norm=Prob::NORMPROB ) const { 
+        TFactor<T> normalized( typename Prob::NormType norm=Prob::NORMPROB ) const {
             TFactor<T> result;
             result._vs = _vs;
             result._p = _p.normalized( norm );
@@ -360,10 +360,10 @@ template <typename T> class TFactor {
          *  \pre \a nsState < ns.states()
          *
          *  The result is a TFactor that depends on the variables in this->vars() except those in \a ns,
-         *  obtained by setting the variables in \a ns to the joint state specified by the linear index 
+         *  obtained by setting the variables in \a ns to the joint state specified by the linear index
          *  \a nsState. Formally, if *this corresponds with the factor \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$,
          *  \f$M \subset L\f$ corresponds with \a ns and \a nsState corresponds with a mapping \f$s\f$ that
-         *  maps a variable \f$x_m\f$ with \f$m\in M\f$ to its state \f$s(x_m) \in X_m\f$, then the slice 
+         *  maps a variable \f$x_m\f$ with \f$m\in M\f$ to its state \f$s(x_m) \in X_m\f$, then the slice
          *  returned corresponds with the factor \f$g : \prod_{l \in L \setminus M} X_l \to [0,\infty)\f$
          *  defined by \f$g(\{x_l\}_{l\in L \setminus M}) = f(\{x_l\}_{l\in L \setminus M}, \{s(x_m)\}_{m\in M})\f$.
          */
@@ -371,7 +371,7 @@ template <typename T> class TFactor {
             assert( ns << _vs );
             VarSet nsrem = _vs / ns;
             TFactor<T> result( nsrem, T(0) );
-            
+
             // OPTIMIZE ME
             IndexFor i_ns (ns, _vs);
             IndexFor i_nsrem (nsrem, _vs);
@@ -394,7 +394,7 @@ template <typename T> class TFactor {
          *  If *this corresponds with \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$L \subset M\f$, then
          *  the embedded factor corresponds with \f$g : \prod_{m\in M} X_m \to [0,\infty) : x \mapsto f(x_L)\f$.
          */
-        TFactor<T> embed(const VarSet & ns) const { 
+        TFactor<T> embed(const VarSet & ns) const {
             assert( ns >> _vs );
             if( _vs == ns )
                 return *this;
@@ -464,10 +464,10 @@ template<typename T> TFactor<T> TFactor<T>::maxMarginal(const VarSet & ns, bool 
 /// Apply binary operator pointwise on two factors
 template<typename T, typename binaryOp> TFactor<T> pointwiseOp( const TFactor<T> &f, const TFactor<T> &g, binaryOp op ) {
     if( f.vars() == g.vars() ) { // optimizate special case
-        TFactor<T> result(f); 
+        TFactor<T> result(f);
         for( size_t i = 0; i < result.states(); i++ )
             result[i] = op( result[i], g[i] );
-        return result; 
+        return result;
     } else {
         TFactor<T> result( f.vars() | g.vars(), 0.0 );
 
@@ -492,7 +492,7 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
     for( size_t alpha1 = 0; alpha1 < i.states(); alpha1++ )
         for( size_t alpha2 = 0; alpha2 < i.states(); alpha2++ )
             if( alpha2 != alpha1 )
-                for( size_t beta1 = 0; beta1 < j.states(); beta1++ ) 
+                for( size_t beta1 = 0; beta1 < j.states(); beta1++ )
                     for( size_t beta2 = 0; beta2 < j.states(); beta2++ )
                         if( beta2 != beta1 ) {
                             size_t as = 1, bs = 1;
@@ -506,7 +506,7 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
                             if( f > max )
                                 max = f;
                         }
-    
+
     return std::tanh( 0.25 * std::log( max ) );
 }
 
@@ -560,7 +560,7 @@ template<typename T> TFactor<T> min( const TFactor<T> &f, const TFactor<T> &g ) 
 /// Calculates the mutual information between the two variables that f depends on, under the distribution given by f
 /** \relates TFactor
  *  \pre f.vars().size() == 2
- */ 
+ */
 template<typename T> Real MutualInfo(const TFactor<T> &f) {
     assert( f.vars().size() == 2 );
     VarSet::const_iterator it = f.vars().begin();

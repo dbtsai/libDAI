@@ -39,7 +39,7 @@ void Observation::applyEvidence( InfAlg &alg ) const {
     for( std::map<Var, size_t>::const_iterator i = _obs.begin(); i != _obs.end(); ++i )
         alg.clamp( alg.fg().findVar(i->first), i->second );
 }
-  
+
 
 void Evidence::addEvidenceTabFile( std::istream &is, FactorGraph &fg ) {
     std::map<std::string, Var> varMap;
@@ -56,12 +56,12 @@ void Evidence::addEvidenceTabFile( std::istream &is, FactorGraph &fg ) {
 void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> &varMap ) {
     std::string line;
     getline( is, line );
-    
+
     // Parse header
     std::vector<std::string> header_fields;
     tokenizeString( line, header_fields );
     std::vector<std::string>::const_iterator p_field = header_fields.begin();
-    if( p_field == header_fields.end() ) 
+    if( p_field == header_fields.end() )
         DAI_THROW(INVALID_EVIDENCE_FILE);
 
     std::vector<Var> vars;
@@ -71,14 +71,14 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
             DAI_THROW(INVALID_EVIDENCE_FILE);
         vars.push_back( elem->second );
     }
-    
+
     // Read samples
     while( getline(is, line) ) {
         std::vector<std::string> fields;
         tokenizeString( line, fields );
-        if( fields.size() != vars.size() ) 
+        if( fields.size() != vars.size() )
             DAI_THROW(INVALID_EVIDENCE_FILE);
-        
+
         Observation sampleData;
         for( size_t i = 0; i < vars.size(); ++i ) {
             if( fields[i].size() > 0 ) { // skip if missing observation

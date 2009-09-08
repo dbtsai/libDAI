@@ -82,7 +82,7 @@ _rnd_gen_type _rnd_gen(42U);
 /// Uniform distribution with values between 0 and 1 (0 inclusive, 1 exclusive).
 boost::uniform_real<> _uni_dist(0,1);
 
-/// Global uniform random random number 
+/// Global uniform random random number
 boost::variate_generator<_rnd_gen_type&, boost::uniform_real<> > _uni_rnd(_rnd_gen, _uni_dist);
 
 /// Normal distribution with mean 0 and standard deviation 1.

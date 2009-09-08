@@ -51,7 +51,7 @@ class DEdge {
     public:
         size_t n1;  ///< First node index
         size_t n2;  ///< Second node index
-    
+
         /// Default constructor
         DEdge() {}
 
@@ -82,7 +82,7 @@ class UEdge {
     public:
         size_t  n1;  ///< First node index
         size_t  n2;  ///< Second node index
-    
+
         /// Default constructor
         UEdge() {}
 
@@ -172,7 +172,7 @@ template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> &G ) 
         // order, such that for all (i1, j1), (i2, j2) in result,
         // if j1 == i2 then (i1, j1) comes before (i2, j2) in result.
         // We do this by reordering the contents of result, effectively
-        // growing the tree starting at the root. At each step, 
+        // growing the tree starting at the root. At each step,
         // result[0..N-1] are the edges already added to the tree,
         // whereas the other elements of result still have to be added.
         // The elements of nodes are the vertices that still have to

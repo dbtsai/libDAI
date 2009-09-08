@@ -38,7 +38,7 @@ int main( int argc, char *argv[] ) {
         // Read FactorGraph from the file specified by the first command line argument
         FactorGraph fg;
         fg.ReadFromFile(argv[1]);
-        
+
         // Set some constants
         size_t verbose = 0;
         double tol = 1.0e-9;

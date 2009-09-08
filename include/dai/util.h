@@ -54,7 +54,7 @@
 #ifdef DAI_DEBUG
 /// \brief "Print variable". Prints the text of an expression, followed by its value (only if DAI_DEBUG is defined)
 /**
- *  Useful debugging macro to see what your code is doing. 
+ *  Useful debugging macro to see what your code is doing.
  *  Example: \code DAI_PV(3+4) \endcode
  *  Output: \code 3+4= 7 \endcode
  */
@@ -142,7 +142,7 @@ inline int rnd( int n) {
 
 
 /// Writes a std::vector to a std::ostream
-template<class T> 
+template<class T>
 std::ostream& operator << (std::ostream& os, const std::vector<T> & x) {
     os << "(";
     for( typename std::vector<T>::const_iterator it = x.begin(); it != x.end(); it++ )
@@ -152,7 +152,7 @@ std::ostream& operator << (std::ostream& os, const std::vector<T> & x) {
 }
 
 /// Writes a std::set to a std::ostream
-template<class T> 
+template<class T>
 std::ostream& operator << (std::ostream& os, const std::set<T> & x) {
     os << "{";
    for( typename std::set<T>::const_iterator it = x.begin(); it != x.end(); it++ )
@@ -202,17 +202,17 @@ class Diffs : public std::vector<double> {
         std::vector<double>::iterator _maxpos;
     public:
         /// Constructor
-        Diffs(long maxsize, double def) : std::vector<double>(), _maxsize(maxsize), _def(def) { 
-            this->reserve(_maxsize); 
-            _pos = begin(); 
-            _maxpos = begin(); 
+        Diffs(long maxsize, double def) : std::vector<double>(), _maxsize(maxsize), _def(def) {
+            this->reserve(_maxsize);
+            _pos = begin();
+            _maxpos = begin();
         }
         /// Returns maximum difference encountered
-        double maxDiff() { 
+        double maxDiff() {
             if( size() < _maxsize )
                 return _def;
             else
-                return( *_maxpos ); 
+                return( *_maxpos );
         }
         /// Register new difference x
         void push(double x) {
@@ -231,7 +231,7 @@ class Diffs : public std::vector<double> {
                 if( _pos == end() )
                     _pos = begin();
                 if( _maxpos == _pos ) {
-                    *_pos++ = x; 
+                    *_pos++ = x;
                     _maxpos = max_element(begin(),end());
                 } else {
                     if( x > *_maxpos )

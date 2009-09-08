@@ -53,7 +53,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors,
         assert( alpha != nrORs() );
     }
     RecomputeORs();
-    
+
     // create bipartite graph
     G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
@@ -69,7 +69,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
     // Retain only maximal clusters
     ClusterGraph cg( cl );
     cg.eraseNonMaximal();
-    
+
     // Create outer regions, giving them counting number 1.0
     ORs.reserve( cg.size() );
     foreach( const VarSet &ns, cg.clusters )
@@ -88,7 +88,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
         assert( alpha != nrORs() );
     }
     RecomputeORs();
-    
+
     // Create inner regions - first pass
     set<VarSet> betas;
     for( size_t alpha = 0; alpha < cg.clusters.size(); alpha++ )
@@ -115,7 +115,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
     IRs.reserve( betas.size() );
     for( set<VarSet>::const_iterator beta = betas.begin(); beta != betas.end(); beta++ )
         IRs.push_back( Region(*beta,0.0) );
-    
+
     // Create edges
     vector<pair<size_t,size_t> > edges;
     for( size_t beta = 0; beta < nrIRs(); beta++ ) {
@@ -124,7 +124,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
                 edges.push_back( pair<size_t,size_t>(alpha,beta) );
         }
     }
-    
+
     // create bipartite graph
     G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
@@ -140,7 +140,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
 
 void RegionGraph::Calc_Counting_Numbers() {
     // Calculates counting numbers of inner regions based upon counting numbers of outer regions
-    
+
     vector<vector<size_t> > ancestors(nrIRs());
     boost::dynamic_bitset<> assigned(nrIRs());
     for( size_t beta = 0; beta < nrIRs(); beta++ ) {
@@ -177,7 +177,7 @@ void RegionGraph::Calc_Counting_Numbers() {
 
 bool RegionGraph::Check_Counting_Numbers() {
     // Checks whether the counting numbers satisfy the fundamental relation
-    
+
     bool all_valid = true;
     for( vector<Var>::const_iterator n = vars().begin(); n != vars().end(); n++ ) {
         double c_n = 0.0;
@@ -242,7 +242,7 @@ ostream & operator << (ostream & os, const RegionGraph & rg) {
     os << "Edges" << endl;
     for( size_t alpha = 0; alpha < rg.nrORs(); alpha++ )
         foreach( const RegionGraph::Neighbor &beta, rg.nbOR(alpha) )
-            os << alpha << "->" << beta << endl;   
+            os << alpha << "->" << beta << endl;
 
     return(os);
 }

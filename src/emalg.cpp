@@ -56,8 +56,8 @@ ParameterEstimation* CondProbEstimation::factory( const PropertySet &p ) {
 }
 
 
-CondProbEstimation::CondProbEstimation( size_t target_dimension, const Prob &pseudocounts ) 
-  : _target_dim(target_dimension), _stats(pseudocounts), _initial_stats(pseudocounts) 
+CondProbEstimation::CondProbEstimation( size_t target_dimension, const Prob &pseudocounts )
+  : _target_dim(target_dimension), _stats(pseudocounts), _initial_stats(pseudocounts)
 {
     assert( !(_stats.size() % _target_dim) );
 }
@@ -100,13 +100,13 @@ Permute SharedParameters::calculatePermutation( const std::vector<Var> &varorder
         labels.push_back( varorder[i].label() );
         outVS |= varorder[i];
     }
-  
+
     // Construct the sigma array for the permutation object
     std::vector<size_t> sigma;
     sigma.reserve( dims.size() );
     for( VarSet::iterator set_iterator = outVS.begin(); sigma.size() < dims.size(); ++set_iterator )
         sigma.push_back( find(labels.begin(), labels.end(), set_iterator->label()) - labels.begin() );
-  
+
     return Permute( dims, sigma );
 }
 
@@ -127,7 +127,7 @@ void SharedParameters::setPermsAndVarSetsFromVarOrders() {
 
 
 SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg_varlookup )
-  : _varsets(), _perms(), _varorders(), _estimation(NULL), _deleteEstimation(true) 
+  : _varsets(), _perms(), _varorders(), _estimation(NULL), _deleteEstimation(true)
 {
     // Read the desired parameter estimation method from the stream
     std::string est_method;
@@ -170,7 +170,7 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg_varl
             labelparse >> label;
             VarSet::const_iterator vsi = vs.begin();
             for( ; vsi != vs.end(); ++vsi )
-                if( vsi->label() == label ) 
+                if( vsi->label() == label )
                     break;
             if( vsi == vs.end() )
                 DAI_THROW(INVALID_EMALG_FILE);
@@ -184,7 +184,7 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg_varl
 }
 
 
-SharedParameters::SharedParameters( const SharedParameters &sp ) 
+SharedParameters::SharedParameters( const SharedParameters &sp )
   : _varsets(sp._varsets), _perms(sp._perms), _varorders(sp._varorders), _estimation(sp._estimation), _deleteEstimation(sp._deleteEstimation)
 {
     // If sp owns its _estimation object, we should clone it instead
@@ -205,7 +205,7 @@ void SharedParameters::collectSufficientStatistics( InfAlg &alg ) {
     for( std::map< FactorIndex, Permute >::iterator i = _perms.begin(); i != _perms.end(); ++i ) {
         Permute &perm = i->second;
         VarSet &vs = _varsets[i->first];
-        
+
         Factor b = alg.belief(vs);
         Prob p( b.states(), 0.0 );
         for( size_t entry = 0; entry < b.states(); ++entry )
@@ -220,7 +220,7 @@ void SharedParameters::setParameters( FactorGraph &fg ) {
     for( std::map<FactorIndex, Permute>::iterator i = _perms.begin(); i != _perms.end(); ++i ) {
         Permute &perm = i->second;
         VarSet &vs = _varsets[i->first];
-        
+
         Factor f( vs, 0.0 );
         for( size_t entry = 0; entry < f.states(); ++entry )
             f[perm.convert_linear_index(entry)] = p[entry];
@@ -282,7 +282,7 @@ EMAlg::EMAlg( const Evidence &evidence, InfAlg &estep, std::istream &msteps_file
     _msteps.reserve(num_msteps);
     for( size_t i = 0; i < num_msteps; ++i )
         _msteps.push_back( MaximizationStep( msteps_file, estep.fg() ) );
-}    
+}
 
 
 void EMAlg::setTermConditions( const PropertySet &p ) {

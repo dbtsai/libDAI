@@ -44,7 +44,7 @@ void LC::setProperties( const PropertySet &opts ) {
     assert( opts.hasKey("verbose") );
     assert( opts.hasKey("cavity") );
     assert( opts.hasKey("updates") );
-    
+
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.verbose = opts.getStringAs<size_t>("verbose");
@@ -99,7 +99,7 @@ LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _panca
 
     // create pancakes
     _pancakes.resize( nrVars() );
-   
+
     // create cavitydists
     for( size_t i=0; i < nrVars(); i++ )
         _cavitydists.push_back(Factor( delta(i) ));
@@ -120,7 +120,7 @@ LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _panca
 }
 
 
-string LC::identify() const { 
+string LC::identify() const {
     return string(Name) + printProperties();
 }
 
@@ -193,7 +193,7 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
 
 
 long LC::SetCavityDists( std::vector<Factor> &Q ) {
-    if( props.verbose >= 1 ) 
+    if( props.verbose >= 1 )
         cerr << Name << "::SetCavityDists:  Setting initial cavity distributions" << endl;
     if( Q.size() != nrVars() )
         return -1;
@@ -263,13 +263,13 @@ double LC::run() {
 
     for( size_t i = 0; i < nrVars(); i++ ) {
         _pancakes[i] = _cavitydists[i];
-        
+
         foreach( const Neighbor &I, nbV(i) ) {
             _pancakes[i] *= factor(I);
             if( props.updates == Properties::UpdateType::SEQRND )
               _pancakes[i] *= _phis[i][I.iter];
         }
-        
+
         _pancakes[i].normalize();
 
         CalcBelief(i);
@@ -303,7 +303,7 @@ double LC::run() {
         // Sequential updates
         if( props.updates == Properties::UpdateType::SEQRND )
             random_shuffle( update_seq.begin(), update_seq.end() );
-        
+
         for( size_t t=0; t < nredges; t++ ) {
             size_t i = update_seq[t].first;
             size_t _I = update_seq[t].second;

@@ -1,5 +1,5 @@
 # This template contains configurations for compiling libDAI under Mac OS X
-# 
+#
 # To use it, simply copy this file to 'Makefile.conf' and adapt 'Makefile.conf'
 # to your local setup
 #

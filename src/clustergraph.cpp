@@ -67,7 +67,7 @@ ClusterGraph ClusterGraph::VarElim_MinFill() const {
     set<size_t> varindices;
     for( size_t i = 0; i < vars.size(); ++i )
         varindices.insert( i );
-    
+
     // Do variable elimination
     while( !varindices.empty() ) {
         set<size_t>::const_iterator lowest = varindices.end();
@@ -100,7 +100,7 @@ ClusterGraph ClusterGraph::VarElim( const std::vector<Var> & ElimSeq ) const {
     cl.eraseNonMaximal();
 
     ClusterGraph result;
-    
+
     // Do variable elimination
     for( vector<Var>::const_iterator n = ElimSeq.begin(); n != ElimSeq.end(); n++ ) {
         size_t i = cl.findVar( *n );

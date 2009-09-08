@@ -54,12 +54,12 @@ class SmallSet {
         SmallSet() : _elements() {}
 
         /// Construct a set with one element
-        SmallSet( const T &t ) : _elements() { 
+        SmallSet( const T &t ) : _elements() {
             _elements.push_back( t );
         }
 
         /// Construct a set with two elements
-        SmallSet( const T &t1, const T &t2 ) { 
+        SmallSet( const T &t1, const T &t2 ) {
             if( t1 < t2 ) {
                 _elements.push_back( t1 );
                 _elements.push_back( t2 );
@@ -99,25 +99,25 @@ class SmallSet {
             return res;
         }
 
-        /// Set-intersection operator: returns all elements in *this that are also contained in x 
+        /// Set-intersection operator: returns all elements in *this that are also contained in x
         SmallSet operator& ( const SmallSet& x ) const {
             SmallSet res;
             std::set_intersection( _elements.begin(), _elements.end(), x._elements.begin(), x._elements.end(), inserter( res._elements, res._elements.begin() ) );
             return res;
         }
-        
+
         /// Erases from *this all elements in x
         SmallSet& operator/= ( const SmallSet& x ) {
             return (*this = (*this / x));
         }
 
         /// Erases one element
-        SmallSet& operator/= ( const T &t ) { 
+        SmallSet& operator/= ( const T &t ) {
             typename std::vector<T>::iterator pos = lower_bound( _elements.begin(), _elements.end(), t );
             if( pos != _elements.end() )
                 if( *pos == t ) // found element, delete it
-                    _elements.erase( pos ); 
-            return *this; 
+                    _elements.erase( pos );
+            return *this;
         }
 
         /// Adds to *this all elements in x
@@ -134,27 +134,27 @@ class SmallSet {
         }
 
         /// Erases from *this all elements not in x
-        SmallSet& operator&= ( const SmallSet& x ) { 
+        SmallSet& operator&= ( const SmallSet& x ) {
             return (*this = (*this & x));
         }
 
         /// Returns true if *this is a subset of x
-        bool operator<< ( const SmallSet& x ) const { 
+        bool operator<< ( const SmallSet& x ) const {
             return std::includes( x._elements.begin(), x._elements.end(), _elements.begin(), _elements.end() );
         }
 
         /// Returns true if x is a subset of *this
-        bool operator>> ( const SmallSet& x ) const { 
+        bool operator>> ( const SmallSet& x ) const {
             return std::includes( _elements.begin(), _elements.end(), x._elements.begin(), x._elements.end() );
         }
 
         /// Returns true if *this and x have elements in common
-        bool intersects( const SmallSet& x ) const { 
-            return( (*this & x).size() > 0 ); 
+        bool intersects( const SmallSet& x ) const {
+            return( (*this & x).size() > 0 );
         }
 
         /// Returns true if *this contains the element t
-        bool contains( const T &t ) const { 
+        bool contains( const T &t ) const {
             return std::binary_search( _elements.begin(), _elements.end(), t );
         }
 
@@ -166,7 +166,7 @@ class SmallSet {
         typedef typename std::vector<T>::const_reverse_iterator const_reverse_iterator;
         /// Reverse iterator over the elements
         typedef typename std::vector<T>::reverse_iterator reverse_iterator;
-        
+
         /// Returns iterator that points to the first element
         iterator begin() { return _elements.begin(); }
         /// Returns constant iterator that points to the first element

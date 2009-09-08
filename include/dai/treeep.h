@@ -83,13 +83,13 @@ class TreeEP : public JTree {
                 DEdgeVec             _RTree;
                 std::vector<size_t>  _a;        // _Qa[alpha]  <->  superTree.Qa[_a[alpha]]
                 std::vector<size_t>  _b;        // _Qb[beta]   <->  superTree.Qb[_b[beta]]
-                                                // _Qb[beta]   <->  _RTree[beta]    
+                                                // _Qb[beta]   <->  _RTree[beta]
                 const Factor *       _I;
                 VarSet               _ns;
                 VarSet               _nsrem;
                 double               _logZ;
-                
-                
+
+
             public:
                 TreeEPSubTree() : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(NULL), _ns(), _nsrem(), _logZ(0.0) {}
                 TreeEPSubTree( const TreeEPSubTree &x) : _Qa(x._Qa), _Qb(x._Qb), _RTree(x._RTree), _a(x._a), _b(x._b), _I(x._I), _ns(x._ns), _nsrem(x._nsrem), _logZ(x._logZ) {}
@@ -162,7 +162,7 @@ class TreeEP : public JTree {
 
 
         /// @name Additional interface specific for TreeEP
-        //@{ 
+        //@{
         //@}
 
     private:

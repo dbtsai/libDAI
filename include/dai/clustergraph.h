@@ -40,7 +40,7 @@ namespace dai {
 
     /// A ClusterGraph is a hypergraph with VarSets as nodes.
     /** It is implemented as bipartite graph with variable (Var) nodes
-     *  and cluster (VarSet) nodes. 
+     *  and cluster (VarSet) nodes.
      */
     class ClusterGraph {
         public:
@@ -65,7 +65,7 @@ namespace dai {
 
             /// Construct from vector<VarSet>
             ClusterGraph( const std::vector<VarSet> & cls );
-            
+
             /// Returns true if cluster I is not contained in a larger cluster
             bool isMaximal( size_t I ) const {
                 DAI_DEBASSERT( I < G.nr2() );
@@ -116,7 +116,7 @@ namespace dai {
                     }
                 return result;
             }
-            
+
             /// Returns union of clusters that contain the variable with index i
             VarSet Delta( size_t i ) const {
                 VarSet result;
@@ -147,7 +147,7 @@ namespace dai {
             VarSet delta( size_t i ) const {
                 return Delta( i ) / vars[i];
             }
-            
+
             /// Erases all clusters that contain n where n is the variable with index i
             ClusterGraph& eraseSubsuming( size_t i ) {
                 while( G.nb1(i).size() ) {
@@ -156,7 +156,7 @@ namespace dai {
                 }
                 return *this;
             }
-            
+
             /// Returns a const reference to the clusters
             const std::vector<VarSet> & toVector() const { return clusters; }
 

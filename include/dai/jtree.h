@@ -53,10 +53,10 @@ class JTree : public DAIAlgRG {
     public:
         /// Rooted tree
         DEdgeVec             RTree;
-        
+
         /// Outer region beliefs
         std::vector<Factor>  Qa;
-        
+
         /// Inner region beliefs
         std::vector<Factor>  Qb;
 
@@ -100,13 +100,13 @@ class JTree : public DAIAlgRG {
 
 
         /// @name Additional interface specific for JTree
-        //@{ 
+        //@{
         void GenerateJT( const std::vector<VarSet> &Cliques );
 
         /// Returns reference the message from outer region alpha to its _beta'th neighboring inner region
-        Factor & message( size_t alpha, size_t _beta ) { return _mes[alpha][_beta]; }   
+        Factor & message( size_t alpha, size_t _beta ) { return _mes[alpha][_beta]; }
         /// Returns const reference to the message from outer region alpha to its _beta'th neighboring inner region
-        const Factor & message( size_t alpha, size_t _beta ) const { return _mes[alpha][_beta]; }   
+        const Factor & message( size_t alpha, size_t _beta ) const { return _mes[alpha][_beta]; }
 
         /// Runs junction-tree with HUGIN updates
         void runHUGIN();

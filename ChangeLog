@@ -39,7 +39,7 @@ git ae0fc30e10be6683cbfc209dcee56f34234a6cb8
   BipartiteGraph and FactorGraph (which will be obsoleted soon)
 * [Frederik Eaton] Added BP_dual, BBP and CBP algorithms
 * [Frederik Eaton] Added Gibbs::state() accessors/mutators
-* [Frederik Eaton] Fixed Gibbs::getVarDist(size_t) to return uniform 
+* [Frederik Eaton] Fixed Gibbs::getVarDist(size_t) to return uniform
   distribution if no state is allowed
 * [Frederik Eaton] Improved parsing code in tests/testdai to allow recursive
   alias substitutions
@@ -57,18 +57,18 @@ git ae0fc30e10be6683cbfc209dcee56f34234a6cb8
   operators
 * [Frederik Eaton] Change cout to cerr in warnings and error messages
 * [Giuseppe Passino] Optimised maximum-residual BP by using a reversed ordered
-  set instead of the linear search (which can yield enormous speedups - a 
+  set instead of the linear search (which can yield enormous speedups - a
   factor 500 has been measured on a binary Ising grid with 128x128 variables!)
-* Added debug assertions to Var which check for inconsistent dimensions of 
+* Added debug assertions to Var which check for inconsistent dimensions of
   variables with the same labels
 * [Giuseppe Passino] Added prefix ++ operator to State (State::operator++())
-* [Giuseppe Passino] Added iterators to FactorGraph (FactorGraph::begin, 
+* [Giuseppe Passino] Added iterators to FactorGraph (FactorGraph::begin,
   FactorGraph::end)
 * [Giuseppe Passino] Added iterators to TFactor (TFactor::begin, TFactor::end)
 * [Giuseppe Passino] Added iterators to TProb (TProb::begin, TProb::end)
 * [Giuseppe Passino] Added BP::findMaximum(), which can be used after running
   max-product BP to construct a global state with maximum probability
-* Improved Makefile (libDAI now also builds out-of-the-box on MacOSX, 
+* Improved Makefile (libDAI now also builds out-of-the-box on MacOSX,
   thanks to Dan Preston; merged Makefile.win and Makefile.shared into Makefile)
 * Fixed bug in calcMarginal, calcPairBeliefs, calcPairBeliefsNew where
   states with zero probability mass were clamped, leading to NaNs or assertion
@@ -82,7 +82,7 @@ git ae0fc30e10be6683cbfc209dcee56f34234a6cb8
   var.h, varset.h, factor.h, enum.h} and of examples/example.cpp
   Merged TODO and FILEFORMAT into doxygen documentation
 * examples/
-  - Moved example.cpp to examples/ 
+  - Moved example.cpp to examples/
   - Added examples/example_bipgraph.cpp
   - Added examples/example_varset.cpp
 * Interface changes:
@@ -113,7 +113,7 @@ New features:
 * Added damping to various algorithms to improve convergence properties.
 * Added more features to utils/createfg for creating factor graphs.
 * Added ExactInf class for brute force exact inference.
-* [Giuseppe Pasino] Added "logdomain" property to BP, a boolean that controls 
+* [Giuseppe Pasino] Added "logdomain" property to BP, a boolean that controls
   whether calculations are done in the log-domain or in the linear domain;
   doing calculations in the log-domain may help if the numerical range
   of a double is too small.
@@ -123,10 +123,10 @@ New features:
 Improved architecture:
 * Added Exceptions framework.
 * Pervasive change of BipartiteGraph implementation (based on an idea by
-  Giuseppe Passino). BipartiteGraph no longer stores the node properties 
-  (former _V1 and _V2), nor does it store a dense adjacency matrix anymore, 
-  nor an edge list. Instead, it stores the graph structure as lists of 
-  neighboring nodes. This yields a significant memory/speed improvement for 
+  Giuseppe Passino). BipartiteGraph no longer stores the node properties
+  (former _V1 and _V2), nor does it store a dense adjacency matrix anymore,
+  nor an edge list. Instead, it stores the graph structure as lists of
+  neighboring nodes. This yields a significant memory/speed improvement for
   large factor graphs, and is more elegant as well. Iterating over neighbors is
   made easy by using boost::foreach.
 * Added conditional compilation of inference methods.
@@ -146,24 +146,24 @@ Code cleanup:
 * Replaced sub_nb class in mr.h by boost::dynamic_bitset.
 * Improved index.h:
   - Renamed Index -> IndexFor
-  - Added some .reserve()'s to IndexFor methods which yields a 
+  - Added some .reserve()'s to IndexFor methods which yields a
     25% speedup of testregression
   - Replaced multind by Permute
   - Added MultiFor
   - Added State
 * New funcstionality of factor.h.
 * Moved Properties and MaxDiff frameworks from InfAlg to each individual
-  inference algorithm, because the Properties framework was not as 
+  inference algorithm, because the Properties framework was not as
   convenient as I hoped, and not every inference algorithm needs a maxdiff
   variable. Also, replaced some FactorGraph functionality in InfAlg by a
-  function that returns the FactorGraph. The result is cleaner (less 
+  function that returns the FactorGraph. The result is cleaner (less
   entangled) code.
 * Removed x2x.
 * Replaced Complex with real numbers (negative potentials are just too rare
   to warrant the additional "complexity" :)).
 
 Miscellaneous improvements:
-* Now compiles also with MS Visual C++ (thanks to Jiuxiang Hu) and with 
+* Now compiles also with MS Visual C++ (thanks to Jiuxiang Hu) and with
   GCC under cygwin.
 * Contributions by Peter Gober:
   - Renamed variable _N in mr.* for compatibility with g++ under cygwin.
@@ -172,7 +172,7 @@ Miscellaneous improvements:
   - moved header files in include/dai and sources in src;
   - changed #ifndefs to GNU style;
   - added extra warning checks (-W -Wextra) and fixed resulting warnings;
-  - dai::TProb: 
+  - dai::TProb:
     o removed copy constructor and assignment operators (redundant);
     o implementation of some methods via STL algorithms;
     o added methods takeExp, takeLog, takeLog0 for transformation in-place;
@@ -183,7 +183,7 @@ Miscellaneous improvements:
     and variables;
   - Optimization of FactorGraph constructors using tr1::unordered_map.
 * FactorGraph constructors no longer check for short loops (huge speed
-  increase for large factor graphs), nor for negative entries. Also, the 
+  increase for large factor graphs), nor for negative entries. Also, the
   normtype is now Prob::NORMPROB by default.
 * Improved MaxSpanningTreePrims algorithm (uses boost::graph).
 
@@ -262,7 +262,7 @@ Regressions
 
 General framework
 
-- DAIAlg is now a template class; typedefs for DAIAlg<FactorGraph> and for 
+- DAIAlg is now a template class; typedefs for DAIAlg<FactorGraph> and for
   DAIAlg<RegionGraph> are provided. In this way, we do not have to write "wrapper"
   functions to forward functionality from either FactorGraph or RegionGraph
   to DAIAlg. Functionality like clamping can be implemented in FactorGraph
@@ -281,12 +281,12 @@ General framework
   different ways and an approximation method is run for each clamping; using the
   saveProbs/undoProbs can give a significant speed increase.
 - Switched to a general Properties framework that handles the parameters of
-  all inference methods in a uniform manner. The Properties class is a map of 
-  several properties in boost::any objects, indexed by their names (strings). 
+  all inference methods in a uniform manner. The Properties class is a map of
+  several properties in boost::any objects, indexed by their names (strings).
   It can read from a stream and write to a stream. It is recursive, in the sense
   that a Properties object can hold a variable of type Properties as well.
 - Added a generic way of constructing inference algorithms from a factor graph,
-  name and properties object. Added the newInfAlg function which constructs 
+  name and properties object. Added the newInfAlg function which constructs
   the requested object. This is used by LCBP, the Matlab interface and the
   command line (test) interface.
 - Added a generic enum framework for enum parameters. Although implemented as a
@@ -302,10 +302,10 @@ Bugfixes
 - Corrected two bugs in operator&& and operator|| in VarSet (they returned
   the logical NOT of what they should return).
 - Fixed bug in RegionGraph::RecomputeOR(s).
-- Fixed bug in utils/create_dreg_fg: 
+- Fixed bug in utils/create_dreg_fg:
   graph structure was not random for given parameters (forgot to call srand()).
 - TreeEP bug workaround: use the complete junction tree instead of a subtree.
-- Fixed bug in JTree::HUGIN() and JTree:ShaferShenoy() in case of junction tree 
+- Fixed bug in JTree::HUGIN() and JTree:ShaferShenoy() in case of junction tree
   that consists of one outer region only.
 - Fixed INIT bug in LCBP2::UpdatePancake().
 - Fixed MaxDiffs flow (except for MR).
@@ -326,13 +326,13 @@ New functionality
   weighted graph where the weight between neighbours i and j is given by
   N(psi,i,j), where psi is the product of all the factors involving both i and j
   (which is an upper bound on the effective interaction between i and j).
-- Implemented MR (MontanariRizzo) based on Bastian's code, but extended it 
+- Implemented MR (MontanariRizzo) based on Bastian's code, but extended it
   to be able to handle connectivities larger than 3 (in principle, up to 32).
   It supports different initialization methods (the original RESPPROP,
   the CLAMPING method and EXACT which uses JTree) and different update methods
   (FULL and LINEAR).
-- Implemented LCBP2, an analogon of LCBP which represents pancakes as little 
-  networks and uses some approximate inference method on them for calculating 
+- Implemented LCBP2, an analogon of LCBP which represents pancakes as little
+  networks and uses some approximate inference method on them for calculating
   marginals.
 - Now there are several LCBP variants (LCBP, LCBPI, LCBPJ, LCBPK, LCBPL);
   LCBPJ works only for pairwise, LCBPK is LCBP improved for higher order
@@ -342,7 +342,7 @@ New functionality
 - Wrote utility to visualize factor graphs using graphviz.
   (it uses the BOOST Program Options library)
 - Added fginfo utility that displays some info about a .fg file.
-- Implemented Factor::strength function that calculates the potential strength 
+- Implemented Factor::strength function that calculates the potential strength
   N(psi,i,j) between variables i and j as described in cs.IT:0504030
 - Wrote a general MatLab interface matlab/dai (similar to tests/test);
   this unified the matlab functions dai, dai_bp, dai_mf, dai_jt, dai_tep, dai_cvm.
@@ -352,10 +352,10 @@ New functionality
 
 Improvements of existing code
 
-- Reimplemented RegionGraph and descendants: a RegionGraph ISA FactorGraph 
-  and also a BipartiteGraph<FRegion,Region>. It now also keeps a map that 
-  associates outer region indices to factor indices (no powers yet, this 
-  is deemed superfluous) and provides functions to recompute (some of) the 
+- Reimplemented RegionGraph and descendants: a RegionGraph ISA FactorGraph
+  and also a BipartiteGraph<FRegion,Region>. It now also keeps a map that
+  associates outer region indices to factor indices (no powers yet, this
+  is deemed superfluous) and provides functions to recompute (some of) the
   outer regions from the factors.
 - InfAlg descendants run() methods now stop immediately and return NAN in case
   they detect NANs. Only BP does not do NAN checking for performance reasons.
@@ -363,14 +363,14 @@ Improvements of existing code
 - HAK, GBP and DoubleLoop now conform to the standards for verbose reporting,
   timing and convergence criteria.
 - Implemented logZ() for JTree. It does the calculation during message-passing.
-- Marginal2ndO now optionally divides by the single node beliefs (to the power n-2); 
+- Marginal2ndO now optionally divides by the single node beliefs (to the power n-2);
   hopefully this will give more accurate approximations.
-- Marginal and Marginal2ndO (optionally) use the new saveProbs/undoProbs functionality 
-  for a faster way of calculating marginals, which does not require a call to init() 
+- Marginal and Marginal2ndO (optionally) use the new saveProbs/undoProbs functionality
+  for a faster way of calculating marginals, which does not require a call to init()
   nor cloning the whole object for each clamping. This leads to a significant speedup.
 - LCBP (and LCBP2) now have complete flexibility in the specification of the
-  inner method, i.e. the method used to generate the initial cavity approximations. 
-  One can pass two strings, a name and a properties string, and LCBP simply invokes 
+  inner method, i.e. the method used to generate the initial cavity approximations.
+  One can pass two strings, a name and a properties string, and LCBP simply invokes
   newInfAlg to construct the corresponding inference algorithm and uses the generic
   marginal functions to approximate cavity marginals.
 - Replaced the global "method" variable by local properties and removed ai.h
@@ -388,7 +388,7 @@ Improvements of existing code
   makeFacCavity -> makeFactorCavity
 - LCBP_SEQMAXRES has been removed because it did strange things.
 - Implemented RandomDRegularGraph
-- Implemented JTree::calcMarginal for marginals that are not confined 
+- Implemented JTree::calcMarginal for marginals that are not confined
   within one cluster (using cut-set conditioning).
 - Added isConnected() method to FactorGraph (some methods do not work with
   disconnected factor graphs).
@@ -405,17 +405,17 @@ Testing framework
 - Made a new and significantly improved testing framework that provides most
   functionality from the command line.
 - The basis is provided by tests/test, which uses the newInfAlg functionality
-  and enables the user to easily compare from the command line different 
-  inference methods on a given factorgraph. All parameters can be specified. 
-  Output consists of CPU time, average and maximum single variable marginal 
-  errors, relative logZ error and MaxDiff(). 
+  and enables the user to easily compare from the command line different
+  inference methods on a given factorgraph. All parameters can be specified.
+  Output consists of CPU time, average and maximum single variable marginal
+  errors, relative logZ error and MaxDiff().
 - tests/aliases.conf contains aliases for standard combinations of methods
   and their options (which can be used in tests/test).
-- tests/large contains several bash/python scripts that create random factor 
+- tests/large contains several bash/python scripts that create random factor
   graphs, compare several approximate inference algorithms (using tests/test) and
   allow for easy visualization of the results using PyX.
 - Added several .fg files for test purposes to /tests (e.g. two ALARM versions
-  alarm.fg and alarm_bnt.fg; testfast.fg, a 4x4 periodic Ising grid for 
+  alarm.fg and alarm_bnt.fg; testfast.fg, a 4x4 periodic Ising grid for
   regression testing).
 - Added a regression test to the Makefile which is included in the standard
   target.  It compares all inference methods on tests/testfast.fg with the
@@ -436,11 +436,11 @@ revision 252
 
 Functionality
 - Added RegionGraph, GBP, CVM and HAK (double-loop).
-- Added JunctionTree (with two update algorithms, HUGIN and Shafer-Shenoy), which is a 
+- Added JunctionTree (with two update algorithms, HUGIN and Shafer-Shenoy), which is a
   RegionGraph.
 - NormType is now chosen automatically (in case of negative factors, Prob::NORMLINF is used,
-  otherwise the default Prob::NORMPROB is used). Also, in case of negative factors, the 
-  RegionGraph constructors assign each Factor to a unique outer region instead of dividing 
+  otherwise the default Prob::NORMPROB is used). Also, in case of negative factors, the
+  RegionGraph constructors assign each Factor to a unique outer region instead of dividing
   it over all subsuming outer regions. See README for when negative factors are known to work
   and when not.
 - FactorGraph::FactorGraph(const vector<Factor>) only gives a warning in case of short loops,
@@ -458,7 +458,7 @@ Implementation / code
 - Made a seperate class ClusterGraph, which is only used by the junction tree
   code. It's main purpose is a graph-theoretical variable elimination algorithm.
 - Implemented the heuristic "minimum-new-edges-in-clique-graph" for variable elimination.
-- Massive code cleanup, moving towards "generic" programming style, using 
+- Massive code cleanup, moving towards "generic" programming style, using
   multiple inheritance and polymorphism.
   o BP, LCBP, MF, HAK and JunctionTree now inherit from a common DAIAlg class
   o Made generic functions Marginal, Marginal2ndO, calcCavityDist, calcCavityDist2ndO, clamp
@@ -541,8 +541,8 @@ the output arguments Q, Q0 of ai).
 0.1.1   (2006-02-28)
 --------------------
 - The constructors of (Log)FactorGraph and LogFactorGraph from a
-vector<(Log)Potential> now merge potentials to prevent short loops (of length 
-4) in the factor graph. These are used in ai to construct the factor graphs 
+vector<(Log)Potential> now merge potentials to prevent short loops (of length
+4) in the factor graph. These are used in ai to construct the factor graphs
 from the psi argument. If compiled with DEBUG defined, the method calc_nb()
 of BipGraph checks for the existence of short loops.
 - Changed calling syntax of ai (now the actual syntax *does* correspond to its

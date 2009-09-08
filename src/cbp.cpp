@@ -44,13 +44,13 @@ const char *CBP::Name = "CBP";
 
 void CBP::setBeliefs( const std::vector<Factor> &bs, double logZ ) {
     size_t i = 0;
-    _beliefsV.clear(); 
+    _beliefsV.clear();
     _beliefsV.reserve( nrVars() );
-    _beliefsF.clear(); 
+    _beliefsF.clear();
     _beliefsF.reserve( nrFactors() );
-    for( i = 0; i < nrVars(); i++ ) 
+    for( i = 0; i < nrVars(); i++ )
         _beliefsV.push_back( bs[i] );
-    for( ; i < nrVars() + nrFactors(); i++ ) 
+    for( ; i < nrVars() + nrFactors(); i++ )
         _beliefsF.push_back( bs[i] );
     _logZ = logZ;
 }
@@ -99,7 +99,7 @@ static vector<Factor> mixBeliefs( Real p, const vector<Factor> &b, const vector<
 
 double CBP::run() {
     size_t seed = props.rand_seed;
-    if( seed > 0) 
+    if( seed > 0)
         rnd_seed( seed );
 
     InfAlg *bp = getInfAlg();
@@ -159,12 +159,12 @@ void CBP::runRecurse( InfAlg *bp, double orig_logZ, vector<size_t> clamped_vars_
     choose_count++;
     if( props.clamp_outfile.length() > 0 )
         *_clamp_ofstream << choose_count << "\t" << clamped_vars_list.size() << "\t" << i << "\t" << xis[0] << endl;
-    
+
     if( clampingVar )
-        foreach( size_t xi, xis ) 
+        foreach( size_t xi, xis )
             assert(/*0<=xi &&*/ xi < var(i).states() );
     else
-        foreach( size_t xI, xis ) 
+        foreach( size_t xI, xis )
             assert(/*0<=xI &&*/ xI < factor(i).states() );
     // - otherwise, clamp and recurse, saving margin estimates for each
     // clamp setting. afterwards, combine estimates.
@@ -173,7 +173,7 @@ void CBP::runRecurse( InfAlg *bp, double orig_logZ, vector<size_t> clamped_vars_
     vector<size_t> cmp_xis = complement( xis, clampingVar ? var(i).states() : factor(i).states() );
 
     /// \todo could do this more efficiently with a nesting version of saveProbs/undoProbs
-    Real lz; 
+    Real lz;
     vector<Factor> b;
     InfAlg *bp_c = bp->clone();
     if( clampingVar ) {
@@ -189,7 +189,7 @@ void CBP::runRecurse( InfAlg *bp, double orig_logZ, vector<size_t> clamped_vars_
     lz = bp_c->logZ();
     b = bp_c->beliefs();
 
-    Real cmp_lz; 
+    Real cmp_lz;
     vector<Factor> cmp_b;
     InfAlg *cmp_bp_c = bp->clone();
     if( clampingVar ) {
@@ -207,7 +207,7 @@ void CBP::runRecurse( InfAlg *bp, double orig_logZ, vector<size_t> clamped_vars_
 
     double p = unSoftMax( lz, cmp_lz );
     Real bp__d = 0.0;
-    
+
     if( Recursion() == Properties::RecurseType::REC_BDIFF && recTol() > 0 ) {
         vector<Factor> combined_b( mixBeliefs( p, b, cmp_b ) );
         Real new_lz = logSumExp( lz,cmp_lz );
@@ -304,9 +304,9 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                     win_xk = bp->beliefV(k).p().argmax().first;
                 }
             }
-            assert( win_k >= 0 ); 
+            assert( win_k >= 0 );
             assert( win_xk >= 0 );
-            i = win_k; 
+            i = win_k;
             xis.resize( 1, win_xk );
             DAI_IFVERB(2, endl<<"CHOOSE_MAXENT chose variable "<<i<<" state "<<xis[0]<<endl);
             if( bp->beliefV(i).p()[xis[0]] < tiny ) {
@@ -324,9 +324,9 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                     win_xk = bp->beliefF(k).p().argmax().first;
                 }
             }
-            assert( win_k >= 0 ); 
+            assert( win_k >= 0 );
             assert( win_xk >= 0 );
-            i = win_k; 
+            i = win_k;
             xis.resize( 1, win_xk );
             DAI_IFVERB(2, endl<<"CHOOSE_MAXENT chose factor "<<i<<" state "<<xis[0]<<endl);
             if( bp->beliefF(i).p()[xis[0]] < tiny ) {
@@ -346,7 +346,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
         int win_k = -1, win_xk = -1;
         for( size_t k = 0; k < nrVars(); k++ ) {
             for( size_t xk = 0; xk < var(k).states(); xk++ ) {
-                if( bp->beliefV(k)[xk] < tiny ) 
+                if( bp->beliefV(k)[xk] < tiny )
                     continue;
                 InfAlg *bp1 = bp->clone();
                 bp1->clamp( k, xk );
@@ -366,13 +366,13 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                 delete bp1;
             }
         }
-        assert( win_k >= 0 ); 
+        assert( win_k >= 0 );
         assert( win_xk >= 0 );
-        i = win_k; 
+        i = win_k;
         xis.resize( 1, win_xk );
     } else if( ChooseMethod() == Properties::ChooseMethodType::CHOOSE_BBP ) {
-        Real mvo; 
-        if( !maxVarOut ) 
+        Real mvo;
+        if( !maxVarOut )
             maxVarOut = &mvo;
         bool clampingVar = (Clamping() == Properties::ClampType::CLAMP_VAR);
         pair<size_t, size_t> cv = bbpFindClampVar( *bp, clampingVar, props.bbp_props, BBP_cost_function(), &mvo );
@@ -387,7 +387,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
             << i << " state " << xi                                     \
             << " (p=" << (clampingVar?bp->beliefV(i)[xi]:bp->beliefF(i)[xi]) \
             << ", entropy = " << (clampingVar?bp->beliefV(i):bp->beliefF(i)).entropy() \
-            << ", maxVar = "<< mvo << ")" 
+            << ", maxVar = "<< mvo << ")"
         Prob b = ( clampingVar ? bp->beliefV(i).p() : bp->beliefF(i).p());
         if( b[xi] < tiny ) {
             cerr << "Warning, at level " << clamped_vars_list.size() << ", bbpFindClampVar found unlikely " << VAR_INFO << endl;
@@ -429,7 +429,7 @@ pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, con
     BBP bbp( &in_bp, bbp_props );
     initBBPCostFnAdj( bbp, in_bp, cfn, NULL );
     bbp.run();
-  
+
     // find and return the (variable,state) with the largest adj_psi_V
     size_t argmax_var = 0;
     size_t argmax_var_state = 0;
@@ -479,7 +479,7 @@ pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, con
         assert(/*0 <= argmax_var_state &&*/
                argmax_var_state < in_bp.fg().factor(argmax_var).states() );
     }
-    if( maxVarOut ) 
+    if( maxVarOut )
         *maxVarOut = max_var;
     return make_pair( argmax_var, argmax_var_state );
 }
@@ -526,8 +526,8 @@ Real dist( const vector<Factor> &b1, const vector<Factor> &b2, size_t nv ) {
 } // end of namespace dai
 
 
-/* {{{ GENERATED CODE: DO NOT EDIT. Created by 
-    ./scripts/regenerate-properties include/dai/cbp.h src/cbp.cpp 
+/* {{{ GENERATED CODE: DO NOT EDIT. Created by
+    ./scripts/regenerate-properties include/dai/cbp.h src/cbp.cpp
 */
 namespace dai {
 

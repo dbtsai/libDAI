@@ -41,7 +41,7 @@ void HAK::setProperties( const PropertySet &opts ) {
     assert( opts.hasKey("verbose") );
     assert( opts.hasKey("doubleloop") );
     assert( opts.hasKey("clusters") );
-    
+
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.verbose = opts.getStringAs<size_t>("verbose");
@@ -98,7 +98,7 @@ void HAK::constructMessages() {
     _Qb.reserve(nrIRs());
     for( size_t beta = 0; beta < nrIRs(); beta++ )
         _Qb.push_back( Factor( IR(beta) ) );
-    
+
     // Create messages
     _muab.clear();
     _muab.reserve( nrORs() );
@@ -144,7 +144,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
         cl = fg.Cliques();
     } else if( props.clusters == Properties::ClustersType::DELTA ) {
         for( size_t i = 0; i < fg.nrVars(); i++ )
-            cl.push_back(fg.Delta(i)); 
+            cl.push_back(fg.Delta(i));
     } else if( props.clusters == Properties::ClustersType::LOOP ) {
         cl = fg.Cliques();
         set<VarSet> scl;
@@ -172,7 +172,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
 }
 
 
-string HAK::identify() const { 
+string HAK::identify() const {
     return string(Name) + printProperties();
 }
 
@@ -242,13 +242,13 @@ double HAK::doGBP() {
                  *
                  * In some cases, the muab's can have very large entries because the muba's have very
                  * small entries. This may cause NANs later on (e.g., multiplying large quantities may
-                 * result in +inf; normalization then tries to calculate inf / inf which is NAN). 
+                 * result in +inf; normalization then tries to calculate inf / inf which is NAN).
                  * A fix of this problem would consist in normalizing the messages muab.
                  * However, it is not obvious whether this is a real solution, because it has a
                  * negative performance impact and the NAN's seem to be a symptom of a fundamental
                  * numerical unstability.
                  */
-                 muab(alpha,_beta).normalize(); 
+                 muab(alpha,_beta).normalize();
             }
 
             Factor Qb_new;
@@ -277,7 +277,7 @@ double HAK::doGBP() {
                 size_t _beta = alpha.dual;
                 muba(alpha,_beta) = _Qb[beta] / muab(alpha,_beta);
 
-                /* TODO: INVESTIGATE WHETHER THIS HACK (INVENTED BY KEES) TO PREVENT NANS MAKES SENSE 
+                /* TODO: INVESTIGATE WHETHER THIS HACK (INVENTED BY KEES) TO PREVENT NANS MAKES SENSE
                  *
                  *   muba(beta,*alpha).makePositive(1e-100);
                  *

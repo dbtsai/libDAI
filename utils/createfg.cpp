@@ -44,7 +44,7 @@ typedef matrix::index_array_type::const_iterator matrix_icit;
 Factor BinaryFactor( const Var &n, double field ) {
     assert( n.states() == 2 );
     double buf[2];
-    buf[0] = exp(-field); 
+    buf[0] = exp(-field);
     buf[1] = exp(field);
     return Factor(n, &buf[0]);
 }
@@ -79,27 +79,27 @@ Factor PottsFactor( const Var &n1, const Var &n2, double beta ) {
 
 
 void MakeHOIFG( size_t N, size_t M, size_t k, double sigma, FactorGraph &fg ) {
-	vector<Var> vars;
-	vector<Factor> factors;
+    vector<Var> vars;
+    vector<Factor> factors;
 
     vars.reserve(N);
-	for( size_t i = 0; i < N; i++ )
-		vars.push_back(Var(i,2));
+    for( size_t i = 0; i < N; i++ )
+        vars.push_back(Var(i,2));
 
-	for( size_t I = 0; I < M; I++ ) {
-		VarSet vars;
-		while( vars.size() < k ) {
-			do {
-				size_t newind = (size_t)(N * rnd_uniform());
-				Var newvar = Var(newind, 2);
-				if( !vars.contains( newvar ) ) {
-					vars |= newvar;
-					break;
-				}
-			} while( 1 );
-		}
+    for( size_t I = 0; I < M; I++ ) {
+        VarSet vars;
+        while( vars.size() < k ) {
+            do {
+                size_t newind = (size_t)(N * rnd_uniform());
+                Var newvar = Var(newind, 2);
+                if( !vars.contains( newvar ) ) {
+                    vars |= newvar;
+                    break;
+                }
+            } while( 1 );
+        }
         factors.push_back( RandomFactor( vars, sigma ) );
-	}
+    }
 
     fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
 }
@@ -154,7 +154,7 @@ void MakeFullFG( size_t N, double mean_w, double mean_th, double sigma_w, double
 void Make3DPotts( size_t n1, size_t n2, size_t n3, size_t states, double beta, FactorGraph &fg ) {
     vector<Var> vars;
     vector<Factor> factors;
-    
+
     for( size_t i1 = 0; i1 < n1; i1++ )
         for( size_t i2 = 0; i2 < n2; i2++ )
             for( size_t i3 = 0; i3 < n3; i3++ ) {
@@ -189,7 +189,7 @@ void MakeGridFG( long periodic, size_t n, double mean_w, double mean_th, double 
     WTh2FG( w, th, fg );
 }
 
-            
+
 void MakeGridNonbinaryFG( bool periodic, size_t n, size_t states, double beta, FactorGraph &fg ) {
     size_t N = n*n;
 
@@ -267,7 +267,7 @@ void MakeDRegFG( size_t N, size_t d, double mean_w, double mean_th, double sigma
     UEdgeVec g = RandomDRegularGraph( N, d );
     for( size_t i = 0; i < g.size(); i++ )
         w(g[i].n1, g[i].n2) = rnd_stdnormal() * sigma_w + mean_w;
-    
+
     for( size_t i = 0; i < N; i++ )
         th[i] = rnd_stdnormal() * sigma_th + mean_th;
 
@@ -332,7 +332,7 @@ size_t order (int x, int p) {
     do {
         prod = (prod * x) % p;
         n++;
-    } while( prod != 1 ); 
+    } while( prod != 1 );
     return n;
 }
 
@@ -522,7 +522,7 @@ int main( int argc, char *argv[] ) {
                     cout << "interactions with <states> states and inverse temperature <beta>." << endl;
                 } else
                     cerr << "Unknown type (should be one of 'full', 'grid', 'grid_torus', 'dreg', 'loop', 'tree', 'hoi', 'ldpc_random', 'ldpc_group', 'ldpc_small', 'potts3d')" << endl;
-                
+
                 if( type == FULL_TYPE || type == GRID_TYPE || type == GRID_TORUS_TYPE || type == DREG_TYPE || type == LOOP_TYPE || type == TREE_TYPE ) {
                     if( type == GRID_TYPE || type == GRID_TORUS_TYPE || type == LOOP_TYPE ) {
                         cout << "if <states> > 2: factor entries are exponents of Gaussians with mean 0 and standard deviation beta; otherwise," << endl;
@@ -530,7 +530,7 @@ int main( int argc, char *argv[] ) {
                     cout << "singleton interactions are Gaussian with mean <mean_th> and standard" << endl;
                     cout << "deviation <sigma_th>; pairwise interactions are Gaussian with mean" << endl;
                     cout << "<mean_w> and standard deviation <sigma_w>." << endl;
-                } 
+                }
             }
             cout << endl << desc << endl;
             return 1;
@@ -591,10 +591,10 @@ int main( int argc, char *argv[] ) {
                 MakeGridNonbinaryFG( periodic, n, states, beta, fg );
             else
                 MakeGridFG( periodic, n, mean_w, mean_th, sigma_w, sigma_th, fg );
-                
+
             cout << "# n = " << n << endl;
             cout << "# N = " << N << endl;
-            
+
             if( states > 2 )
                 cout << "# beta = " << beta << endl;
             else {
@@ -758,7 +758,7 @@ int main( int argc, char *argv[] ) {
 
             // Add likelihoods
             for( size_t i = 0; i < N; i++ )
-               factors.push_back( Factor(Var(i,2), likelihood + output[i]*2) ); 
+               factors.push_back( Factor(Var(i,2), likelihood + output[i]*2) );
 
             // Construct Factor Graph
             fg = FactorGraph( factors );
