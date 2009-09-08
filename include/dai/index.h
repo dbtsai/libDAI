@@ -65,7 +65,7 @@ class IndexFor {
     private:
         /// The current linear index corresponding to the state of indexVars
         long                _index;
-
+	
         /// For each variable in forVars, the amount of change in _index
         std::vector<long>   _sum;
 
@@ -74,7 +74,7 @@ class IndexFor {
         
         /// For each variable in forVars, its number of possible values
         std::vector<size_t> _dims;
-
+	
     public:
         /// Default constructor
         IndexFor() { 
@@ -224,13 +224,26 @@ class Permute {
         Permute( const std::vector<size_t> &d, const std::vector<size_t> &sigma ) : _dims(d), _sigma(sigma) {
             assert( _dims.size() == _sigma.size() );
         }
-
+  
+	Permute(const std::vector< Var >& vars) : _dims(vars.size()), _sigma(vars.size()) {
+	    VarSet vs(vars.begin(), vars.end(), vars.size());
+	    for (size_t i = 0; i < vars.size(); ++i) {
+		_dims[i] = vars[i].states();
+	    }
+	    VarSet::iterator set_iter = vs.begin();
+	    for (size_t i = 0; i < vs.size(); ++i, ++set_iter) {
+		std::vector< Var >::const_iterator j;
+		j = find(vars.begin(), vars.end(), *set_iter);
+		_sigma[i] = j - vars.begin();
+	    }
+	}
+	
         /// Calculates a permuted linear index.
         /** Converts the linear index li to a vector index
          *  corresponding with the dimensions in _dims, permutes it according to sigma, 
          *  and converts it back to a linear index  according to the permuted dimensions.
          */
-        size_t convert_linear_index( size_t li ) {
+        size_t convert_linear_index( size_t li ) const {
             size_t N = _dims.size();
 
             // calculate vector index corresponding to linear index
