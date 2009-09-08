@@ -265,7 +265,7 @@ template <typename T> class TProb {
         }
 
         /// Return *this minus q (sizes should be identical)
-        Prob<T> operator- (const TProb<T> & q) const {
+        TProb<T> operator- (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
             TProb<T> diff( *this );
             diff -= q;
