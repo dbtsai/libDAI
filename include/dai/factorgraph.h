@@ -289,9 +289,10 @@ class FactorGraph {
         /// Restores all factors connected to a set of variables from their backups
         void restoreFactors( const VarSet &ns );
 
-        // Friends
-        friend std::ostream& operator << (std::ostream& os, const FactorGraph& fg);
-        friend std::istream& operator >> (std::istream& is, FactorGraph& fg);
+        /// Writes a FactorGraph to an output stream
+        friend std::ostream& operator<< (std::ostream &os, const FactorGraph &fg );
+        /// Reads a FactorGraph from an input stream
+        friend std::istream& operator>> (std::istream &is, FactorGraph &fg );
 
         // OBSOLETE
         /// @name Backwards compatibility layer (to be removed soon)

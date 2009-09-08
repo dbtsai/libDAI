@@ -343,6 +343,10 @@ Real getCostFn( const InfAlg &fg, bbp_cfn_t cfn_type, const std::vector<size_t> 
 
 /// Function to test the validity of adjoints computed by BBP given a state for each variable using numerical derivatives.
 /** Factors containing a variable are multiplied by psi_1 adjustments to verify accuracy of _adj_psi_V.
+ *  \param bp BP object.
+ *  \param state Global state of all variables.
+ *  \param bbp_props BBP Properties.
+ *  \param cfn Cost function to be used.
  *  \param h controls size of perturbation.
  */
 double numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const PropertySet &bbp_props, bbp_cfn_t cfn, double h );

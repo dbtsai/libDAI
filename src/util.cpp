@@ -73,19 +73,22 @@ double toc() {
 #endif
 }
 
-// This is a typedef for a random number generator.
-// Try boost::mt19937 or boost::ecuyer1988 instead of boost::minstd_rand
-typedef boost::minstd_rand _rnd_gen_type;
+/// Type of global random number generator
+typedef boost::minstd_rand _rnd_gen_type;  // Try boost::mt19937 or boost::ecuyer1988 instead of boost::minstd_rand
 
+/// Global random number generator
 _rnd_gen_type _rnd_gen(42U);
 
-// Define a uniform random number distribution which produces
-// values between 0 and 1 (0 inclusive, 1 exclusive).
+/// Uniform distribution with values between 0 and 1 (0 inclusive, 1 exclusive).
 boost::uniform_real<> _uni_dist(0,1);
+
+/// Global uniform random random number 
 boost::variate_generator<_rnd_gen_type&, boost::uniform_real<> > _uni_rnd(_rnd_gen, _uni_dist);
 
-// Define a normal distribution with mean 0 and standard deviation 1.
+/// Normal distribution with mean 0 and standard deviation 1.
 boost::normal_distribution<> _normal_dist;
+
+/// Global random number generator with standard normal distribution
 boost::variate_generator<_rnd_gen_type&, boost::normal_distribution<> > _normal_rnd(_rnd_gen, _normal_dist);
 
 
@@ -105,10 +108,7 @@ int rnd_int( int min, int max ) {
     return (int)floor(_uni_rnd() * (max + 1 - min) + min);
 }
 
-void tokenizeString(const std::string& s,
-                    std::vector<std::string>& outTokens,
-                    const std::string& delim)
-{
+void tokenizeString(const std::string& s, std::vector<std::string>& outTokens, const std::string& delim) {
     size_t start = 0;
     while (start < s.size()) {
         size_t end = s.find_first_of(delim, start);

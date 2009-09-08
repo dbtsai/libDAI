@@ -43,8 +43,9 @@
 namespace dai {
 
 
-/// Function object similar to std::divides(), but different in that dividing by zero results in zero
+// Function object similar to std::divides(), but different in that dividing by zero results in zero
 template<typename T> struct divides0 : public std::binary_function<T, T, T> {
+    // Returns (j == 0 ? 0 : (i/j))
     T operator()(const T& i, const T& j) const {
         if( j == (T)0 )
             return (T)0;

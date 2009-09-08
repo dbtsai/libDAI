@@ -93,7 +93,7 @@
  *
  *  \section discuss_templates Polymorphism by template parameterization
  *  Instead of polymorphism by inheritance, use polymorphism by template parameterization. 
- *  For example, the real reason for introducing the complicated inheritance scheme of InfAlg
+ *  For example, the real reason for introducing the complicated inheritance scheme of dai::InfAlg
  *  was for functions like dai::calcMarginal. Instead, one could use a template function:
  *  \code
  *  template<typename InfAlg>
@@ -116,13 +116,13 @@
  *  \date October 10, 2008
  *
  *  \section about About libDAI
- *  libDAI is a free/open source C++ library (licensed under GPL) that provides
+ *  libDAI is a free/open source C++ library (licensed under GPLv2+) that provides
  *  implementations of various (approximate) inference methods for discrete 
  *  graphical models. libDAI supports arbitrary factor graphs with discrete 
  *  variables; this includes discrete Markov Random Fields and Bayesian 
  *  Networks.
  *
- *  The library is targeted at researchers; to be able to use the library, a 
+ *  The library is targeted at researchers. To be able to use the library, a 
  *  good understanding of graphical models is needed. 
  *
  *  \section limitations Limitations
@@ -131,7 +131,8 @@
  *  various inference methods. In particular, it contains no GUI, currently 
  *  only supports its own file format for input and output (although support 
  *  for standard file formats may be added later), and provides very limited
- *  visualization functionalities.
+ *  visualization functionalities. The only learning method supported currently
+ *  is EM for learning factor parameters.
  *
  *  \section features Features
  *  Currently, libDAI supports the following (approximate) inference methods:

@@ -84,7 +84,7 @@ void FactorGraph::constructGraph( size_t nrEdges ) {
 
 
 /// Writes a FactorGraph to an output stream
-ostream& operator << (ostream& os, const FactorGraph& fg) {
+std::ostream& operator<< ( std::ostream &os, const FactorGraph &fg ) {
     os << fg.nrFactors() << endl;
 
     for( size_t I = 0; I < fg.nrFactors(); I++ ) {
@@ -111,7 +111,7 @@ ostream& operator << (ostream& os, const FactorGraph& fg) {
 
 
 /// Reads a FactorGraph from an input stream
-istream& operator >> (istream& is, FactorGraph& fg) {
+std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
     long verbose = 0;
 
     vector<Factor> facs;

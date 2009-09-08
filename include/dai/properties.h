@@ -159,8 +159,10 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
             return res;
         }
 
-        // Friends
+        /// Writes a PropertySet object to an output stream
         friend std::ostream& operator<< (std::ostream & os, const PropertySet & ps);
+
+        /// Reads a PropertySet object from an input stream, storing values as strings
         friend std::istream& operator>> (std::istream& is, PropertySet & ps);
 };
 

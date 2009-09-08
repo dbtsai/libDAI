@@ -31,6 +31,7 @@ namespace dai {
 using namespace std;
 
 
+/// Convenience typedef
 typedef BipartiteGraph::Neighbor Neighbor;
 
 
@@ -57,6 +58,7 @@ std::vector<size_t> getGibbsState( const InfAlg &ia, size_t iters ) {
 }
 
 
+/// Returns the entry of the I'th factor corresponding to a global state
 size_t getFactorEntryForState( const FactorGraph &fg, size_t I, const vector<size_t> &state ) {
     size_t f_entry = 0;
     for( int _j = fg.nbF(I).size() - 1; _j >= 0; _j-- ) {

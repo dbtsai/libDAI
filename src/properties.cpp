@@ -60,7 +60,7 @@ std::ostream& operator<< (std::ostream & os, const PropertySet & ps) {
 
 
 /// Reads a PropertySet object from an input stream, storing values as strings
-std::istream& operator >> (std::istream& is, PropertySet & ps) {
+std::istream& operator>> (std::istream& is, PropertySet & ps) {
     ps = PropertySet();
 
     std::string s;
