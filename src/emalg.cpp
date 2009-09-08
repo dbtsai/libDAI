@@ -193,8 +193,8 @@ SharedParameters::SharedParameters( const SharedParameters &sp )
 }
 
 
-SharedParameters::SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation, bool deleteParameterEstimationInDestructor )
-  : _varsets(), _perms(), _varorders(varorders), _estimation(estimation), _deleteEstimation(deleteParameterEstimationInDestructor) 
+SharedParameters::SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation, bool deletePE )
+  : _varsets(), _perms(), _varorders(varorders), _estimation(estimation), _deleteEstimation(deletePE)
 {
     // Calculate the necessary permutations
     setPermsAndVarSetsFromVarOrders();
@@ -230,23 +230,19 @@ void SharedParameters::setParameters( FactorGraph &fg ) {
 }
 
 
-void SharedParameters::collectParameters( const FactorGraph& fg, std::vector< Real >& outVals, std::vector< Var >& outVarOrder ) {
+void SharedParameters::collectParameters( const FactorGraph &fg, std::vector<Real> &outVals, std::vector<Var> &outVarOrder ) {
     FactorOrientations::iterator it = _varorders.begin();
-    if (it == _varorders.end()) {
-	return;
-    }
-    FactorIndex i = it->first;
-    std::vector< Var >::iterator var_it = _varorders[i].begin();
-    std::vector< Var >::iterator var_stop = _varorders[i].end();
-    for ( ; var_it != var_stop; ++var_it) {
-	outVarOrder.push_back(*var_it);
-    }
-    const Factor& f = fg.factor(i);
-    assert(f.vars() == _varsets[i]);
-    const Permute& perm = _perms[i];
-    for (size_t val_index = 0; val_index < f.states(); ++val_index) {
-	outVals.push_back(f[perm.convert_linear_index(val_index)]);
-    }
+    if( it == _varorders.end() )
+        return;
+    FactorIndex I = it->first;
+    for( std::vector<Var>::const_iterator var_it = _varorders[I].begin(); var_it != _varorders[I].end(); ++var_it )
+        outVarOrder.push_back( *var_it );
+
+    const Factor &f = fg.factor(I);
+    assert( f.vars() == _varsets[I] );
+    const Permute &perm = _perms[I];
+    for( size_t val_index = 0; val_index < f.states(); ++val_index )
+        outVals.push_back( f[perm.convert_linear_index(val_index)] );
 }
 
 
@@ -286,7 +282,7 @@ EMAlg::EMAlg( const Evidence &evidence, InfAlg &estep, std::istream &msteps_file
     _msteps.reserve(num_msteps);
     for( size_t i = 0; i < num_msteps; ++i )
         _msteps.push_back( MaximizationStep( msteps_file, estep.fg() ) );
-}	
+}    
 
 
 void EMAlg::setTermConditions( const PropertySet &p ) {
@@ -322,29 +318,29 @@ bool EMAlg::hasSatisfiedTermConditions() const {
 
 Real EMAlg::iterate( MaximizationStep &mstep ) {
     Real logZ = 0;
-	Real likelihood = 0;
-	
-	_estep.run();
-	logZ = _estep.logZ();
-	
+    Real likelihood = 0;
+
+    _estep.run();
+    logZ = _estep.logZ();
+
     // Expectation calculation
     for( Evidence::const_iterator e = _evidence.begin(); e != _evidence.end(); ++e ) {
         InfAlg* clamped = _estep.clone();
         e->applyEvidence( *clamped );
         clamped->init();
         clamped->run();
-		
-		likelihood += clamped->logZ() - logZ;
-		
+
+        likelihood += clamped->logZ() - logZ;
+
         mstep.addExpectations( *clamped );
-		
+
         delete clamped;
     }
-    
+
     // Maximization of parameters
     mstep.maximize( _estep.fg() );
-	
-	return likelihood;
+
+    return likelihood;
 }
 
 

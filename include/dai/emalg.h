@@ -179,8 +179,9 @@ class SharedParameters {
         /// Constructor 
         /** \param varorders  all the factor orientations for this parameter
          *  \param estimation a pointer to the parameter estimation method
+         *  \param deletePE whether the parameter estimation object should be deleted in the destructor
          */ 
-        SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation, bool deleteParameterEstimationInDestructor=0);
+        SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation, bool deletePE=false );
 
         /// Constructor for making an object from a stream and a factor graph
         SharedParameters( std::istream &is, const FactorGraph &fg_varlookup );
@@ -197,7 +198,8 @@ class SharedParameters {
         /// Estimate and set the shared parameters
         void setParameters( FactorGraph &fg );
 
-	void collectParameters( const FactorGraph& fg, std::vector< Real >& outVals, std::vector< Var >& outVarOrder );
+        /// Returns the parameters
+        void collectParameters( const FactorGraph &fg, std::vector<Real> &outVals, std::vector<Var> &outVarOrder );
 };
 
 
@@ -222,15 +224,15 @@ class MaximizationStep {
         /// Using all of the currently added expectations, make new factors with maximized parameters and set them in the FactorGraph.
         void maximize( FactorGraph &fg );
 
-	/// @name iterator interface
-	//@{
-	typedef std::vector< SharedParameters >::iterator iterator;
-	typedef std::vector< SharedParameters >::const_iterator const_iterator;
-	iterator begin() { return _params.begin(); }
-	const_iterator begin() const { return _params.begin(); }
-	iterator end() { return _params.end(); }
-	const_iterator end() const { return _params.end(); }
-	//@}
+        /// @name Iterator interface
+        //@{
+        typedef std::vector<SharedParameters>::iterator iterator;
+        typedef std::vector<SharedParameters>::const_iterator const_iterator;
+        iterator begin() { return _params.begin(); }
+        const_iterator begin() const { return _params.begin(); }
+        iterator end() { return _params.end(); }
+        const_iterator end() const { return _params.end(); }
+        //@}
 };
 
 
@@ -310,14 +312,14 @@ class EMAlg {
          */
         bool hasSatisfiedTermConditions() const;
 
-	/// Return the last calculated log likelihood
-	Real getLogZ() const { return _lastLogZ.back(); }
+        /// Return the last calculated log likelihood
+        Real getLogZ() const { return _lastLogZ.back(); }
 
         /// Returns number of iterations done so far
         size_t getCurrentIters() const { return _iters; }
 
-	/// Get the iteration method used
-	const InfAlg& eStep() const { return _estep; }
+        /// Get the iteration method used
+        const InfAlg& eStep() const { return _estep; }
 
         /// Perform an iteration over all maximization steps
         Real iterate();
@@ -328,15 +330,15 @@ class EMAlg {
         /// Iterate until termination conditions are satisfied
         void run();
 
-	/// @name iterator interface
-	//@{ !!!
-	typedef std::vector< MaximizationStep >::iterator s_iterator;
-	typedef std::vector< MaximizationStep >::const_iterator const_s_iterator;
-	s_iterator s_begin() { return _msteps.begin(); }
-	const_s_iterator s_begin() const { return _msteps.begin(); }
-	s_iterator s_end() { return _msteps.end(); }
-	const_s_iterator s_end() const { return _msteps.end(); }
-	//@}
+        /// @name Iterator interface
+        //@{
+        typedef std::vector<MaximizationStep>::iterator s_iterator;
+        typedef std::vector<MaximizationStep>::const_iterator const_s_iterator;
+        s_iterator s_begin() { return _msteps.begin(); }
+        const_s_iterator s_begin() const { return _msteps.begin(); }
+        s_iterator s_end() { return _msteps.end(); }
+        const_s_iterator s_end() const { return _msteps.end(); }
+        //@}
 };
 
 

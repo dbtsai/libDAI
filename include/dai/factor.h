@@ -46,7 +46,7 @@ namespace dai {
 // Function object similar to std::divides(), but different in that dividing by zero results in zero
 template<typename T> struct divides0 : public std::binary_function<T, T, T> {
     // Returns (j == 0 ? 0 : (i/j))
-    T operator()(const T& i, const T& j) const {
+    T operator()( const T &i, const T &j ) const {
         if( j == (T)0 )
             return (T)0;
         else
@@ -95,41 +95,42 @@ template <typename T> class TFactor {
         /// Constructs TFactor depending on no variables, with value p
         TFactor ( Real p = 1.0 ) : _vs(), _p(1,p) {}
 
-        /// Constructs TFactor depending on variables in ns, with uniform distribution
-        TFactor( const VarSet& ns ) : _vs(ns), _p(_vs.nrStates()) {}
+        /// Constructs TFactor depending on variables in vars, with uniform distribution
+        TFactor( const VarSet& vars ) : _vs(vars), _p(_vs.nrStates()) {}
         
-        /// Constructs TFactor depending on variables in ns, with all values set to p
-        TFactor( const VarSet& ns, Real p ) : _vs(ns), _p(_vs.nrStates(),p) {}
+        /// Constructs TFactor depending on variables in vars, with all values set to p
+        TFactor( const VarSet& vars, Real p ) : _vs(vars), _p(_vs.nrStates(),p) {}
         
-        /// Constructs TFactor depending on variables in ns, copying the values from the range starting at begin
-        /** \param ns contains the variables that the new TFactor should depend on.
+        /// Constructs TFactor depending on variables in vars, copying the values from the range starting at begin
+        /** \param vars contains the variables that the new TFactor should depend on.
          *  \tparam Iterator Iterates over instances of type T; should support addition of size_t.
          *  \param begin Points to first element to be added.
          */
         template<typename TIterator>
-        TFactor( const VarSet& ns, TIterator begin ) : _vs(ns), _p(begin, begin + _vs.nrStates(), _vs.nrStates()) {}
+        TFactor( const VarSet& vars, TIterator begin ) : _vs(vars), _p(begin, begin + _vs.nrStates(), _vs.nrStates()) {}
 
-        /// Constructs TFactor depending on variables in ns, with values set to the TProb p
-        TFactor( const VarSet& ns, const TProb<T>& p ) : _vs(ns), _p(p) {
+        /// Constructs TFactor depending on variables in vars, with values set to the TProb p
+        TFactor( const VarSet& vars, const TProb<T> &p ) : _vs(vars), _p(p) {
             DAI_DEBASSERT( _vs.nrStates() == _p.size() );
         }
-        TFactor( const std::vector< Var >& vars, const std::vector< T >& p ) : _vs(vars.begin(), vars.end(), vars.size()), _p(p.size()) {
+
+        /// Constructs TFactor depending on variables in vars, permuting the values given in TProb p
+        TFactor( const std::vector<Var> &vars, const std::vector<T> &p ) : _vs(vars.begin(), vars.end(), vars.size()), _p(p.size()) {
             Permute permindex(vars);
-            for (size_t li = 0; li < p.size(); ++li) {
+            for( size_t li = 0; li < p.size(); ++li )
                 _p[permindex.convert_linear_index(li)] = p[li];
-            }
         }
         
-        /// Constructs TFactor depending on the variable n, with uniform distribution
-        TFactor( const Var& n ) : _vs(n), _p(n.states()) {}
+        /// Constructs TFactor depending on the variable v, with uniform distribution
+        TFactor( const Var &v ) : _vs(v), _p(v.states()) {}
 
         /// Returns const reference to value vector
-        const TProb<T> & p() const { return _p; }
+        const TProb<T>& p() const { return _p; }
         /// Returns reference to value vector
-        TProb<T> & p() { return _p; }
+        TProb<T>& p() { return _p; }
 
         /// Returns const reference to variable set
-        const VarSet & vars() const { return _vs; }
+        const VarSet& vars() const { return _vs; }
 
         /// Returns the number of possible joint states of the variables
         /** \note This is equal to the length of the value vector.

@@ -69,14 +69,13 @@ class Evidence {
         /// Default constructor
         Evidence() : _samples() {}
       
-        /// Constructor with existing samples
-	  Evidence(std::vector<Observation>& samples) : _samples(samples) {}
+        /// Construct from existing samples
+        Evidence( std::vector<Observation> &samples ) : _samples(samples) {}
 
-/// Read in tabular data from a stream. 
+        /// Read in tabular data from a stream. 
         /** Each line contains one sample, and the first line is a header line with names.
          */
         void addEvidenceTabFile( std::istream& is, std::map<std::string, Var> &varMap );
-
     
         /// Read in tabular data from a stream. 
         /** Each line contains one sample, and the first line is a header line with 

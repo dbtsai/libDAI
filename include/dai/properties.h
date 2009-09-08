@@ -146,18 +146,8 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
         }
 
         /// Shorthand for (temporarily) adding properties, e.g. PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
-		PropertySet operator()(const PropertyKey &key, const PropertyValue &val) const { PropertySet copy = *this; return copy.Set(key,val); }
+        PropertySet operator()(const PropertyKey &key, const PropertyValue &val) const { PropertySet copy = *this; return copy.Set(key,val); }
 		
-		std::vector< PropertyKey > keys() const {
-			std::vector< PropertyKey > result;
-			result.reserve(size());
-			PropertySet::const_iterator i = begin();
-			for ( ; i != end(); ++i) {
-				result.push_back(i->first);
-			}
-			return result;
-		}
-
         /// Check if a property with the given key exists
         bool hasKey(const PropertyKey &key) const { PropertySet::const_iterator x = find(key); return (x != this->end()); }
 
@@ -168,6 +158,15 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
             for( i = begin(); i != end(); i++ )
                 res.insert( i->first );
             return res;
+        }
+
+        /// Returns a vector containing all keys
+        std::vector<PropertyKey> keys() const {
+            std::vector<PropertyKey> result;
+            result.reserve( size() );
+            for( PropertySet::const_iterator i = begin(); i != end(); ++i )
+                result.push_back( i->first );
+            return result;
         }
 
         /// Writes a PropertySet object to an output stream

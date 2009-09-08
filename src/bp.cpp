@@ -125,7 +125,7 @@ void BP::construct() {
             newEP.residual = 0.0;
             _edges[i].push_back( newEP );
             if( props.updates == Properties::UpdateType::SEQMAX )
-                _edge2lut[i].push_back( _lut.insert( std::make_pair( newEP.residual, std::make_pair( i, _edges[i].size() - 1 ))) );
+                _edge2lut[i].push_back( _lut.insert( make_pair( newEP.residual, make_pair( i, _edges[i].size() - 1 ))) );
         }
     }
 }
@@ -503,15 +503,15 @@ void BP::updateResidual( size_t i, size_t _I, double r ) {
 	
 	// rearrange look-up table (delete and reinsert new key)
 	_lut.erase( _edge2lut[i][_I] );
-	_edge2lut[i][_I] = _lut.insert( std::make_pair( r, std::make_pair(i, _I) ) );
+	_edge2lut[i][_I] = _lut.insert( make_pair( r, make_pair(i, _I) ) );
 }
 
 
 std::vector<size_t> BP::findMaximum() const {
-    std::vector<size_t> maximum( nrVars() );
-    std::vector<bool> visitedVars( nrVars(), false );
-    std::vector<bool> visitedFactors( nrFactors(), false );
-    std::stack<size_t> scheduledFactors;
+    vector<size_t> maximum( nrVars() );
+    vector<bool> visitedVars( nrVars(), false );
+    vector<bool> visitedFactors( nrFactors(), false );
+    stack<size_t> scheduledFactors;
     for( size_t i = 0; i < nrVars(); ++i ) {
         if( visitedVars[i] )
             continue;
@@ -520,7 +520,7 @@ std::vector<size_t> BP::findMaximum() const {
         // Maximise with respect to variable i
         Prob prod;
         calcBeliefV( i, prod );
-        maximum[i] = std::max_element( prod.begin(), prod.end() ) - prod.begin();
+        maximum[i] = max_element( prod.begin(), prod.end() ) - prod.begin();
         
         foreach( const Neighbor &I, nbV(i) )
             if( !visitedFactors[I] ) 
@@ -549,7 +549,7 @@ std::vector<size_t> BP::findMaximum() const {
 
             // The allowed configuration is restrained according to the variables assigned so far:
             // pick the argmax amongst the allowed states
-            Real maxProb = std::numeric_limits<Real>::min();
+            Real maxProb = numeric_limits<Real>::min();
             State maxState( factor(I).vars() );
             for( State s( factor(I).vars() ); s.valid(); ++s ){
                 // First, calculate whether this state is consistent with variables that
@@ -572,7 +572,7 @@ std::vector<size_t> BP::findMaximum() const {
                 if( visitedVars[j.node] ) {
                     // We have already visited j earlier - hopefully our state is consistent
                     if( maximum[j.node] != maxState(var(j.node)) && props.verbose >= 1 )
-                        std::cerr << "BP::findMaximum - warning: maximum not consistent due to loops." << std::endl;
+                        cerr << "BP::findMaximum - warning: maximum not consistent due to loops." << endl;
                 } else {
                     // We found a consistent state for variable j
                     visitedVars[j.node] = true;
