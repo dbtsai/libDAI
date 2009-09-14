@@ -75,7 +75,7 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
         const PropertyValue & Get(const PropertyKey &key) const {
             PropertySet::const_iterator x = find(key);
             if( x == this->end() )
-                DAI_THROWE(NOT_FOUND,"PropertySet::Get cannot find property '" + key + "'");
+                DAI_THROWE(OBJECT_NOT_FOUND,"PropertySet::Get cannot find property '" + key + "'");
             return x->second;
         }
 
