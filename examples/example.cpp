@@ -54,10 +54,20 @@ int main( int argc, char *argv[] ) {
         // using the parameters specified by opts and an additional property
         // that specifies the type of updates the JTree algorithm should perform
         JTree jt( fg, opts("updates",string("HUGIN")) );
-        // Initialize junction tree algoritm
+        // Initialize junction tree algorithm
         jt.init();
         // Run junction tree algorithm
         jt.run();
+
+        // Construct another JTree (junction tree) object that is used to calculate
+        // the joint configuration of variables that has maximum probability (MAP state)
+        JTree jtmap( fg, opts("updates",string("HUGIN"))("inference",string("MAXPROD")) );
+        // Initialize junction tree algorithm
+        jtmap.init();
+        // Run junction tree algorithm
+        jtmap.run();
+        // Calculate joint state of all variables that has maximum probability
+        vector<size_t> jtmapstate = jtmap.findMaximum();
 
         // Construct a BP (belief propagation) object from the FactorGraph fg
         // using the parameters specified by opts and two additional properties,
@@ -111,18 +121,33 @@ int main( int argc, char *argv[] ) {
         // Report log partition sum of fg, approximated by the belief propagation algorithm
         cout << "Approximate (loopy belief propagation) log partition sum: " << bp.logZ() << endl;
 
+        // Report exact MAP variable marginals
+        cout << "Exact MAP variable marginals:" << endl;
+        for( size_t i = 0; i < fg.nrVars(); i++ )
+            cout << jtmap.belief(fg.var(i)) << endl;
+
         // Report max-product variable marginals
-        cout << "Max-product variable marginals:" << endl;
+        cout << "Approximate (max-product) MAP variable marginals:" << endl;
         for( size_t i = 0; i < fg.nrVars(); i++ )
             cout << mp.belief(fg.var(i)) << endl;
 
+        // Report exact MAP factor marginals
+        cout << "Exact MAP factor marginals:" << endl;
+        for( size_t I = 0; I < fg.nrFactors(); I++ )
+            cout << jtmap.belief(fg.factor(I).vars()) << "=" << jtmap.beliefF(I) << endl;
+
         // Report max-product factor marginals
-        cout << "Max-product factor marginals:" << endl;
+        cout << "Approximate (max-product) MAP factor marginals:" << endl;
         for( size_t I = 0; I < fg.nrFactors(); I++ )
             cout << mp.belief(fg.factor(I).vars()) << "=" << mp.beliefF(I) << endl;
 
-        // Report max-product joint state
-        cout << "Max-product state:" << endl;
+        // Report exact MAP joint state
+        cout << "Exact MAP state:" << endl;
+        for( size_t i = 0; i < jtmapstate.size(); i++ )
+            cout << fg.var(i) << ": " << jtmapstate[i] << endl;
+
+        // Report max-product MAP joint state
+        cout << "Approximate (max-product) MAP state:" << endl;
         for( size_t i = 0; i < mpstate.size(); i++ )
             cout << fg.var(i) << ": " << mpstate[i] << endl;
     }

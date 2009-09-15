@@ -92,6 +92,10 @@ Currently, libDAI supports the following (approximate) inference methods:
     * Gibbs sampler;
     * Conditioned BP [EaG09].
 
+These inference methods can be used to calculate partition sums, marginals
+over subsets of variables, and MAP states (the joint state of variables that
+has maximum probability).
+
 In addition, libDAI supports parameter learning of conditional probability
 tables by Expectation Maximization.
 
@@ -147,7 +151,8 @@ You need:
 - GNU make
 - doxygen
 - graphviz
-- recent boost C++ libraries (at least version 1.34, or 1.37 for cygwin)
+- recent boost C++ libraries (at least version 1.34, or 1.37 for cygwin;
+  version 1.37 shipped with Ubuntu 9.04 is known not to work)
 
 On Debian/Ubuntu, you can easily install all these packages with a single command:
 "apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev"

@@ -65,11 +65,17 @@ class JTree : public DAIAlgRG {
             /// Enumeration of possible JTree updates
             DAI_ENUM(UpdateType,HUGIN,SHSH)
 
+            /// Enumeration of inference variants
+            DAI_ENUM(InfType,SUMPROD,MAXPROD);
+
             /// Verbosity
             size_t verbose;
 
             /// Type of updates
             UpdateType updates;
+
+            /// Type of inference: sum-product or max-product?
+            InfType inference;
         } props;
 
         /// Name of this inference algorithm
@@ -119,6 +125,11 @@ class JTree : public DAIAlgRG {
 
         /// Calculates the marginal of a set of variables
         Factor calcMarginal( const VarSet& ns );
+
+        /// Calculates the joint state of all variables that has maximum probability
+        /** Assumes that run() has been called and that props.inference == MAXPROD
+         */
+        std::vector<std::size_t> findMaximum() const;
         //@}
 
     private:
