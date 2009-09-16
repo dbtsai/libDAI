@@ -1,3 +1,13 @@
+* Updated copyright headers
+* Added max-product functionality to JTree
+* [Charlie Vaske] EM bugfix (was using abs() instead of fabs() in 
+  determining EM termination, which caused a loss of precision).
+* [Charlie Vaske] New constructor in Permute for canonical variable ordering
+* [Charlie Vaske] New constructor in Factor that reorders variables to canonical ordering
+* [Charlie Vaske] New accessor in Properties for getting all keys
+* [Charlie Vaske] New function for getting inferred parameters
+* Cleaned up error handling by introducing the DAI_THROWE macro
+* Introduced DAI_DEBASSERT macro to abbreviate a common pattern
 * Changed FactorGraph::clamp and DAIAlg::clamp interfaces (the variable to be
   clamped is now indicated by its index, not as a Var) and marked the old
   interface as obsolete

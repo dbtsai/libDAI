@@ -1,3 +1,12 @@
+# This file is part of libDAI - http://www.libdai.org/
+#
+# libDAI is licensed under the terms of the GNU General Public License version
+# 2, or (at your option) any later version. libDAI is distributed without any
+# warranty. See the file COPYING for more details.
+#
+# Copyright (C) 2009  Joris Mooij  [joris dot mooij at libdai dot org]
+
+
 # This template contains configurations for compiling libDAI with Visual C++
 # under Windows (and GNU Make)
 #
@@ -5,6 +14,7 @@
 # to your local setup
 #
 # A boolean variable VAR can be set to true ("VAR=true") or to false ("VAR=")
+
 
 # COMPILATION AND BUILD FLAGS
 # Enable/disable various approximate inference methods

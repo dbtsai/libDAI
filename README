@@ -3,10 +3,29 @@ libDAI - A free/open source C++ library for Discrete Approximate Inference metho
 
 v 0.2.2 - September 30, 2008
 
+----------------------------------------------------------------------------------
 
-Copyright (C) 2006-2008  Joris Mooij  [joris dot mooij at tuebingen dot mpg dot de]
-Radboud University Nijmegen, The Netherlands /
-Max Planck Institute for Biological Cybernetics, Germany
+This file is part of libDAI - http://www.libdai.org/
+
+libDAI is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+libDAI is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with libDAI in the file COPYING. 
+If not, see http://www.gnu.org/licenses/
+
+----------------------------------------------------------------------------------
+
+Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+Copyright (C) 2002-2007  Radboud University Nijmegen, The Netherlands
+Copyright (C) 2002       Martijn Leisink  [martijn@mbfys.kun.nl]
 
 with contributions from:
 
@@ -22,38 +41,21 @@ Peter Gober
 Patrick Pletscher
 Sebastian Nowozin
 
-
-----------------------------------------------------------------------------------
-This file is part of libDAI.
-
-libDAI is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-libDAI is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with libDAI; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ----------------------------------------------------------------------------------
 
-
-SCIENTISTS: If you write a scientific paper describing research that made 
-substantive use of this program, please (a) mention the fashion in which 
-this software was used, including the version number, with a citation 
-to the literature, to allow replication; (b) mention this software in the 
-Acknowledgements section.  The appropriate citation is: 
+If you write a scientific paper describing research that made substantive use
+of this program, please (a) mention the fashion in which this software was
+used, including the version number, with a citation to the literature, to allow
+replication; (b) mention this software in the Acknowledgements section. The
+appropriate citation is: 
 
 J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete 
 Approximate Inference methods", http://www.libdai.org
 
-Moreover, as a personal note, I would appreciate it if you would email me with
-citations of papers referencing this work so I can mention them to my funding
-agent and tenure committee.
+Moreover, as a personal note, I would appreciate it if you would email me 
+(joris.mooij@libdai.org) with citations of papers referencing this work.
+
+----------------------------------------------------------------------------------
 
 
 About libDAI
