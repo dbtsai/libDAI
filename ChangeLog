@@ -1,3 +1,5 @@
+* Added a constructor TProb<T>::TProb<T>( const std::vector<S> &v )
+* Introduced CCNODEBUGFLAGS in Makefile
 * Updated copyright headers
 * Added max-product functionality to JTree
 * [Charlie Vaske] EM bugfix (was using abs() instead of fabs() in 

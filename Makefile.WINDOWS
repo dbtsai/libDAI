@@ -56,9 +56,11 @@ CC=cl
 # Output filename option of the compiler
 CCO=/Fe
 # Flags for the C++ compiler
-CCFLAGS=/EHsc /Ox -DWINDOWS
+CCFLAGS=/EHsc -DWINDOWS
 # Flags to add in debugging mode (if DEBUG=true)
-CCDEBUGFLAGS=/Zi -DDAI_DEBUG
+CCDEBUGFLAGS=/Ox /Zi -DDAI_DEBUG
+# Flags to add in non-debugging mode (if DEBUG=false)
+CCNODEBUGFLAGS=/Ox
 # Standard include directories
 CCINC=/Iinclude /IC:\boost_1_36_0
 
@@ -76,5 +78,3 @@ CCLIB=/LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\ATLMFC\LIB" /LIB
 MATLABDIR=c:\matlab
 # The following should resolve to the MatLab mex compile command
 MEX=$(MATLABDIR)\bin\mex
-# Specify the same C++ compiler and flags to mex
-MEXFLAGS=CXX\#$(CC) CXXFLAGS\#"$(CCFLAGS)"

@@ -19,6 +19,13 @@ SRC=src
 # Destination directory of libDAI library
 LIB=lib
 
+# Set final compiler flags
+ifdef DEBUG
+  CCFLAGS:=$(CCFLAGS) $(CCDEBUGFLAGS)
+else
+  CCFLAGS:=$(CCFLAGS) $(CCNODEBUGFLAGS)
+endif
+
 # Define build targets
 TARGETS=tests utils lib examples testregression testem
 ifdef WITH_DOC
@@ -26,6 +33,12 @@ ifdef WITH_DOC
 endif
 ifdef WITH_MATLAB
   TARGETS:=$(TARGETS) matlabs
+  # Specify the same C++ compiler and flags to mex
+  ifneq ($(OS),WINDOWS)
+    MEXFLAGS=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'
+  else
+    MEXFLAGS=CXX\#$(CC) CXXFLAGS\#"$(CCFLAGS)"
+  endif
   ifdef NEW_MATLAB
     MEXFLAGS:=$(MEXFLAGS) -largeArrayDims
   else
@@ -72,14 +85,10 @@ ifdef WITH_CBP
   OBJECTS:=$(OBJECTS) bbp$(OE) cbp$(OE) bp_dual$(OE)
 endif
 
-
 # Define standard libDAI header dependencies
 HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h $(INC)/util.h
 
 # Setup final command for C++ compiler and MEX
-ifdef DEBUG
-  CCFLAGS:=$(CCFLAGS) $(CCDEBUGFLAGS)
-endif
 ifneq ($(OS),WINDOWS)
   CC:=$(CC) $(CCINC) $(CCFLAGS) $(CCLIB)
 else

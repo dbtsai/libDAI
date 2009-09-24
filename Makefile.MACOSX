@@ -55,9 +55,11 @@ CC=g++
 # Output filename option of the compiler
 CCO=-o
 # Flags for the C++ compiler
-CCFLAGS=-O3 -Wno-deprecated -Wall -W -Wextra -fpic
+CCFLAGS=-Wno-deprecated -Wall -W -Wextra -fpic
 # Flags to add in debugging mode (if DEBUG=true)
-CCDEBUGFLAGS=-g -DDAI_DEBUG
+CCDEBUGFLAGS=-O3 -g -DDAI_DEBUG
+# Flags to add in non-debugging mode (if DEBUG=false)
+CCNODEBUGFLAGS=-O3
 # Standard include directories
 CCINC=-Iinclude -I/opt/local/include
 
@@ -74,5 +76,3 @@ CCLIB=-Llib -L/opt/local/lib
 MATLABDIR=/agbs/share/sw/matlab
 # The following should resolve to the MatLab mex compile command
 MEX=$(MATLABDIR)/bin/mex
-# Specify the same C++ compiler and flags to mex
-MEXFLAGS=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'

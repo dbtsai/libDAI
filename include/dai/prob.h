@@ -85,6 +85,16 @@ template <typename T> class TProb {
             _p.insert( _p.begin(), begin, end );
         }
 
+        /// Construct vector from a vector
+        /** \tparam S type of elements in v
+         *  \param v vector used for initialization
+         */
+        template <typename S>
+        TProb( const std::vector<S> &v ) : _p() {
+            _p.reserve( v.size() );
+            _p.insert( _p.begin(), v.begin(), v.end() );
+        }
+
         /// Returns a const reference to the vector
         const std::vector<T> & p() const { return _p; }
 

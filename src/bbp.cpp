@@ -806,7 +806,7 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
                 // free cloned InfAlg
                 delete bp_prb;
             }
-            Prob p_adj_est( adj_est.begin(), adj_est.end() );
+            Prob p_adj_est( adj_est );
             // compare this numerical estimate to the BBP estimate; sum the distances
             cout << "i: " << i
                  << ", p_adj_est: " << p_adj_est
@@ -856,14 +856,14 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
                     adj_m_est.push_back((cf_prb-cf0)/h);
                 }
 
-                Prob p_adj_n_est(adj_n_est.begin(), adj_n_est.end());
+                Prob p_adj_n_est( adj_n_est );
                 // compare this numerical estimate to the BBP estimate; sum the distances
                 cerr << "i: " << i << ", I: " << I
                      << ", adj_n_est: " << p_adj_n_est
                      << ", bbp.adj_n(i,I): " << bbp.adj_n(i,I) << endl;
                 d += dist(p_adj_n_est, bbp.adj_n(i,I), Prob::DISTL1);
 
-                Prob p_adj_m_est(adj_m_est.begin(), adj_m_est.end());
+                Prob p_adj_m_est( adj_m_est );
                 // compare this numerical estimate to the BBP estimate; sum the distances
                 cerr << "i: " << i << ", I: " << I
                      << ", adj_m_est: " << p_adj_m_est
@@ -890,7 +890,7 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
                 // add it to list of adjoints
                 adj_b_V_est.push_back((cf_prb-cf0)/h);
             }
-            Prob p_adj_b_V_est(adj_b_V_est.begin(), adj_b_V_est.end());
+            Prob p_adj_b_V_est( adj_b_V_est );
             // compare this numerical estimate to the BBP estimate; sum the distances
             cerr << "i: " << i
                  << ", adj_b_V_est: " << p_adj_b_V_est

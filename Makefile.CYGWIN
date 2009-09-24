@@ -56,9 +56,11 @@ CC=g++
 CCO=-o
 # Flags for the C++ compiler
 # (dynamic linking of Boost libraries seems not to work on Cygwin)
-CCFLAGS=-O3 -Wno-deprecated -Wall -W -Wextra -DCYGWIN -static
+CCFLAGS=-Wno-deprecated -Wall -W -Wextra -DCYGWIN -static
 # Flags to add in debugging mode (if DEBUG=true)
-CCDEBUGFLAGS=-g -DDAI_DEBUG
+CCDEBUGFLAGS=-O3 -g -DDAI_DEBUG
+# Flags to add in non-debugging mode (if DEBUG=false)
+CCNODEBUGFLAGS=-O3
 # Standard include directories
 CCINC=-Iinclude -I/usr/local/include/boost-1_37
 
@@ -75,5 +77,3 @@ CCLIB=-Llib
 MATLABDIR=/agbs/share/sw/matlab
 # The following should resolve to the MatLab mex compile command
 MEX=$(MATLABDIR)/bin/mex
-# Specify the same C++ compiler and flags to mex
-MEXFLAGS=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'
