@@ -30,10 +30,10 @@ const char *MR::Name = "MR";
 
 
 void MR::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("tol") );
-    assert( opts.hasKey("verbose") );
-    assert( opts.hasKey("updates") );
-    assert( opts.hasKey("inits") );
+    DAI_ASSERT( opts.hasKey("tol") );
+    DAI_ASSERT( opts.hasKey("verbose") );
+    DAI_ASSERT( opts.hasKey("updates") );
+    DAI_ASSERT( opts.hasKey("inits") );
 
     props.tol = opts.getStringAs<double>("tol");
     props.verbose = opts.getStringAs<size_t>("verbose");
@@ -395,7 +395,7 @@ void MR::solvemcav() {
             for(size_t _j=0; _j<con[i]; _j++){ // for all j in N_i
                 size_t _i = kindex[i][_j];
                 size_t j = nb[i][_j];
-                assert( nb[j][_i] == i );
+                DAI_ASSERT( nb[j][_i] == i );
 
                 double newM = 0.0;
                 if( props.updates == Properties::UpdateType::FULL ) {

@@ -42,7 +42,7 @@ typedef matrix::index_array_type::const_iterator matrix_icit;
 
 
 Factor BinaryFactor( const Var &n, double field ) {
-    assert( n.states() == 2 );
+    DAI_ASSERT( n.states() == 2 );
     double buf[2];
     buf[0] = exp(-field);
     buf[1] = exp(field);
@@ -51,9 +51,9 @@ Factor BinaryFactor( const Var &n, double field ) {
 
 
 Factor BinaryFactor( const Var &n1, const Var &n2, double coupling ) {
-    assert( n1.states() == 2 );
-    assert( n2.states() == 2 );
-    assert( n1 != n2 );
+    DAI_ASSERT( n1.states() == 2 );
+    DAI_ASSERT( n2.states() == 2 );
+    DAI_ASSERT( n1 != n2 );
     double buf[4];
     buf[0] = (buf[3] = exp(coupling));
     buf[1] = (buf[2] = exp(-coupling));
@@ -71,7 +71,7 @@ Factor RandomFactor( const VarSet &ns, double beta ) {
 
 Factor PottsFactor( const Var &n1, const Var &n2, double beta ) {
     Factor fac( VarSet( n1, n2 ), 1.0 );
-    assert( n1.states() == n2.states() );
+    DAI_ASSERT( n1.states() == n2.states() );
     for( size_t s = 0; s < n1.states(); s++ )
         fac[ s * (n1.states() + 1) ] = exp(beta);
     return fac;
@@ -111,7 +111,7 @@ void WTh2FG( const matrix &w, const vector<double> &th, FactorGraph &fg ) {
     vector<Factor> factors;
 
     size_t N = th.size();
-    assert( (w.size1() == N) && (w.size2() == N) );
+    DAI_ASSERT( (w.size1() == N) && (w.size2() == N) );
 
     vars.reserve(N);
     for( size_t i = 0; i < N; i++ )
@@ -283,7 +283,7 @@ void MakeDRegFG( size_t N, size_t d, double mean_w, double mean_th, double sigma
 BipartiteGraph CreateRandomBipartiteGraph( size_t N, size_t K, size_t n, size_t k ) {
     BipartiteGraph G;
 
-    assert( N * n == K * k );
+    DAI_ASSERT( N * n == K * k );
 
     // build lists of degree-repeated vertex numbers
     std::vector<size_t> stubs1(N*n,0);
@@ -326,7 +326,7 @@ int powmod (int x, int n, int p) {
 // Returns order of x in GF(p) with p prime
 size_t order (int x, int p) {
     x = x % p;
-    assert( x != 0 );
+    DAI_ASSERT( x != 0 );
     size_t n = 0;
     size_t prod = 1;
     do {
@@ -384,15 +384,15 @@ BipartiteGraph CreateGroupStructuredLDPCGraph( size_t p, size_t j, size_t k ) {
     for( a = 2; a < p; a++ )
         if( order(a,p) == k )
             break;
-    assert( a != p );
+    DAI_ASSERT( a != p );
     for( b = 2; b < p; b++ )
         if( order(b,p) == j )
             break;
-    assert( b != p );
+    DAI_ASSERT( b != p );
 //    cout << "# order(a=" << a << ") = " << order(a,p) << endl;
 //    cout << "# order(b=" << b << ") = " << order(b,p) << endl;
 
-    assert( N * n == K * k );
+    DAI_ASSERT( N * n == K * k );
 
     typedef BipartiteGraph::Edge Edge;
     vector<Edge> edges;

@@ -49,7 +49,7 @@ ParameterEstimation* CondProbEstimation::factory( const PropertySet &p ) {
 CondProbEstimation::CondProbEstimation( size_t target_dimension, const Prob &pseudocounts )
   : _target_dim(target_dimension), _stats(pseudocounts), _initial_stats(pseudocounts)
 {
-    assert( !(_stats.size() % _target_dim) );
+    DAI_ASSERT( !(_stats.size() % _target_dim) );
 }
 
 
@@ -104,14 +104,14 @@ Permute SharedParameters::calculatePermutation( const std::vector<Var> &varorder
 void SharedParameters::setPermsAndVarSetsFromVarOrders() {
     if( _varorders.size() == 0 )
         return;
-    assert( _estimation != NULL );
+    DAI_ASSERT( _estimation != NULL );
 
     // Construct the permutation objects and the varsets
     for( FactorOrientations::const_iterator foi = _varorders.begin(); foi != _varorders.end(); ++foi ) {
         VarSet vs;
         _perms[foi->first] = calculatePermutation( foi->second, vs );
         _varsets[foi->first] = vs;
-        assert( _estimation->probSize() == vs.nrStates() );
+        DAI_ASSERT( _estimation->probSize() == vs.nrStates() );
     }
 }
 
@@ -229,7 +229,7 @@ void SharedParameters::collectParameters( const FactorGraph &fg, std::vector<Rea
         outVarOrder.push_back( *var_it );
 
     const Factor &f = fg.factor(I);
-    assert( f.vars() == _varsets[I] );
+    DAI_ASSERT( f.vars() == _varsets[I] );
     const Permute &perm = _perms[I];
     for( size_t val_index = 0; val_index < f.states(); ++val_index )
         outVals.push_back( f[perm.convert_linear_index(val_index)] );

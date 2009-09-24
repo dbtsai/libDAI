@@ -23,7 +23,6 @@
 #include <boost/any.hpp>
 #include <map>
 #include <vector>
-#include <cassert>
 #include <typeinfo>
 #include <dai/exceptions.h>
 #include <dai/util.h>
@@ -95,7 +94,7 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
         void ConvertTo(const PropertyKey &key) { 
             PropertyValue val = Get(key);
             if( val.type() != typeid(ValueType) ) {
-                assert( val.type() == typeid(std::string) );
+                DAI_ASSERT( val.type() == typeid(std::string) );
                 try {
                     Set(key, boost::lexical_cast<ValueType>(GetAs<std::string>(key)));
                 } catch(boost::bad_lexical_cast &) {

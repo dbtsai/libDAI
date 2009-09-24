@@ -26,7 +26,7 @@ typedef BipartiteGraph::Neighbor Neighbor;
 
 
 Prob unnormAdjoint( const Prob &w, Real Z_w, const Prob &adj_w ) {
-    assert( w.size() == adj_w.size() );
+    DAI_ASSERT( w.size() == adj_w.size() );
     Prob adj_w_unnorm( w.size(), 0.0 );
     Real s = 0.0;
     for( size_t i = 0; i < w.size(); i++ )
@@ -207,7 +207,7 @@ void BBP::RegeneratePsiAdjoints() {
     _adj_psi_V.reserve( _fg->nrVars() );
     for( size_t i = 0; i < _fg->nrVars(); i++ ) {
         Prob p( _adj_b_V_unnorm[i] );
-        assert( p.size() == _fg->var(i).states() );
+        DAI_ASSERT( p.size() == _fg->var(i).states() );
         foreach( const Neighbor &I, _fg->nbV(i) )
             p *= _bp_dual.msgM( i, I.iter );
         p += _init_adj_psi_V[i];
@@ -217,7 +217,7 @@ void BBP::RegeneratePsiAdjoints() {
     _adj_psi_F.reserve( _fg->nrFactors() );
     for( size_t I = 0; I < _fg->nrFactors(); I++ ) {
         Prob p( _adj_b_F_unnorm[I] );
-        assert( p.size() == _fg->factor(I).states() );
+        DAI_ASSERT( p.size() == _fg->factor(I).states() );
         foreach( const Neighbor &i, _fg->nbF(I) ) {
             Prob n_iI( _bp_dual.msgN( i, i.dual ) );
             const _ind_t& ind = _index( i, i.dual );
@@ -269,7 +269,7 @@ void BBP::RegenerateParMessageAdjoints() {
 
             { // calculate adj_m
                 Prob prod( _adj_b_V_unnorm[i] );
-                assert( prod.size() == _fg->var(i).states() );
+                DAI_ASSERT( prod.size() == _fg->var(i).states() );
                 foreach( const Neighbor &J, _fg->nbV(i) )
                     if( J.node != I.node )
                         prod *= _bp_dual.msgM(i,J.iter);
@@ -294,7 +294,7 @@ void BBP::RegenerateSeqMessageAdjoints() {
         foreach( const Neighbor &I, _fg->nbV(i) ) {
             // calculate adj_m
             Prob prod( _adj_b_V_unnorm[i] );
-            assert( prod.size() == _fg->var(i).states() );
+            DAI_ASSERT( prod.size() == _fg->var(i).states() );
             foreach( const Neighbor &J, _fg->nbV(i) )
                 if( J.node != I.node )
                     prod *= _bp_dual.msgM( i, J.iter );
@@ -447,7 +447,7 @@ void BBP::setSeqMsgM( size_t i, size_t _I, const Prob &p ) {
 void BBP::sendSeqMsgN( size_t i, size_t _I, const Prob &f ) {
     Prob f_unnorm = unnormAdjoint( _bp_dual.msgN(i,_I), _bp_dual.zN(i,_I), f );
     const Neighbor &I = _fg->nbV(i)[_I];
-    assert( I.iter == _I );
+    DAI_ASSERT( I.iter == _I );
     _adj_psi_V[i] += f_unnorm * T( i, _I );
 #if 0
     if(f_unnorm.sumAbs() > pv_thresh) {
@@ -536,7 +536,7 @@ void BBP::sendSeqMsgM( size_t j, size_t _I ) {
                 DAI_PV(_fg->nbV(i).size());
             }
 #endif
-            assert( _fg->nbV(i)[i.dual].node == I );
+            DAI_ASSERT( _fg->nbV(i)[i.dual].node == I );
             sendSeqMsgN( i, i.dual, msg );
         }
     }
@@ -585,7 +585,7 @@ void BBP::getMsgMags( Real &s, Real &new_s ) {
 //             argmax_var_state = argmax_state.first;
 //         }
 //     }
-//     assert(/*0 <= argmax_var_state &&*/
+//     DAI_ASSERT(/*0 <= argmax_var_state &&*/
 //            argmax_var_state < _fg->var(argmax_var).states());
 //     return tuple<size_t,size_t,Real>(argmax_var,argmax_var_state,max_var);
 // }
@@ -603,7 +603,7 @@ void BBP::getArgmaxMsgM( size_t &out_i, size_t &out__I, Real &mag ) {
                 out__I = I.iter;
             }
         }
-    assert( found );
+    DAI_ASSERT( found );
 }
 
 
@@ -1001,14 +1001,14 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 state = getGibbsState( ia, 2*ia.Iterations() );
             else
                 state = *stateP;
-            assert( state.size() == fg.nrVars() );
+            DAI_ASSERT( state.size() == fg.nrVars() );
 
             vector<Prob> b1_adj;
             b1_adj.reserve(fg.nrVars());
             for( size_t i = 0; i < state.size(); i++ ) {
                 size_t n = fg.var(i).states();
                 Prob delta( n, 0.0 );
-                assert(/*0<=state[i] &&*/ state[i] < n);
+                DAI_ASSERT(/*0<=state[i] &&*/ state[i] < n);
                 double b = ia.beliefV(i)[state[i]];
                 switch( (size_t)cfn_type ) {
                     case bbp_cfn_t::CFN_GIBBS_B:
@@ -1036,7 +1036,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 state = getGibbsState( ia, 2*ia.Iterations() );
             else
                 state = *stateP;
-            assert( state.size() == fg.nrVars() );
+            DAI_ASSERT( state.size() == fg.nrVars() );
 
             vector<Prob> b2_adj;
             b2_adj.reserve( fg.nrVars() );
@@ -1045,7 +1045,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 Prob delta( n, 0.0 );
 
                 size_t x_I = getFactorEntryForState( fg, I, state );
-                assert(/*0<=x_I &&*/ x_I < n);
+                DAI_ASSERT(/*0<=x_I &&*/ x_I < n);
 
                 double b = ia.beliefF(I)[x_I];
                 switch( (size_t)cfn_type ) {
@@ -1090,9 +1090,9 @@ Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stat
         case bbp_cfn_t::CFN_GIBBS_B:
         case bbp_cfn_t::CFN_GIBBS_B2:
         case bbp_cfn_t::CFN_GIBBS_EXP: {
-            assert( stateP != NULL );
+            DAI_ASSERT( stateP != NULL );
             vector<size_t> state = *stateP;
-            assert( state.size() == fg.nrVars() );
+            DAI_ASSERT( state.size() == fg.nrVars() );
             for( size_t i = 0; i < fg.nrVars(); i++ ) {
                 double b = ia.beliefV(i)[state[i]];
                 switch( (size_t)cfn_type ) {
@@ -1113,9 +1113,9 @@ Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stat
         } case bbp_cfn_t::CFN_GIBBS_B_FACTOR:
           case bbp_cfn_t::CFN_GIBBS_B2_FACTOR:
           case bbp_cfn_t::CFN_GIBBS_EXP_FACTOR: {
-            assert( stateP != NULL );
+            DAI_ASSERT( stateP != NULL );
             vector<size_t> state = *stateP;
-            assert( state.size() == fg.nrVars() );
+            DAI_ASSERT( state.size() == fg.nrVars() );
             for( size_t I = 0; I < fg.nrFactors(); I++ ) {
                 size_t x_I = getFactorEntryForState( fg, I, state );
                 double b = ia.beliefF(I)[x_I];

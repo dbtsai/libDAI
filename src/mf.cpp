@@ -27,8 +27,8 @@ const char *MF::Name = "MF";
 
 
 void MF::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("tol") );
-    assert( opts.hasKey("maxiter") );
+    DAI_ASSERT( opts.hasKey("tol") );
+    DAI_ASSERT( opts.hasKey("maxiter") );
 
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
@@ -158,7 +158,7 @@ Factor MF::belief (const VarSet &ns) const {
     if( ns.size() == 1 )
         return belief( *(ns.begin()) );
     else {
-        assert( ns.size() == 1 );
+        DAI_ASSERT( ns.size() == 1 );
         return Factor();
     }
 }

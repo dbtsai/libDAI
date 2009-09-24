@@ -93,7 +93,7 @@ ClusterGraph ClusterGraph::VarElim( const std::vector<Var> & ElimSeq ) const {
     // Do variable elimination
     for( vector<Var>::const_iterator n = ElimSeq.begin(); n != ElimSeq.end(); n++ ) {
         size_t i = cl.findVar( *n );
-        assert( i != cl.vars.size() );
+        DAI_ASSERT( i != cl.vars.size() );
 
         result.insert( cl.Delta(i) );
 

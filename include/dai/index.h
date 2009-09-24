@@ -22,7 +22,6 @@
 #include <vector>
 #include <algorithm>
 #include <map>
-#include <cassert>
 #include <dai/varset.h>
 
 
@@ -158,14 +157,14 @@ class MultiFor {
 
         /// Return linear state
         operator size_t() const {
-            assert( valid() );
+            DAI_ASSERT( valid() );
             return( _state );
         }
 
         /// Return k'th index
         size_t operator[]( size_t k ) const {
-            assert( valid() );
-            assert( k < _states.size() );
+            DAI_ASSERT( valid() );
+            DAI_ASSERT( k < _states.size() );
             return _states[k];
         }
 
@@ -209,7 +208,7 @@ class Permute {
 
         /// Construct from vector of index dimensions and permutation sigma
         Permute( const std::vector<size_t> &d, const std::vector<size_t> &sigma ) : _dims(d), _sigma(sigma) {
-            assert( _dims.size() == _sigma.size() );
+            DAI_ASSERT( _dims.size() == _sigma.size() );
         }
 
         /// Construct from vector of variables
@@ -275,13 +274,13 @@ class State {
 
         /// Return linear state
         operator size_t() const {
-            assert( valid() );
+            DAI_ASSERT( valid() );
             return( state );
         }
 
         /// Return state of variable n, or zero if n is not in this State
         size_t operator() ( const Var &n ) const {
-            assert( valid() );
+            DAI_ASSERT( valid() );
             states_type::const_iterator entry = states.find( n );
             if( entry == states.end() )
                 return 0;
@@ -291,7 +290,7 @@ class State {
 
         /// Return linear state of variables in varset, setting them to zero if they are not in this State
         size_t operator() ( const VarSet &vs ) const {
-            assert( valid() );
+            DAI_ASSERT( valid() );
             size_t vs_state = 0;
             size_t prod = 1;
             for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ ) {

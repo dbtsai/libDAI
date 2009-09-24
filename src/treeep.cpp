@@ -27,10 +27,10 @@ const char *TreeEP::Name = "TREEEP";
 
 
 void TreeEP::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("tol") );
-    assert( opts.hasKey("maxiter") );
-    assert( opts.hasKey("verbose") );
-    assert( opts.hasKey("type") );
+    DAI_ASSERT( opts.hasKey("tol") );
+    DAI_ASSERT( opts.hasKey("maxiter") );
+    DAI_ASSERT( opts.hasKey("verbose") );
+    DAI_ASSERT( opts.hasKey("type") );
 
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
@@ -74,7 +74,7 @@ TreeEP::TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &
         for( beta = 0; beta < jt_RTree.size(); beta++ )
             if( UEdge( jt_RTree[beta].n1, jt_RTree[beta].n2 ) == UEdge( alpha1, alpha2 ) )
                 break;
-        assert( beta != jt_RTree.size() );
+        DAI_ASSERT( beta != jt_RTree.size() );
 
         size_t newalpha1 = find(_a.begin(), _a.end(), alpha1) - _a.begin();
         if( newalpha1 == _a.size() ) {
@@ -189,7 +189,7 @@ double TreeEP::TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::ve
 TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opts("updates",string("HUGIN")), false), _maxdiff(0.0), _iters(0), props(), _Q() {
     setProperties( opts );
 
-    assert( fg.isConnected() );
+    DAI_ASSERT( fg.isConnected() );
 
     if( opts.hasKey("tree") ) {
         ConstructRG( opts.GetAs<DEdgeVec>("tree") );
@@ -280,7 +280,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
                 fac2OR[I] = alpha;
                 break;
             }
-    // DIFF WITH JTree::GenerateJT:      assert
+    // DIFF WITH JTree::GenerateJT: assert
     }
     RecomputeORs();
 

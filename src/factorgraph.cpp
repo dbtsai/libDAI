@@ -301,7 +301,7 @@ vector<VarSet> FactorGraph::Cliques() const {
 
 
 void FactorGraph::clamp( size_t i, size_t x, bool backup ) {
-    assert( x <= var(i).states() );
+    DAI_ASSERT( x <= var(i).states() );
     Factor mask( var(i), 0.0 );
     mask[x] = 1.0;
 
@@ -319,7 +319,7 @@ void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
     Factor mask_n( n, 0.0 );
 
     foreach( size_t i, is ) {
-        assert( i <= n.states() );
+        DAI_ASSERT( i <= n.states() );
         mask_n[i] = 1.0;
     }
 
@@ -335,7 +335,7 @@ void FactorGraph::clampFactor( size_t I, const vector<size_t> &is, bool backup )
     Factor newF( factor(I).vars(), 0.0 );
 
     foreach( size_t i, is ) {
-        assert( i <= st );
+        DAI_ASSERT( i <= st );
         newF[i] = factor(I)[i];
     }
 

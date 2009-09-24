@@ -42,7 +42,7 @@ int main() {
             cout << "    " << s0 << "              " << s1 << "              " << X.calcState(states) << endl;
 
             // VarSet::calcStates is the inverse of VarSet::calcState
-            assert( X.calcStates(X.calcState(states)) == states );
+            DAI_ASSERT( X.calcStates(X.calcState(states)) == states );
         }
 
     cout << endl << "And vice versa:" << endl;
@@ -55,7 +55,7 @@ int main() {
         cout << "    " << states[x0] << "              " << states[x1] << "              " << S << endl;
 
         // VarSet::calcState is the inverse of VarSet::calcStates
-        assert( X.calcState(X.calcStates(S)) == S );
+        DAI_ASSERT( X.calcState(X.calcStates(S)) == S );
     }
 
     return 0;

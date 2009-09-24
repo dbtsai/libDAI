@@ -19,9 +19,9 @@
 
 #include <ostream>
 #include <vector>
-#include <cassert>
 #include <algorithm>
 #include <dai/util.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -251,7 +251,7 @@ class BipartiteGraph {
             nbs1new.reserve( sizeHint );
             size_t iter = 0;
             for( NodeInputIterator it = begin; it != end; ++it ) {
-                assert( *it < nr2() );
+                DAI_ASSERT( *it < nr2() );
                 Neighbor nb1new( iter, *it, nb2(*it).size() );
                 Neighbor nb2new( nb2(*it).size(), nr1(), iter++ );
                 nbs1new.push_back( nb1new );
@@ -272,7 +272,7 @@ class BipartiteGraph {
             nbs2new.reserve( sizeHint );
             size_t iter = 0;
             for( NodeInputIterator it = begin; it != end; ++it ) {
-                assert( *it < nr1() );
+                DAI_ASSERT( *it < nr1() );
                 Neighbor nb2new( iter, *it, nb1(*it).size() );
                 Neighbor nb1new( nb1(*it).size(), nr2(), iter++ );
                 nbs2new.push_back( nb2new );
@@ -289,8 +289,8 @@ class BipartiteGraph {
 
         /// Removes edge between node n1 of type 1 and node n2 of type 2.
         void eraseEdge( size_t n1, size_t n2 ) {
-            assert( n1 < nr1() );
-            assert( n2 < nr2() );
+            DAI_ASSERT( n1 < nr1() );
+            DAI_ASSERT( n2 < nr2() );
             for( Neighbors::iterator i1 = _nb1[n1].begin(); i1 != _nb1[n1].end(); i1++ )
                 if( i1->node == n2 ) {
                     _nb1[n1].erase( i1 );
@@ -307,8 +307,8 @@ class BipartiteGraph {
         /** If check == true, only adds the edge if it does not exist already.
          */
         void addEdge( size_t n1, size_t n2, bool check = true ) {
-            assert( n1 < nr1() );
-            assert( n2 < nr2() );
+            DAI_ASSERT( n1 < nr1() );
+            DAI_ASSERT( n2 < nr2() );
             bool exists = false;
             if( check ) {
                 // Check whether the edge already exists
@@ -373,7 +373,7 @@ class BipartiteGraph {
         }
 
         const Edge& edge(size_t e) const {
-            assert(_edge_indexed);
+            DAI_ASSERT(_edge_indexed);
             return _edges[e];
         }
 
@@ -382,15 +382,15 @@ class BipartiteGraph {
         }
 
         size_t VV2E(size_t n1, size_t n2) const {
-            assert(_edge_indexed);
+            DAI_ASSERT(_edge_indexed);
             Edge e(n1,n2);
             hash_map<Edge,size_t>::const_iterator i = _vv2e.find(e);
-            assert(i != _vv2e.end());
+            DAI_ASSERT(i != _vv2e.end());
             return i->second;
         }
 
         size_t nr_edges() const {
-            assert(_edge_indexed);
+            DAI_ASSERT(_edge_indexed);
             return _edges.size();
         }
         //}@

@@ -24,8 +24,8 @@ const char *JTree::Name = "JTREE";
 
 
 void JTree::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("verbose") );
-    assert( opts.hasKey("updates") );
+    DAI_ASSERT( opts.hasKey("verbose") );
+    DAI_ASSERT( opts.hasKey("updates") );
 
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.updates = opts.getStringAs<Properties::UpdateType>("updates");
@@ -117,7 +117,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
                 fac2OR.push_back( alpha );
                 break;
             }
-        assert( alpha != nrORs() );
+        DAI_ASSERT( alpha != nrORs() );
     }
     RecomputeORs();
 
@@ -181,7 +181,7 @@ Factor JTree::belief( const VarSet &ns ) const {
         for( alpha = Qa.begin(); alpha != Qa.end(); alpha++ )
             if( alpha->vars() >> ns )
                 break;
-        assert( alpha != Qa.end() );
+        DAI_ASSERT( alpha != Qa.end() );
         return( alpha->marginal(ns) );
     }
 }
@@ -364,7 +364,7 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
             if( OR(newTree[e].n2).vars().contains( *n ) )
                 break;
         }
-        assert( e != newTree.size() );
+        DAI_ASSERT( e != newTree.size() );
 
         // track-back path to root and add edges to subTree
         subTree.insert( newTree[e] );
@@ -382,7 +382,7 @@ size_t JTree::findEfficientTree( const VarSet& ns, DEdgeVec &Tree, size_t Previo
             if( newTree[e].n2 == PreviousRoot )
                 break;
         }
-        assert( e != newTree.size() );
+        DAI_ASSERT( e != newTree.size() );
 
         // track-back path to root and add edges to subTree
         subTree.insert( newTree[e] );
@@ -470,7 +470,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
                 for( beta = 0; beta < nrIRs(); beta++ )
                     if( UEdge( RTree[beta].n1, RTree[beta].n2 ) == UEdge( alpha1, alpha2 ) )
                         break;
-                assert( beta != nrIRs() );
+                DAI_ASSERT( beta != nrIRs() );
                 b[i] = beta;
 
                 if( !Qa_old.count( alpha1 ) )

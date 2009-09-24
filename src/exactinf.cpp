@@ -23,7 +23,7 @@ const char *ExactInf::Name = "EXACT";
 
 
 void ExactInf::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("verbose") );
+    DAI_ASSERT( opts.hasKey("verbose") );
 
     props.verbose = opts.getStringAs<size_t>("verbose");
 }
@@ -106,7 +106,7 @@ Factor ExactInf::belief( const VarSet &ns ) const {
         for( I = 0; I < nrFactors(); I++ )
             if( factor(I).vars() >> ns )
                 break;
-        assert( I != nrFactors() );
+        DAI_ASSERT( I != nrFactors() );
         return beliefF(I).marginal(ns);
     }
 }

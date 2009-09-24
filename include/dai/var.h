@@ -19,7 +19,7 @@
 
 
 #include <iostream>
-#include <cassert>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -69,7 +69,7 @@ class Var {
         bool operator <= ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
-                assert( _states == n._states );
+                DAI_ASSERT( _states == n._states );
 #endif
             return( _label <= n._label );
         }
@@ -77,7 +77,7 @@ class Var {
         bool operator >= ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
-                assert( _states == n._states );
+                DAI_ASSERT( _states == n._states );
 #endif
             return( _label >= n._label );
         }
@@ -85,7 +85,7 @@ class Var {
         bool operator != ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
-                assert( _states == n._states );
+                DAI_ASSERT( _states == n._states );
 #endif
             return( _label != n._label );
         }
@@ -93,7 +93,7 @@ class Var {
         bool operator == ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
-                assert( _states == n._states );
+                DAI_ASSERT( _states == n._states );
 #endif
             return( _label == n._label );
         }

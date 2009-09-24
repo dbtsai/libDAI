@@ -250,7 +250,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
 
     delete clamped;
 
-    assert( result.size() == (ns.size() * (ns.size() - 1) / 2) );
+    DAI_ASSERT( result.size() == (ns.size() * (ns.size() - 1) / 2) );
 
     return result;
 }

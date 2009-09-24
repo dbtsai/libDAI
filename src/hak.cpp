@@ -25,11 +25,11 @@ const char *HAK::Name = "HAK";
 
 
 void HAK::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("tol") );
-    assert( opts.hasKey("maxiter") );
-    assert( opts.hasKey("verbose") );
-    assert( opts.hasKey("doubleloop") );
-    assert( opts.hasKey("clusters") );
+    DAI_ASSERT( opts.hasKey("tol") );
+    DAI_ASSERT( opts.hasKey("maxiter") );
+    DAI_ASSERT( opts.hasKey("verbose") );
+    DAI_ASSERT( opts.hasKey("doubleloop") );
+    DAI_ASSERT( opts.hasKey("clusters") );
 
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
@@ -40,7 +40,7 @@ void HAK::setProperties( const PropertySet &opts ) {
     if( opts.hasKey("loopdepth") )
         props.loopdepth = opts.getStringAs<size_t>("loopdepth");
     else
-        assert( props.clusters != Properties::ClustersType::LOOP );
+        DAI_ASSERT( props.clusters != Properties::ClustersType::LOOP );
     if( opts.hasKey("damping") )
         props.damping = opts.getStringAs<double>("damping");
     else
@@ -209,7 +209,7 @@ double HAK::doGBP() {
 
     // Check whether counting numbers won't lead to problems
     for( size_t beta = 0; beta < nrIRs(); beta++ )
-        assert( nbIR(beta).size() + IR(beta).c() != 0.0 );
+        DAI_ASSERT( nbIR(beta).size() + IR(beta).c() != 0.0 );
 
     // Keep old beliefs to check convergence
     vector<Factor> old_beliefs;
@@ -440,7 +440,7 @@ Factor HAK::belief( const VarSet &ns ) const {
         for( alpha = _Qa.begin(); alpha != _Qa.end(); alpha++ )
             if( alpha->vars() >> ns )
                 break;
-        assert( alpha != _Qa.end() );
+        DAI_ASSERT( alpha != _Qa.end() );
         return( alpha->marginal(ns) );
     }
 }

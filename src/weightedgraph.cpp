@@ -10,9 +10,9 @@
 
 
 #include <algorithm>
-#include <cassert>
 #include <dai/weightedgraph.h>
 #include <dai/util.h>
+#include <dai/exceptions.h>
 
 
 namespace dai {
@@ -40,7 +40,7 @@ DEdgeVec GrowRootedTree( const Graph & T, size_t Root ) {
             for( Graph::iterator e = Gr.begin(); e != Gr.end(); ) {
                 bool e1_in_treeV = treeV.count( e->n1 );
                 bool e2_in_treeV = treeV.count( e->n2 );
-                assert( !(e1_in_treeV && e2_in_treeV) );
+                DAI_ASSERT( !(e1_in_treeV && e2_in_treeV) );
                 if( e1_in_treeV ) {
                     // Add directed edge, pointing away from the root
                     result.push_back( DEdge( e->n1, e->n2 ) );
@@ -70,7 +70,7 @@ UEdgeVec RandomDRegularGraph( size_t N, size_t d ) {
     // (which becomes uniform in the limit that d is small and N goes
     // to infinity).
 
-    assert( (N * d) % 2 == 0 );
+    DAI_ASSERT( (N * d) % 2 == 0 );
 
     bool ready = false;
     UEdgeVec G;

@@ -33,10 +33,10 @@ const char *BP::Name = "BP";
 
 
 void BP::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("tol") );
-    assert( opts.hasKey("maxiter") );
-    assert( opts.hasKey("logdomain") );
-    assert( opts.hasKey("updates") );
+    DAI_ASSERT( opts.hasKey("tol") );
+    DAI_ASSERT( opts.hasKey("maxiter") );
+    DAI_ASSERT( opts.hasKey("logdomain") );
+    DAI_ASSERT( opts.hasKey("updates") );
 
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
@@ -133,7 +133,7 @@ void BP::init() {
 
 
 void BP::findMaxResidual( size_t &i, size_t &_I ) {
-    assert( !_lut.empty() );
+    DAI_ASSERT( !_lut.empty() );
     LutType::const_iterator largestEl = _lut.end();
     --largestEl;
     i  = largestEl->second.first;
@@ -435,7 +435,7 @@ Factor BP::belief( const VarSet &ns ) const {
         for( I = 0; I < nrFactors(); I++ )
             if( factor(I).vars() >> ns )
                 break;
-        assert( I != nrFactors() );
+        DAI_ASSERT( I != nrFactors() );
         return beliefF(I).marginal(ns);
     }
 }

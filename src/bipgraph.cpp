@@ -19,7 +19,7 @@ using namespace std;
 
 
 void BipartiteGraph::erase1( size_t n1 ) {
-    assert( n1 < nr1() );
+    DAI_ASSERT( n1 < nr1() );
     // Erase neighbor entry of node n1
     _nb1.erase( _nb1.begin() + n1 );
     // Adjust neighbor entries of nodes of type 2
@@ -45,7 +45,7 @@ void BipartiteGraph::erase1( size_t n1 ) {
 
 
 void BipartiteGraph::erase2( size_t n2 ) {
-    assert( n2 < nr2() );
+    DAI_ASSERT( n2 < nr2() );
     // Erase neighbor entry of node n2
     _nb2.erase( _nb2.begin() + n2 );
     // Adjust neighbor entries of nodes of type 1
@@ -242,20 +242,20 @@ void BipartiteGraph::check() const {
     for( size_t n1 = 0; n1 < N1; n1++ ) {
         size_t iter = 0;
         foreach( const Neighbor &n2, nb1(n1) ) {
-            assert( n2.iter == iter );
-            assert( n2.node < N2 );
-            assert( n2.dual < nb2(n2).size() );
-            assert( nb2(n2, n2.dual) == n1 );
+            DAI_ASSERT( n2.iter == iter );
+            DAI_ASSERT( n2.node < N2 );
+            DAI_ASSERT( n2.dual < nb2(n2).size() );
+            DAI_ASSERT( nb2(n2, n2.dual) == n1 );
             iter++;
         }
     }
     for( size_t n2 = 0; n2 < N2; n2++ ) {
         size_t iter = 0;
         foreach( const Neighbor &n1, nb2(n2) ) {
-            assert( n1.iter == iter );
-            assert( n1.node < N1 );
-            assert( n1.dual < nb1(n1).size() );
-            assert( nb1(n1, n1.dual) == n2 );
+            DAI_ASSERT( n1.iter == iter );
+            DAI_ASSERT( n1.node < N1 );
+            DAI_ASSERT( n1.dual < nb1(n1).size() );
+            DAI_ASSERT( nb1(n1, n1.dual) == n2 );
             iter++;
         }
     }

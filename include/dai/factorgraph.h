@@ -188,7 +188,7 @@ class FactorGraph {
 
         /// Set the content of the I'th factor and make a backup of its old content if backup == true
         virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {
-            assert( newFactor.vars() == factor(I).vars() );
+            DAI_ASSERT( newFactor.vars() == factor(I).vars() );
             if( backup )
                 backupFactor( I );
             _factors[I] = newFactor;

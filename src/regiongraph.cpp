@@ -39,7 +39,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors,
                 fac2OR.push_back( alpha );
                 break;
             }
-        assert( alpha != nrORs() );
+        DAI_ASSERT( alpha != nrORs() );
     }
     RecomputeORs();
 
@@ -74,7 +74,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
                 fac2OR.push_back( alpha );
                 break;
             }
-        assert( alpha != nrORs() );
+        DAI_ASSERT( alpha != nrORs() );
     }
     RecomputeORs();
 
@@ -207,7 +207,7 @@ void RegionGraph::RecomputeORs( const VarSet &ns ) {
 
 
 void RegionGraph::RecomputeOR( size_t I ) {
-    assert( I < nrFactors() );
+    DAI_ASSERT( I < nrFactors() );
     if( fac2OR[I] != -1U ) {
         size_t alpha = fac2OR[I];
         OR(alpha).fill( 1.0 );

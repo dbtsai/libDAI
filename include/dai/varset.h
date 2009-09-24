@@ -20,7 +20,6 @@
 
 #include <vector>
 #include <map>
-#include <cassert>
 #include <ostream>
 #include <dai/var.h>
 #include <dai/util.h>
@@ -139,7 +138,7 @@ class VarSet : public SmallSet<Var> {
                 states[*n] = linearState % n->states();
                 linearState /= n->states();
             }
-            assert( linearState == 0 );
+            DAI_ASSERT( linearState == 0 );
             return states;
         }
 

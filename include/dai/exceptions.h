@@ -51,6 +51,17 @@
  */
 #define DAI_THROWE(cod,msg) throw dai::Exception(dai::Exception::cod, std::string(__FILE__ ", line " DAI_TOSTRING(__LINE__)), msg)
 
+/// Assertion mechanism, similar to the standard assert() macro, but is always active, even if NDEBUG is defined
+#define DAI_ASSERT(condition) ((condition) ? ((void)0) : DAI_THROWE(ASSERTION_FAILED, #condition))
+
+// Assertion only if DAI_DEBUG is defined
+#ifdef DAI_DEBUG
+/// Assertion mechanism similar to DAI_ASSERT which is only active if DAI_DEBUG is defined
+#define DAI_DEBASSERT(x) do {DAI_ASSERT(x);} while(0)
+#else
+#define DAI_DEBASSERT(X) do {} while(0)
+#endif
+
 
 namespace dai {
 
@@ -59,7 +70,8 @@ namespace dai {
 class Exception : public std::runtime_error {
     public:
         /// Enumeration of exceptions used in libDAI
-        enum Code {NOT_IMPLEMENTED,
+        enum Code {ASSERTION_FAILED,
+                   NOT_IMPLEMENTED,
                    UNKNOWN_DAI_ALGORITHM,
                    UNKNOWN_PROPERTY_TYPE,
                    MALFORMED_PROPERTY,

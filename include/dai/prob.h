@@ -21,7 +21,6 @@
 #include <cmath>
 #include <vector>
 #include <ostream>
-#include <cassert>
 #include <algorithm>
 #include <numeric>
 #include <functional>
@@ -545,7 +544,7 @@ template<typename T> std::ostream& operator<< (std::ostream& os, const TProb<T>&
 /** \relates TProb
  */
 template<typename T> TProb<T> min( const TProb<T> &a, const TProb<T> &b ) {
-    assert( a.size() == b.size() );
+    DAI_ASSERT( a.size() == b.size() );
     TProb<T> result( a.size() );
     for( size_t i = 0; i < a.size(); i++ )
         if( a[i] < b[i] )
@@ -560,7 +559,7 @@ template<typename T> TProb<T> min( const TProb<T> &a, const TProb<T> &b ) {
 /** \relates TProb
  */
 template<typename T> TProb<T> max( const TProb<T> &a, const TProb<T> &b ) {
-    assert( a.size() == b.size() );
+    DAI_ASSERT( a.size() == b.size() );
     TProb<T> result( a.size() );
     for( size_t i = 0; i < a.size(); i++ )
         if( a[i] > b[i] )

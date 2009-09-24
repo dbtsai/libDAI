@@ -28,7 +28,7 @@ const char *Gibbs::Name = "GIBBS";
 
 
 void Gibbs::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("iters") );
+    DAI_ASSERT( opts.hasKey("iters") );
     props.iters = opts.getStringAs<size_t>("iters");
 
     if( opts.hasKey("verbose") )
@@ -111,7 +111,7 @@ inline size_t Gibbs::getFactorEntryDiff( size_t I, size_t i ) {
 
 
 Prob Gibbs::getVarDist( size_t i ) {
-    assert( i < nrVars() );
+    DAI_ASSERT( i < nrVars() );
     size_t i_states = var(i).states();
     Prob i_given_MB( i_states, 1.0 );
 
@@ -220,7 +220,7 @@ Factor Gibbs::belief( const VarSet &ns ) const {
         for( I = 0; I < nrFactors(); I++ )
             if( factor(I).vars() >> ns )
                 break;
-        assert( I != nrFactors() );
+        DAI_ASSERT( I != nrFactors() );
         return beliefF(I).marginal(ns);
     }
 }

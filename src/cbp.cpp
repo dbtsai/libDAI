@@ -77,7 +77,7 @@ void CBP::construct() {
 /// Calculates a vector of mixtures p * b + (1-p) * c
 static vector<Factor> mixBeliefs( Real p, const vector<Factor> &b, const vector<Factor> &c ) {
     vector<Factor> out;
-    assert( b.size() == c.size() );
+    DAI_ASSERT( b.size() == c.size() );
     out.reserve( b.size() );
     Real pc = 1 - p;
     for( size_t i = 0; i < b.size(); i++ )
@@ -152,10 +152,10 @@ void CBP::runRecurse( InfAlg *bp, double orig_logZ, vector<size_t> clamped_vars_
 
     if( clampingVar )
         foreach( size_t xi, xis )
-            assert(/*0<=xi &&*/ xi < var(i).states() );
+            DAI_ASSERT(/*0<=xi &&*/ xi < var(i).states() );
     else
         foreach( size_t xI, xis )
-            assert(/*0<=xI &&*/ xI < factor(i).states() );
+            DAI_ASSERT(/*0<=xI &&*/ xI < factor(i).states() );
     // - otherwise, clamp and recurse, saving margin estimates for each
     // clamp setting. afterwards, combine estimates.
 
@@ -258,9 +258,9 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                 xi = rnd( var(i).states() );
                 t++;
             } while( bp->beliefV(i).p()[xi] < tiny && t < t1 );
-            assert( t < t1 );
+            DAI_ASSERT( t < t1 );
             xis.resize( 1, xi );
-            //         assert(!_clamped_vars.count(i)); // not true for >2-ary variables
+            // DAI_ASSERT(!_clamped_vars.count(i)); // not true for >2-ary variables
             DAI_IFVERB(2, "CHOOSE_RANDOM at level " << clamped_vars_list.size() << " chose variable " << i << " state " << xis[0] << endl);
         } else {
             int t = 0, t1 = 100;
@@ -277,9 +277,9 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                 xi = rnd( factor(i).states() );
                 t++;
             } while( bp->beliefF(i).p()[xi] < tiny && t < t1 );
-            assert( t < t1 );
+            DAI_ASSERT( t < t1 );
             xis.resize( 1, xi );
-            //         assert(!_clamped_vars.count(i)); // not true for >2-ary variables
+            // DAI_ASSERT(!_clamped_vars.count(i)); // not true for >2-ary variables
             DAI_IFVERB(2, endl<<"CHOOSE_RANDOM chose factor "<<i<<" state "<<xis[0]<<endl);
         }
     } else if( ChooseMethod() == Properties::ChooseMethodType::CHOOSE_MAXENT ) {
@@ -294,8 +294,8 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                     win_xk = bp->beliefV(k).p().argmax().first;
                 }
             }
-            assert( win_k >= 0 );
-            assert( win_xk >= 0 );
+            DAI_ASSERT( win_k >= 0 );
+            DAI_ASSERT( win_xk >= 0 );
             i = win_k;
             xis.resize( 1, win_xk );
             DAI_IFVERB(2, endl<<"CHOOSE_MAXENT chose variable "<<i<<" state "<<xis[0]<<endl);
@@ -314,8 +314,8 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                     win_xk = bp->beliefF(k).p().argmax().first;
                 }
             }
-            assert( win_k >= 0 );
-            assert( win_xk >= 0 );
+            DAI_ASSERT( win_k >= 0 );
+            DAI_ASSERT( win_xk >= 0 );
             i = win_k;
             xis.resize( 1, win_xk );
             DAI_IFVERB(2, endl<<"CHOOSE_MAXENT chose factor "<<i<<" state "<<xis[0]<<endl);
@@ -331,7 +331,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
         if( !doL1 && needGibbsState( BBP_cost_function() ) )
             state = getGibbsState( *bp, 2*bp->Iterations() );
         // try clamping each variable manually
-        assert( Clamping() == Properties::ClampType::CLAMP_VAR );
+        DAI_ASSERT( Clamping() == Properties::ClampType::CLAMP_VAR );
         Real max_cost = 0.0;
         int win_k = -1, win_xk = -1;
         for( size_t k = 0; k < nrVars(); k++ ) {
@@ -356,8 +356,8 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                 delete bp1;
             }
         }
-        assert( win_k >= 0 );
-        assert( win_xk >= 0 );
+        DAI_ASSERT( win_k >= 0 );
+        DAI_ASSERT( win_xk >= 0 );
         i = win_k;
         xis.resize( 1, win_xk );
     } else if( ChooseMethod() == Properties::ChooseMethodType::CHOOSE_BBP ) {
@@ -390,9 +390,9 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
 
         xis.resize( 1, xi );
         if( clampingVar )
-            assert(/*0<=xi &&*/ xi < var(i).states() );
+            DAI_ASSERT(/*0<=xi &&*/ xi < var(i).states() );
         else
-            assert(/*0<=xi &&*/ xi < factor(i).states() );
+            DAI_ASSERT(/*0<=xi &&*/ xi < factor(i).states() );
         DAI_IFVERB(2, "CHOOSE_BBP (num clamped = " << clamped_vars_list.size() << ") chose " << i << " state " << xi << endl);
     } else
         DAI_THROW(UNKNOWN_ENUM_VALUE);
@@ -446,7 +446,7 @@ pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, con
                 argmax_var_state = argmax_state.first;
             }
         }
-        assert(/*0 <= argmax_var_state &&*/
+        DAI_ASSERT(/*0 <= argmax_var_state &&*/
                argmax_var_state < in_bp.fg().var(argmax_var).states() );
     } else {
         for( size_t I = 0; I < in_bp.fg().nrFactors(); I++ ) {
@@ -466,7 +466,7 @@ pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, con
                 argmax_var_state = argmax_state.first;
             }
         }
-        assert(/*0 <= argmax_var_state &&*/
+        DAI_ASSERT(/*0 <= argmax_var_state &&*/
                argmax_var_state < in_bp.fg().factor(argmax_var).states() );
     }
     if( maxVarOut )
@@ -484,7 +484,7 @@ vector<size_t> complement( vector<size_t> &xis, size_t n_states ) {
         if( j >= xis.size() || xis[j] > xi )
             cmp_xis.push_back(xi);
     }
-    assert( xis.size()+cmp_xis.size() == n_states );
+    DAI_ASSERT( xis.size()+cmp_xis.size() == n_states );
     return cmp_xis;
 }
 

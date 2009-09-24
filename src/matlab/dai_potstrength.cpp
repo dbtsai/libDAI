@@ -59,7 +59,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
             i = *n;
             break;
         }
-    assert( i.label() == ilabel );
+    DAI_ASSERT( i.label() == ilabel );
 
     // Find variable in psi with label jlabel
     Var j;
@@ -68,7 +68,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
             j = *n;
             break;
         }
-    assert( j.label() == jlabel );
+    DAI_ASSERT( j.label() == jlabel );
 
     // Calculate N(psi,i,j);
     double N = psi.strength( i, j );

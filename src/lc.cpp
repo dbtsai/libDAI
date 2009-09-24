@@ -28,11 +28,11 @@ const char *LC::Name = "LC";
 
 
 void LC::setProperties( const PropertySet &opts ) {
-    assert( opts.hasKey("tol") );
-    assert( opts.hasKey("maxiter") );
-    assert( opts.hasKey("verbose") );
-    assert( opts.hasKey("cavity") );
-    assert( opts.hasKey("updates") );
+    DAI_ASSERT( opts.hasKey("tol") );
+    DAI_ASSERT( opts.hasKey("maxiter") );
+    DAI_ASSERT( opts.hasKey("verbose") );
+    DAI_ASSERT( opts.hasKey("cavity") );
+    DAI_ASSERT( opts.hasKey("updates") );
 
     props.tol = opts.getStringAs<double>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");

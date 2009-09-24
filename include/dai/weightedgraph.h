@@ -24,7 +24,6 @@
 #include <map>
 #include <iostream>
 #include <set>
-#include <cassert>
 #include <limits>
 #include <climits>   // Work-around for bug in boost graph library
 

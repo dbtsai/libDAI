@@ -355,7 +355,7 @@ template <typename T> class TFactor {
          *  defined by \f$g(\{x_l\}_{l\in L \setminus M}) = f(\{x_l\}_{l\in L \setminus M}, \{s(x_m)\}_{m\in M})\f$.
          */
         TFactor<T> slice( const VarSet& ns, size_t nsState ) const {
-            assert( ns << _vs );
+            DAI_ASSERT( ns << _vs );
             VarSet nsrem = _vs / ns;
             TFactor<T> result( nsrem, T(0) );
 
@@ -382,7 +382,7 @@ template <typename T> class TFactor {
          *  the embedded factor corresponds with \f$g : \prod_{m\in M} X_m \to [0,\infty) : x \mapsto f(x_L)\f$.
          */
         TFactor<T> embed(const VarSet & ns) const {
-            assert( ns >> _vs );
+            DAI_ASSERT( ns >> _vs );
             if( _vs == ns )
                 return *this;
             else
@@ -529,7 +529,7 @@ template<typename T> Real dist( const TFactor<T> &f, const TFactor<T> &g, Prob::
  *  \pre f.vars() == g.vars()
  */
 template<typename T> TFactor<T> max( const TFactor<T> &f, const TFactor<T> &g ) {
-    assert( f._vs == g._vs );
+    DAI_ASSERT( f._vs == g._vs );
     return TFactor<T>( f._vs, min( f.p(), g.p() ) );
 }
 
@@ -539,7 +539,7 @@ template<typename T> TFactor<T> max( const TFactor<T> &f, const TFactor<T> &g ) 
  *  \pre f.vars() == g.vars()
  */
 template<typename T> TFactor<T> min( const TFactor<T> &f, const TFactor<T> &g ) {
-    assert( f._vs == g._vs );
+    DAI_ASSERT( f._vs == g._vs );
     return TFactor<T>( f._vs, max( f.p(), g.p() ) );
 }
 
@@ -549,7 +549,7 @@ template<typename T> TFactor<T> min( const TFactor<T> &f, const TFactor<T> &g ) 
  *  \pre f.vars().size() == 2
  */
 template<typename T> Real MutualInfo(const TFactor<T> &f) {
-    assert( f.vars().size() == 2 );
+    DAI_ASSERT( f.vars().size() == 2 );
     VarSet::const_iterator it = f.vars().begin();
     Var i = *it; it++; Var j = *it;
     TFactor<T> projection = f.marginal(i) * f.marginal(j);

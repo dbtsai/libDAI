@@ -1,3 +1,5 @@
+* Replaced the standard assert() macro by DAI_ASSERT, which throws a
+  dai::Exception and is even active if NDEBUG is defined
 * Added a constructor TProb<T>::TProb<T>( const std::vector<S> &v )
 * Introduced CCNODEBUGFLAGS in Makefile
 * Updated copyright headers

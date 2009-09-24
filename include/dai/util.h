@@ -50,12 +50,9 @@
 #define DAI_PV(x) do {std::cerr << #x "= " << (x) << std::endl;} while(0)
 /// "Debugging message": Prints a message (only if DAI_DEBUG is defined)
 #define DAI_DMSG(str) do {std::cerr << str << std::endl;} while(0)
-/// Assertion if DAI_DEBUG is defined
-#define DAI_DEBASSERT(x) do {assert(x);} while(0)
 #else
 #define DAI_PV(x) do {} while(0)
 #define DAI_DMSG(str) do {} while(0)
-#define DAI_DEBASSERT(X) do {} while(0)
 #endif
 
 /// Produces accessor and mutator methods according to the common pattern.

@@ -36,13 +36,13 @@ int main() {
         // Iterate over all neighbors n2 of n1
         foreach( const BipartiteGraph::Neighbor &n2, G.nb1(n1) ) {
             // The n2.iter'th neighbor of n1 is n2:
-            assert( G.nb1(n1)[n2.iter] == n2 );
+            DAI_ASSERT( G.nb1(n1)[n2.iter] == n2 );
 
             // The n2.dual'th neighbor of n2 is n1:
-            assert( G.nb2(n2)[n2.dual] == n1 );
+            DAI_ASSERT( G.nb2(n2)[n2.dual] == n1 );
 
             // n2 can be used as an abbreviation of n2.node:
-            assert( static_cast<size_t>(n2) == n2.node );
+            DAI_ASSERT( static_cast<size_t>(n2) == n2.node );
 
             cout << "  the " << n2.iter << "'th neighbor is node " << n2 << " of type 2" << endl;
         }

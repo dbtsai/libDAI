@@ -16,7 +16,8 @@ namespace dai {
 
 
     std::string Exception::ErrorStrings[NUM_ERRORS] = {
-        "This feature is not implemented",
+        "Assertion failed",
+        "Feature not implemented",
         "Unknown DAI algorithm",
         "Unknown Property type",
         "Malformed Property",
