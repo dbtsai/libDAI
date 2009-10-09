@@ -48,6 +48,9 @@ class HAK : public DAIAlgRG {
             /// Enumeration of possible cluster choices
             DAI_ENUM(ClustersType,MIN,DELTA,LOOP)
 
+            /// Enumeration of possible message initializations
+            DAI_ENUM(InitType,UNIFORM,RANDOM)
+
             /// Verbosity
             size_t verbose;
 
@@ -62,6 +65,9 @@ class HAK : public DAIAlgRG {
 
             /// How to choose the clusters
             ClustersType clusters;
+
+            /// How to initialize the messages
+            InitType init;
 
             /// Use single-loop (GBP) or double-loop (HAK)
             bool doubleloop;
