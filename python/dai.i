@@ -1,3 +1,13 @@
+/*  This file is part of libDAI - http://www.libdai.org/
+ *
+ *  libDAI is licensed under the terms of the GNU General Public License version
+ *  2, or (at your option) any later version. libDAI is distributed without any
+ *  warranty. See the file COPYING for more details.
+ *
+ *  Copyright (C) 2009  Patrick Pletscher  [pletscher at inf dot ethz dot ch]
+ */
+
+
 %module dai
 
         struct Neighbor {
@@ -30,6 +40,10 @@
 %include "../include/dai/smallset.h"
 %template(SmallSetVar) dai::SmallSet< dai::Var >;
 %include "../include/dai/varset.h"
+%extend dai::VarSet {
+        inline void append(const dai::Var &v) { (*self) |= v; }
+};
+
 %include "../include/dai/prob.h"
 %template(Prob) dai::TProb<Real>;
 %extend dai::TProb<Real> {

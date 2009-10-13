@@ -1,3 +1,12 @@
+# This file is part of libDAI - http://www.libdai.org/
+#
+# libDAI is licensed under the terms of the GNU General Public License version
+# 2, or (at your option) any later version. libDAI is distributed without any
+# warranty. See the file COPYING for more details.
+#
+# Copyright (C) 2009  Patrick Pletscher  [pletscher at inf dot ethz dot ch]
+
+
 include ../Makefile.conf
 
 .PHONY:	all
@@ -12,4 +21,4 @@ _dai.so:		../lib/libdai.a dai.i
 .PHONY: clean
 
 clean:		
-			rm -f dai_wrap.cxx dai_wrap.o _dai.so dai.py dai.pyc
+			rm -f dai_wrap.cxx dai_wrap.o _dai.so dai.py dai.pyc sprinkler.fg
