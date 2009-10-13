@@ -76,3 +76,13 @@ CCLIB=-Llib -L/opt/local/lib
 MATLABDIR=/agbs/share/sw/matlab
 # The following should resolve to the MatLab mex compile command
 MEX=$(MATLABDIR)/bin/mex
+# Specify the same C++ compiler and flags to mex
+MEXFLAGS=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'
+
+# SWIG PYTHON INTERFACE
+# The following should resolve to the SWIG command
+SWIG=swig -classic
+# Location of Python header files
+INCLUDE_PYTHON=/usr/include/python2.5
+# Location of Boost C++ library header files
+INCLUDE_BOOST=/usr/include/boost
