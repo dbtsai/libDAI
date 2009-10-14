@@ -11,16 +11,16 @@ include ../Makefile.conf
 
 .PHONY:	all
 
-all:			_dai.so
+all:			_dai.so dai.oct
 
 _dai.so:		../lib/libdai.a dai.i
-			$(SWIG) -python -c++ dai.i
+			$(SWIG) -python -classic -c++ dai.i
 			g++ -Wall -c -O3 -g -fPIC dai_wrap.cxx -I$(INCLUDE_PYTHON) -I$(INCLUDE_BOOST) -I../include
 			g++ -shared dai_wrap.o -o _dai.so ../lib/libdai.a
 
 dai.oct:		../lib/libdai.a dai.i
 			$(SWIG) -octave -c++ -o dai_wrap.cpp dai.i
-			mkoctfile -I$(INCLUDE_PYTHON) -I$(INCLUDE_BOOST) -I../include -l../lib/libdai.a dai_wrap.cpp
+			mkoctfile -I$(INCLUDE_PYTHON) -I$(INCLUDE_BOOST) -I../include -o dai.oct dai_wrap.cpp ../lib/libdai.a
 
 .PHONY: clean
 

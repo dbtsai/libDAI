@@ -5,6 +5,7 @@
  *  warranty. See the file COPYING for more details.
  *
  *  Copyright (C) 2009  Patrick Pletscher  [pletscher at inf dot ethz dot ch]
+ *                2009  Joris Mooij        [joris dot mooij at libdai dot org]
  */
 
 
@@ -41,21 +42,23 @@
 %template(SmallSetVar) dai::SmallSet< dai::Var >;
 %include "../include/dai/varset.h"
 %extend dai::VarSet {
-        inline void append(const dai::Var &v) { (*self) |= v; }
+        inline void append(const dai::Var &v) { (*self) |= v; }   /* for python, octave */
 };
 
 %include "../include/dai/prob.h"
 %template(Prob) dai::TProb<Real>;
 %extend dai::TProb<Real> {
-        inline Real __getitem__(int i) const {return (*self)[i];}
-        inline void __setitem__(int i,Real d) {(*self)[i] = d;}
-        %template(TProbRealConstructor) TProb<double *>;
-        %template(TProbIntConstructor)  TProb<size_t *>;
+        inline Real __getitem__(int i) const {return (*self)[i];} /* for python */
+        inline void __setitem__(int i,Real d) {(*self)[i] = d;}   /* for python */
+        inline Real __paren(int i) const {return (*self)[i];}     /* for octave */
+        inline void __paren_asgn(int i,Real d) {(*self)[i] = d;}  /* for octave */
 };
 %include "../include/dai/factor.h"
 %extend dai::TFactor<Real> {
-        inline Real __getitem__(int i) const {return (*self)[i];}
-        inline void __setitem__(int i,Real d) {(*self)[i] = d;}
+        inline Real __getitem__(int i) const {return (*self)[i];} /* for python */
+        inline void __setitem__(int i,Real d) {(*self)[i] = d;}   /* for python */
+        inline Real __paren(int i) const {return (*self)[i];}     /* for octave */
+        inline void __paren_asgn(int i,Real d) {(*self)[i] = d;}  /* for octave */
 };
 
 %template(Factor) dai::TFactor<Real>;

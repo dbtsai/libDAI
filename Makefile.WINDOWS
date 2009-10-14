@@ -83,7 +83,7 @@ MEXFLAGS=CXX\#$(CC) CXXFLAGS\#"$(CCFLAGS)"
 
 # SWIG PYTHON INTERFACE
 # The following should resolve to the SWIG command
-SWIG=swig -classic
+SWIG=swig
 # Location of Python header files
 INCLUDE_PYTHON=C:\python2.5
 # Location of Boost C++ library header files
