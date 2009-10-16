@@ -11,6 +11,7 @@
 /// \file
 /// \brief Defines class BP_dual
 /// \todo This replicates a large part of the functionality of BP; would it not be shorter to adapt BP instead?
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_bp_dual_h

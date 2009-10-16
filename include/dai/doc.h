@@ -11,6 +11,8 @@
 /** \file
  *  \brief Contains additional doxygen documentation
  *
+ *  \todo Improve documentation
+ *
  *  \todo Merge COPYING into doxygen documentation
  *  \todo Merge README into doxygen documentation
  *  \todo Document examples, tests and utils
@@ -19,7 +21,6 @@
  *
  *  \todo Use "gcc -MM" to generate dependencies for targets: http://make.paulandlesley.org/autodep.html
  *  \todo Investigate whether switching to cmake as cross-platform build system would be a good idea.
- *  \todo Switch from nmake to GNU make under Windows http://gnuwin32.sourceforge.net/
  *
  *  \todo Replace VarSets by SmallSet<size_t> where appropriate, in order to minimize the use of FactorGraph::findVar().
  *
@@ -36,6 +37,7 @@
  *
  *  \idea Use Boost::uBLAS framework to deal with matrices, especially, with 2D sparse matrices.
  *  See http://www.boost.org/libs/numeric/ublas/doc/matrix_sparse.htm
+ *  I read somewhere that boost::uBLAS concentrates more on correct implementation than on performance.
  *
  *  \idea Introduce naming scheme:
  *  - all Vars should be named v_..., e.g. v_i instead of i

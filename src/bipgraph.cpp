@@ -18,6 +18,27 @@ namespace dai {
 using namespace std;
 
 
+void BipartiteGraph::addEdge( size_t n1, size_t n2, bool check ) {
+    DAI_ASSERT( n1 < nr1() );
+    DAI_ASSERT( n2 < nr2() );
+    bool exists = false;
+    if( check ) {
+        // Check whether the edge already exists
+        foreach( const Neighbor &nb2, nb1(n1) )
+            if( nb2 == n2 ) {
+                exists = true;
+                break;
+            }
+    }
+    if( !exists ) { // Add edge
+        Neighbor nb_1( nb1(n1).size(), n2, nb2(n2).size() );
+        Neighbor nb_2( nb_1.dual, n1, nb_1.iter );
+        nb1(n1).push_back( nb_1 );
+        nb2(n2).push_back( nb_2 );
+    }
+}
+
+
 void BipartiteGraph::erase1( size_t n1 ) {
     DAI_ASSERT( n1 < nr1() );
     // Erase neighbor entry of node n1
@@ -66,6 +87,39 @@ void BipartiteGraph::erase2( size_t n2 ) {
                 iter++;
             }
         }
+    }
+}
+
+
+void BipartiteGraph::eraseEdge( size_t n1, size_t n2 ) {
+    DAI_ASSERT( n1 < nr1() );
+    DAI_ASSERT( n2 < nr2() );
+    size_t iter;
+    // Search for edge among neighbors of n1
+    for( iter = 0; iter < nb1(n1).size(); iter++ )
+        if( nb1(n1, iter).node == n2 ) {
+            // Remove it
+            nb1(n1).erase( nb1(n1).begin() + iter );
+            break;
+        }
+    // Change the iter and dual values of the subsequent neighbors
+    for( ; iter < nb1(n1).size(); iter++ ) {
+        Neighbor &m2 = nb1( n1, iter );
+        m2.iter = iter;
+        nb2( m2.node, m2.dual ).dual = iter;
+    }
+    // Search for edge among neighbors of n2
+    for( iter = 0; iter < nb2(n2).size(); iter++ )
+        if( nb2(n2, iter).node == n1 ) {
+            // Remove it
+            nb2(n2).erase( nb2(n2).begin() + iter );
+            break;
+        }
+    // Change the iter and node values of the subsequent neighbors
+    for( ; iter < nb2(n2).size(); iter++ ) {
+        Neighbor &m1 = nb2( n2, iter );
+        m1.iter = iter;
+        nb1( m1.node, m1.dual ).dual = iter;
     }
 }
 
@@ -236,7 +290,7 @@ void BipartiteGraph::printDot( std::ostream& os ) const {
 }
 
 
-void BipartiteGraph::check() const {
+void BipartiteGraph::checkConsistency() const {
     size_t N1 = nr1();
     size_t N2 = nr2();
     for( size_t n1 = 0; n1 < N1; n1++ ) {

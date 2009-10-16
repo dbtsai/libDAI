@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines BipartiteGraph class
+/// \brief Defines the BipartiteGraph class
 
 
 #ifndef __defined_libdai_bipgraph_h
@@ -27,7 +27,7 @@
 namespace dai {
 
 
-/// Represents the neighborhood structure of nodes in a bipartite graph.
+/// Represents the neighborhood structure of nodes in an undirected, bipartite graph.
 /** A bipartite graph has two types of nodes: type 1 and type 2. Edges can occur only between
  *  nodes of different type. Nodes are indexed by an unsigned integer. If there are nr1()
  *  nodes of type 1 and nr2() nodes of type 2, the nodes of type 1 are numbered
@@ -35,7 +35,7 @@ namespace dai {
  *  between node \a n1 of type 1 and node \a n2 of type 2 is represented by a BipartiteGraph::Edge(\a n1,\a n2).
  *
  *  A BipartiteGraph is implemented as a sparse adjacency list, i.e., it stores for each node a list of
- *  its neighboring nodes. In particular, it stores for each node of type 1 a vector of Neighbor structures
+ *  its neighboring nodes. More precisely: it stores for each node of type 1 a vector of Neighbor structures
  *  (accessible by the nb1() method) describing the neighboring nodes of type 2; similarly, for each node
  *  of type 2 it stores a vector of Neighbor structures (accessibly by the nb2() method) describing the
  *  neighboring nodes of type 1.
@@ -51,12 +51,13 @@ class BipartiteGraph {
          *  will be sparse, so we need some way of storing a set of
          *  the neighbors of a node, which is both fast and
          *  memory-efficient. We also need to be able to go between
-         *  viewing node \a A as a neighbor of node \a B, and node \a
-         *  B as a neighbor of node \a A. The Neighbor struct solves
+         *  viewing node \a a as a neighbor of node \a b, and node \a b
+         *  as a neighbor of node \a a. The Neighbor struct solves
          *  both of these problems. Each node has a list of neighbors,
-         *  stored as a vector<Neighbor>, and extra information is
-         *  included in the Neighbor struct which allows us to access
-         *  a node as a neighbor of its neighbor (the \a dual member).
+         *  stored as a std::vector<\link Neighbor \endlink>, and 
+         *  extra information is included in the Neighbor struct which 
+         *  allows us to access a node as a neighbor of its neighbor 
+         *  (the \c dual member).
          *
          *  By convention, variable identifiers naming indices into a
          *  vector of neighbors are prefixed with an underscore ("_").
@@ -68,14 +69,14 @@ class BipartiteGraph {
          *  \endcode
          *
          *  Here, \a i is the "absolute" index of node i, but \a _I is
-         *  understood as a "relative" index, giving node I's entry in
-         *  nb1(i). The corresponding Neighbor structure can be
-         *  accessed as nb1(i,_I) or nb1(i)[_I]. The absolute index of
-         *  \a _I, which would be called \a I, can be recovered from
-         *  the \a node member: nb1(i,_I).node. The \a iter member
-         *  gives the relative index \a _I, and the \a dual member
-         *  gives the "dual" relative index, i.e. the index of \a i in
-         *  \a I's neighbor list.
+         *  understood as a "relative" index, giving node \a I 's entry in
+         *  <tt>nb1(i)</tt>. The corresponding Neighbor structure can be
+         *  accessed as <tt>nb1(i,_I)</tt> or <tt>nb1(i)[_I]</tt>. The 
+         *  absolute index of \a _I, which would be called \a I, can be 
+         *  recovered from the \c node member: <tt>nb1(i,_I).node</tt>. 
+         *  The \c iter member gives the relative index \a _I, and the 
+         *  \c dual member gives the "dual" relative index, i.e., the 
+         *  index of \a i in \a I 's neighbor list.
          *
          *  \code
          *  Neighbor n = nb1(i,_I);
@@ -84,8 +85,9 @@ class BipartiteGraph {
          *  nb2(n.node,n.dual).node == i
          *  \endcode
          *
-         *  In a FactorGraph, nb1 is called nbV, and nb2 is called
-         *  nbF.
+         *  In a FactorGraph, the nodes of type 1 represent variables, and
+         *  the nodes of type 2 represent factors. For convenience, nb1() is 
+         *  called FactorGraph::nbV(), and nb2() is called FactorGraph::nbF().
          *
          *  There is no easy way to transform a pair of absolute node
          *  indices \a i and \a I into a Neighbor structure relative
@@ -112,7 +114,7 @@ class BipartiteGraph {
             /// Constructor that sets the Neighbor members according to the parameters
             Neighbor( size_t iter, size_t node, size_t dual ) : iter(iter), node(node), dual(dual) {}
 
-            /// Cast to size_t returns node member
+            /// Cast to \c size_t returns \c node member
             operator size_t () const { return node; }
         };
 
@@ -144,9 +146,11 @@ class BipartiteGraph {
         std::vector<Edge> _edges;
         /// Call indexEdges() first to initialize these members
         hash_map<Edge,size_t> _vv2e;
-        //}@
+        //@}
 
     public:
+    /// @name Constructors and destructors
+    //@{
         /// Default constructor (creates an empty bipartite graph)
         BipartiteGraph() : _nb1(), _nb2(), _edge_indexed(false) {}
 
@@ -161,7 +165,61 @@ class BipartiteGraph {
         BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ), _edge_indexed(false) {
             construct( nr1, nr2, begin, end );
         }
+    //@}
 
+    /// @name Accessors and mutators
+    //@{
+        /// Returns constant reference to the \a _i2 'th neighbor of node \a i1 of type 1
+        const Neighbor & nb1( size_t i1, size_t _i2 ) const {
+            DAI_DEBASSERT( i1 < _nb1.size() );
+            DAI_DEBASSERT( _i2 < _nb1[i1].size() );
+            return _nb1[i1][_i2];
+        }
+        /// Returns reference to the \a _i2 'th neighbor of node \a i1 of type 1
+        Neighbor & nb1( size_t i1, size_t _i2 ) {
+            DAI_DEBASSERT( i1 < _nb1.size() );
+            DAI_DEBASSERT( _i2 < _nb1[i1].size() );
+            return _nb1[i1][_i2];
+        }
+
+        /// Returns constant reference to the \a _i1 'th neighbor of node \a i2 of type 2
+        const Neighbor & nb2( size_t i2, size_t _i1 ) const {
+            DAI_DEBASSERT( i2 < _nb2.size() );
+            DAI_DEBASSERT( _i1 < _nb2[i2].size() );
+            return _nb2[i2][_i1];
+        }
+        /// Returns reference to the \a _i1 'th neighbor of node \a i2 of type 2
+        Neighbor & nb2( size_t i2, size_t _i1 ) {
+            DAI_DEBASSERT( i2 < _nb2.size() );
+            DAI_DEBASSERT( _i1 < _nb2[i2].size() );
+            return _nb2[i2][_i1];
+        }
+
+        /// Returns constant reference to all neighbors of node \a i1 of type 1
+        const Neighbors & nb1( size_t i1 ) const {
+            DAI_DEBASSERT( i1 < _nb1.size() );
+            return _nb1[i1];
+        }
+        /// Returns reference to all neighbors of node \a i1 of type 1
+        Neighbors & nb1( size_t i1 ) {
+            DAI_DEBASSERT( i1 < _nb1.size() );
+            return _nb1[i1];
+        }
+
+        /// Returns constant reference to all neighbors of node \a i2 of type 2
+        const Neighbors & nb2( size_t i2 ) const {
+            DAI_DEBASSERT( i2 < _nb2.size() );
+            return _nb2[i2];
+        }
+        /// Returns reference to all neighbors of node \a i2 of type 2
+        Neighbors & nb2( size_t i2 ) {
+            DAI_DEBASSERT( i2 < _nb2.size() );
+            return _nb2[i2];
+        }
+    //@}
+
+    /// @name Adding nodes and edges
+    //@{
         /// (Re)constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
          *  \param nr1 The number of nodes of type 1.
@@ -172,54 +230,78 @@ class BipartiteGraph {
         template<typename EdgeInputIterator>
         void construct( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end );
 
-        /// Returns constant reference to the _i2'th neighbor of node i1 of type 1
-        const Neighbor & nb1( size_t i1, size_t _i2 ) const {
-            DAI_DEBASSERT( i1 < _nb1.size() );
-            DAI_DEBASSERT( _i2 < _nb1[i1].size() );
-            return _nb1[i1][_i2];
-        }
-        /// Returns reference to the _i2'th neighbor of node i1 of type 1
-        Neighbor & nb1( size_t i1, size_t _i2 ) {
-            DAI_DEBASSERT( i1 < _nb1.size() );
-            DAI_DEBASSERT( _i2 < _nb1[i1].size() );
-            return _nb1[i1][_i2];
+        /// Adds a node of type 1 without neighbors and returns the index of the added node.
+        size_t add1() { _nb1.push_back( Neighbors() ); return _nb1.size() - 1; }
+
+        /// Adds a node of type 2 without neighbors and returns the index of the added node.
+        size_t add2() { _nb2.push_back( Neighbors() ); return _nb2.size() - 1; }
+
+        /// Adds a node of type 1, with neighbors specified by a range of nodes of type 2.
+        /** \tparam NodeInputIterator Iterator that iterates over instances of \c size_t.
+         *  \param begin Points to the first index of the nodes of type 2 that should become neighbors of the added node.
+         *  \param end Points just beyond the last index of the nodes of type 2 that should become neighbors of the added node.
+         *  \param sizeHint For improved efficiency, the size of the range may be specified by \a sizeHint.
+         *  \returns Index of the added node.
+         */
+        template <typename NodeInputIterator>
+        size_t add1( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
+            Neighbors nbs1new;
+            nbs1new.reserve( sizeHint );
+            size_t iter = 0;
+            for( NodeInputIterator it = begin; it != end; ++it ) {
+                DAI_ASSERT( *it < nr2() );
+                Neighbor nb1new( iter, *it, nb2(*it).size() );
+                Neighbor nb2new( nb2(*it).size(), nr1(), iter++ );
+                nbs1new.push_back( nb1new );
+                nb2( *it ).push_back( nb2new );
+            }
+            _nb1.push_back( nbs1new );
+            return _nb1.size() - 1;
         }
 
-        /// Returns constant reference to the _i1'th neighbor of node i2 of type 2
-        const Neighbor & nb2( size_t i2, size_t _i1 ) const {
-            DAI_DEBASSERT( i2 < _nb2.size() );
-            DAI_DEBASSERT( _i1 < _nb2[i2].size() );
-            return _nb2[i2][_i1];
-        }
-        /// Returns reference to the _i1'th neighbor of node i2 of type 2
-        Neighbor & nb2( size_t i2, size_t _i1 ) {
-            DAI_DEBASSERT( i2 < _nb2.size() );
-            DAI_DEBASSERT( _i1 < _nb2[i2].size() );
-            return _nb2[i2][_i1];
-        }
-
-        /// Returns constant reference to all neighbors of node i1 of type 1
-        const Neighbors & nb1( size_t i1 ) const {
-            DAI_DEBASSERT( i1 < _nb1.size() );
-            return _nb1[i1];
-        }
-        /// Returns reference to all neighbors of node of i1 type 1
-        Neighbors & nb1( size_t i1 ) {
-            DAI_DEBASSERT( i1 < _nb1.size() );
-            return _nb1[i1];
-        }
-
-        /// Returns constant reference to all neighbors of node i2 of type 2
-        const Neighbors & nb2( size_t i2 ) const {
-            DAI_DEBASSERT( i2 < _nb2.size() );
-            return _nb2[i2];
-        }
-        /// Returns reference to all neighbors of node i2 of type 2
-        Neighbors & nb2( size_t i2 ) {
-            DAI_DEBASSERT( i2 < _nb2.size() );
-            return _nb2[i2];
+        /// Adds a node of type 2, with neighbors specified by a range of nodes of type 1.
+        /** \tparam NodeInputIterator Iterator that iterates over instances of \c size_t.
+         *  \param begin Points to the first index of the nodes of type 1 that should become neighbors of the added node.
+         *  \param end Points just beyond the last index of the nodes of type 1 that should become neighbors of the added node.
+         *  \param sizeHint For improved efficiency, the size of the range may be specified by \a sizeHint.
+         *  \returns Index of the added node.
+         */
+        template <typename NodeInputIterator>
+        size_t add2( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
+            Neighbors nbs2new;
+            nbs2new.reserve( sizeHint );
+            size_t iter = 0;
+            for( NodeInputIterator it = begin; it != end; ++it ) {
+                DAI_ASSERT( *it < nr1() );
+                Neighbor nb2new( iter, *it, nb1(*it).size() );
+                Neighbor nb1new( nb1(*it).size(), nr2(), iter++ );
+                nbs2new.push_back( nb2new );
+                nb1( *it ).push_back( nb1new );
+            }
+            _nb2.push_back( nbs2new );
+            return _nb2.size() - 1;
         }
 
+        /// Adds an edge between node \a n1 of type 1 and node \a n2 of type 2.
+        /** If \a check == \c true, only adds the edge if it does not exist already.
+         */
+        void addEdge( size_t n1, size_t n2, bool check = true );
+    //@}
+
+    /// @name Erasing nodes and edges
+    //@{
+        /// Removes node \a n1 of type 1 and all incident edges; indices of other nodes are changed accordingly.
+        void erase1( size_t n1 );
+
+        /// Removes node \a n2 of type 2 and all incident edges; indices of other nodes are changed accordingly.
+        void erase2( size_t n2 );
+
+        /// Removes edge between node \a n1 of type 1 and node \a n2 of type 2.
+        void eraseEdge( size_t n1, size_t n2 );
+    //@}
+
+    /// @name Queries
+    //@{
         /// Returns number of nodes of type 1
         size_t nr1() const { return _nb1.size(); }
         /// Returns number of nodes of type 2
@@ -233,106 +315,13 @@ class BipartiteGraph {
             return sum;
         }
 
-        /// Adds a node of type 1 without neighbors.
-        void add1() { _nb1.push_back( Neighbors() ); }
-
-        /// Adds a node of type 2 without neighbors.
-        void add2() { _nb2.push_back( Neighbors() ); }
-
-        /// Adds a node of type 1, with neighbors specified by a range of nodes of type 2.
-        /** \tparam NodeInputIterator Iterator that iterates over instances of size_t.
-         *  \param begin Points to the first index of the nodes of type 2 that should become neighbors of the added node.
-         *  \param end Points just beyond the last index of the nodes of type 2 that should become neighbors of the added node.
-         *  \param sizeHint For improved efficiency, the size of the range may be specified by sizeHint.
-         */
-        template <typename NodeInputIterator>
-        void add1( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
-            Neighbors nbs1new;
-            nbs1new.reserve( sizeHint );
-            size_t iter = 0;
-            for( NodeInputIterator it = begin; it != end; ++it ) {
-                DAI_ASSERT( *it < nr2() );
-                Neighbor nb1new( iter, *it, nb2(*it).size() );
-                Neighbor nb2new( nb2(*it).size(), nr1(), iter++ );
-                nbs1new.push_back( nb1new );
-                nb2( *it ).push_back( nb2new );
-            }
-            _nb1.push_back( nbs1new );
-        }
-
-        /// Adds a node of type 2, with neighbors specified by a range of nodes of type 1.
-        /** \tparam NodeInputIterator Iterator that iterates over instances of size_t.
-         *  \param begin Points to the first index of the nodes of type 1 that should become neighbors of the added node.
-         *  \param end Points just beyond the last index of the nodes of type 1 that should become neighbors of the added node.
-         *  \param sizeHint For improved efficiency, the size of the range may be specified by sizeHint.
-         */
-        template <typename NodeInputIterator>
-        void add2( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
-            Neighbors nbs2new;
-            nbs2new.reserve( sizeHint );
-            size_t iter = 0;
-            for( NodeInputIterator it = begin; it != end; ++it ) {
-                DAI_ASSERT( *it < nr1() );
-                Neighbor nb2new( iter, *it, nb1(*it).size() );
-                Neighbor nb1new( nb1(*it).size(), nr2(), iter++ );
-                nbs2new.push_back( nb2new );
-                nb1( *it ).push_back( nb1new );
-            }
-            _nb2.push_back( nbs2new );
-        }
-
-        /// Removes node n1 of type 1 and all incident edges.
-        void erase1( size_t n1 );
-
-        /// Removes node n2 of type 2 and all incident edges.
-        void erase2( size_t n2 );
-
-        /// Removes edge between node n1 of type 1 and node n2 of type 2.
-        void eraseEdge( size_t n1, size_t n2 ) {
-            DAI_ASSERT( n1 < nr1() );
-            DAI_ASSERT( n2 < nr2() );
-            for( Neighbors::iterator i1 = _nb1[n1].begin(); i1 != _nb1[n1].end(); i1++ )
-                if( i1->node == n2 ) {
-                    _nb1[n1].erase( i1 );
-                    break;
-                }
-            for( Neighbors::iterator i2 = _nb2[n2].begin(); i2 != _nb2[n2].end(); i2++ )
-                if( i2->node == n1 ) {
-                    _nb2[n2].erase( i2 );
-                    break;
-                }
-        }
-
-        /// Adds an edge between node n1 of type 1 and node n2 of type 2.
-        /** If check == true, only adds the edge if it does not exist already.
-         */
-        void addEdge( size_t n1, size_t n2, bool check = true ) {
-            DAI_ASSERT( n1 < nr1() );
-            DAI_ASSERT( n2 < nr2() );
-            bool exists = false;
-            if( check ) {
-                // Check whether the edge already exists
-                foreach( const Neighbor &nb2, nb1(n1) )
-                    if( nb2 == n2 ) {
-                        exists = true;
-                        break;
-                    }
-            }
-            if( !exists ) { // Add edge
-                Neighbor nb_1( _nb1[n1].size(), n2, _nb2[n2].size() );
-                Neighbor nb_2( nb_1.dual, n1, nb_1.iter );
-                _nb1[n1].push_back( nb_1 );
-                _nb2[n2].push_back( nb_2 );
-            }
-        }
-
-        /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node n1 of type 1.
-        /** If include == true, includes n1 itself, otherwise excludes n1.
+        /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node \a n1 of type 1.
+        /** If \a include == \c true, includes \a n1 itself, otherwise excludes \a n1.
          */
         std::vector<size_t> delta1( size_t n1, bool include = false ) const;
 
-        /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node n2 of type 2.
-        /** If include == true, includes n2 itself, otherwise excludes n2.
+        /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node \a n2 of type 2.
+        /** If \a include == \c true, includes \a n2 itself, otherwise excludes \a n2.
          */
         std::vector<size_t> delta2( size_t n2, bool include = false ) const;
 
@@ -344,12 +333,19 @@ class BipartiteGraph {
         /// Returns true if the graph is a tree, i.e., if it is singly connected and connected.
         bool isTree() const;
 
+        /// Checks internal consistency
+        void checkConsistency() const;
+    //@}
+
+    /// @name Input and output
+    //@{
         /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
+    //@}
 
         // OBSOLETE
-        /// @name Backwards compatibility layer (to be removed soon)
-        //@{
+    /// @name Backwards compatibility layer (to be removed soon)
+    //@{
         void indexEdges() {
             std::cerr << "Warning: this BipartiteGraph edge interface is obsolete!" << std::endl;
             _edges.clear();
@@ -393,11 +389,7 @@ class BipartiteGraph {
             DAI_ASSERT(_edge_indexed);
             return _edges.size();
         }
-        //}@
-
-    private:
-        /// Checks internal consistency
-        void check() const;
+    //@}
 };
 
 

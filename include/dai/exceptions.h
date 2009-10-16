@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines Exception class and the DAI_THROW macro
-/// \todo Improve documentation
+/// \brief Defines the Exception class and macros for throwing exceptions and doing assertions
 
 
 #ifndef __defined_libdai_exceptions_h
@@ -30,29 +29,31 @@
 /// Used by DAI_THROW
 #define DAI_TOSTRING(x) DAI_QUOTE(x)
 
-/// Macro that simplifies throwing an exception with a useful error message.
-/** \param cod Corresponds to one of the enum values in dai::Exception::codes
+/// Macro that simplifies throwing an exception with a useful default error message. 
+/** The error message consists of a description of the exception, the source 
+ *  code file and line number where the exception has been thrown.
+ *  \param cod Corresponds to one of the enum values of dai::Exception::Code
  *
- *  Example:
+ *  \par Example:
  *  \code
  *  DAI_THROW(NOT_IMPLEMENTED);
  *  \endcode
  */
 #define DAI_THROW(cod) throw dai::Exception(dai::Exception::cod, std::string(__FILE__ ", line " DAI_TOSTRING(__LINE__)))
 
-/// Macro that simplifies throwing an exception with a useful error message. It also allows for writing a detailed error message to stderr.
-/** \param cod Corresponds to one of the enum values in dai::Exception::codes
+/// Macro that simplifies throwing an exception with a user-defined error message.
+/** \param cod Corresponds to one of the enum values of dai::Exception::Code
  *  \param msg Detailed error message that will be written to std::cerr.
  *
- *  Example:
+ *  \par Example:
  *  \code
  *  DAI_THROWE(NOT_IMPLEMENTED,"Detailed error message");
  *  \endcode
  */
 #define DAI_THROWE(cod,msg) throw dai::Exception(dai::Exception::cod, std::string(__FILE__ ", line " DAI_TOSTRING(__LINE__)), msg)
 
-/// Assertion mechanism, similar to the standard assert() macro, but is always active, even if NDEBUG is defined
-#define DAI_ASSERT(condition) ((condition) ? ((void)0) : DAI_THROWE(ASSERTION_FAILED, #condition))
+/// Assertion mechanism, similar to the standard assert() macro. It is always active, even if NDEBUG is defined
+#define DAI_ASSERT(condition) ((condition) ? ((void)0) : DAI_THROWE(ASSERTION_FAILED, std::string("Assertion \"" #condition "\" failed")))
 
 // Assertion only if DAI_DEBUG is defined
 #ifdef DAI_DEBUG
@@ -66,30 +67,34 @@
 namespace dai {
 
 
-/// Represents an exception (based on std::runtime_error)
+/// Error handling in libDAI is done by throwing an instance of the Exception class.
+/** The Exception class inherits from std::runtime_error. It defines several types of exceptions
+ *  and corresponding error messages. The recommended way to throw an instance of the Exception
+ *  class is by using the #DAI_THROW or #DAI_THROWE macros.
+ */
 class Exception : public std::runtime_error {
     public:
         /// Enumeration of exceptions used in libDAI
-        enum Code {ASSERTION_FAILED,
-                   NOT_IMPLEMENTED,
+        enum Code {NOT_IMPLEMENTED,
+                   ASSERTION_FAILED,
+                   IMPOSSIBLE_TYPECAST,
+                   OBJECT_NOT_FOUND,
+                   UNKNOWN_ENUM_VALUE,
                    UNKNOWN_DAI_ALGORITHM,
+                   UNKNOWN_PARAMETER_ESTIMATION_METHOD,
                    UNKNOWN_PROPERTY_TYPE,
                    MALFORMED_PROPERTY,
-                   UNKNOWN_ENUM_VALUE,
+                   NOT_ALL_PROPERTIES_SPECIFIED,
                    CANNOT_READ_FILE,
                    CANNOT_WRITE_FILE,
                    INVALID_FACTORGRAPH_FILE,
-                   NOT_ALL_PROPERTIES_SPECIFIED,
-                   MULTIPLE_UNDO,
-                   FACTORGRAPH_NOT_CONNECTED,
-                   IMPOSSIBLE_TYPECAST,
-                   INTERNAL_ERROR,
-                   RUNTIME_ERROR,
-                   NOT_NORMALIZABLE,
                    INVALID_EVIDENCE_FILE,
                    INVALID_EMALG_FILE,
-                   UNKNOWN_PARAMETER_ESTIMATION_METHOD,
-                   OBJECT_NOT_FOUND,
+                   NOT_NORMALIZABLE,
+                   MULTIPLE_UNDO,
+                   FACTORGRAPH_NOT_CONNECTED,
+                   INTERNAL_ERROR,
+                   RUNTIME_ERROR,
                    NUM_ERRORS};  // NUM_ERRORS should be the last entry
 
         /// Constructor
@@ -98,11 +103,11 @@ class Exception : public std::runtime_error {
                 std::cerr << "ERROR: " << detailedMsg << std::endl;
         }
 
-        /// Copy constructor
-        Exception( const Exception &e ) : std::runtime_error(e), errorcode(e.errorcode) {}
-
         /// Returns error code of this exception
         Code code() const { return errorcode; }
+
+        /// Returns error message corresponding to an error code
+        const std::string &message( const Code c ) const { return ErrorStrings[c]; }
 
 
     private:

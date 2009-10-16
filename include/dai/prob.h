@@ -12,6 +12,7 @@
 /// \file
 /// \brief Defines TProb<T> and Prob classes
 /// \todo Rename to Vector<T>
+/// \todo Check documentation
 
 
 #ifndef __defined_libdai_prob_h

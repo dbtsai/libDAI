@@ -26,6 +26,7 @@
 /// \file
 /// \brief Defines classes related to Expectation Maximization: EMAlg, ParameterEstimation, CondProbEstimation and SharedParameters
 /// \todo Describe EM file format
+/// \todo Improve documentation
 
 
 namespace dai {

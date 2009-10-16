@@ -12,6 +12,7 @@
 
 /// \file
 /// \brief Defines TFactor<T> and Factor classes
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_factor_h

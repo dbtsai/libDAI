@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines the DAI_ENUM macro
+/// \brief Defines the DAI_ENUM macro, which can be used to define an \c enum with additional functionality.
 
 
 #ifndef __defined_libdai_enum_h
@@ -22,7 +22,7 @@
 #include <dai/exceptions.h>
 
 
-/// Extends the C++ enum type by supporting input/output streaming and conversion to and from const char* and size_t
+/// Extends the C++ \c enum type by supporting input/output streaming and conversion to and from <tt>const char*</tt> and \c size_t
 /** For more details see the source code.
  *
  *  \par Example:

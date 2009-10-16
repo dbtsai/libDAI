@@ -11,7 +11,8 @@
 
 
 /// \file
-/// \brief Defines SmallSet<T> class
+/// \brief Defines the SmallSet<T> class, which represents a set; the implementation is optimized for a small number of elements.
+/// \todo Check documentation
 
 
 #ifndef __defined_libdai_smallset_h
@@ -37,6 +38,8 @@ class SmallSet {
         std::vector<T> _elements;
 
     public:
+    /// @name Constructors and destructors
+    //@{
         /// Default constructor (construct an empty set)
         SmallSet() : _elements() {}
 
@@ -71,7 +74,10 @@ class SmallSet {
             typename std::vector<T>::iterator new_end = std::unique( _elements.begin(), _elements.end() );
             _elements.erase( new_end, _elements.end() );
         }
+    //@}
 
+    /// @name Operators for set-theoretic operations
+    //@{
         /// Set-minus operator: returns all elements in *this, except those in x
         SmallSet operator/ ( const SmallSet& x ) const {
             SmallSet res;
@@ -134,7 +140,10 @@ class SmallSet {
         bool operator>> ( const SmallSet& x ) const {
             return std::includes( _elements.begin(), _elements.end(), x._elements.begin(), x._elements.end() );
         }
+    //@}
 
+    /// @name Queries
+    //@{
         /// Returns true if *this and x have elements in common
         bool intersects( const SmallSet& x ) const {
             return( (*this & x).size() > 0 );
@@ -145,6 +154,13 @@ class SmallSet {
             return std::binary_search( _elements.begin(), _elements.end(), t );
         }
 
+        /// Returns number of elements
+        typename std::vector<T>::size_type size() const { return _elements.size(); }
+
+        /// Returns whether the SmallSet is empty
+        bool empty() const { return _elements.size() == 0; }
+    //@}
+
         /// Constant iterator over the elements
         typedef typename std::vector<T>::const_iterator const_iterator;
         /// Iterator over the elements
@@ -154,6 +170,8 @@ class SmallSet {
         /// Reverse iterator over the elements
         typedef typename std::vector<T>::reverse_iterator reverse_iterator;
 
+    /// @name Iterator interface
+    //@{
         /// Returns iterator that points to the first element
         iterator begin() { return _elements.begin(); }
         /// Returns constant iterator that points to the first element
@@ -173,13 +191,10 @@ class SmallSet {
         reverse_iterator rend() { return _elements.rend(); }
         /// Returns constant reverse iterator that points beyond the first element
         const_reverse_iterator rend() const { return _elements.rend(); }
+    //@}
 
-        /// Returns number of elements
-        typename std::vector<T>::size_type size() const { return _elements.size(); }
-
-        /// Returns whether the SmallSet is empty
-        bool empty() const { return _elements.size() == 0; }
-
+    /// @name Comparison operators
+    //@{
         /// Returns true if a and b are identical
         friend bool operator==( const SmallSet &a, const SmallSet &b ) {
             return (a._elements == b._elements);
@@ -194,6 +209,7 @@ class SmallSet {
         friend bool operator<( const SmallSet &a, const SmallSet &b ) {
             return a._elements < b._elements;
         }
+    //@}
 };
 
 

@@ -291,7 +291,7 @@ class FactorGraph {
         void indexEdges() { G.indexEdges(); }
         size_t nr_edges() const { return G.nr_edges(); }
         const std::vector<Edge>& edges() const { return G.edges(); }
-        //}@
+        //@}
 
     private:
         /// Part of constructors (creates edges, neighbors and adjacency matrix)

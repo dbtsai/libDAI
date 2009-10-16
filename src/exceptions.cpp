@@ -16,26 +16,26 @@ namespace dai {
 
 
     std::string Exception::ErrorStrings[NUM_ERRORS] = {
-        "Assertion failed",
         "Feature not implemented",
+        "Assertion failed",
+        "Impossible typecast",
+        "Requested object not found",
+        "Unknown ENUM value",
         "Unknown DAI algorithm",
+        "Unrecognized parameter estimation method",
         "Unknown Property type",
         "Malformed Property",
-        "Unknown ENUM value",
+        "Not all mandatory Properties specified",
         "Cannot read file",
         "Cannot write file",
         "Invalid FactorGraph file",
-        "Not all mandatory Properties specified",
-        "Multiple undo levels unsupported",
-        "FactorGraph is not connected",
-        "Impossible typecast",
-        "Internal error",
-        "Runtime error",
-        "Quantity not normalizable",
         "Invalid Evidence file",
         "Invalid Expectation-Maximization file",
-        "Unrecognized parameter estimation method",
-        "Requested object not found"
+        "Quantity not normalizable",
+        "Multiple undo levels unsupported",
+        "FactorGraph is not connected",
+        "Internal error",
+        "Runtime error"
     };
 
 

@@ -1,3 +1,6 @@
+* Fixed bug in BipartiteGraph::eraseEdge()
+* Added python and octave ports for examples/example_sprinkler.cpp
+* [Patrick Pletscher] Added SWIG wrapper code for python and octave
 * Added init parameter to HAK/GBP to allow for random initialization
 * Replaced the standard assert() macro by DAI_ASSERT, which throws a
   dai::Exception and is even active if NDEBUG is defined

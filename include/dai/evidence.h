@@ -12,6 +12,7 @@
 /// \file
 /// \brief Defines classes Evidence and Observation
 /// \todo Describe tabular data file format
+/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_evidence_h

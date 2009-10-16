@@ -11,7 +11,7 @@
 
 
 /// \file
-/// \brief Defines class Var
+/// \brief Defines class Var, which represents a discrete random variable.
 
 
 #ifndef __defined_libdai_var_h
@@ -29,9 +29,9 @@ namespace dai {
 /** A Var stores the \a label of the variable (an integer-valued unique ID)
  *  and the number of possible values (\a states) of that variable. Two
  *  Var objects with the same label are assumed to be identical (i.e., it
- *  is assumed that their states are also the same).
+ *  is assumed that they have the same number of possible states).
  *
- *  In this manual, we use the following notational conventions. The discrete
+ *  In the documentation, we use the following notational conventions. The discrete
  *  random variable with label \f$l\f$ is denoted as \f$x_l\f$, and the number
  *  of possible values of this variable as \f$S_l\f$; this is represented in
  *  code by the object Var(\f$l\f$,\f$S_l\f$). The set of possible values of
@@ -46,9 +46,9 @@ class Var {
         size_t  _states;
 
     public:
-        /// Default constructor
+        /// Default constructor (creates a variable with label -1 and 0 states)
         Var() : _label(-1), _states(0) {}
-        /// Constructor
+        /// Constructs a variable with a given label and number of states
         Var( long label, size_t states ) : _label(label), _states(states) {}
 
         /// Returns the label
@@ -61,9 +61,9 @@ class Var {
         /// Returns reference to number of states
         size_t& states () { return _states; }
 
-        /// Smaller-than operator (compares only labels)
+        /// Smaller-than operator (only compares labels)
         bool operator < ( const Var& n ) const { return( _label <  n._label ); }
-        /// Larger-than operator (compares only labels)
+        /// Larger-than operator (only compares labels)
         bool operator > ( const Var& n ) const { return( _label >  n._label ); }
         /// Smaller-than-or-equal-to operator (only compares labels)
         bool operator <= ( const Var& n ) const {
