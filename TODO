@@ -2,7 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	index.h
 	factor.h
 	weightedgraph.h
 	factorgraph.h
@@ -27,3 +26,10 @@ Improve documentation:
 	evidence.h
 	emalg.h
 	doc.h
+
+Write a concept/notations page for the documentation,
+explaing the concepts of "state" (index into a 
+multi-dimensional array, e.g., one corresponding
+to the Cartesian product of statespaces of variables)
+and "linear index". This should make it easier to
+document index.h and varset.h

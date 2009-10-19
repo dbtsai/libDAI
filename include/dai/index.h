@@ -11,8 +11,7 @@
 
 
 /// \file
-/// \brief Defines the IndexFor, multifor, Permute and State classes
-/// \todo Improve documentation of IndexFor
+/// \brief Defines the IndexFor, multifor, Permute and State classes, which all deal with indexing multi-dimensional arrays
 
 
 #ifndef __defined_libdai_index_h
@@ -31,21 +30,24 @@ namespace dai {
 /// Tool for looping over the states of several variables.
 /** The class IndexFor is an important tool for indexing Factor entries.
  *  Its usage can best be explained by an example.
- *  Assume indexVars, forVars are both VarSets.
+ *  Assume \a indexVars, \a forVars are both VarSet 's.
  *  Then the following code:
  *  \code
  *      IndexFor i( indexVars, forVars );
- *      for( ; i >= 0; ++i ) {
- *          // use long(i)
+ *      size_t iter = 0;
+ *      for( ; i.valid(); i++, iter++ ) {
+ *          cout << "State of forVars: " << forVars.calcStates( iter ) << "; ";
+ *          cout << "state of indexVars: " << indexVars.calcStates( long(i) ) << endl;
  *      }
  *  \endcode
- *  loops over all joint states of the variables in forVars,
- *  and (long)i is equal to the linear index of the corresponding
- *  state of indexVars, where the variables in indexVars that are
- *  not in forVars assume their zero'th value.
+ *  loops over all joint states of the variables in \a forVars,
+ *  and <tt>(long)i</tt> equals the linear index of the corresponding
+ *  state of \a indexVars, where the variables in \a indexVars that are
+ *  not in \a forVars assume their zero'th value.
  *  \idea Optimize all indices as follows: keep a cache of all (or only
  *  relatively small) indices that have been computed (use a hash). Then,
- *  instead of computing on the fly, use the precomputed ones.
+ *  instead of computing on the fly, use the precomputed ones. Here the
+ *  labels of the variables don't matter, but the ranges of the variables do.
  */
 class IndexFor {
     private:
@@ -56,19 +58,17 @@ class IndexFor {
         std::vector<long>   _sum;
 
         /// For each variable in forVars, the current state
-        std::vector<size_t> _count;
+        std::vector<size_t> _state;
 
         /// For each variable in forVars, its number of possible values
         std::vector<size_t> _ranges;
 
     public:
         /// Default constructor
-        IndexFor() {
-            _index = -1;
-        }
+        IndexFor() : _index(-1) {}
 
-        /// Constructor
-        IndexFor( const VarSet& indexVars, const VarSet& forVars ) : _count( forVars.size(), 0 ) {
+        /// Construct IndexFor object from \a indexVars and \a forVars
+        IndexFor( const VarSet& indexVars, const VarSet& forVars ) : _state( forVars.size(), 0 ) {
             long sum = 1;
 
             _ranges.reserve( forVars.size() );
@@ -89,41 +89,64 @@ class IndexFor {
             _index = 0;
         }
 
-        /// Sets the index back to zero
-        IndexFor& clear() {
-            fill( _count.begin(), _count.end(), 0 );
+        /// Resets the state
+        IndexFor& reset() {
+            fill( _state.begin(), _state.end(), 0 );
             _index = 0;
             return( *this );
         }
 
-        /// Conversion to long
+        // OBSOLETE
+        /// Conversion to \c long: returns linear index of the current state of indexVars
         operator long () const {
             return( _index );
         }
 
-        /// Pre-increment operator
+        // NEW VERSION
+        /*
+        /// Conversion to \c size_t: returns linear index of the current state of indexVars
+        operator size_t() const {
+            DAI_ASSERT( valid() );
+            return( _index );
+        }
+        */
+
+        /// Increments the current state of \a forVars (prefix)
         IndexFor& operator++ () {
             if( _index >= 0 ) {
                 size_t i = 0;
 
-                while( i < _count.size() ) {
+                while( i < _state.size() ) {
                     _index += _sum[i];
-                    if( ++_count[i] < _ranges[i] )
+                    if( ++_state[i] < _ranges[i] )
                         break;
                     _index -= _sum[i] * _ranges[i];
-                    _count[i] = 0;
+                    _state[i] = 0;
                     i++;
                 }
 
-                if( i == _count.size() )
+                if( i == _state.size() )
                     _index = -1;
             }
             return( *this );
+        }
+
+        /// Increments the current state of \a forVars (postfix)
+        void operator++( int ) {
+            operator++();
+        }
+
+        /// Returns \c true if the current state is valid
+        bool valid() const {
+            return( _index >= 0 );
         }
 };
 
 
 /// Tool for calculating permutations of linear indices of multi-dimensional arrays.
+/** \note This is mainly useful for converting indices into multi-dimensional arrays 
+ *  corresponding to joint states of variables to and from the canonical ordering used in libDAI.
+ */
 class Permute {
     private:
         /// Stores the number of possible values of all indices

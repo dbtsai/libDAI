@@ -96,7 +96,7 @@ void BBP::RegenerateInds() {
         foreach( const Neighbor &I, _fg->nbV(i) ) {
             _ind_t index;
             index.reserve( _fg->factor(I).states() );
-            for( IndexFor k(_fg->var(i), _fg->factor(I).vars()); k >= 0; ++k )
+            for( IndexFor k(_fg->var(i), _fg->factor(I).vars()); k.valid(); ++k )
                 index.push_back( k );
             _indices[i].push_back( index );
         }

@@ -92,14 +92,14 @@ void BP_dual::calcNewM( size_t i, size_t _I ) {
         if( j != i ) { // for all j in I \ i
             Prob &n = msgN(j,j.dual);
             IndexFor ind( fg().var(j), fg().factor(I).vars() );
-            for( size_t x = 0; ind >= 0; x++, ++ind )
+            for( size_t x = 0; ind.valid(); x++, ++ind )
                 prod[x] *= n[ind];
         }
     // Marginalize onto i
     Prob marg( fg().var(i).states(), 0.0 );
     // ind is the precalculated Index(i,I) i.e. to x_I == k corresponds x_i == ind[k]
     IndexFor ind( fg().var(i), fg().factor(I).vars() );
-    for( size_t x = 0; ind >= 0; x++, ++ind )
+    for( size_t x = 0; ind.valid(); x++, ++ind )
         marg[ind] += prod[x];
 
     _msgs.Zm[i][_I] = marg.normalize();
@@ -141,7 +141,7 @@ void BP_dual::calcBeliefF( size_t I ) {
     foreach( const Neighbor &j, fg().nbF(I) ) {
         IndexFor ind( fg().var(j), fg().factor(I).vars() );
         Prob n( msgN(j,j.dual) );
-        for( size_t x = 0; ind >= 0; x++, ++ind )
+        for( size_t x = 0; ind.valid(); x++, ++ind )
             prod[x] *= n[ind];
     }
     _beliefs.Zb2[I] = prod.normalize();

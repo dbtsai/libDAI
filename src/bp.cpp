@@ -106,7 +106,7 @@ void BP::construct() {
 
             if( DAI_BP_FAST ) {
                 newEP.index.reserve( factor(I).states() );
-                for( IndexFor k( var(i), factor(I).vars() ); k >= 0; ++k )
+                for( IndexFor k( var(i), factor(I).vars() ); k.valid(); ++k )
                     newEP.index.push_back( k );
             }
 
