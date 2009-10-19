@@ -46,10 +46,10 @@ class HAK : public DAIAlgRG {
         /// Parameters of this inference algorithm
         struct Properties {
             /// Enumeration of possible cluster choices
-            DAI_ENUM(ClustersType,MIN,DELTA,LOOP)
+            DAI_ENUM(ClustersType,MIN,DELTA,LOOP);
 
             /// Enumeration of possible message initializations
-            DAI_ENUM(InitType,UNIFORM,RANDOM)
+            DAI_ENUM(InitType,UNIFORM,RANDOM);
 
             /// Verbosity
             size_t verbose;

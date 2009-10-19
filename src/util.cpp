@@ -69,27 +69,27 @@ typedef boost::minstd_rand _rnd_gen_type;  // Try boost::mt19937 or boost::ecuye
 _rnd_gen_type _rnd_gen(42U);
 
 /// Uniform distribution with values between 0 and 1 (0 inclusive, 1 exclusive).
-boost::uniform_real<> _uni_dist(0,1);
+boost::uniform_real<Real> _uni_dist(0,1);
 
 /// Global uniform random random number
-boost::variate_generator<_rnd_gen_type&, boost::uniform_real<> > _uni_rnd(_rnd_gen, _uni_dist);
+boost::variate_generator<_rnd_gen_type&, boost::uniform_real<Real> > _uni_rnd(_rnd_gen, _uni_dist);
 
 /// Normal distribution with mean 0 and standard deviation 1.
 boost::normal_distribution<> _normal_dist;
 
 /// Global random number generator with standard normal distribution
-boost::variate_generator<_rnd_gen_type&, boost::normal_distribution<> > _normal_rnd(_rnd_gen, _normal_dist);
+boost::variate_generator<_rnd_gen_type&, boost::normal_distribution<Real> > _normal_rnd(_rnd_gen, _normal_dist);
 
 
 void rnd_seed( size_t seed ) {
     _rnd_gen.seed(seed);
 }
 
-double rnd_uniform() {
+Real rnd_uniform() {
     return _uni_rnd();
 }
 
-double rnd_stdnormal() {
+Real rnd_stdnormal() {
     return _normal_rnd();
 }
 

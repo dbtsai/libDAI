@@ -68,10 +68,6 @@
 #define DAI_IFVERB(n, stmt) if(props.verbose>=n) { cerr << stmt; }
 
 
-/// Real number (alias for double, which could be changed to long double if necessary)
-typedef double Real;
-
-
 #ifdef WINDOWS
     /// Returns true if argument is NAN (Not A Number)
     bool isnan( double x );
@@ -88,6 +84,20 @@ typedef double Real;
 
 
 namespace dai {
+
+
+/// Real number (alias for double, which could be changed to long double if necessary)
+typedef double Real;
+
+/// Returns logarithm of \a x
+inline Real log( Real x ) {
+    return std::log(x);
+}
+
+/// Returns exponent of \a x
+inline Real exp( Real x ) {
+    return std::exp(x);
+}
 
 
 #ifdef WINDOWS
@@ -109,14 +119,21 @@ namespace dai {
 double toc();
 
 
+/// Returns absolute value of \a t
+template<class T>
+inline T abs( const T &t ) {
+    return (t < 0) ? (-t) : t;
+}
+
+
 /// Sets the random seed
 void rnd_seed( size_t seed );
 
 /// Returns a real number, distributed uniformly on [0,1)
-double rnd_uniform();
+Real rnd_uniform();
 
 /// Returns a real number from a standard-normal distribution
-double rnd_stdnormal();
+Real rnd_stdnormal();
 
 /// Returns a random integer in interval [min, max]
 int rnd_int( int min, int max );

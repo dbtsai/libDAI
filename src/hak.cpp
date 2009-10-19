@@ -24,6 +24,26 @@ using namespace std;
 const char *HAK::Name = "HAK";
 
 
+
+/// Sets factor entries that lie between 0 and \a epsilon to \a epsilon
+template <class T>
+TFactor<T>& makePositive( TFactor<T> &f, T epsilon ) {
+    for( size_t t = 0; t < f.states(); t++ )
+        if( (0 < f[t]) && (f[t] < epsilon) )
+            f[t] = epsilon;
+    return f;
+}
+
+/// Sets factor entries that are smaller (in absolute value) than \a epsilon to 0
+template <class T>
+TFactor<T>& makeZero( TFactor<T> &f, T epsilon ) {
+    for( size_t t = 0; t < f.states(); t++ )
+        if( f[t] < epsilon && f[t] > -epsilon )
+            f[t] = 0;
+    return f;
+}
+
+
 void HAK::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("maxiter") );

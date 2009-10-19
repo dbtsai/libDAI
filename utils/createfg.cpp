@@ -44,8 +44,8 @@ typedef matrix::index_array_type::const_iterator matrix_icit;
 Factor BinaryFactor( const Var &n, double field ) {
     DAI_ASSERT( n.states() == 2 );
     double buf[2];
-    buf[0] = exp(-field);
-    buf[1] = exp(field);
+    buf[0] = std::exp(-field);
+    buf[1] = std::exp(field);
     return Factor(n, &buf[0]);
 }
 
@@ -55,8 +55,8 @@ Factor BinaryFactor( const Var &n1, const Var &n2, double coupling ) {
     DAI_ASSERT( n2.states() == 2 );
     DAI_ASSERT( n1 != n2 );
     double buf[4];
-    buf[0] = (buf[3] = exp(coupling));
-    buf[1] = (buf[2] = exp(-coupling));
+    buf[0] = (buf[3] = std::exp(coupling));
+    buf[1] = (buf[2] = std::exp(-coupling));
     return Factor( VarSet(n1, n2), &buf[0] );
 }
 
@@ -64,7 +64,7 @@ Factor BinaryFactor( const Var &n1, const Var &n2, double coupling ) {
 Factor RandomFactor( const VarSet &ns, double beta ) {
     Factor fac( ns );
     for( size_t t = 0; t < fac.states(); t++ )
-        fac[t] = exp(rnd_stdnormal() * beta);
+        fac[t] = std::exp(rnd_stdnormal() * beta);
     return fac;
 }
 
@@ -73,7 +73,7 @@ Factor PottsFactor( const Var &n1, const Var &n2, double beta ) {
     Factor fac( VarSet( n1, n2 ), 1.0 );
     DAI_ASSERT( n1.states() == n2.states() );
     for( size_t s = 0; s < n1.states(); s++ )
-        fac[ s * (n1.states() + 1) ] = exp(beta);
+        fac[ s * (n1.states() + 1) ] = std::exp(beta);
     return fac;
 }
 

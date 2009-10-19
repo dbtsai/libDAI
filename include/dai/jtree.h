@@ -52,7 +52,7 @@ class JTree : public DAIAlgRG {
         /// Parameters of this inference algorithm
         struct Properties {
             /// Enumeration of possible JTree updates
-            DAI_ENUM(UpdateType,HUGIN,SHSH)
+            DAI_ENUM(UpdateType,HUGIN,SHSH);
 
             /// Enumeration of inference variants
             DAI_ENUM(InfType,SUMPROD,MAXPROD);

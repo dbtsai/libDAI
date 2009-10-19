@@ -11,8 +11,7 @@
 
 
 /// \file
-/// \brief Defines the SmallSet<T> class, which represents a set; the implementation is optimized for a small number of elements.
-/// \todo Check documentation
+/// \brief Defines the SmallSet<<em>T</em>> class, which represents a set (optimized for a small number of elements).
 
 
 #ifndef __defined_libdai_smallset_h
@@ -27,8 +26,8 @@ namespace dai {
 
 
 /// Represents a set; the implementation is optimized for a small number of elements.
-/** SmallSet uses an ordered std::vector<T> to represent a set; this is faster than
- *  using a std::set<T> if the number of elements is small.
+/** SmallSet uses an ordered <tt>std::vector<</tt><em>T</em><tt>></tt> to represent a set; this is faster than
+ *  using a <tt>std::set<</tt><em>T</em><tt>></tt> if the number of elements is small.
  *  \tparam T Should be less-than-comparable.
  */
 template <typename T>
@@ -40,15 +39,15 @@ class SmallSet {
     public:
     /// @name Constructors and destructors
     //@{
-        /// Default constructor (construct an empty set)
+        /// Default constructor (constructs an empty set)
         SmallSet() : _elements() {}
 
-        /// Construct a set with one element
+        /// Construct a set consisting of one element
         SmallSet( const T &t ) : _elements() {
             _elements.push_back( t );
         }
 
-        /// Construct a set with two elements
+        /// Construct a set consisting of two elements
         SmallSet( const T &t1, const T &t2 ) {
             if( t1 < t2 ) {
                 _elements.push_back( t1 );
@@ -61,10 +60,10 @@ class SmallSet {
         }
 
         /// Construct a SmallSet from a range of elements.
-        /** \tparam TIterator Iterates over instances of type T.
+        /** \tparam TIterator Iterates over instances of type \a T.
          *  \param begin Points to first element to be added.
          *  \param end Points just beyond last element to be added.
-         *  \param sizeHint For efficiency, the number of elements can be speficied by sizeHint.
+         *  \param sizeHint For efficiency, the number of elements can be speficied by \a sizeHint.
          */
         template <typename TIterator>
         SmallSet( TIterator begin, TIterator end, size_t sizeHint=0 ) {
@@ -78,28 +77,28 @@ class SmallSet {
 
     /// @name Operators for set-theoretic operations
     //@{
-        /// Set-minus operator: returns all elements in *this, except those in x
+        /// Set-minus operator: returns all elements in \c *this, except those in \a x
         SmallSet operator/ ( const SmallSet& x ) const {
             SmallSet res;
             std::set_difference( _elements.begin(), _elements.end(), x._elements.begin(), x._elements.end(), inserter( res._elements, res._elements.begin() ) );
             return res;
         }
 
-        /// Set-union operator: returns all elements in *this, plus those in x
+        /// Set-union operator: returns all elements in \c *this, plus those in \a x
         SmallSet operator| ( const SmallSet& x ) const {
             SmallSet res;
             std::set_union( _elements.begin(), _elements.end(), x._elements.begin(), x._elements.end(), inserter( res._elements, res._elements.begin() ) );
             return res;
         }
 
-        /// Set-intersection operator: returns all elements in *this that are also contained in x
+        /// Set-intersection operator: returns all elements in \c *this that are also contained in \a x
         SmallSet operator& ( const SmallSet& x ) const {
             SmallSet res;
             std::set_intersection( _elements.begin(), _elements.end(), x._elements.begin(), x._elements.end(), inserter( res._elements, res._elements.begin() ) );
             return res;
         }
 
-        /// Erases from *this all elements in x
+        /// Erases from \c *this all elements in \a x
         SmallSet& operator/= ( const SmallSet& x ) {
             return (*this = (*this / x));
         }
@@ -113,7 +112,7 @@ class SmallSet {
             return *this;
         }
 
-        /// Adds to *this all elements in x
+        /// Adds to \c *this all elements in \a x
         SmallSet& operator|= ( const SmallSet& x ) {
             return( *this = (*this | x) );
         }
@@ -126,17 +125,17 @@ class SmallSet {
             return *this;
         }
 
-        /// Erases from *this all elements not in x
+        /// Erases from \c *this all elements not in \a x
         SmallSet& operator&= ( const SmallSet& x ) {
             return (*this = (*this & x));
         }
 
-        /// Returns true if *this is a subset of x
+        /// Returns \c true if \c *this is a subset of \a x
         bool operator<< ( const SmallSet& x ) const {
             return std::includes( x._elements.begin(), x._elements.end(), _elements.begin(), _elements.end() );
         }
 
-        /// Returns true if x is a subset of *this
+        /// Returns \c true if \a x is a subset of \c *this
         bool operator>> ( const SmallSet& x ) const {
             return std::includes( _elements.begin(), _elements.end(), x._elements.begin(), x._elements.end() );
         }
@@ -144,12 +143,12 @@ class SmallSet {
 
     /// @name Queries
     //@{
-        /// Returns true if *this and x have elements in common
+        /// Returns \c true if \c *this and \a x have elements in common
         bool intersects( const SmallSet& x ) const {
             return( (*this & x).size() > 0 );
         }
 
-        /// Returns true if *this contains the element t
+        /// Returns \c true if \c *this contains the element \a t
         bool contains( const T &t ) const {
             return std::binary_search( _elements.begin(), _elements.end(), t );
         }
@@ -157,7 +156,7 @@ class SmallSet {
         /// Returns number of elements
         typename std::vector<T>::size_type size() const { return _elements.size(); }
 
-        /// Returns whether the SmallSet is empty
+        /// Returns whether \c *this is empty
         bool empty() const { return _elements.size() == 0; }
     //@}
 
@@ -195,12 +194,12 @@ class SmallSet {
 
     /// @name Comparison operators
     //@{
-        /// Returns true if a and b are identical
+        /// Returns \c true if \a a and \a b are identical
         friend bool operator==( const SmallSet &a, const SmallSet &b ) {
             return (a._elements == b._elements);
         }
 
-        /// Returns true if a and b are not identical
+        /// Returns \c true if \a a and \a b are not identical
         friend bool operator!=( const SmallSet &a, const SmallSet &b ) {
             return !(a._elements == b._elements);
         }
