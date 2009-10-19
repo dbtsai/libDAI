@@ -1,3 +1,6 @@
+* Added TProb<T>::divided_by(const TProb<T>&) const
+* Removed TProb<T>::makeZero(double), TProb<T>::makePositive(double),
+  TFactor<T>::makeZero(double), TFactor<T>::makePositive(double)
 * Fixed bug in BipartiteGraph::eraseEdge()
 * Added python and octave ports for examples/example_sprinkler.cpp
 * [Patrick Pletscher] Added SWIG wrapper code for python and octave

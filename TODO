@@ -1,0 +1,27 @@
+Improve documentation:
+
+index.h
+factor.h
+weightedgraph.h
+factorgraph.h
+clustergraph.h
+regiongraph.h
+properties.h
+util.h
+daialg.h
+alldai.h
+exactinf.h
+mf.h
+bp.h
+jtree.h
+hak.h
+treeep.h
+lc.h
+mr.h
+gibbs.h
+bp_dual.h
+bbp.h
+cbp.h
+evidence.h
+emalg.h
+doc.h
