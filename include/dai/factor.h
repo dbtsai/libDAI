@@ -283,6 +283,24 @@ template <typename T> class TFactor {
             return pointwiseOp(*this,f,std::minus<T>());
         }
 
+        // OBSOLETE
+        /// Sets all values that are smaller than epsilon to 0
+        /** \note Obsolete, to be removed soon
+         */
+        TFactor<T>& makeZero( T epsilon ) {
+            _p.makeZero( epsilon );
+            return *this;
+        }
+
+        // OBSOLETE
+        /// Sets all values that are smaller than epsilon to epsilon
+        /** \note Obsolete, to be removed soon
+         */
+        TFactor<T>& makePositive( T epsilon ) {
+            _p.makePositive( epsilon );
+            return *this;
+        }
+
         /// Returns pointwise inverse of *this.
         /** If zero == true, uses 1 / 0 == 0; otherwise 1 / 0 == Inf.
          */

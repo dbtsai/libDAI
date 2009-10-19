@@ -1,0 +1,22 @@
+The following functions are obsolete and will be removed in the next major release (0.3.0):
+
+TFactor<T>& TFactor<T>::makeZero( T epsilon );
+TFactor<T>& TFactor<T>::makePositive( T epsilon );
+TProb<T>& TProb<T>::makePositive( T epsilon );
+TProb<T>& TProb<T>::makeZero( T epsilon );
+virtual void InfAlg::clamp( const Var &v, size_t x, bool backup = false ) = 0;
+void DAIAlg<GRM>::clamp( const Var &v, size_t x, bool backup = false );
+virtual void FactorGraph::clamp( const Var &v, size_t x, bool backup = false );
+size_t FactorGraph::VV2E(size_t n1, size_t n2) const;
+const Edge& FactorGraph::edge(size_t e) const;
+void FactorGraph::indexEdges();
+size_t FactorGraph::nr_edges() const;
+const std::vector<Edge>& FactorGraph::edges() const;
+bool BipartiteGraph::_edge_indexed;
+std::vector<Edge> BipartiteGraph::_edges;
+hash_map<Edge,size_t> BipartiteGraph::_vv2e;
+void BipartiteGraph::indexEdges();
+const Edge& BipartiteGraph::edge(size_t e) const;
+const std::vector<Edge>& BipartiteGraph::edges() const;
+size_t BipartiteGraph::VV2E(size_t n1, size_t n2) const;
+size_t BipartiteGraph::nr_edges() const;

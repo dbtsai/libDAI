@@ -370,6 +370,28 @@ template <typename T> class TProb {
             return *this;
         }
 
+        // OBSOLETE
+        /// Sets entries that are smaller (in absolute value) than \a epsilon to 0
+        /** \note Obsolete, to be removed soon
+         */
+        TProb<T>& makeZero( T epsilon ) {
+            for( size_t i = 0; i < size(); i++ )
+                if( (_p[i] < epsilon) && (_p[i] > -epsilon) )
+                    _p[i] = 0;
+            return *this;
+        }
+        
+        // OBSOLETE
+        /// Sets entries that are smaller than \a epsilon to \a epsilon
+        /** \note Obsolete, to be removed soon
+         */
+        TProb<T>& makePositive( T epsilon ) {
+            for( size_t i = 0; i < size(); i++ )
+                if( (0 < _p[i]) && (_p[i] < epsilon) )
+                    _p[i] = epsilon;
+            return *this;
+        }
+
         /// Adds scalar \a x to each entry
         TProb<T>& operator+= (T x) {
             std::transform( _p.begin(), _p.end(), _p.begin(), std::bind2nd( std::plus<T>(), x ) );
