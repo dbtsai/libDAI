@@ -208,7 +208,7 @@ template <typename T> class TProb {
             return Z;
         }
 
-        /// Returns true if one or more entries are NaN
+        /// Returns \c true if one or more entries are NaN
         bool hasNaNs() const {
             bool foundnan = false;
             for( typename std::vector<T>::const_iterator x = _p.begin(); x != _p.end(); x++ )
@@ -219,7 +219,7 @@ template <typename T> class TProb {
             return foundnan;
         }
 
-        /// Returns true if one or more entries are negative
+        /// Returns \c true if one or more entries are negative
         bool hasNegatives() const {
             return (std::find_if( _p.begin(), _p.end(), std::bind2nd( std::less<T>(), (T)0 ) ) != _p.end());
         }
@@ -237,7 +237,7 @@ template <typename T> class TProb {
         }
 
         /// Lexicographical comparison
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          */
         bool operator<= (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
@@ -282,7 +282,7 @@ template <typename T> class TProb {
         }
 
         /// Returns pointwise logarithm
-        /** If zero==true, uses log(0)==0; otherwise, log(0)==-Inf.
+        /** If \a zero == \c true, uses <tt>log(0)==0</tt>; otherwise, <tt>log(0)==-Inf</tt>.
          */
         TProb<T> log(bool zero=false) const {
             TProb<T> l(*this);
@@ -291,7 +291,7 @@ template <typename T> class TProb {
         }
 
         /// Returns pointwise inverse
-        /** If zero==true; uses 1/0==0, otherwise 1/0==Inf.
+        /** If \a zero == \c true, uses <tt>1/0==0</tt>; otherwise, <tt>1/0==Inf</tt>.
          */
         TProb<T> inverse(bool zero=true) const {
             TProb<T> inv;
@@ -335,7 +335,7 @@ template <typename T> class TProb {
         }
 
         /// Applies logarithm pointwise
-        /** If zero==true, uses log(0)==0; otherwise, log(0)==-Inf.
+        /** If \a zero == \c true, uses <tt>log(0)==0</tt>; otherwise, <tt>log(0)==-Inf</tt>.
          */
         const TProb<T>& takeLog(bool zero=false) {
             if( zero ) {
@@ -466,7 +466,7 @@ template <typename T> class TProb {
     /// \name Operations with other equally-sized vectors
     //@{
         /// Pointwise addition with \a q
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          */
         TProb<T>& operator+= (const TProb<T> & q) {
             DAI_DEBASSERT( size() == q.size() );
@@ -475,7 +475,7 @@ template <typename T> class TProb {
         }
 
         /// Pointwise subtraction of \a q
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          */
         TProb<T>& operator-= (const TProb<T> & q) {
             DAI_DEBASSERT( size() == q.size() );
@@ -484,7 +484,7 @@ template <typename T> class TProb {
         }
 
         /// Pointwise multiplication with \a q
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          */
         TProb<T>& operator*= (const TProb<T> & q) {
             DAI_DEBASSERT( size() == q.size() );
@@ -493,7 +493,7 @@ template <typename T> class TProb {
         }
 
         /// Pointwise division by \a q, where division by 0 yields 0
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          *  \see divide(const TProb<T> &)
          */
         TProb<T>& operator/= (const TProb<T> & q) {
@@ -508,7 +508,7 @@ template <typename T> class TProb {
         }
 
         /// Pointwise division by \a q, where division by 0 yields +Inf
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          *  \see operator/=(const TProb<T> &)
          */
         TProb<T>& divide (const TProb<T> & q) {
@@ -521,7 +521,7 @@ template <typename T> class TProb {
     /// \name Transformations with other equally-sized vectors
     //@{
         /// Returns sum of \c *this and \a q
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          */
         TProb<T> operator+ (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
@@ -531,7 +531,7 @@ template <typename T> class TProb {
         }
 
         /// Return \c *this minus \a q
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          */
         TProb<T> operator- (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
@@ -541,7 +541,7 @@ template <typename T> class TProb {
         }
 
         /// Return product of \c *this with \a q
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          */
         TProb<T> operator* (const TProb<T> & q) const {
             DAI_DEBASSERT( size() == q.size() );
@@ -551,7 +551,7 @@ template <typename T> class TProb {
         }
 
         /// Returns quotient of \c *this with \a q, where division by 0 yields +Inf
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          *  \see divided_by(const TProb<T> &)
          */
         TProb<T> operator/ (const TProb<T> & q) const {
@@ -562,7 +562,7 @@ template <typename T> class TProb {
         }
 
         /// Pointwise division by \a q, where division by 0 yields 0
-        /** \pre this->size() == q.size()
+        /** \pre <tt>this->size() == q.size()</tt>
          *  \see operator/(const TProb<T> &)
          */
         TProb<T> divided_by (const TProb<T> & q) const {
@@ -577,7 +577,7 @@ template <typename T> class TProb {
 
 /// Returns distance between \a p and \a q, measured using distance measure \a dt
 /** \relates TProb
- *  \pre this->size() == q.size()
+ *  \pre <tt>this->size() == q.size()</tt>
  */
 template<typename T> T dist( const TProb<T> &p, const TProb<T> &q, typename TProb<T>::DistType dt ) {
     DAI_DEBASSERT( p.size() == q.size() );
@@ -615,16 +615,17 @@ template<typename T> T dist( const TProb<T> &p, const TProb<T> &q, typename TPro
 /// Writes a TProb<T> to an output stream
 /** \relates TProb
  */
-template<typename T> std::ostream& operator<< (std::ostream& os, const TProb<T>& P) {
+template<typename T> std::ostream& operator<< (std::ostream& os, const TProb<T>& p) {
     os << "[";
-    std::copy( P.p().begin(), P.p().end(), std::ostream_iterator<T>(os, " ") );
+    std::copy( p.p().begin(), p.p().end(), std::ostream_iterator<T>(os, " ") );
     os << "]";
     return os;
 }
 
 
-/// Returns the TProb<T> containing the pointwise minimum of a and b (which should have equal size)
+/// Returns the pointwise minimum of \a a and \a b
 /** \relates TProb
+ *  \pre <tt>this->size() == q.size()</tt>
  */
 template<typename T> TProb<T> min( const TProb<T> &a, const TProb<T> &b ) {
     DAI_ASSERT( a.size() == b.size() );
@@ -638,8 +639,9 @@ template<typename T> TProb<T> min( const TProb<T> &a, const TProb<T> &b ) {
 }
 
 
-/// Returns the TProb<T> containing the pointwise maximum of a and b (which should have equal size)
+/// Returns the pointwise maximum of \a a and \a b
 /** \relates TProb
+ *  \pre <tt>this->size() == q.size()</tt>
  */
 template<typename T> TProb<T> max( const TProb<T> &a, const TProb<T> &b ) {
     DAI_ASSERT( a.size() == b.size() );

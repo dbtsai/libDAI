@@ -103,7 +103,7 @@ MEX:=$(MEX) $(CCLIB) $(CCINC) $(MEXFLAGS)
 
 all : $(TARGETS)
 
-examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_sprinkler$(EE)
+examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE)
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
@@ -201,6 +201,9 @@ examples/example_bipgraph$(EE) : examples/example_bipgraph.cpp $(HEADERS) $(LIB)
 
 examples/example_varset$(EE) : examples/example_varset.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)examples/example_varset$(EE) examples/example_varset.cpp $(LIBS)
+
+examples/example_permute$(EE) : examples/example_permute.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)examples/example_permute$(EE) examples/example_permute.cpp $(LIBS)
 
 examples/example_sprinkler$(EE) : examples/example_sprinkler.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)examples/example_sprinkler$(EE) examples/example_sprinkler.cpp $(LIBS)
@@ -303,7 +306,7 @@ ifneq ($(OS),WINDOWS)
 clean :
 	-rm *$(OE)
 	-rm matlab/*$(ME)
-	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_sprinkler$(EE)
+	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE)
 	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc

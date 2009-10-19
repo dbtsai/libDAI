@@ -199,7 +199,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
 
             // store value, but permute indices first according
             // to internal representation
-            facs.back()[permindex.convert_linear_index( li  )] = val;
+            facs.back()[permindex.convertLinearIndex( li )] = val;
         }
     }
 

@@ -11,8 +11,8 @@
 
 
 /// \file
-/// \brief Defines the IndexFor, MultiFor, Permute and State classes
-/// \todo Improve documentation
+/// \brief Defines the IndexFor, multifor, Permute and State classes
+/// \todo Improve documentation of IndexFor
 
 
 #ifndef __defined_libdai_index_h
@@ -59,7 +59,7 @@ class IndexFor {
         std::vector<size_t> _count;
 
         /// For each variable in forVars, its number of possible values
-        std::vector<size_t> _dims;
+        std::vector<size_t> _ranges;
 
     public:
         /// Default constructor
@@ -71,19 +71,19 @@ class IndexFor {
         IndexFor( const VarSet& indexVars, const VarSet& forVars ) : _count( forVars.size(), 0 ) {
             long sum = 1;
 
-            _dims.reserve( forVars.size() );
+            _ranges.reserve( forVars.size() );
             _sum.reserve( forVars.size() );
 
             VarSet::const_iterator j = forVars.begin();
             for( VarSet::const_iterator i = indexVars.begin(); i != indexVars.end(); ++i ) {
                 for( ; j != forVars.end() && *j <= *i; ++j ) {
-                    _dims.push_back( j->states() );
+                    _ranges.push_back( j->states() );
                     _sum.push_back( (*i == *j) ? sum : 0 );
                 }
                 sum *= i->states();
             }
             for( ; j != forVars.end(); ++j ) {
-                _dims.push_back( j->states() );
+                _ranges.push_back( j->states() );
                 _sum.push_back( 0 );
             }
             _index = 0;
@@ -108,9 +108,9 @@ class IndexFor {
 
                 while( i < _count.size() ) {
                     _index += _sum[i];
-                    if( ++_count[i] < _dims[i] )
+                    if( ++_count[i] < _ranges[i] )
                         break;
-                    _index -= _sum[i] * _dims[i];
+                    _index -= _sum[i] * _ranges[i];
                     _count[i] = 0;
                     i++;
                 }
@@ -123,120 +123,51 @@ class IndexFor {
 };
 
 
-/// MultiFor makes it easy to perform a dynamic number of nested for loops.
-/** An example of the usage is as follows:
- *  \code
- *  std::vector<size_t> dims;
- *  dims.push_back( 3 );
- *  dims.push_back( 4 );
- *  dims.push_back( 5 );
- *  for( MultiFor s(dims); s.valid(); ++s )
- *      cout << "linear index: " << (size_t)s << " corresponds to indices " << s[0] << ", " << s[1] << ", " << s[2] << endl;
- *  \endcode
- *  which would be equivalent to:
- *  \code
- *  size_t s = 0;
- *  for( size_t s0 = 0; s0 < 3; s0++ )
- *      for( size_t s1 = 0; s1 < 4; s1++ )
- *          for( size_t s2 = 0; s2 < 5; s++, s2++ )
- *              cout << "linear index: " << (size_t)s << " corresponds to indices " << s0 << ", " << s1 << ", " << s2 << endl;
- *  \endcode
- */
-class MultiFor {
-    private:
-        std::vector<size_t>  _dims;
-        std::vector<size_t>  _states;
-        long                 _state;
-
-    public:
-        /// Default constructor
-        MultiFor() : _dims(), _states(), _state(0) {}
-
-        /// Initialize from vector of index dimensions
-        MultiFor( const std::vector<size_t> &d ) : _dims(d), _states(d.size(),0), _state(0) {}
-
-        /// Return linear state
-        operator size_t() const {
-            DAI_ASSERT( valid() );
-            return( _state );
-        }
-
-        /// Return k'th index
-        size_t operator[]( size_t k ) const {
-            DAI_ASSERT( valid() );
-            DAI_ASSERT( k < _states.size() );
-            return _states[k];
-        }
-
-        /// Prefix increment operator
-        MultiFor & operator++() {
-            if( valid() ) {
-                _state++;
-                size_t i;
-                for( i = 0; i != _states.size(); i++ ) {
-                    if( ++(_states[i]) < _dims[i] )
-                        break;
-                    _states[i] = 0;
-                }
-                if( i == _states.size() )
-                    _state = -1;
-            }
-            return *this;
-        }
-
-        /// Postfix increment operator
-        void operator++( int ) {
-            operator++();
-        }
-
-        /// Returns true if the current state is valid
-        bool valid() const {
-            return( _state >= 0 );
-        }
-};
-
-
-/// Tool for calculating permutations of multiple indices.
+/// Tool for calculating permutations of linear indices of multi-dimensional arrays.
 class Permute {
     private:
-        std::vector<size_t>  _dims;
+        /// Stores the number of possible values of all indices
+        std::vector<size_t>  _ranges;
+        /// Stores the permutation
         std::vector<size_t>  _sigma;
 
     public:
         /// Default constructor
-        Permute() : _dims(), _sigma() {}
+        Permute() : _ranges(), _sigma() {}
 
-        /// Construct from vector of index dimensions and permutation sigma
-        Permute( const std::vector<size_t> &d, const std::vector<size_t> &sigma ) : _dims(d), _sigma(sigma) {
-            DAI_ASSERT( _dims.size() == _sigma.size() );
+        /// Construct from vector of index ranges and permutation
+        Permute( const std::vector<size_t> &rs, const std::vector<size_t> &sigma ) : _ranges(rs), _sigma(sigma) {
+            DAI_ASSERT( _ranges.size() == _sigma.size() );
         }
 
-        /// Construct from vector of variables
-        Permute( const std::vector<Var> &vars ) : _dims(vars.size()), _sigma(vars.size()) {
-            VarSet vs( vars.begin(), vars.end(), vars.size() );
+        /// Construct from vector of variables.
+        /** The implied permutation maps the index of each variable in \a vars according to the canonical ordering 
+         *  (i.e., sorted ascendingly according to their label) to the index it has in \a vars.
+         */
+        Permute( const std::vector<Var> &vars ) : _ranges(vars.size()), _sigma(vars.size()) {
             for( size_t i = 0; i < vars.size(); ++i )
-                _dims[i] = vars[i].states();
-            VarSet::const_iterator set_iter = vs.begin();
-            for( size_t i = 0; i < vs.size(); ++i, ++set_iter )
-                _sigma[i] = find( vars.begin(), vars.end(), *set_iter ) - vars.begin();
+                _ranges[i] = vars[i].states();
+            VarSet vs( vars.begin(), vars.end(), vars.size() );
+            VarSet::const_iterator vs_i = vs.begin();
+            for( size_t i = 0; i < vs.size(); ++i, ++vs_i )
+                _sigma[i] = find( vars.begin(), vars.end(), *vs_i ) - vars.begin();
         }
 
         /// Calculates a permuted linear index.
-        /** Converts the linear index li to a vector index
-         *  corresponding with the dimensions in _dims, permutes it according to sigma,
-         *  and converts it back to a linear index  according to the permuted dimensions.
+        /** Converts the linear index \a li to a vector index, permutes its 
+         *  components, and converts it back to a linear index.
          */
-        size_t convert_linear_index( size_t li ) const {
-            size_t N = _dims.size();
+        size_t convertLinearIndex( size_t li ) const {
+            size_t N = _ranges.size();
 
             // calculate vector index corresponding to linear index
             std::vector<size_t> vi;
             vi.reserve( N );
             size_t prod = 1;
             for( size_t k = 0; k < N; k++ ) {
-                vi.push_back( li % _dims[k] );
-                li /= _dims[k];
-                prod *= _dims[k];
+                vi.push_back( li % _ranges[k] );
+                li /= _ranges[k];
+                prod *= _ranges[k];
             }
 
             // convert permuted vector index to corresponding linear index
@@ -244,51 +175,164 @@ class Permute {
             size_t sigma_li = 0;
             for( size_t k = 0; k < N; k++ ) {
                 sigma_li += vi[_sigma[k]] * prod;
-                prod *= _dims[_sigma[k]];
+                prod *= _ranges[_sigma[k]];
             }
 
             return sigma_li;
         }
+
+        // OBSOLETE
+        /// For backwards compatibility (to be removed soon)
+        size_t convert_linear_index( size_t li ) const { return convertLinearIndex(li); }
+
+        /// Returns const reference to the permutation
+        const std::vector<size_t>& sigma() const { return _sigma; }
+
+        /// Returns reference to the permutation
+        std::vector<size_t>& sigma() { return _sigma; }
+
+        /// Returns the result of applying the permutation on \a i
+        size_t operator[]( size_t i ) const {
+#ifdef DAI_DEBUG
+            return _sigma.at(i);
+#else
+            return _sigma[i];
+#endif
+        }
 };
 
 
-/// Contains the joint state of variables within a VarSet and useful things to do with this information.
-/** This is very similar to a MultiFor, but tailored for Vars and Varsets.
+/// multifor makes it easy to perform a dynamic number of nested \c for loops.
+/** An example of the usage is as follows:
+ *  \code
+ *  std::vector<size_t> ranges;
+ *  ranges.push_back( 3 );
+ *  ranges.push_back( 4 );
+ *  ranges.push_back( 5 );
+ *  for( multifor s(ranges); s.valid(); ++s )
+ *      cout << "linear index: " << (size_t)s << " corresponds to indices " << s[2] << ", " << s[1] << ", " << s[0] << endl;
+ *  \endcode
+ *  which would be equivalent to:
+ *  \code
+ *  size_t s = 0;
+ *  for( size_t s2 = 0; s2 < 5; s2++ )
+ *      for( size_t s1 = 0; s1 < 4; s1++ )
+ *          for( size_t s0 = 0; s0 < 3; s++, s0++ )
+ *              cout << "linear index: " << (size_t)s << " corresponds to indices " << s2 << ", " << s1 << ", " << s0 << endl;
+ *  \endcode
+ */
+class multifor {
+    private:
+        /// Stores the number of possible values of all indices
+        std::vector<size_t>  _ranges;
+        /// Stores the current values of all indices
+        std::vector<size_t>  _indices;
+        /// Stores the current linear index
+        long                 _linear_index;
+
+    public:
+        /// Default constructor
+        multifor() : _ranges(), _indices(), _linear_index(0) {}
+
+        /// Initialize from vector of index ranges
+        multifor( const std::vector<size_t> &d ) : _ranges(d), _indices(d.size(),0), _linear_index(0) {}
+
+        /// Returns linear index (i.e., the index in the Cartesian product space)
+        operator size_t() const {
+            DAI_DEBASSERT( valid() );
+            return( _linear_index );
+        }
+
+        /// Returns \a k 'th index
+        size_t operator[]( size_t k ) const {
+            DAI_DEBASSERT( valid() );
+            DAI_DEBASSERT( k < _indices.size() );
+            return _indices[k];
+        }
+
+        /// Increments the current indices (prefix)
+        multifor & operator++() {
+            if( valid() ) {
+                _linear_index++;
+                size_t i;
+                for( i = 0; i != _indices.size(); i++ ) {
+                    if( ++(_indices[i]) < _ranges[i] )
+                        break;
+                    _indices[i] = 0;
+                }
+                if( i == _indices.size() )
+                    _linear_index = -1;
+            }
+            return *this;
+        }
+
+        /// Increments the current indices (postfix)
+        void operator++( int ) {
+            operator++();
+        }
+
+        /// Returns \c true if the current indices are valid
+        bool valid() const {
+            return( _linear_index >= 0 );
+        }
+};
+
+
+/// Makes it easy to iterate over all possible joint states of variables within a VarSet.
+/** A joint state of several variables can be represented in two different ways, by a map that maps each variable
+ *  to its own state, or by an integer that gives the index of the joint state in the canonical enumeration.
+ *
+ *  Both representations are useful, and the main functionality provided by the State class is to simplify iterating
+ *  over the various joint states of a VarSet and to provide access to the current state in both representations.
+ *
+ *  \note The same functionality could be achieved by simply iterating over the linear state and using VarSet::calcStates,
+ *  but the State class offers a more efficient implementation.
+ *
+ *  \note A State is very similar to a \link multifor \endlink, but tailored for Var 's and VarSet 's.
+ *
+ *  \see VarSet::calcState, VarSet::calcStates
  */
 class State {
     private:
+        /// Type for representing a joint state of some variables as a map, which maps each variable to its state
         typedef std::map<Var, size_t> states_type;
 
+        /// Current state (represented linearly)
         long                          state;
+
+        /// Current state (represented as a map)
         states_type                   states;
 
     public:
         /// Default constructor
         State() : state(0), states() {}
 
-        /// Initialize from VarSet
+        /// Initialize from VarSet, resetting the current state
         State( const VarSet &vs ) : state(0) {
             for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ )
                 states[*v] = 0;
         }
 
-        /// Return linear state
+        /// Return current linear state
         operator size_t() const {
             DAI_ASSERT( valid() );
             return( state );
         }
 
-        /// Return state of variable n, or zero if n is not in this State
-        size_t operator() ( const Var &n ) const {
+        /// Return current state represented as a map
+        const states_type& get() const { return states; }
+
+        /// Return current state of variable \a v, or 0 if \a v is not in \c *this
+        size_t operator() ( const Var &v ) const {
             DAI_ASSERT( valid() );
-            states_type::const_iterator entry = states.find( n );
+            states_type::const_iterator entry = states.find( v );
             if( entry == states.end() )
                 return 0;
             else
                 return entry->second;
         }
 
-        /// Return linear state of variables in varset, setting them to zero if they are not in this State
+        /// Return linear state of variables in \a vs, assuming that variables that are not in \c *this are in state 0
         size_t operator() ( const VarSet &vs ) const {
             DAI_ASSERT( valid() );
             size_t vs_state = 0;
@@ -302,7 +346,7 @@ class State {
             return vs_state;
         }
 
-        /// Prefix increment operator
+        /// Increments the current state (prefix)
         void operator++( ) {
             if( valid() ) {
                 state++;
@@ -318,19 +362,36 @@ class State {
             }
         }
 
-        /// Postfix increment operator
+        /// Increments the current state (postfix)
         void operator++( int ) {
             operator++();
         }
 
-        /// Returns true if the current state is valid
+        /// Returns \c true if the current state is valid
         bool valid() const {
             return( state >= 0 );
+        }
+
+        /// Resets the current state (to the joint state represented by linear state 0)
+        void reset() {
+            state = 0;
+            for( states_type::iterator s = states.begin(); s != states.end(); s++ )
+                s->second = 0;
         }
 };
 
 
 } // end of namespace dai
+
+
+/** \example example_permute.cpp
+ *  This example shows how to use the Permute, multifor and State classes.
+ *
+ *  \section Output
+ *  \verbinclude examples/example_permute.out
+ *
+ *  \section Source
+ */
 
 
 #endif

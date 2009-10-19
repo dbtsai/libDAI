@@ -154,7 +154,7 @@ class VarSet : public SmallSet<Var> {
         friend std::ostream& operator<<( std::ostream &os, const VarSet &vs )  {
             os << "{";
             for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ )
-                os << (v != vs.begin() ? "," : "") << *v;
+                os << (v != vs.begin() ? ", " : "") << *v;
             os << "}";
             return( os );
         }
@@ -166,7 +166,7 @@ class VarSet : public SmallSet<Var> {
 
 
 /** \example example_varset.cpp
- *  This example shows how to use the Var and VarSet classes. It also explains the concept of "states" for VarSets.
+ *  This example shows how to use the Var, VarSet and State classes. It also explains the concept of "states" for VarSets.
  *
  *  \section Output
  *  \verbinclude examples/example_varset.out

@@ -199,7 +199,7 @@ void SharedParameters::collectSufficientStatistics( InfAlg &alg ) {
         Factor b = alg.belief(vs);
         Prob p( b.states(), 0.0 );
         for( size_t entry = 0; entry < b.states(); ++entry )
-            p[entry] = b[perm.convert_linear_index(entry)];
+            p[entry] = b[perm.convertLinearIndex(entry)];
         _estimation->addSufficientStatistics( p );
     }
 }
@@ -213,7 +213,7 @@ void SharedParameters::setParameters( FactorGraph &fg ) {
 
         Factor f( vs, 0.0 );
         for( size_t entry = 0; entry < f.states(); ++entry )
-            f[perm.convert_linear_index(entry)] = p[entry];
+            f[perm.convertLinearIndex(entry)] = p[entry];
 
         fg.setFactor( i->first, f );
     }
@@ -232,7 +232,7 @@ void SharedParameters::collectParameters( const FactorGraph &fg, std::vector<Rea
     DAI_ASSERT( f.vars() == _varsets[I] );
     const Permute &perm = _perms[I];
     for( size_t val_index = 0; val_index < f.states(); ++val_index )
-        outVals.push_back( f[perm.convert_linear_index(val_index)] );
+        outVals.push_back( f[perm.convertLinearIndex(val_index)] );
 }
 
 

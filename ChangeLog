@@ -1,3 +1,6 @@
+* Renamed Permute::convert_linear_index into Permute::convertLinearIndex
+  (and provided an alias for backwards compatibility)
+* Added examples/example_permute.cpp
 * Added TProb<T>::divided_by(const TProb<T>&) const
 * Fixed bug in BipartiteGraph::eraseEdge()
 * Added python and octave ports for examples/example_sprinkler.cpp

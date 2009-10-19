@@ -20,3 +20,4 @@ const Edge& BipartiteGraph::edge(size_t e) const;
 const std::vector<Edge>& BipartiteGraph::edges() const;
 size_t BipartiteGraph::VV2E(size_t n1, size_t n2) const;
 size_t BipartiteGraph::nr_edges() const;
+size_t Permute::convert_linear_index( size_t li ) const;

@@ -106,7 +106,7 @@ template <typename T> class TFactor {
         TFactor( const std::vector<Var> &vars, const std::vector<T> &p ) : _vs(vars.begin(), vars.end(), vars.size()), _p(p.size()) {
             Permute permindex(vars);
             for( size_t li = 0; li < p.size(); ++li )
-                _p[permindex.convert_linear_index(li)] = p[li];
+                _p[permindex.convertLinearIndex(li)] = p[li];
         }
 
         /// Constructs TFactor depending on the variable v, with uniform distribution

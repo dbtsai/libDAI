@@ -158,7 +158,7 @@ std::ostream& operator << (std::ostream& os, const std::vector<T> & x) {
 template<class T>
 std::ostream& operator << (std::ostream& os, const std::set<T> & x) {
     os << "{";
-   for( typename std::set<T>::const_iterator it = x.begin(); it != x.end(); it++ )
+    for( typename std::set<T>::const_iterator it = x.begin(); it != x.end(); it++ )
         os << (it != x.begin() ? ", " : "") << *it;
     os << "}";
     return os;
