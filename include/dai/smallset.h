@@ -11,7 +11,7 @@
 
 
 /// \file
-/// \brief Defines the SmallSet<<em>T</em>> class, which represents a set (optimized for a small number of elements).
+/// \brief Defines the SmallSet<> class, which represents a set (optimized for a small number of elements).
 
 
 #ifndef __defined_libdai_smallset_h

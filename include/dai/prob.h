@@ -10,8 +10,8 @@
 
 
 /// \file
-/// \brief Defines TProb<T> and Prob classes which represent (probability) vectors
-/// \todo Rename to Vector<T>
+/// \brief Defines TProb<> and Prob classes which represent (probability) vectors
+/// \todo Rename to Vector<>
 
 
 #ifndef __defined_libdai_prob_h
@@ -150,7 +150,7 @@ template <typename T> class TProb {
         /// Returns length of the vector (i.e., the number of entries)
         size_t size() const { return _p.size(); }
 
-        /// Returns the Shannon entropy of *this, \f$-\sum_i p_i \log p_i\f$
+        /// Returns the Shannon entropy of \c *this, \f$-\sum_i p_i \log p_i\f$
         T entropy() const {
             T S = 0;
             for( size_t i = 0; i < size(); i++ )
@@ -250,7 +250,10 @@ template <typename T> class TProb {
 
     /// \name Unary transformations
     //@{
+        // OBSOLETE
         /// Returns pointwise signum
+        /** \note Obsolete, to be removed soon
+         */
         TProb<T> sgn() const {
             TProb<T> x;
             x._p.reserve( size() );
@@ -455,7 +458,7 @@ template <typename T> class TProb {
             return quot;
         }
 
-        /// Returns *this raised to the power \a x
+        /// Returns \c *this raised to the power \a x
         TProb<T> operator^ (T x) const {
             TProb<T> power(*this);
             power ^= x;

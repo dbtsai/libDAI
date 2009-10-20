@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines abstract base class InfAlg, its descendants DAIAlg<T>, the specializations DAIAlgFG and DAIAlgRG and some generic inference methods.
+/// \brief Defines abstract base class InfAlg, its descendants DAIAlg<>, the specializations DAIAlgFG and DAIAlgRG and some generic inference methods.
 /// \todo Improve documentation
 
 
