@@ -21,7 +21,7 @@ namespace dai {
 using namespace std;
 
 
-DEdgeVec GrowRootedTree( const Graph & T, size_t Root ) {
+DEdgeVec GrowRootedTree( const Graph &T, size_t Root ) {
     DEdgeVec result;
     if( T.size() == 0 )
         return result;
@@ -62,14 +62,6 @@ DEdgeVec GrowRootedTree( const Graph & T, size_t Root ) {
 
 
 UEdgeVec RandomDRegularGraph( size_t N, size_t d ) {
-    // Algorithm 1 in "Generating random regular graphs quickly"
-    // by A. Steger and N.C. Wormald
-    //
-    // Draws a random graph with size N and uniform degree d
-    // from an almost uniform probability distribution over these graphs
-    // (which becomes uniform in the limit that d is small and N goes
-    // to infinity).
-
     DAI_ASSERT( (N * d) % 2 == 0 );
 
     bool ready = false;

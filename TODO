@@ -2,7 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	weightedgraph.h
 	factorgraph.h
 	clustergraph.h
 	regiongraph.h

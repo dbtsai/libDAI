@@ -208,6 +208,12 @@
  *  "Choosing a Variable to Clamp",
  *  <em>Proceedings of the Twelfth International Conference on Artificial Intelligence and Statistics (AISTATS 2009)</em> 5:145-152
  *  http://jmlr.csail.mit.edu/proceedings/papers/v5/eaton09a/eaton09a.pdf
+ *
+ *  \anchor StW99 \ref StW99
+ *  A. Steger and N. C. Wormald (1999):
+ *  "Generating Random Regular Graphs Quickly",
+ *  <em>Combinatorics, Probability and Computing</em> Vol 8, Issue 4, pp. 377-396
+ *  http://www.math.uwaterloo.ca/~nwormald/papers/randgen.pdf
  */
 
 
