@@ -212,12 +212,12 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
 }
 
 
-VarSet FactorGraph::delta( unsigned i ) const {
+VarSet FactorGraph::delta( size_t i ) const {
     return( Delta(i) / var(i) );
 }
 
 
-VarSet FactorGraph::Delta( unsigned i ) const {
+VarSet FactorGraph::Delta( size_t i ) const {
     // calculate Markov Blanket
     VarSet Del;
     foreach( const Neighbor &I, nbV(i) ) // for all neighboring factors I of i
@@ -236,7 +236,7 @@ VarSet FactorGraph::Delta( const VarSet &ns ) const {
 }
 
 
-void FactorGraph::makeCavity( unsigned i, bool backup ) {
+void FactorGraph::makeCavity( size_t i, bool backup ) {
     // fills all Factors that include var(i) with ones
     map<size_t,Factor> newFacs;
     foreach( const Neighbor &I, nbV(i) ) // for all neighboring factors I of i
@@ -306,7 +306,7 @@ void FactorGraph::clamp( size_t i, size_t x, bool backup ) {
     mask[x] = 1.0;
 
     map<size_t, Factor> newFacs;
-    foreach( const BipartiteGraph::Neighbor &I, nbV(i) )
+    foreach( const Neighbor &I, nbV(i) )
         newFacs[I] = factor(I) * mask;
     setFactors( newFacs, backup );
 
@@ -324,7 +324,7 @@ void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
     }
 
     map<size_t, Factor> newFacs;
-    foreach( const BipartiteGraph::Neighbor &I, nbV(i) )
+    foreach( const Neighbor &I, nbV(i) )
         newFacs[I] = factor(I) * mask_n;
     setFactors( newFacs, backup );
 }
@@ -410,7 +410,8 @@ bool FactorGraph::isBinary() const {
 }
 
 
-FactorGraph FactorGraph::clamped( const Var &v, size_t state ) const {
+FactorGraph FactorGraph::clamped( size_t i, size_t state ) const {
+    Var v = var( i );
     Real zeroth_order = 1.0;
     vector<Factor> clamped_facs;
     for( size_t I = 0; I < nrFactors(); I++ ) {

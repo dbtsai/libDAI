@@ -7,6 +7,7 @@ TProb<T>& TProb<T>::makeZero( T epsilon );
 virtual void InfAlg::clamp( const Var &v, size_t x, bool backup = false ) = 0;
 void DAIAlg<GRM>::clamp( const Var &v, size_t x, bool backup = false );
 virtual void FactorGraph::clamp( const Var &v, size_t x, bool backup = false );
+FactorGraph clamped( const Var &v, size_t x ) const;
 size_t FactorGraph::VV2E(size_t n1, size_t n2) const;
 const Edge& FactorGraph::edge(size_t e) const;
 void FactorGraph::indexEdges();
