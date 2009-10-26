@@ -1,6 +1,6 @@
 # testfast.fg
 # METHOD                               	MAX ERROR	AVG ERROR	LOGZ ERROR	MAXDIFF	
-EXACT[verbose=0]                       	
+EXACT                                  	
 # ({x0}, (3.888e-01, 6.112e-01))
 # ({x1}, (5.556e-01, 4.444e-01))
 # ({x2}, (4.587e-01, 5.413e-01))
