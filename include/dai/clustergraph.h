@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines class ClusterGraph
-/// \todo Improve documentation
+/// \brief Defines class ClusterGraph, which is mainly useful for the junction tree algorithm
 
 
 #ifndef __defined_libdai_clustergraph_h
@@ -27,9 +26,8 @@
 namespace dai {
 
 
-    /// A ClusterGraph is a hypergraph with VarSets as nodes.
-    /** It is implemented as bipartite graph with variable (Var) nodes
-     *  and cluster (VarSet) nodes.
+    /// A ClusterGraph is a hypergraph with variables as nodes, and "clusters" (sets of variables) as hyperedges.
+    /** It is implemented as a bipartite graph with variable (Var) nodes and cluster (VarSet) nodes.
      */
     class ClusterGraph {
         public:
@@ -49,13 +47,55 @@ namespace dai {
             typedef BipartiteGraph::Edge     Edge;
 
         public:
+        /// \name Constructors and destructors
+        //@{
             /// Default constructor
             ClusterGraph() : G(), vars(), clusters() {}
 
-            /// Construct from vector<VarSet>
+            /// Construct from vector of VarSet 's
             ClusterGraph( const std::vector<VarSet> & cls );
+        //@}
 
-            /// Returns true if cluster I is not contained in a larger cluster
+        /// \name Queries
+        //@{
+            /// Returns a constant reference to the clusters
+            const std::vector<VarSet> & toVector() const { return clusters; }
+
+            /// Returns number of clusters
+            size_t size() const {
+                return G.nr2();
+            }
+
+            /// Returns the index of variable \a n
+            size_t findVar( const Var &n ) const {
+                return find( vars.begin(), vars.end(), n ) - vars.begin();
+            }
+
+            /// Returns union of clusters that contain the \a i 'th variable
+            VarSet Delta( size_t i ) const {
+                VarSet result;
+                foreach( const Neighbor &I, G.nb1(i) )
+                    result |= clusters[I];
+                return result;
+            }
+
+            /// Returns union of clusters that contain the \a i 'th (except this variable itself)
+            VarSet delta( size_t i ) const {
+                return Delta( i ) / vars[i];
+            }
+
+            /// Returns \c true if variables with indices \a i1 and \a i2 are adjacent, i.e., both contained in the same cluster
+            bool adj( size_t i1, size_t i2 ) {
+                bool result = false;
+                foreach( const Neighbor &I, G.nb1(i1) )
+                    if( find( G.nb2(I).begin(), G.nb2(I).end(), i2 ) != G.nb2(I).end() ) {
+                        result = true;
+                        break;
+                    }
+                return result;
+            }
+
+            /// Returns \c true if cluster \a I is not contained in a larger cluster
             bool isMaximal( size_t I ) const {
                 DAI_DEBASSERT( I < G.nr2() );
                 const VarSet & clI = clusters[I];
@@ -72,48 +112,10 @@ namespace dai {
                 }
                 return maximal;
             }
+        //@}
 
-            /// Erases all VarSets that are not maximal
-            ClusterGraph& eraseNonMaximal() {
-                for( size_t I = 0; I < G.nr2(); ) {
-                    if( !isMaximal(I) ) {
-                        clusters.erase( clusters.begin() + I );
-                        G.erase2(I);
-                    } else
-                        I++;
-                }
-                return *this;
-            }
-
-            /// Returns number of clusters
-            size_t size() const {
-                return G.nr2();
-            }
-
-            /// Returns index of variable n
-            size_t findVar( const Var &n ) const {
-                return find( vars.begin(), vars.end(), n ) - vars.begin();
-            }
-
-            /// Returns true if vars with indices i1 and i2 are adjacent, i.e., both contained in the same cluster
-            bool adj( size_t i1, size_t i2 ) {
-                bool result = false;
-                foreach( const Neighbor &I, G.nb1(i1) )
-                    if( find( G.nb2(I).begin(), G.nb2(I).end(), i2 ) != G.nb2(I).end() ) {
-                        result = true;
-                        break;
-                    }
-                return result;
-            }
-
-            /// Returns union of clusters that contain the variable with index i
-            VarSet Delta( size_t i ) const {
-                VarSet result;
-                foreach( const Neighbor &I, G.nb1(i) )
-                    result |= clusters[I];
-                return result;
-            }
-
+        /// \name Operations
+        //@{
             /// Inserts a cluster (if it does not already exist)
             void insert( const VarSet &cl ) {
                 if( find( clusters.begin(), clusters.end(), cl ) == clusters.end() ) {
@@ -132,12 +134,19 @@ namespace dai {
                 }
             }
 
-            /// Returns union of clusters that contain variable with index i, minus this variable
-            VarSet delta( size_t i ) const {
-                return Delta( i ) / vars[i];
+            /// Erases all clusters that are not maximal
+            ClusterGraph& eraseNonMaximal() {
+                for( size_t I = 0; I < G.nr2(); ) {
+                    if( !isMaximal(I) ) {
+                        clusters.erase( clusters.begin() + I );
+                        G.erase2(I);
+                    } else
+                        I++;
+                }
+                return *this;
             }
 
-            /// Erases all clusters that contain n where n is the variable with index i
+            /// Erases all clusters that contain the \a i 'th variable
             ClusterGraph& eraseSubsuming( size_t i ) {
                 while( G.nb1(i).size() ) {
                     clusters.erase( clusters.begin() + G.nb1(i)[0] );
@@ -145,14 +154,23 @@ namespace dai {
                 }
                 return *this;
             }
+        //@}
 
-            /// Returns a const reference to the clusters
-            const std::vector<VarSet> & toVector() const { return clusters; }
+        /// \name Input/Ouput
+        //@{
+            /// Writes a ClusterGraph to an output stream
+            friend std::ostream & operator << ( std::ostream & os, const ClusterGraph & cl ) {
+                os << cl.toVector();
+                return os;
+            }
+        //@}
 
-            /// Calculates cost of eliminating the variable with index i.
+        /// \name Variable elimination
+        //@{
+            /// Calculates cost of eliminating the \a i 'th variable.
             /** The cost is measured as "number of added edges in the adjacency graph",
-             *  where the adjacency graph has the variables as its nodes and
-             *  connects nodes i1 and i2 iff i1 and i2 occur in some common cluster.
+             *  where the adjacency graph has the variables as its nodes and connects
+             *  nodes \a i1 and \a i2 iff \a i1 and \a i2 occur together in some common cluster.
              */
             size_t eliminationCost( size_t i ) {
                 std::vector<size_t> id_n = G.delta1( i );
@@ -170,23 +188,21 @@ namespace dai {
                 return cost;
             }
 
-            /// Performs Variable Elimination without Probs, i.e. only keeping track of
-            /*  the interactions that are created along the way.
-             *  \param ElimSeq A set of outer clusters and an elimination sequence
+            /// Performs Variable Elimination, only keeping track of the interactions that are created along the way.
+            /** \param ElimSeq The sequence in which to eliminate the variables
              *  \return A set of elimination "cliques"
              *  \todo Variable elimination should be implemented generically using a function
-             *  object that tells you which variable to delete.
+             *  object that specifies which variable to delete next.
              */
             ClusterGraph VarElim( const std::vector<Var> &ElimSeq ) const;
 
-            /// Performs Variable Eliminiation using the MinFill heuristic
+            /// Performs Variable Eliminiation using the "MinFill" heuristic
+            /** The "MinFill" heuristic greedily minimizes the cost of eliminating a variable,
+             *  measured with eliminationCost().
+             *  \return A set of elimination "cliques"
+             */
             ClusterGraph VarElim_MinFill() const;
-
-            /// Writes a ClusterGraph to an output stream
-            friend std::ostream & operator << ( std::ostream & os, const ClusterGraph & cl ) {
-                os << cl.toVector();
-                return os;
-            }
+        //@}
     };
 
 
