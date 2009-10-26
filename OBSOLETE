@@ -23,3 +23,5 @@ size_t BipartiteGraph::VV2E(size_t n1, size_t n2) const;
 size_t BipartiteGraph::nr_edges() const;
 size_t Permute::convert_linear_index( size_t li ) const;
 TProb<T> TProb<T>::sgn() const;
+bool Check_Counting_Numbers();
+void Calc_Counting_Numbers();

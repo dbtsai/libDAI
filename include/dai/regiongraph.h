@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines classes Region, FRegion and RegionGraph
-/// \todo Improve documentation
+/// \brief Defines classes Region, FRegion and RegionGraph.
 
 
 #ifndef __defined_libdai_regiongraph_h
@@ -37,17 +36,18 @@ class Region : public VarSet {
         /// Default constructor
         Region() : VarSet(), _c(1.0) {}
 
-        /// Construct Region from a VarSet and a counting number
-        Region(const VarSet & x, double c) : VarSet(x), _c(c) {}
+        /// Construct from a set of variables and a counting number
+        Region(const VarSet &x, double c) : VarSet(x), _c(c) {}
 
-        /// Provide read access to counting number
+        /// Returns constant reference to counting number
         const double & c() const { return _c; }
-        /// Provide full access to counting number
+
+        /// Returns reference to counting number
         double & c() { return _c; }
 };
 
 
-/// A FRegion is a factor with a counting number
+/// An FRegion is a factor with a counting number
 class FRegion : public Factor {
     private:
         /// Counting number
@@ -57,17 +57,33 @@ class FRegion : public Factor {
         /// Default constructor
         FRegion() : Factor(), _c(1.0) {}
 
-        /// Constructs FRegion from a Factor and a counting number
+        /// Constructs from a factor and a counting number
         FRegion( const Factor & x, double c ) : Factor(x), _c(c) {}
 
-        /// Provide read access to counting number
+        /// Returns constant reference to counting number
         const double & c() const { return _c; }
-        /// Provide full access to counting number
+
+        /// Returns reference to counting number
         double & c() { return _c; }
 };
 
 
-/// A RegionGraph is a bipartite graph consisting of outer regions (type FRegion) and inner regions (type Region)
+/// A RegionGraph combines a bipartite graph consisting of outer regions (type FRegion) and inner regions (type Region) with a FactorGraph
+/** A RegionGraph inherits from a FactorGraph and adds additional structure in the form of a "region graph". Our definition of region graph
+ *  is inspired by [\ref HAK03], which is less general than the definition given in [\ref YFW05].
+ *
+ *  The extra structure described by a RegionGraph over that described by a FactorGraph is:
+ *  - a set of outer regions (indexed by \f$\alpha\f$), where each outer region consists of
+ *    - a factor defined on a subset of variables
+ *    - a counting number
+ *  - a set of inner regions (indexed by \f$\beta\f$), where each inner region consists of
+ *    - a subset of variables
+ *    - a counting number
+ *  - edges between inner and outer regions
+ *
+ *  Each factor in the factor graph belongs to an outer region; normally, the factor contents
+ *  of an outer region would be the product of all the factors that belong to that region.
+ */
 class RegionGraph : public FactorGraph {
     public:
         /// Stores the neighborhood structure
@@ -84,28 +100,81 @@ class RegionGraph : public FactorGraph {
 
 
     public:
+    /// \name Constructors and destructors
+    //@{
         /// Default constructor
         RegionGraph() : FactorGraph(), G(), ORs(), IRs(), fac2OR() {}
 
-        /// Constructs a RegionGraph from a FactorGraph
+        /// Partially constructs a region graph from a factor graph
         RegionGraph( const FactorGraph &fg ) : FactorGraph(fg), G(), ORs(), IRs(), fac2OR() {}
 
-        /// Constructs a RegionGraph from a FactorGraph, a vector of outer regions, a vector of inner regions and a vector of edges
+        /// Constructs a region graph from a factor graph, a vector of outer regions, a vector of inner regions and a vector of edges
+        /** The counting numbers for the outer regions are set to 1.
+         */
         RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors, const std::vector<Region> &irs, const std::vector<std::pair<size_t,size_t> > &edges );
 
-        /// Constructs a RegionGraph from a FactorGraph and a vector of outer VarSets (CVM style)
+        /// Constructs a region graph from a factor graph and a vector of outer clusters (CVM style)
+        /** The region graph is constructed as in the Cluster Variation Method. 
+         *
+         *  The outer regions have as variable subsets the clusters specified in \a cl. 
+         *  Each factor in the factor graph \a fg is assigned to one of the outer regions. 
+         *  Each outer region gets counting number 1. 
+         *
+         *  The inner regions are (repeated) intersections of outer regions.
+         *  An inner and an outer region are connected if the variables in the inner region form a
+         *  subset of the variables in the outer region. The counting numbers for the inner
+         *  regions are calculated by calcCountingNumbers() and satisfy the Moebius formula.
+         */
         RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl );
 
-        /// Clone *this (virtual copy constructor)
+        /// Clone \c *this (virtual copy constructor)
         virtual RegionGraph* clone() const { return new RegionGraph(*this); }
+    //@}
 
-        /// Set the content of the I'th factor and make a backup of its old content if backup == true
+    /// \name Queries
+    //@{
+        /// Returns number of outer regions
+        size_t nrORs() const { return ORs.size(); }
+        /// Returns number of inner regions
+        size_t nrIRs() const { return IRs.size(); }
+
+        /// Returns constant reference to outer region \a alpha
+        const FRegion & OR(size_t alpha) const { return ORs[alpha]; }
+        /// Returns reference to outer region \a alpha
+        FRegion & OR(size_t alpha) { return ORs[alpha]; }
+
+        /// Returns constant reference to inner region \a beta
+        const Region & IR(size_t beta) const { return IRs[beta]; }
+        /// Returns reference to inner region \a beta
+        Region & IR(size_t beta) { return IRs[beta]; }
+
+        /// Returns constant reference to the neighbors of outer region \a alpha
+        const Neighbors & nbOR( size_t alpha ) const { return G.nb1(alpha); }
+        /// Returns constant reference to the neighbors of inner region \a beta
+        const Neighbors & nbIR( size_t beta ) const { return G.nb2(beta); }
+
+        /// Check whether the counting numbers are valid
+        /** Counting numbers are said to be (variable) valid if for each variable \f$x\f$,
+         *    \f[\sum_{\alpha \ni x} c_\alpha + \sum_{\beta \ni x} c_\beta = 1\f]
+         *  or in words, if the sum of the counting numbers of the regions
+         *  that contain the variable equals one.
+         */
+        bool checkCountingNumbers() const;
+
+        // OBSOLETE
+        /// For backwards compatibility (to be removed soon)
+        bool Check_Counting_Numbers() { return checkCountingNumbers(); }
+    //@}
+
+    /// \name Operations
+    //@{
+        /// Set the content of the \a I 'th factor and make a backup of its old content if \a backup == \c true
         virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {
             FactorGraph::setFactor( I, newFactor, backup );
             RecomputeOR( I );
         }
 
-        /// Set the contents of all factors as specified by facs and make a backup of the old contents if backup == true
+        /// Set the contents of all factors as specified by \a facs and make a backup of the old contents if \a backup == \c true
         virtual void setFactors( const std::map<size_t, Factor> & facs, bool backup = false ) {
             FactorGraph::setFactors( facs, backup );
             VarSet ns;
@@ -114,50 +183,40 @@ class RegionGraph : public FactorGraph {
             RecomputeORs( ns );
         }
 
-
-        /// Provides read access to outer region
-        const FRegion & OR(size_t alpha) const { return ORs[alpha]; }
-        /// Provides access to outer region
-        FRegion & OR(size_t alpha) { return ORs[alpha]; }
-
-        /// Provides read access to inner region
-        const Region & IR(size_t beta) const { return IRs[beta]; }
-        /// Provides access to inner region
-        Region & IR(size_t beta) { return IRs[beta]; }
-
-        /// Returns number of outer regions
-        size_t nrORs() const { return ORs.size(); }
-        /// Returns number of inner regions
-        size_t nrIRs() const { return IRs.size(); }
-
-
-        /// Provides read access to neighbors of outer region
-        const Neighbors & nbOR( size_t alpha ) const { return G.nb1(alpha); }
-        /// Provides full access to neighbors of outer region
-        Neighbors & nbOR( size_t alpha ) { return G.nb1(alpha); }
-
-        /// Provides read access to neighbors of inner region
-        const Neighbors & nbIR( size_t beta ) const { return G.nb2(beta); }
-        /// Provides full access to neighbors of inner region
-        Neighbors & nbIR( size_t beta ) { return G.nb2(beta); }
-
-
-        /// Calculates counting numbers of inner regions based upon counting numbers of outer regions
-        void Calc_Counting_Numbers();
-        /// Check whether the counting numbers are valid
-        bool Check_Counting_Numbers();
-
         /// Recompute all outer regions
+        /** The factor contents of each outer region is set to the product of the factors belonging to that region.
+         */
         void RecomputeORs();
 
-        /// Recompute all outer regions involving the variables in ns
-        void RecomputeORs( const VarSet & ns );
+        /// Recompute all outer regions involving the variables in \a vs
+        /** The factor contents of each outer region involving at least one of the variables in \a vs is set to the product of the factors belonging to that region.
+         */
+        void RecomputeORs( const VarSet &vs );
 
-        /// Recompute all outer regions involving factor I
+        /// Recompute all outer regions involving factor \a I
+        /** The factor contents of each outer region involving the \a I 'th factor is set to the product of the factors belonging to that region.
+         */
         void RecomputeOR( size_t I );
 
-        // Friends
+        /// Calculates counting numbers of inner regions based upon counting numbers of outer regions
+        /** The counting numbers of the inner regions are set using the Moebius inversion formula:
+         *    \f[ c_\beta := 1 - \sum_{\gamma \in \mathrm{an}(\beta)} c_\gamma \f]
+         *  where \f$\mathrm{an}(\beta)\f$ are the ancestors of inner region \f$\beta\f$ according to
+         *  the partial ordering induced by the subset relation (i.e., a region is a child of another
+         *  region if its variables are a subset of the variables of its parent region).
+         */
+        void calcCountingNumbers();
+
+        // OBSOLETE
+        /// For backwards compatibility (to be removed soon)
+        void Calc_Counting_Numbers() { calcCountingNumbers(); }
+    //@}
+
+    /// \name Input/output
+    //@{
+        /// Writes a RegionGraph to an output stream
         friend std::ostream & operator << ( std::ostream & os, const RegionGraph & rg );
+    //@}
 };
 
 

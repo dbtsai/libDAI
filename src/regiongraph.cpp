@@ -29,7 +29,7 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors,
     for( vector<Region>::const_iterator alpha = ors.begin(); alpha != ors.end(); alpha++ )
         ORs.push_back( FRegion(Factor(*alpha, 1.0), 1.0) );
 
-    // For each factor, find an outer regions that subsumes that factor.
+    // For each factor, find an outer region that subsumes that factor.
     // Then, multiply the outer region with that factor.
     fac2OR.reserve( nrFactors() );
     for( size_t I = 0; I < nrFactors(); I++ ) {
@@ -43,12 +43,12 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors,
     }
     RecomputeORs();
 
-    // create bipartite graph
+    // Create bipartite graph
     G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Check counting numbers
 #ifdef DAI_DEBUG
-    Check_Counting_Numbers();
+    checkCountingNumbers();
 #endif
 }
 
@@ -114,20 +114,20 @@ RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl )
         }
     }
 
-    // create bipartite graph
+    // Create bipartite graph
     G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Calculate counting numbers
-    Calc_Counting_Numbers();
+    calcCountingNumbers();
 
     // Check counting numbers
 #ifdef DAI_DEBUG
-    Check_Counting_Numbers();
+    checkCountingNumbers();
 #endif
 }
 
 
-void RegionGraph::Calc_Counting_Numbers() {
+void RegionGraph::calcCountingNumbers() {
     // Calculates counting numbers of inner regions based upon counting numbers of outer regions
 
     vector<vector<size_t> > ancestors(nrIRs());
@@ -164,7 +164,7 @@ void RegionGraph::Calc_Counting_Numbers() {
 }
 
 
-bool RegionGraph::Check_Counting_Numbers() {
+bool RegionGraph::checkCountingNumbers() const {
     // Checks whether the counting numbers satisfy the fundamental relation
 
     bool all_valid = true;

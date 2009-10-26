@@ -156,7 +156,7 @@ void JTree::GenerateJT( const std::vector<VarSet> &Cliques ) {
     }
 
     // Check counting numbers
-    Check_Counting_Numbers();
+    checkCountingNumbers();
 
     if( props.verbose >= 3 ) {
         cerr << "Resulting regiongraph: " << *this << endl;

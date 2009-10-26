@@ -1,3 +1,9 @@
+* Renamed RegionGraph::Check_Counting_Numbers into
+  RegionGraph::checkCountingNumbers
+  (and provided an alias for backwards compatibility)
+* Renamed RegionGraph::Calc_Counting_Numbers into
+  RegionGraph::calcCountingNumbers
+  (and provided an alias for backwards compatibility)
 * Renamed Permute::convert_linear_index into Permute::convertLinearIndex
   (and provided an alias for backwards compatibility)
 * Added examples/example_permute.cpp

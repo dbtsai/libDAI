@@ -299,7 +299,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Check counting numbers
-    Check_Counting_Numbers();
+    checkCountingNumbers();
 
     // Create messages and beliefs
     Qa.clear();
