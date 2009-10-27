@@ -74,7 +74,7 @@ class VarSet : public SmallSet<Var> {
          *  number of possible values ("states") of variable \f$x_l\f$, the number of
          *  joint configurations of the variables in \f$\{x_l\}_{l\in L}\f$ is given by \f$\prod_{l\in L} S_l\f$.
          */
-        size_t nrStates() {
+        size_t nrStates() const {
             size_t states = 1;
             for( VarSet::const_iterator n = begin(); n != end(); n++ )
                 states *= n->states();
@@ -106,7 +106,7 @@ class VarSet : public SmallSet<Var> {
          *  maps a joint state to a linear index; this is the inverse of the mapping
          *  \f$\sigma^{-1}\f$ induced by calcStates().
          */
-        size_t calcState( const std::map<Var, size_t> &states ) {
+        size_t calcState( const std::map<Var, size_t> &states ) const {
             size_t prod = 1;
             size_t state = 0;
             for( VarSet::const_iterator n = begin(); n != end(); n++ ) {
@@ -137,7 +137,7 @@ class VarSet : public SmallSet<Var> {
          *  maps a linear index to a joint state; this is the inverse of the mapping \f$\sigma\f$
          *  induced by calcState().
          */
-        std::map<Var, size_t> calcStates( size_t linearState ) {
+        std::map<Var, size_t> calcStates( size_t linearState ) const {
             std::map<Var, size_t> states;
             for( VarSet::const_iterator n = begin(); n != end(); n++ ) {
                 states[*n] = linearState % n->states();
