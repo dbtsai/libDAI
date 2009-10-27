@@ -1,3 +1,11 @@
+* Replaced constructor
+    TFactor<T>::TFactor( const VarSet& vars, TIterator begin )
+  by two constructors
+    TFactor<T>::TFactor( const VarSet& vars, const T* p )
+    TFactor<T>::TFactor( const VarSet& vars, const std::vector<S> &x )
+* Fixed bugs (min and max were reversed) in
+  TFactor<T> min( const TFactor<T> &, const TFactor<T> & )
+  TFactor<T> max( const TFactor<T> &, const TFactor<T> & )
 * Renamed RegionGraph::Check_Counting_Numbers into
   RegionGraph::checkCountingNumbers
   (and provided an alias for backwards compatibility)

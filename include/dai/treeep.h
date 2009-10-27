@@ -38,9 +38,9 @@ namespace dai {
 class TreeEP : public JTree {
     private:
         /// Maximum difference encountered so far
-        double                  _maxdiff;
+        Real                  _maxdiff;
         /// Number of iterations needed
-        size_t                  _iters;
+        size_t                _iters;
 
     public:
         /// Parameters of this inference algorithm
@@ -55,7 +55,7 @@ class TreeEP : public JTree {
             size_t maxiter;
 
             /// Tolerance
-            double tol;
+            Real tol;
 
             /// How to choose the tree
             TypeType type;
@@ -76,7 +76,7 @@ class TreeEP : public JTree {
                 const Factor *       _I;
                 VarSet               _ns;
                 VarSet               _nsrem;
-                double               _logZ;
+                Real                 _logZ;
 
 
             public:
@@ -101,7 +101,7 @@ class TreeEP : public JTree {
                 void init();
                 void InvertAndMultiply( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb );
                 void HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &Qb );
-                double logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const;
+                Real logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const;
                 const Factor *& I() { return _I; }
         };
 
@@ -144,8 +144,8 @@ class TreeEP : public JTree {
         virtual Real logZ() const;
         virtual void init();
         virtual void init( const VarSet &/*ns*/ ) { init(); }
-        virtual double run();
-        virtual double maxDiff() const { return _maxdiff; }
+        virtual Real run();
+        virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
         //@}
 

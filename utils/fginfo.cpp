@@ -108,13 +108,13 @@ int main( int argc, char *argv[] ) {
             cout << "Treewidth:           " << tw.first << endl;
             cout << "Largest cluster for JTree has " << tw.second << " states " << endl;
         }
-        double stsp = 1.0;
+        long double stsp = 1.0;
         for( size_t i = 0; i < fg.nrVars(); i++ )
             stsp *= fg.var(i).states();
         cout << "Total state space:   " << stsp << endl;
 
-        double cavsum_lcbp = 0.0;
-        double cavsum_lcbp2 = 0.0;
+        long double cavsum_lcbp = 0.0;
+        long double cavsum_lcbp2 = 0.0;
         size_t max_Delta_size = 0;
         map<size_t,size_t> cavsizes;
         for( size_t i = 0; i < fg.nrVars(); i++ ) {

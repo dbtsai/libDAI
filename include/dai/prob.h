@@ -301,10 +301,10 @@ template <typename T> class TProb {
             inv._p.reserve( size() );
             if( zero )
                 for( size_t i = 0; i < size(); i++ )
-                    inv._p.push_back( _p[i] == 0.0 ? 0.0 : 1.0 / _p[i] );
+                    inv._p.push_back( _p[i] == (T)0 ? (T)0 : (T)1 / _p[i] );
             else
                 for( size_t i = 0; i < size(); i++ )
-                    inv._p.push_back( 1.0 / _p[i] );
+                    inv._p.push_back( (T)1 / _p[i] );
             return inv;
         }
 

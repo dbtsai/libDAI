@@ -678,7 +678,7 @@ std::vector<Prob> BBP::getZeroAdjV( const FactorGraph &fg ) {
 
 void BBP::run() {
     typedef BBP::Properties::UpdateType UT;
-    Real &tol = props.tol;
+    Real tol = props.tol;
     UT &updates = props.updates;
 
     Real tic = toc();
@@ -760,7 +760,7 @@ void BBP::run() {
 }
 
 
-double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const PropertySet &bbp_props, bbp_cfn_t cfn, double h ) {
+Real numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const PropertySet &bbp_props, bbp_cfn_t cfn, Real h ) {
     // calculate the value of the unperturbed cost function
     Real cf0 = getCostFn( bp, cfn, state );
 
@@ -777,7 +777,7 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
 
         // for each variable i
         for( size_t i = 0; i < fg.nrVars(); i++ ) {
-            vector<double> adj_est;
+            vector<Real> adj_est;
             // for each value xi
             for( size_t xi = 0; xi < fg.var(i).states(); xi++ ) {
                 // Clone 'bp' (which may be any InfAlg)
@@ -828,7 +828,7 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
         for(size_t i=0; i<bp_dual.nrVars(); i++) {
             // for each factor I ~ i
             foreach(size_t I, bp_dual.nbV(i)) {
-                vector<double> adj_n_est;
+                vector<Real> adj_n_est;
                 // for each value xi
                 for(size_t xi=0; xi<bp_dual.var(i).states(); xi++) {
                     BP_dual bp_dual_prb(bp_dual);
@@ -842,7 +842,7 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
                     adj_n_est.push_back((cf_prb-cf0)/h);
                 }
 
-                vector<double> adj_m_est;
+                vector<Real> adj_m_est;
                 // for each value xi
                 for(size_t xi=0; xi<bp_dual.var(i).states(); xi++) {
                     BP_dual bp_dual_prb(bp_dual);
@@ -876,7 +876,7 @@ double numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const Prop
     /*    if(0) {
         // verify bbp.adj_b_V
         for(size_t i=0; i<bp_dual.nrVars(); i++) {
-            vector<double> adj_b_V_est;
+            vector<Real> adj_b_V_est;
             // for each value xi
             for(size_t xi=0; xi<bp_dual.var(i).states(); xi++) {
                 BP_dual bp_dual_prb(bp_dual);
@@ -965,7 +965,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 size_t dim = fg.factor(I).states();
                 Prob p( dim, 0.0 );
                 for( size_t xI = 0; xI < dim; xI++ ) {
-                    double bIxI = ia.beliefF(I)[xI];
+                    Real bIxI = ia.beliefF(I)[xI];
                     if( bIxI < 1.0e-15 )
                         p[xI] = -1.0e10;
                     else
@@ -982,7 +982,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 size_t dim = fg.var(i).states();
                 Prob p( dim, 0.0 );
                 for( size_t xi = 0; xi < fg.var(i).states(); xi++ ) {
-                    double bixi = ia.beliefV(i)[xi];
+                    Real bixi = ia.beliefV(i)[xi];
                     if( bixi < 1.0e-15 )
                         p[xi] = -1.0e10;
                     else
@@ -1009,7 +1009,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 size_t n = fg.var(i).states();
                 Prob delta( n, 0.0 );
                 DAI_ASSERT(/*0<=state[i] &&*/ state[i] < n);
-                double b = ia.beliefV(i)[state[i]];
+                Real b = ia.beliefV(i)[state[i]];
                 switch( (size_t)cfn_type ) {
                     case bbp_cfn_t::CFN_GIBBS_B:
                         delta[state[i]] = 1.0;
@@ -1047,7 +1047,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
                 size_t x_I = getFactorEntryForState( fg, I, state );
                 DAI_ASSERT(/*0<=x_I &&*/ x_I < n);
 
-                double b = ia.beliefF(I)[x_I];
+                Real b = ia.beliefF(I)[x_I];
                 switch( (size_t)cfn_type ) {
                     case bbp_cfn_t::CFN_GIBBS_B_FACTOR:
                         delta[x_I] = 1.0;
@@ -1072,7 +1072,7 @@ void initBBPCostFnAdj( BBP &bbp, const InfAlg &ia, bbp_cfn_t cfn_type, const vec
 
 
 Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stateP ) {
-    double cf = 0.0;
+    Real cf = 0.0;
     const FactorGraph &fg = ia.fg();
 
     switch( (size_t)cfn_type ) {
@@ -1094,7 +1094,7 @@ Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stat
             vector<size_t> state = *stateP;
             DAI_ASSERT( state.size() == fg.nrVars() );
             for( size_t i = 0; i < fg.nrVars(); i++ ) {
-                double b = ia.beliefV(i)[state[i]];
+                Real b = ia.beliefV(i)[state[i]];
                 switch( (size_t)cfn_type ) {
                     case bbp_cfn_t::CFN_GIBBS_B:
                         cf += b;
@@ -1118,7 +1118,7 @@ Real getCostFn( const InfAlg &ia, bbp_cfn_t cfn_type, const vector<size_t> *stat
             DAI_ASSERT( state.size() == fg.nrVars() );
             for( size_t I = 0; I < fg.nrFactors(); I++ ) {
                 size_t x_I = getFactorEntryForState( fg, I, state );
-                double b = ia.beliefF(I)[x_I];
+                Real b = ia.beliefF(I)[x_I];
                 switch( (size_t)cfn_type ) {
                     case bbp_cfn_t::CFN_GIBBS_B_FACTOR:
                         cf += b;
@@ -1173,8 +1173,8 @@ void BBP::Properties::set(const PropertySet &opts)
         DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"updates\" for method \"BBP\"");
     verbose = opts.getStringAs<size_t>("verbose");
     maxiter = opts.getStringAs<size_t>("maxiter");
-    tol = opts.getStringAs<double>("tol");
-    damping = opts.getStringAs<double>("damping");
+    tol = opts.getStringAs<Real>("tol");
+    damping = opts.getStringAs<Real>("damping");
     updates = opts.getStringAs<UpdateType>("updates");
 }
 PropertySet BBP::Properties::get() const {

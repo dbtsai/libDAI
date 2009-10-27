@@ -314,7 +314,7 @@ void JTree::runShaferShenoy() {
 }
 
 
-double JTree::run() {
+Real JTree::run() {
     if( props.updates == Properties::UpdateType::HUGIN )
         runHUGIN();
     else if( props.updates == Properties::UpdateType::SHSH )
@@ -484,7 +484,7 @@ Factor JTree::calcMarginal( const VarSet& ns ) {
             // For all states of nsrem
             for( State s(nsrem); s.valid(); s++ ) {
                 // CollectEvidence
-                double logZ = 0.0;
+                Real logZ = 0.0;
                 for( size_t i = Tsize; (i--) != 0; ) {
                 // Make outer region T[i].n1 consistent with outer region T[i].n2
                 // IR(i) = seperator OR(T[i].n1) && OR(T[i].n2)

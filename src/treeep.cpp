@@ -32,7 +32,7 @@ void TreeEP::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("verbose") );
     DAI_ASSERT( opts.hasKey("type") );
 
-    props.tol = opts.getStringAs<double>("tol");
+    props.tol = opts.getStringAs<Real>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.type = opts.getStringAs<Properties::TypeType>("type");
@@ -176,8 +176,8 @@ void TreeEP::TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<F
 }
 
 
-double TreeEP::TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const {
-    double s = 0.0;
+Real TreeEP::TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const {
+    Real s = 0.0;
     for( size_t alpha = 0; alpha < _Qa.size(); alpha++ )
         s += (Qa[_a[alpha]] * _Qa[alpha].log(true)).sum();
     for( size_t beta = 0; beta < _Qb.size(); beta++ )
@@ -200,7 +200,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
             // ALT: construct weighted graph with as weights an upper bound on the
             // effective interaction strength between pairs of nodes
 
-            WeightedGraph<double> wg;
+            WeightedGraph<Real> wg;
             for( size_t i = 0; i < nrVars(); ++i ) {
                 Var v_i = var(i);
                 VarSet di = delta(i);
@@ -365,7 +365,7 @@ void TreeEP::init() {
 }
 
 
-double TreeEP::run() {
+Real TreeEP::run() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3)
@@ -420,7 +420,7 @@ double TreeEP::run() {
 
 
 Real TreeEP::logZ() const {
-    double s = 0.0;
+    Real s = 0.0;
 
     // entropy of the tree
     for( size_t beta = 0; beta < nrIRs(); beta++ )

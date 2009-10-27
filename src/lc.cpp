@@ -34,7 +34,7 @@ void LC::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("cavity") );
     DAI_ASSERT( opts.hasKey("updates") );
 
-    props.tol = opts.getStringAs<double>("tol");
+    props.tol = opts.getStringAs<Real>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.cavity = opts.getStringAs<Properties::CavityType>("cavity");
@@ -46,7 +46,7 @@ void LC::setProperties( const PropertySet &opts ) {
     if( opts.hasKey("reinit") )
         props.reinit = opts.getStringAs<bool>("reinit");
     if( opts.hasKey("damping") )
-        props.damping = opts.getStringAs<double>("damping");
+        props.damping = opts.getStringAs<Real>("damping");
     else
         props.damping = 0.0;
 }
@@ -119,9 +119,9 @@ void LC::CalcBelief (size_t i) {
 }
 
 
-double LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet &opts) {
+Real LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet &opts) {
     Factor Bi;
-    double maxdiff = 0;
+    Real maxdiff = 0;
 
     if( props.verbose >= 2 )
         cerr << "Initing cavity " << var(i) << "(" << delta(i).size() << " vars, " << delta(i).nrStates() << " states)" << endl;
@@ -151,7 +151,7 @@ double LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet 
 }
 
 
-double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
+Real LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
     double tic = toc();
 
     if( props.verbose >= 1 ) {
@@ -166,9 +166,9 @@ double LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
             cerr << "Using pairwise(new) " << name << opts << "...";
     }
 
-    double maxdiff = 0.0;
+    Real maxdiff = 0.0;
     for( size_t i = 0; i < nrVars(); i++ ) {
-        double md = CalcCavityDist(i, name, opts);
+        Real md = CalcCavityDist(i, name, opts);
         if( md > maxdiff )
             maxdiff = md;
     }
@@ -237,7 +237,7 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
 }
 
 
-double LC::run() {
+Real LC::run() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
     if( props.verbose >= 2 )
@@ -246,7 +246,7 @@ double LC::run() {
     double tic = toc();
     Diffs diffs(nrVars(), 1.0);
 
-    double md = InitCavityDists( props.cavainame, props.cavaiopts );
+    Real md = InitCavityDists( props.cavainame, props.cavaiopts );
     if( md > _maxdiff )
         _maxdiff = md;
 

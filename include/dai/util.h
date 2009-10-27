@@ -79,7 +79,7 @@
     double log1p( double x );
 
     /// Define INFINITY
-    #define INFINITY (std::numeric_limits<double>::infinity())
+    #define INFINITY (std::numeric_limits<Real>::infinity())
 #endif
 
 
@@ -197,28 +197,28 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
 void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
 
 /// Used to keep track of the progress made by iterative algorithms
-class Diffs : public std::vector<double> {
+class Diffs : public std::vector<Real> {
     private:
         size_t _maxsize;
-        double _def;
-        std::vector<double>::iterator _pos;
-        std::vector<double>::iterator _maxpos;
+        Real _def;
+        std::vector<Real>::iterator _pos;
+        std::vector<Real>::iterator _maxpos;
     public:
         /// Constructor
-        Diffs(long maxsize, double def) : std::vector<double>(), _maxsize(maxsize), _def(def) {
+        Diffs(long maxsize, Real def) : std::vector<Real>(), _maxsize(maxsize), _def(def) {
             this->reserve(_maxsize);
             _pos = begin();
             _maxpos = begin();
         }
         /// Returns maximum difference encountered
-        double maxDiff() {
+        Real maxDiff() {
             if( size() < _maxsize )
                 return _def;
             else
                 return( *_maxpos );
         }
         /// Register new difference x
-        void push(double x) {
+        void push(Real x) {
             if( size() < _maxsize ) {
                 push_back(x);
                 _pos = end();

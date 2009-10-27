@@ -30,14 +30,14 @@ void MF::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("maxiter") );
 
-    props.tol = opts.getStringAs<double>("tol");
+    props.tol = opts.getStringAs<Real>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     if( opts.hasKey("verbose") )
         props.verbose = opts.getStringAs<size_t>("verbose");
     else
         props.verbose = 0U;
     if( opts.hasKey("damping") )
-        props.damping = opts.getStringAs<double>("damping");
+        props.damping = opts.getStringAs<Real>("damping");
     else
         props.damping = 0.0;
 }
@@ -84,7 +84,7 @@ void MF::init() {
 }
 
 
-double MF::run() {
+Real MF::run() {
     double tic = toc();
 
     if( props.verbose >= 1 )

@@ -149,7 +149,7 @@ void RegionGraph::calcCountingNumbers() {
                     if( !assigned[*beta2] )
                         has_unassigned_ancestor = true;
                 if( !has_unassigned_ancestor ) {
-                    double c = 1.0;
+                    Real c = 1.0;
                     foreach( const Neighbor &alpha, nbIR(beta) )
                         c -= OR(alpha).c();
                     for( vector<size_t>::const_iterator beta2 = ancestors[beta].begin(); beta2 != ancestors[beta].end(); beta2++ )
@@ -169,7 +169,7 @@ bool RegionGraph::checkCountingNumbers() const {
 
     bool all_valid = true;
     for( vector<Var>::const_iterator n = vars().begin(); n != vars().end(); n++ ) {
-        double c_n = 0.0;
+        Real c_n = 0.0;
         for( size_t alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars().contains( *n ) )
                 c_n += OR(alpha).c();

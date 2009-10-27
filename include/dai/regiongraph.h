@@ -30,20 +30,20 @@ namespace dai {
 class Region : public VarSet {
     private:
         /// Counting number
-        double          _c;
+        Real          _c;
 
     public:
         /// Default constructor
         Region() : VarSet(), _c(1.0) {}
 
         /// Construct from a set of variables and a counting number
-        Region(const VarSet &x, double c) : VarSet(x), _c(c) {}
+        Region(const VarSet &x, Real c) : VarSet(x), _c(c) {}
 
         /// Returns constant reference to counting number
-        const double & c() const { return _c; }
+        const Real & c() const { return _c; }
 
         /// Returns reference to counting number
-        double & c() { return _c; }
+        Real & c() { return _c; }
 };
 
 
@@ -51,20 +51,20 @@ class Region : public VarSet {
 class FRegion : public Factor {
     private:
         /// Counting number
-        double _c;
+        Real _c;
 
     public:
         /// Default constructor
         FRegion() : Factor(), _c(1.0) {}
 
         /// Constructs from a factor and a counting number
-        FRegion( const Factor & x, double c ) : Factor(x), _c(c) {}
+        FRegion( const Factor & x, Real c ) : Factor(x), _c(c) {}
 
         /// Returns constant reference to counting number
-        const double & c() const { return _c; }
+        const Real & c() const { return _c; }
 
         /// Returns reference to counting number
-        double & c() { return _c; }
+        Real & c() { return _c; }
 };
 
 

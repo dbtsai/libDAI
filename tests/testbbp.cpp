@@ -30,9 +30,9 @@ int main( int argc, char *argv[] ) {
 
         // Set some constants
         size_t verbose = 0;
-        double tol = 1.0e-9;
+        Real   tol = 1.0e-9;
         size_t maxiter = 10000;
-        double damping = 0.0;
+        Real   damping = 0.0;
         BBP::Properties::UpdateType updates = BBP::Properties::UpdateType::PAR;
 
         // Store the constants in a PropertySet object
@@ -100,8 +100,8 @@ int main( int argc, char *argv[] ) {
                     break;
             }
 
-            double h = 1e-4;
-            double result = numericBBPTest( bp, &state, opts("updates",updates), cfn, h );
+            Real h = 1e-4;
+            Real result = numericBBPTest( bp, &state, opts("updates",updates), cfn, h );
             cout << "result: " << result << ",\tupdates=" << updates << ", cfn=" << cfn << endl;
         }
     }

@@ -39,20 +39,20 @@ class MR : public DAIAlgFG {
 
         std::vector<size_t>                             con;       // con[i] = connectivity of spin i
         std::vector<std::vector<size_t> >               nb;        // nb[i] are the neighbours of spin i
-        std::vector<std::vector<double> >               tJ;        // tJ[i][_j] is the tanh of the interaction between spin i and its neighbour nb[i][_j]
-        std::vector<double>                             theta;     // theta[i] is the local field on spin i
-        std::vector<std::vector<double> >               M;         // M[i][_j] is M^{(i)}_j
+        std::vector<std::vector<Real> >                 tJ;        // tJ[i][_j] is the tanh of the interaction between spin i and its neighbour nb[i][_j]
+        std::vector<Real>                               theta;     // theta[i] is the local field on spin i
+        std::vector<std::vector<Real> >                 M;         // M[i][_j] is M^{(i)}_j
         std::vector<std::vector<size_t> >               kindex;    // the _j'th neighbour of spin i has spin i as its kindex[i][_j]'th neighbour
-        std::vector<std::vector<std::vector<double> > > cors;
+        std::vector<std::vector<std::vector<Real> > >   cors;
 
         static const size_t kmax = 31;
         typedef boost::dynamic_bitset<> sub_nb;
 
         size_t N;
 
-        std::vector<double> Mag;
+        std::vector<Real> Mag;
 
-        double _maxdiff;
+        Real _maxdiff;
         size_t _iters;
 
     public:
@@ -68,7 +68,7 @@ class MR : public DAIAlgFG {
             size_t verbose;
 
             /// Tolerance
-            double tol;
+            Real tol;
 
             /// Update equations
             UpdateType updates;
@@ -98,8 +98,8 @@ class MR : public DAIAlgFG {
         virtual Real logZ() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual void init() {}
         virtual void init( const VarSet &/*ns*/ ) { DAI_THROW(NOT_IMPLEMENTED); }
-        virtual double run();
-        virtual double maxDiff() const { return _maxdiff; }
+        virtual Real run();
+        virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
         //@}
 
@@ -109,25 +109,25 @@ class MR : public DAIAlgFG {
         //@}
 
     private:
-        void init(size_t Nin, double *_w, double *_th);
+        void init(size_t Nin, Real *_w, Real *_th);
         void makekindex();
         void init_cor();
-        double init_cor_resp();
+        Real init_cor_resp();
         void solvemcav();
         void solveM();
 
-        double _tJ(size_t i, sub_nb A);
+        Real _tJ(size_t i, sub_nb A);
 
-        double Omega(size_t i, size_t _j, size_t _l);
-        double T(size_t i, sub_nb A);
-        double T(size_t i, size_t _j);
-        double Gamma(size_t i, size_t _j, size_t _l1, size_t _l2);
-        double Gamma(size_t i, size_t _l1, size_t _l2);
+        Real Omega(size_t i, size_t _j, size_t _l);
+        Real T(size_t i, sub_nb A);
+        Real T(size_t i, size_t _j);
+        Real Gamma(size_t i, size_t _j, size_t _l1, size_t _l2);
+        Real Gamma(size_t i, size_t _l1, size_t _l2);
 
-        double appM(size_t i, sub_nb A);
-        void sum_subs(size_t j, sub_nb A, double *sum_even, double *sum_odd);
+        Real appM(size_t i, sub_nb A);
+        void sum_subs(size_t j, sub_nb A, Real *sum_even, Real *sum_odd);
 
-        double sign(double a) { return (a >= 0) ? 1.0 : -1.0; }
+        Real sign(Real a) { return (a >= 0) ? 1.0 : -1.0; }
 
         void setProperties( const PropertySet &opts );
         PropertySet getProperties() const;

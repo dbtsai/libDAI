@@ -30,12 +30,12 @@ class TestDAI {
     protected:
         InfAlg          *obj;
         string          name;
-        vector<double>  err;
+        vector<Real>    err;
 
     public:
         vector<Factor>  q;
-        double          logZ;
-        double          maxdiff;
+        Real            logZ;
+        Real            maxdiff;
         double          time;
         size_t          iters;
         bool            has_logZ;
@@ -45,7 +45,8 @@ class TestDAI {
         TestDAI( const FactorGraph &fg, const string &_name, const PropertySet &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0), iters(0U), has_logZ(false), has_maxdiff(false), has_iters(false) {
             double tic = toc();
             if( name == "LDPC" ) {
-                double zero[2] = {1.0, 0.0};
+                Prob zero(2,0.0);
+                zero[0] = 1.0;
                 q.clear();
                 for( size_t i = 0; i < fg.nrVars(); i++ )
                     q.push_back( Factor(Var(i,2), zero) );
@@ -134,11 +135,11 @@ class TestDAI {
                 err.push_back( dist( q[i], x[i], Prob::DISTTV ) );
         }
 
-        double maxErr() {
+        Real maxErr() {
             return( *max_element( err.begin(), err.end() ) );
         }
 
-        double avgErr() {
+        Real avgErr() {
             return( accumulate( err.begin(), err.end(), 0.0 ) / err.size() );
         }
 };
@@ -192,8 +193,8 @@ pair<string, PropertySet> parseMethod( const string &_s, const map<string,string
 }
 
 
-double clipdouble( double x, double minabs ) {
-    if( fabs(x) < minabs )
+Real clipReal( Real x, Real minabs ) {
+    if( abs(x) < minabs )
         return minabs;
     else
         return x;
@@ -204,7 +205,7 @@ int main( int argc, char *argv[] ) {
     string filename;
     string aliases;
     vector<string> methods;
-    double tol;
+    Real tol;
     size_t maxiter;
     size_t verbose;
     bool marginals = false;
@@ -221,7 +222,7 @@ int main( int argc, char *argv[] ) {
     opts_optional.add_options()
         ("help", "produce help message")
         ("aliases", po::value< string >(&aliases), "Filename for aliases")
-        ("tol", po::value< double >(&tol), "Override tolerance")
+        ("tol", po::value< Real >(&tol), "Override tolerance")
         ("maxiter", po::value< size_t >(&maxiter), "Override maximum number of iterations")
         ("verbose", po::value< size_t >(&verbose), "Override verbosity")
         ("marginals", po::value< bool >(&marginals), "Output single node marginals?")
@@ -282,7 +283,7 @@ int main( int argc, char *argv[] ) {
         fg.ReadFromFile( filename.c_str() );
 
         vector<Factor> q0;
-        double logZ0 = 0.0;
+        Real logZ0 = 0.0;
 
         cout.setf( ios_base::scientific );
         cout.precision( 3 );
@@ -333,22 +334,22 @@ int main( int argc, char *argv[] ) {
                 cout.setf( ios_base::scientific );
                 cout.precision( 3 );
 
-                double me = clipdouble( piet.maxErr(), 1e-9 );
+                Real me = clipReal( piet.maxErr(), 1e-9 );
                 cout << me << "\t";
 
-                double ae = clipdouble( piet.avgErr(), 1e-9 );
+                Real ae = clipReal( piet.avgErr(), 1e-9 );
                 cout << ae << "\t";
 
                 if( piet.has_logZ ) {
                     cout.setf( ios::showpos );
-                    double le = clipdouble( piet.logZ / logZ0 - 1.0, 1e-9 );
+                    Real le = clipReal( piet.logZ / logZ0 - 1.0, 1e-9 );
                     cout << le << "\t";
                     cout.unsetf( ios::showpos );
                 } else
                     cout << "N/A       \t";
 
                 if( piet.has_maxdiff ) {
-                    double md = clipdouble( piet.maxdiff, 1e-9 );
+                    Real md = clipReal( piet.maxdiff, 1e-9 );
                     if( isnan( me ) )
                         md = me;
                     if( isnan( ae ) )

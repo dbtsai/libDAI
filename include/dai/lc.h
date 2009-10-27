@@ -41,7 +41,7 @@ class LC : public DAIAlgFG {
         std::vector<Factor>      _beliefs;
 
         /// Maximum difference encountered so far
-        double                  _maxdiff;
+        Real                    _maxdiff;
         /// Number of iterations needed
         size_t                  _iters;
 
@@ -61,13 +61,13 @@ class LC : public DAIAlgFG {
             size_t maxiter;
 
             /// Tolerance
-            double tol;
+            Real tol;
 
             /// Complete or partial reinit of cavity graphs?
             bool reinit;
 
             /// Damping constant
-            double damping;
+            Real damping;
 
             /// How to initialize the cavities
             CavityType cavity;
@@ -103,8 +103,8 @@ class LC : public DAIAlgFG {
         virtual Real logZ() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual void init();
         virtual void init( const VarSet &/*ns*/ ) { init(); }
-        virtual double run();
-        virtual double maxDiff() const { return _maxdiff; }
+        virtual Real run();
+        virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
         //@}
 
@@ -112,8 +112,8 @@ class LC : public DAIAlgFG {
 
         /// @name Additional interface specific for LC
         //@{
-        double CalcCavityDist( size_t i, const std::string &name, const PropertySet &opts );
-        double InitCavityDists( const std::string &name, const PropertySet &opts );
+        Real CalcCavityDist( size_t i, const std::string &name, const PropertySet &opts );
+        Real InitCavityDists( const std::string &name, const PropertySet &opts );
         long SetCavityDists( std::vector<Factor> &Q );
 
         Factor NewPancake (size_t i, size_t _I, bool & hasNaNs);

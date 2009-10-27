@@ -32,7 +32,7 @@ using boost::shared_ptr;
 const char *CBP::Name = "CBP";
 
 
-void CBP::setBeliefs( const std::vector<Factor> &bs, double logZ ) {
+void CBP::setBeliefs( const std::vector<Factor> &bs, Real logZ ) {
     size_t i = 0;
     _beliefsV.clear();
     _beliefsV.reserve( nrVars() );
@@ -87,7 +87,7 @@ static vector<Factor> mixBeliefs( Real p, const vector<Factor> &b, const vector<
 }
 
 
-double CBP::run() {
+Real CBP::run() {
     size_t seed = props.rand_seed;
     if( seed > 0)
         rnd_seed( seed );
@@ -116,7 +116,7 @@ InfAlg* CBP::getInfAlg() {
     bpProps.Set("maxiter", props.maxiter);
     bpProps.Set("verbose", props.verbose);
     bpProps.Set("logdomain", false);
-    bpProps.Set("damping", 0.0);
+    bpProps.Set("damping", (Real)0.0);
     BP *bp = new BP( *this, bpProps );
     bp->recordSentMessages = true;
     bp->init();
@@ -124,8 +124,8 @@ InfAlg* CBP::getInfAlg() {
 }
 
 
-void CBP::runRecurse( InfAlg *bp, double orig_logZ, vector<size_t> clamped_vars_list, size_t &num_leaves,
-                      size_t &choose_count, double &sum_level, Real &lz_out, vector<Factor>& beliefs_out) {
+void CBP::runRecurse( InfAlg *bp, Real orig_logZ, vector<size_t> clamped_vars_list, size_t &num_leaves,
+                      size_t &choose_count, Real &sum_level, Real &lz_out, vector<Factor>& beliefs_out) {
     // choose a variable/states to clamp:
     size_t i;
     vector<size_t> xis;
@@ -195,7 +195,7 @@ void CBP::runRecurse( InfAlg *bp, double orig_logZ, vector<size_t> clamped_vars_
     cmp_lz = cmp_bp_c->logZ();
     cmp_b = cmp_bp_c->beliefs();
 
-    double p = unSoftMax( lz, cmp_lz );
+    Real p = unSoftMax( lz, cmp_lz );
     Real bp__d = 0.0;
 
     if( Recursion() == Properties::RecurseType::REC_BDIFF && recTol() > 0 ) {
@@ -567,16 +567,16 @@ void CBP::Properties::set(const PropertySet &opts)
     } else {
         verbose = 0;
     }
-    tol = opts.getStringAs<double>("tol");
+    tol = opts.getStringAs<Real>("tol");
     updates = opts.getStringAs<UpdateType>("updates");
     maxiter = opts.getStringAs<size_t>("maxiter");
-    rec_tol = opts.getStringAs<double>("rec_tol");
+    rec_tol = opts.getStringAs<Real>("rec_tol");
     if(opts.hasKey("max_levels")) {
         max_levels = opts.getStringAs<size_t>("max_levels");
     } else {
         max_levels = 10;
     }
-    min_max_adj = opts.getStringAs<double>("min_max_adj");
+    min_max_adj = opts.getStringAs<Real>("min_max_adj");
     choose = opts.getStringAs<ChooseMethodType>("choose");
     recursion = opts.getStringAs<RecurseType>("recursion");
     clamp = opts.getStringAs<ClampType>("clamp");

@@ -32,7 +32,7 @@ class MF : public DAIAlgFG {
     private:
         std::vector<Factor>  _beliefs;
         /// Maximum difference encountered so far
-        double _maxdiff;
+        Real _maxdiff;
         /// Number of iterations needed
         size_t _iters;
 
@@ -46,10 +46,10 @@ class MF : public DAIAlgFG {
             size_t maxiter;
 
             /// Tolerance
-            double tol;
+            Real tol;
 
             /// Damping constant
-            double damping;
+            Real damping;
         } props;
 
         /// Name of this inference algorithm
@@ -76,8 +76,8 @@ class MF : public DAIAlgFG {
         virtual Real logZ() const;
         virtual void init();
         virtual void init( const VarSet &ns );
-        virtual double run();
-        virtual double maxDiff() const { return _maxdiff; }
+        virtual Real run();
+        virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
         //@}
 

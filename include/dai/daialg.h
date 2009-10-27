@@ -85,7 +85,7 @@ class InfAlg {
         /*  Before run() is called the first time, init() should be called.
          *  If run() returns successfully, the results can be queried using the methods belief(), beliefs() and logZ().
          */
-        virtual double run() = 0;
+        virtual Real run() = 0;
 
         /// Clamp variable with index i to value x (i.e. multiply with a Kronecker delta \f$\delta_{x_i, x}\f$)
         /** If backup == true, make a backup of all factors that are changed
@@ -101,7 +101,7 @@ class InfAlg {
 
         /// Return maximum difference between single node beliefs in the last pass
         /// \throw Exception if not implemented/supported
-        virtual double maxDiff() const = 0;
+        virtual Real maxDiff() const = 0;
 
         /// Return number of passes over the factorgraph
         /// \throw Exception if not implemented/supported

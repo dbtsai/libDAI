@@ -38,7 +38,7 @@ class HAK : public DAIAlgRG {
         std::vector<std::vector<Factor> >  _muab;
         std::vector<std::vector<Factor> >  _muba;
         /// Maximum difference encountered so far
-        double _maxdiff;
+        Real _maxdiff;
         /// Number of iterations needed
         size_t _iters;
 
@@ -58,10 +58,10 @@ class HAK : public DAIAlgRG {
             size_t maxiter;
 
             /// Tolerance
-            double tol;
+            Real tol;
 
             /// Damping constant
-            double damping;
+            Real damping;
 
             /// How to choose the clusters
             ClustersType clusters;
@@ -100,8 +100,8 @@ class HAK : public DAIAlgRG {
         virtual Real logZ() const;
         virtual void init();
         virtual void init( const VarSet &ns );
-        virtual double run();
-        virtual double maxDiff() const { return _maxdiff; }
+        virtual Real run();
+        virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
         //@}
 
@@ -113,8 +113,8 @@ class HAK : public DAIAlgRG {
         const Factor& Qa( size_t alpha ) const { return _Qa[alpha]; };
         const Factor& Qb( size_t beta ) const { return _Qb[beta]; };
 
-        double doGBP();
-        double doDoubleLoop();
+        Real doGBP();
+        Real doDoubleLoop();
         //@}
 
     private:

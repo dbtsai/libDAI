@@ -75,7 +75,7 @@ boost::uniform_real<Real> _uni_dist(0,1);
 boost::variate_generator<_rnd_gen_type&, boost::uniform_real<Real> > _uni_rnd(_rnd_gen, _uni_dist);
 
 /// Normal distribution with mean 0 and standard deviation 1.
-boost::normal_distribution<> _normal_dist;
+boost::normal_distribution<Real> _normal_dist;
 
 /// Global random number generator with standard normal distribution
 boost::variate_generator<_rnd_gen_type&, boost::normal_distribution<Real> > _normal_rnd(_rnd_gen, _normal_dist);

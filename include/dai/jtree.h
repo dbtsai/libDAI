@@ -37,7 +37,7 @@ namespace dai {
 class JTree : public DAIAlgRG {
     private:
         std::vector<std::vector<Factor> >  _mes;
-        double               _logZ;
+        Real _logZ;
 
     public:
         /// Rooted tree
@@ -88,8 +88,8 @@ class JTree : public DAIAlgRG {
         virtual Real logZ() const;
         virtual void init() {}
         virtual void init( const VarSet &/*ns*/ ) {}
-        virtual double run();
-        virtual double maxDiff() const { return 0.0; }
+        virtual Real run();
+        virtual Real maxDiff() const { return 0.0; }
         virtual size_t Iterations() const { return 1UL; }
         //@}
 

@@ -87,11 +87,11 @@ std::ostream& operator<< ( std::ostream &os, const FactorGraph &fg ) {
         os << endl;
         size_t nr_nonzeros = 0;
         for( size_t k = 0; k < fg.factor(I).states(); k++ )
-            if( fg.factor(I)[k] != 0.0 )
+            if( fg.factor(I)[k] != (Real)0 )
                 nr_nonzeros++;
         os << nr_nonzeros << endl;
         for( size_t k = 0; k < fg.factor(I).states(); k++ )
-            if( fg.factor(I)[k] != 0.0 )
+            if( fg.factor(I)[k] != (Real)0 )
                 os << k << " " << setw(os.precision()+4) << fg.factor(I)[k] << endl;
     }
 
@@ -164,7 +164,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
                 vardims[labels[mi]] = dims[mi];
             I_vars |= Var(labels[mi], dims[mi]);
         }
-        facs.push_back( Factor( I_vars, 0.0 ) );
+        facs.push_back( Factor( I_vars, (Real)0 ) );
 
         // calculate permutation sigma (internally, members are sorted)
         vector<size_t> sigma(nr_members,0);
@@ -189,7 +189,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
             cerr << "  nonzeroes: " << nr_nonzeros << endl;
         for( size_t k = 0; k < nr_nonzeros; k++ ) {
             size_t li;
-            double val;
+            Real val;
             while( (is.peek()) == '#' )
                 getline(is,line);
             is >> li;
@@ -240,7 +240,7 @@ void FactorGraph::makeCavity( size_t i, bool backup ) {
     // fills all Factors that include var(i) with ones
     map<size_t,Factor> newFacs;
     foreach( const Neighbor &I, nbV(i) ) // for all neighboring factors I of i
-        newFacs[I] = Factor(factor(I).vars(), 1.0);
+        newFacs[I] = Factor( factor(I).vars(), (Real)1 );
     setFactors( newFacs, backup );
 }
 
@@ -302,8 +302,8 @@ vector<VarSet> FactorGraph::Cliques() const {
 
 void FactorGraph::clamp( size_t i, size_t x, bool backup ) {
     DAI_ASSERT( x <= var(i).states() );
-    Factor mask( var(i), 0.0 );
-    mask[x] = 1.0;
+    Factor mask( var(i), (Real)0 );
+    mask[x] = (Real)1;
 
     map<size_t, Factor> newFacs;
     foreach( const Neighbor &I, nbV(i) )
@@ -316,11 +316,11 @@ void FactorGraph::clamp( size_t i, size_t x, bool backup ) {
 
 void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
     Var n = var(i);
-    Factor mask_n( n, 0.0 );
+    Factor mask_n( n, (Real)0 );
 
     foreach( size_t i, is ) {
         DAI_ASSERT( i <= n.states() );
-        mask_n[i] = 1.0;
+        mask_n[i] = (Real)1;
     }
 
     map<size_t, Factor> newFacs;
@@ -332,7 +332,7 @@ void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
 
 void FactorGraph::clampFactor( size_t I, const vector<size_t> &is, bool backup ) {
     size_t st = factor(I).states();
-    Factor newF( factor(I).vars(), 0.0 );
+    Factor newF( factor(I).vars(), (Real)0 );
 
     foreach( size_t i, is ) {
         DAI_ASSERT( i <= st );
@@ -412,7 +412,7 @@ bool FactorGraph::isBinary() const {
 
 FactorGraph FactorGraph::clamped( size_t i, size_t state ) const {
     Var v = var( i );
-    Real zeroth_order = 1.0;
+    Real zeroth_order = (Real)1;
     vector<Factor> clamped_facs;
     for( size_t I = 0; I < nrFactors(); I++ ) {
         VarSet v_I = factor(I).vars();

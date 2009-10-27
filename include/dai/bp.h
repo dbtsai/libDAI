@@ -32,18 +32,18 @@ namespace dai {
 class BP : public DAIAlgFG {
     private:
         typedef std::vector<size_t> ind_t;
-        typedef std::multimap<double, std::pair<std::size_t, std::size_t> > LutType;
+        typedef std::multimap<Real, std::pair<std::size_t, std::size_t> > LutType;
         struct EdgeProp {
             ind_t  index;
             Prob   message;
             Prob   newMessage;
-            double residual;
+            Real   residual;
         };
         std::vector<std::vector<EdgeProp> > _edges;
         std::vector<std::vector<LutType::iterator> > _edge2lut;
         LutType _lut;
         /// Maximum difference encountered so far
-        double _maxdiff;
+        Real _maxdiff;
         /// Number of iterations needed
         size_t _iters;
         /// The history of message updates (only recorded if recordSentMessages is true)
@@ -65,13 +65,13 @@ class BP : public DAIAlgFG {
             size_t maxiter;
 
             /// Tolerance
-            double tol;
+            Real tol;
 
             /// Do updates in logarithmic domain?
             bool logdomain;
 
             /// Damping constant
-            double damping;
+            Real damping;
 
             /// Update schedule
             UpdateType updates;
@@ -133,8 +133,8 @@ class BP : public DAIAlgFG {
         virtual Real logZ() const;
         virtual void init();
         virtual void init( const VarSet &ns );
-        virtual double run();
-        virtual double maxDiff() const { return _maxdiff; }
+        virtual Real run();
+        virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
         //@}
 
@@ -167,12 +167,12 @@ class BP : public DAIAlgFG {
         const Prob & newMessage(size_t i, size_t _I) const { return _edges[i][_I].newMessage; }
         ind_t & index(size_t i, size_t _I) { return _edges[i][_I].index; }
         const ind_t & index(size_t i, size_t _I) const { return _edges[i][_I].index; }
-        double & residual(size_t i, size_t _I) { return _edges[i][_I].residual; }
-        const double & residual(size_t i, size_t _I) const { return _edges[i][_I].residual; }
+        Real & residual(size_t i, size_t _I) { return _edges[i][_I].residual; }
+        const Real & residual(size_t i, size_t _I) const { return _edges[i][_I].residual; }
 
         void calcNewMessage( size_t i, size_t _I );
         void updateMessage( size_t i, size_t _I );
-        void updateResidual( size_t i, size_t _I, double r );
+        void updateResidual( size_t i, size_t _I, Real r );
         void findMaxResidual( size_t &i, size_t &_I );
         /// Calculates unnormalized belief of variable
         void calcBeliefV( size_t i, Prob &p ) const;

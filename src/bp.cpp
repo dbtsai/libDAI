@@ -38,7 +38,7 @@ void BP::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("logdomain") );
     DAI_ASSERT( opts.hasKey("updates") );
 
-    props.tol = opts.getStringAs<double>("tol");
+    props.tol = opts.getStringAs<Real>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.logdomain = opts.getStringAs<bool>("logdomain");
     props.updates = opts.getStringAs<Properties::UpdateType>("updates");
@@ -48,7 +48,7 @@ void BP::setProperties( const PropertySet &opts ) {
     else
         props.verbose = 0;
     if( opts.hasKey("damping") )
-        props.damping = opts.getStringAs<double>("damping");
+        props.damping = opts.getStringAs<Real>("damping");
     else
         props.damping = 0.0;
     if( opts.hasKey("inference") )
@@ -120,7 +120,7 @@ void BP::construct() {
 
 
 void BP::init() {
-    double c = props.logdomain ? 0.0 : 1.0;
+    Real c = props.logdomain ? 0.0 : 1.0;
     for( size_t i = 0; i < nrVars(); ++i ) {
         foreach( const Neighbor &I, nbV(i) ) {
             message( i, I.iter ).fill( c );
@@ -225,7 +225,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
 
 // BP::run does not check for NANs for performance reasons
 // Somehow NaNs do not often occur in BP...
-double BP::run() {
+Real BP::run() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3)
@@ -460,7 +460,7 @@ void BP::init( const VarSet &ns ) {
     for( VarSet::const_iterator n = ns.begin(); n != ns.end(); ++n ) {
         size_t ni = findVar( *n );
         foreach( const Neighbor &I, nbV( ni ) ) {
-            double val = props.logdomain ? 0.0 : 1.0;
+            Real val = props.logdomain ? 0.0 : 1.0;
             message( ni, I.iter ).fill( val );
             newMessage( ni, I.iter ).fill( val );
             if( props.updates == Properties::UpdateType::SEQMAX )
@@ -485,7 +485,7 @@ void BP::updateMessage( size_t i, size_t _I ) {
 }
 
 
-void BP::updateResidual( size_t i, size_t _I, double r ) {
+void BP::updateResidual( size_t i, size_t _I, Real r ) {
     EdgeProp* pEdge = &_edges[i][_I];
     pEdge->residual = r;
 
@@ -508,7 +508,7 @@ std::vector<size_t> BP::findMaximum() const {
         // Maximise with respect to variable i
         Prob prod;
         calcBeliefV( i, prod );
-        maximum[i] = max_element( prod.begin(), prod.end() ) - prod.begin();
+        maximum[i] = prod.argmax().first;
 
         foreach( const Neighbor &I, nbV(i) )
             if( !visitedFactors[I] )

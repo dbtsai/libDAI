@@ -35,7 +35,7 @@ void MR::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("updates") );
     DAI_ASSERT( opts.hasKey("inits") );
 
-    props.tol = opts.getStringAs<double>("tol");
+    props.tol = opts.getStringAs<Real>("tol");
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.updates = opts.getStringAs<Properties::UpdateType>("updates");
     props.inits = opts.getStringAs<Properties::InitType>("inits");
@@ -64,7 +64,7 @@ string MR::printProperties() const {
 
 
 // init N, con, nb, tJ, theta
-void MR::init(size_t Nin, double *_w, double *_th) {
+void MR::init(size_t Nin, Real *_w, Real *_th) {
     size_t i,j;
 
     N = Nin;
@@ -91,33 +91,33 @@ void MR::init(size_t Nin, double *_w, double *_th) {
 
 
 // calculate cors
-double MR::init_cor_resp() {
+Real MR::init_cor_resp() {
     size_t j,k,l, runx,i2;
-    double variab1, variab2;
-    double md, maxdev;
-    double thbJsite[kmax];
-    double xinter;
-    double rinter;
-    double res[kmax];
+    Real variab1, variab2;
+    Real md, maxdev;
+    Real thbJsite[kmax];
+    Real xinter;
+    Real rinter;
+    Real res[kmax];
     size_t s2;
     size_t flag;
     size_t concav;
     size_t runs = 3000;
-    double eps = 0.2;
+    Real eps = 0.2;
     size_t cavity;
 
-    vector<vector<double> > tJ_org;
+    vector<vector<Real> > tJ_org;
     vector<vector<size_t> > nb_org;
     vector<size_t> con_org;
-    vector<double> theta_org;
+    vector<Real> theta_org;
 
-    vector<double> xfield(N*kmax,0.0);
-    vector<double> rfield(N*kmax,0.0);
-    vector<double> Hfield(N,0.0);
-    vector<double> devs(N*kmax,0.0);
-    vector<double> devs2(N*kmax,0.0);
-    vector<double> dev(N,0.0);
-    vector<double> avmag(N,0.0);
+    vector<Real> xfield(N*kmax,0.0);
+    vector<Real> rfield(N*kmax,0.0);
+    vector<Real> Hfield(N,0.0);
+    vector<Real> devs(N*kmax,0.0);
+    vector<Real> devs2(N*kmax,0.0);
+    vector<Real> dev(N,0.0);
+    vector<Real> avmag(N,0.0);
 
     // save original tJ, nb
     nb_org = nb;
@@ -248,7 +248,7 @@ double MR::init_cor_resp() {
 }
 
 
-double MR::T(size_t i, sub_nb A) {
+Real MR::T(size_t i, sub_nb A) {
     // i is a variable index
     // A is a subset of nb[i]
     //
@@ -258,7 +258,7 @@ double MR::T(size_t i, sub_nb A) {
     _nbi_min_A.set();
     _nbi_min_A &= ~A;
 
-    double res = theta[i];
+    Real res = theta[i];
     for( size_t _j = 0; _j < _nbi_min_A.size(); _j++ )
         if( _nbi_min_A.test(_j) )
             res += atanh(tJ[i][_j] * M[i][_j]);
@@ -266,46 +266,46 @@ double MR::T(size_t i, sub_nb A) {
 }
 
 
-double MR::T(size_t i, size_t _j) {
+Real MR::T(size_t i, size_t _j) {
     sub_nb j(con[i]);
     j.set(_j);
     return T(i,j);
 }
 
 
-double MR::Omega(size_t i, size_t _j, size_t _l) {
+Real MR::Omega(size_t i, size_t _j, size_t _l) {
     sub_nb jl(con[i]);
     jl.set(_j);
     jl.set(_l);
-    double Tijl = T(i,jl);
+    Real Tijl = T(i,jl);
     return Tijl / (1.0 + tJ[i][_l] * M[i][_l] * Tijl);
 }
 
 
-double MR::Gamma(size_t i, size_t _j, size_t _l1, size_t _l2) {
+Real MR::Gamma(size_t i, size_t _j, size_t _l1, size_t _l2) {
     sub_nb jll(con[i]);
     jll.set(_j);
-    double Tij = T(i,jll);
+    Real Tij = T(i,jll);
     jll.set(_l1);
     jll.set(_l2);
-    double Tijll = T(i,jll);
+    Real Tijll = T(i,jll);
 
     return (Tijll - Tij) / (1.0 + tJ[i][_l1] * tJ[i][_l2] * M[i][_l1] * M[i][_l2] + tJ[i][_l1] * M[i][_l1] * Tijll + tJ[i][_l2] * M[i][_l2] * Tijll);
 }
 
 
-double MR::Gamma(size_t i, size_t _l1, size_t _l2) {
+Real MR::Gamma(size_t i, size_t _l1, size_t _l2) {
     sub_nb ll(con[i]);
-    double Ti = T(i,ll);
+    Real Ti = T(i,ll);
     ll.set(_l1);
     ll.set(_l2);
-    double Till = T(i,ll);
+    Real Till = T(i,ll);
 
     return (Till - Ti) / (1.0 + tJ[i][_l1] * tJ[i][_l2] * M[i][_l1] * M[i][_l2] + tJ[i][_l1] * M[i][_l1] * Till + tJ[i][_l2] * M[i][_l2] * Till);
 }
 
 
-double MR::_tJ(size_t i, sub_nb A) {
+Real MR::_tJ(size_t i, sub_nb A) {
     // i is a variable index
     // A is a subset of nb[i]
     //
@@ -319,7 +319,7 @@ double MR::_tJ(size_t i, sub_nb A) {
 }
 
 
-double MR::appM(size_t i, sub_nb A) {
+Real MR::appM(size_t i, sub_nb A) {
     // i is a variable index
     // A is a subset of nb[i]
     //
@@ -334,7 +334,7 @@ double MR::appM(size_t i, sub_nb A) {
     else {
         sub_nb A_j(A); A_j.reset(_j);
 
-        double result = M[i][_j] * appM(i, A_j);
+        Real result = M[i][_j] * appM(i, A_j);
         for( size_t _k = 0; _k < A_j.size(); _k++ )
             if( A_j.test(_k) ) {
                 sub_nb A_jk(A_j); A_jk.reset(_k);
@@ -346,7 +346,7 @@ double MR::appM(size_t i, sub_nb A) {
 }
 
 
-void MR::sum_subs(size_t j, sub_nb A, double *sum_even, double *sum_odd) {
+void MR::sum_subs(size_t j, sub_nb A, Real *sum_even, Real *sum_odd) {
     // j is a variable index
     // A is a subset of nb[j]
 
@@ -378,8 +378,8 @@ void MR::sum_subs(size_t j, sub_nb A, double *sum_even, double *sum_odd) {
 
 
 void MR::solvemcav() {
-    double sum_even, sum_odd;
-    double maxdev;
+    Real sum_even, sum_odd;
+    Real maxdev;
     size_t maxruns = 1000;
 
     makekindex();
@@ -397,7 +397,7 @@ void MR::solvemcav() {
                 size_t j = nb[i][_j];
                 DAI_ASSERT( nb[j][_i] == i );
 
-                double newM = 0.0;
+                Real newM = 0.0;
                 if( props.updates == Properties::UpdateType::FULL ) {
                     // find indices in nb[j] that do not correspond with i
                     sub_nb _nbj_min_i(con[j]);
@@ -413,8 +413,8 @@ void MR::solvemcav() {
                     newM = (tanh(theta[j]) * sum_even + sum_odd) / (sum_even + tanh(theta[j]) * sum_odd);
 
                     sum_subs(i, _nbi_min_j, &sum_even, &sum_odd);
-                    double denom = sum_even + tanh(theta[i]) * sum_odd;
-                    double numer = 0.0;
+                    Real denom = sum_even + tanh(theta[i]) * sum_odd;
+                    Real numer = 0.0;
                     for(size_t _k=0; _k<con[i]; _k++) if(_k != _j) {
                         sub_nb _nbi_min_jk(_nbi_min_j);
                         _nbi_min_jk.reset(_k);
@@ -431,7 +431,7 @@ void MR::solvemcav() {
                             newM += Gamma(j,_i,_l1,_l2) * tJ[j][_l1] * tJ[j][_l2] * cors[j][_l1][_l2];
                 }
 
-                double dev = newM - M[i][_j];
+                Real dev = newM - M[i][_j];
 //              dev *= 0.02;
                 if( fabs(dev) >= maxdev )
                     maxdev = fabs(dev);
@@ -463,7 +463,7 @@ void MR::solveM() {
             _nbi.set();
 
             // calc numerator1 and denominator1
-            double sum_even, sum_odd;
+            Real sum_even, sum_odd;
             sum_subs(i, _nbi, &sum_even, &sum_odd);
 
             Mag[i] = (tanh(theta[i]) * sum_even + sum_odd) / (sum_even + tanh(theta[i]) * sum_odd);
@@ -486,7 +486,7 @@ void MR::init_cor() {
     for( size_t i = 0; i < nrVars(); i++ ) {
         vector<Factor> pairq;
         if( props.inits == Properties::InitType::CLAMPING ) {
-            BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", 1.0e-9)("maxiter", (size_t)10000)("verbose", (size_t)0)("logdomain", false));
+            BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", (Real)1.0e-9)("maxiter", (size_t)10000)("verbose", (size_t)0)("logdomain", false));
             bpcav.makeCavity( i );
             pairq = calcPairBeliefs( bpcav, delta(i), false );
         } else if( props.inits == Properties::InitType::EXACT ) {
@@ -499,7 +499,7 @@ void MR::init_cor() {
             size_t j = findVar( *(kit) );
             size_t k = findVar( *(++kit) );
             pairq[jk].normalize();
-            double cor = (pairq[jk][3] - pairq[jk][2] - pairq[jk][1] + pairq[jk][0]) - (pairq[jk][3] + pairq[jk][2] - pairq[jk][1] - pairq[jk][0]) * (pairq[jk][3] - pairq[jk][2] + pairq[jk][1] - pairq[jk][0]);
+            Real cor = (pairq[jk][3] - pairq[jk][2] - pairq[jk][1] + pairq[jk][0]) - (pairq[jk][3] + pairq[jk][2] - pairq[jk][1] - pairq[jk][0]) * (pairq[jk][3] - pairq[jk][2] + pairq[jk][1] - pairq[jk][0]);
             for( size_t _j = 0; _j < con[i]; _j++ ) if( nb[i][_j] == j )
                 for( size_t _k = 0; _k < con[i]; _k++ ) if( nb[i][_k] == k ) {
                     cors[i][_j][_k] = cor;
@@ -515,7 +515,7 @@ string MR::identify() const {
 }
 
 
-double MR::run() {
+Real MR::run() {
     if( supported ) {
         if( props.verbose >= 1 )
             cerr << "Starting " << identify() << "...";
@@ -539,7 +539,7 @@ double MR::run() {
           kindex[i].resize(kmax);
 
         if( props.inits == Properties::InitType::RESPPROP ) {
-            double md = init_cor_resp();
+            Real md = init_cor_resp();
             if( md > _maxdiff )
                 _maxdiff = md;
         } else if( props.inits == Properties::InitType::EXACT )
@@ -577,7 +577,7 @@ Factor MR::belief( const Var &n ) const {
     if( supported ) {
         size_t i = findVar( n );
 
-        Real x[2];
+        Prob x(2);
         x[0] = 0.5 - Mag[i] / 2.0;
         x[1] = 0.5 + Mag[i] / 2.0;
 
@@ -623,8 +623,8 @@ MR::MR( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), support
     // create w and th
     size_t Nin = fg.nrVars();
 
-    double *w = new double[Nin*Nin];
-    double *th = new double[Nin];
+    Real *w = new Real[Nin*Nin];
+    Real *th = new Real[Nin];
 
     for( size_t i = 0; i < Nin; i++ ) {
         th[i] = 0.0;

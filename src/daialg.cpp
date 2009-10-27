@@ -130,7 +130,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& ns, bool reIni
                 if( logZ != -INFINITY )
                     logZ0 = logZ;
 
-            double Z_xj;
+            Real Z_xj;
             if( logZ == -INFINITY )
                 Z_xj = 0;
             else
@@ -230,7 +230,7 @@ vector<Factor> calcPairBeliefsNew( const InfAlg & obj, const VarSet& ns, bool re
                         if( logZ != -INFINITY )
                             logZ0 = logZ;
 
-                    double Z_xj;
+                    Real Z_xj;
                     if( logZ == -INFINITY )
                         Z_xj = 0;
                     else

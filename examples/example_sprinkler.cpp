@@ -74,13 +74,12 @@ int main() {
 
     // Calculate joint probability of all four variables
     Factor P;
-    for( size_t I = 0; I < SprinklerNetwork.nrFactors(); I++ ) {
+    for( size_t I = 0; I < SprinklerNetwork.nrFactors(); I++ )
         P *= SprinklerNetwork.factor( I );
-    }
     // P.normalize();  // Not necessary: a Bayesian network is already normalized by definition
 
     // Calculate some probabilities
-    double denom = P.marginal( W )[1];
+    Real denom = P.marginal( W )[1];
     cout << "P(W=1) = " << denom << endl;
     cout << "P(S=1 | W=1) = " << P.marginal( VarSet( S, W ) )[3] / denom << endl;
     cout << "P(R=1 | W=1) = " << P.marginal( VarSet( R, W ) )[3] / denom << endl;

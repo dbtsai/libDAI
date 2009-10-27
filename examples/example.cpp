@@ -29,9 +29,9 @@ int main( int argc, char *argv[] ) {
         fg.ReadFromFile(argv[1]);
 
         // Set some constants
-        size_t  maxiter = 10000;
-        double  tol = 1e-9;
-        size_t  verb = 1;
+        size_t maxiter = 10000;
+        Real   tol = 1e-9;
+        size_t verb = 1;
 
         // Store the constants in a PropertySet object
         PropertySet opts;

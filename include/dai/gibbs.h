@@ -70,8 +70,8 @@ class Gibbs : public DAIAlgFG {
         virtual Real logZ() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual void init();
         virtual void init( const VarSet &/*ns*/ ) { init(); }
-        virtual double run();
-        virtual double maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
+        virtual Real run();
+        virtual Real maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual size_t Iterations() const { return props.iters; }
         //@}
 

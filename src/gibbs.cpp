@@ -157,7 +157,7 @@ void Gibbs::init() {
 }
 
 
-double Gibbs::run() {
+Real Gibbs::run() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3 )
@@ -188,12 +188,12 @@ double Gibbs::run() {
 
 
 Factor Gibbs::beliefV( size_t i ) const {
-    return Factor( var(i), _var_counts[i].begin() ).normalized();
+    return Factor( var(i), _var_counts[i] ).normalized();
 }
 
 
 Factor Gibbs::beliefF( size_t I ) const {
-    return Factor( factor(I).vars(), _factor_counts[I].begin() ).normalized();
+    return Factor( factor(I).vars(), _factor_counts[I] ).normalized();
 }
 
 

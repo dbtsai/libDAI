@@ -98,13 +98,21 @@ template <typename T> class TFactor {
         /// Constructs factor depending on variables in \a vars with all values set to \a p
         TFactor( const VarSet& vars, T p ) : _vs(vars), _p(_vs.nrStates(),p) {}
 
-        /// Constructs factor depending on variables in \a vars, copying the values from a range
-        /** \tparam Iterator Iterates over instances of type \a T; should support addition of \c size_t.
+        /// Constructs factor depending on variables in \a vars, copying the values from a std::vector<>
+        /** \tparam S Type of values of \a x
          *  \param vars contains the variables that the new factor should depend on.
-         *  \param begin Points to first value to be added.
+         *  \param x Vector with values to be copied.
          */
-        template<typename TIterator>
-        TFactor( const VarSet& vars, TIterator begin ) : _vs(vars), _p(begin, begin + _vs.nrStates(), _vs.nrStates()) {}
+        template<typename S>
+        TFactor( const VarSet& vars, const std::vector<S> &x ) : _vs(vars), _p(x.begin(), x.begin() + _vs.nrStates(), _vs.nrStates()) {
+            DAI_ASSERT( x.size() == vars.nrStates() );
+        }
+
+        /// Constructs factor depending on variables in \a vars, copying the values from an array
+        /** \param vars contains the variables that the new factor should depend on.
+         *  \param p Points to array of values to be added.
+         */
+        TFactor( const VarSet& vars, const T* p ) : _vs(vars), _p(p, p + _vs.nrStates(), _vs.nrStates()) {}
 
         /// Constructs factor depending on variables in \a vars, copying the values from \a p
         TFactor( const VarSet& vars, const TProb<T> &p ) : _vs(vars), _p(p) {
@@ -539,7 +547,7 @@ template<typename T, typename binaryOp> TFactor<T> pointwiseOp( const TFactor<T>
             result[i] = op( result[i], g[i] );
         return result;
     } else {
-        TFactor<T> result( f.vars() | g.vars(), 0.0 );
+        TFactor<T> result( f.vars() | g.vars(), (T)0 );
 
         IndexFor i1(f.vars(), result.vars());
         IndexFor i2(g.vars(), result.vars());
@@ -584,7 +592,7 @@ template<typename T> T dist( const TFactor<T> &f, const TFactor<T> &g, Prob::Dis
  */
 template<typename T> TFactor<T> max( const TFactor<T> &f, const TFactor<T> &g ) {
     DAI_ASSERT( f._vs == g._vs );
-    return TFactor<T>( f._vs, min( f.p(), g.p() ) );
+    return TFactor<T>( f._vs, max( f.p(), g.p() ) );
 }
 
 
@@ -594,7 +602,7 @@ template<typename T> TFactor<T> max( const TFactor<T> &f, const TFactor<T> &g ) 
  */
 template<typename T> TFactor<T> min( const TFactor<T> &f, const TFactor<T> &g ) {
     DAI_ASSERT( f._vs == g._vs );
-    return TFactor<T>( f._vs, max( f.p(), g.p() ) );
+    return TFactor<T>( f._vs, min( f.p(), g.p() ) );
 }
 
 

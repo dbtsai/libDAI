@@ -51,7 +51,7 @@ void HAK::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("doubleloop") );
     DAI_ASSERT( opts.hasKey("clusters") );
 
-    props.tol = opts.getStringAs<double>("tol");
+    props.tol = opts.getStringAs<Real>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.doubleloop = opts.getStringAs<bool>("doubleloop");
@@ -62,7 +62,7 @@ void HAK::setProperties( const PropertySet &opts ) {
     else
         DAI_ASSERT( props.clusters != Properties::ClustersType::LOOP );
     if( opts.hasKey("damping") )
-        props.damping = opts.getStringAs<double>("damping");
+        props.damping = opts.getStringAs<Real>("damping");
     else
         props.damping = 0.0;
     if( opts.hasKey("init") )
@@ -248,7 +248,7 @@ void HAK::init() {
 }
 
 
-double HAK::doGBP() {
+Real HAK::doGBP() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3)
@@ -373,7 +373,7 @@ double HAK::doGBP() {
 }
 
 
-double HAK::doDoubleLoop() {
+Real HAK::doDoubleLoop() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
     if( props.verbose >= 3)
@@ -385,7 +385,7 @@ double HAK::doDoubleLoop() {
     vector<FRegion> org_ORs = ORs;
 
     // Save original inner counting numbers and set negative counting numbers to zero
-    vector<double> org_IR_cs( nrIRs(), 0.0 );
+    vector<Real> org_IR_cs( nrIRs(), 0.0 );
     for( size_t beta = 0; beta < nrIRs(); beta++ ) {
         org_IR_cs[beta] = IR(beta).c();
         if( IR(beta).c() < 0.0 )
@@ -402,9 +402,9 @@ double HAK::doDoubleLoop() {
     Diffs diffs(nrVars(), 1.0);
 
     size_t outer_maxiter   = props.maxiter;
-    double outer_tol       = props.tol;
+    Real   outer_tol       = props.tol;
     size_t outer_verbose   = props.verbose;
-    double org_maxdiff     = _maxdiff;
+    Real   org_maxdiff     = _maxdiff;
 
     // Set parameters for inner loop
     props.maxiter = 5;
@@ -469,7 +469,7 @@ double HAK::doDoubleLoop() {
 }
 
 
-double HAK::run() {
+Real HAK::run() {
     if( props.doubleloop )
         return doDoubleLoop();
     else

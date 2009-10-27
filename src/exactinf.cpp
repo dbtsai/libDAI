@@ -67,7 +67,7 @@ void ExactInf::init() {
 }
 
 
-double ExactInf::run() {
+Real ExactInf::run() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
 

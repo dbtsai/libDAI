@@ -271,10 +271,10 @@ class BBP {
            size_t maxiter;
 
            /// Tolerance (not used for updates = SEQ_BP_REV, SEQ_BP_FWD)
-           double tol;
+           Real tol;
 
            /// Damping constant (0 for none); damping = 1 - lambda where lambda is the damping constant used in [\ref EaG09]
-           double damping;
+           Real damping;
 
            /// Update schedule
            UpdateType updates;
@@ -294,9 +294,9 @@ class BBP {
             /// Maximum number of iterations
             size_t maxiter;
             /// Tolerance (not used for updates = SEQ_BP_REV, SEQ_BP_FWD)
-            double tol;
+            Real tol;
             /// Damping constant (0 for none); damping = 1 - lambda where lambda is the damping constant used in [\ref EaG09]
-            double damping;
+            Real damping;
             /// Update schedule
             UpdateType updates;
 
@@ -339,7 +339,7 @@ Real getCostFn( const InfAlg &fg, bbp_cfn_t cfn_type, const std::vector<size_t> 
  *  \param cfn Cost function to be used.
  *  \param h controls size of perturbation.
  */
-double numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const PropertySet &bbp_props, bbp_cfn_t cfn, double h );
+Real numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const PropertySet &bbp_props, bbp_cfn_t cfn, Real h );
 
 
 } // end of namespace dai

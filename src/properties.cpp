@@ -25,6 +25,8 @@ std::ostream& operator<< (std::ostream & os, const Property & p) {
         os << boost::any_cast<std::string>(p.second);
     else if( p.second.type() == typeid(double) )
         os << boost::any_cast<double>(p.second);
+    else if( p.second.type() == typeid(long double) )
+        os << boost::any_cast<long double>(p.second);
     else if( p.second.type() == typeid(bool) )
         os << boost::any_cast<bool>(p.second);
     else if( p.second.type() == typeid(PropertySet) )

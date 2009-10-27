@@ -36,32 +36,32 @@
 using namespace std;
 using namespace dai;
 namespace po = boost::program_options;
-typedef boost::numeric::ublas::compressed_matrix<double> matrix;
+typedef boost::numeric::ublas::compressed_matrix<Real> matrix;
 typedef matrix::value_array_type::const_iterator matrix_vcit;
 typedef matrix::index_array_type::const_iterator matrix_icit;
 
 
-Factor BinaryFactor( const Var &n, double field ) {
+Factor BinaryFactor( const Var &n, Real field ) {
     DAI_ASSERT( n.states() == 2 );
-    double buf[2];
+    Real buf[2];
     buf[0] = std::exp(-field);
     buf[1] = std::exp(field);
     return Factor(n, &buf[0]);
 }
 
 
-Factor BinaryFactor( const Var &n1, const Var &n2, double coupling ) {
+Factor BinaryFactor( const Var &n1, const Var &n2, Real coupling ) {
     DAI_ASSERT( n1.states() == 2 );
     DAI_ASSERT( n2.states() == 2 );
     DAI_ASSERT( n1 != n2 );
-    double buf[4];
+    Real buf[4];
     buf[0] = (buf[3] = std::exp(coupling));
     buf[1] = (buf[2] = std::exp(-coupling));
     return Factor( VarSet(n1, n2), &buf[0] );
 }
 
 
-Factor RandomFactor( const VarSet &ns, double beta ) {
+Factor RandomFactor( const VarSet &ns, Real beta ) {
     Factor fac( ns );
     for( size_t t = 0; t < fac.states(); t++ )
         fac[t] = std::exp(rnd_stdnormal() * beta);
@@ -69,7 +69,7 @@ Factor RandomFactor( const VarSet &ns, double beta ) {
 }
 
 
-Factor PottsFactor( const Var &n1, const Var &n2, double beta ) {
+Factor PottsFactor( const Var &n1, const Var &n2, Real beta ) {
     Factor fac( VarSet( n1, n2 ), 1.0 );
     DAI_ASSERT( n1.states() == n2.states() );
     for( size_t s = 0; s < n1.states(); s++ )
@@ -78,7 +78,7 @@ Factor PottsFactor( const Var &n1, const Var &n2, double beta ) {
 }
 
 
-void MakeHOIFG( size_t N, size_t M, size_t k, double sigma, FactorGraph &fg ) {
+void MakeHOIFG( size_t N, size_t M, size_t k, Real sigma, FactorGraph &fg ) {
     vector<Var> vars;
     vector<Factor> factors;
 
@@ -106,7 +106,7 @@ void MakeHOIFG( size_t N, size_t M, size_t k, double sigma, FactorGraph &fg ) {
 
 
 // w should be upper triangular or lower triangular
-void WTh2FG( const matrix &w, const vector<double> &th, FactorGraph &fg ) {
+void WTh2FG( const matrix &w, const vector<Real> &th, FactorGraph &fg ) {
     vector<Var>    vars;
     vector<Factor> factors;
 
@@ -127,7 +127,7 @@ void WTh2FG( const matrix &w, const vector<double> &th, FactorGraph &fg ) {
         while( pos == w.index1_data()[i+1] )
             i++;
         size_t j = w.index2_data()[pos];
-        double w_ij = w.value_data()[pos];
+        Real w_ij = w.value_data()[pos];
         factors.push_back( BinaryFactor( vars[i], vars[j], w_ij ) );
     }
     for( size_t i = 0; i < N; i++ )
@@ -137,9 +137,9 @@ void WTh2FG( const matrix &w, const vector<double> &th, FactorGraph &fg ) {
 }
 
 
-void MakeFullFG( size_t N, double mean_w, double mean_th, double sigma_w, double sigma_th, FactorGraph &fg ) {
+void MakeFullFG( size_t N, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
     matrix w(N,N,N*(N-1)/2);
-    vector<double> th(N,0.0);
+    vector<Real> th(N,0.0);
 
     for( size_t i = 0; i < N; i++ ) {
         for( size_t j = i+1; j < N; j++ )
@@ -151,7 +151,7 @@ void MakeFullFG( size_t N, double mean_w, double mean_th, double sigma_w, double
 }
 
 
-void Make3DPotts( size_t n1, size_t n2, size_t n3, size_t states, double beta, FactorGraph &fg ) {
+void Make3DPotts( size_t n1, size_t n2, size_t n3, size_t states, Real beta, FactorGraph &fg ) {
     vector<Var> vars;
     vector<Factor> factors;
 
@@ -171,11 +171,11 @@ void Make3DPotts( size_t n1, size_t n2, size_t n3, size_t states, double beta, F
 }
 
 
-void MakeGridFG( long periodic, size_t n, double mean_w, double mean_th, double sigma_w, double sigma_th, FactorGraph &fg ) {
+void MakeGridFG( long periodic, size_t n, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
     size_t N = n*n;
 
     matrix w(N,N,2*N);
-    vector<double> th(N,0.0);
+    vector<Real> th(N,0.0);
 
     for( size_t i = 0; i < n; i++ )
         for( size_t j = 0; j < n; j++ ) {
@@ -190,7 +190,7 @@ void MakeGridFG( long periodic, size_t n, double mean_w, double mean_th, double 
 }
 
 
-void MakeGridNonbinaryFG( bool periodic, size_t n, size_t states, double beta, FactorGraph &fg ) {
+void MakeGridNonbinaryFG( bool periodic, size_t n, size_t states, Real beta, FactorGraph &fg ) {
     size_t N = n*n;
 
     vector<Var>    vars;
@@ -214,9 +214,9 @@ void MakeGridNonbinaryFG( bool periodic, size_t n, size_t states, double beta, F
 }
 
 
-void MakeLoopFG( size_t N, double mean_w, double mean_th, double sigma_w, double sigma_th, FactorGraph &fg ) {
+void MakeLoopFG( size_t N, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
     matrix w(N,N,N);
-    vector<double> th(N,0.0);
+    vector<Real> th(N,0.0);
 
     for( size_t i = 0; i < N; i++ ) {
         w(i, (i+1)%N) = rnd_stdnormal() * sigma_w + mean_w;
@@ -227,7 +227,7 @@ void MakeLoopFG( size_t N, double mean_w, double mean_th, double sigma_w, double
 }
 
 
-void MakeLoopNonbinaryFG( size_t N, size_t states, double beta, FactorGraph &fg ) {
+void MakeLoopNonbinaryFG( size_t N, size_t states, Real beta, FactorGraph &fg ) {
     vector<Var>    vars;
     vector<Factor> factors;
 
@@ -244,9 +244,9 @@ void MakeLoopNonbinaryFG( size_t N, size_t states, double beta, FactorGraph &fg 
 }
 
 
-void MakeTreeFG( size_t N, double mean_w, double mean_th, double sigma_w, double sigma_th, FactorGraph &fg ) {
+void MakeTreeFG( size_t N, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
     matrix w(N,N,N-1);
-    vector<double> th(N,0.0);
+    vector<Real> th(N,0.0);
 
     for( size_t i = 0; i < N; i++ ) {
         th[i] = rnd_stdnormal() * sigma_th + mean_th;
@@ -260,9 +260,9 @@ void MakeTreeFG( size_t N, double mean_w, double mean_th, double sigma_w, double
 }
 
 
-void MakeDRegFG( size_t N, size_t d, double mean_w, double mean_th, double sigma_w, double sigma_th, FactorGraph &fg ) {
+void MakeDRegFG( size_t N, size_t d, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
     matrix w(N,N,(d*N)/2);
-    vector<double> th(N,0.0);
+    vector<Real> th(N,0.0);
 
     UEdgeVec g = RandomDRegularGraph( N, d );
     for( size_t i = 0; i < g.size(); i++ )
@@ -413,7 +413,7 @@ BipartiteGraph CreateGroupStructuredLDPCGraph( size_t p, size_t j, size_t k ) {
 
 
 // Make parity check table
-void MakeParityCheck( double *result, size_t n, double eps ) {
+void MakeParityCheck( Real *result, size_t n, Real eps ) {
     size_t N = 1 << n;
     for( size_t i = 0; i < N; i++ ) {
         size_t c = 0;
@@ -447,7 +447,7 @@ int main( int argc, char *argv[] ) {
         size_t N, K, k, d, j, n1, n2, n3;
         size_t prime;
         size_t seed;
-        double beta, sigma_w, sigma_th, noise, mean_w, mean_th;
+        Real beta, sigma_w, sigma_th, noise, mean_w, mean_th;
         string type;
         size_t states = 2;
 
@@ -466,12 +466,12 @@ int main( int argc, char *argv[] ) {
             ("d",        po::value<size_t>(&d),        "variable connectivity\n\t(only for type=='dreg')")
             ("j",        po::value<size_t>(&j),        "number of parity checks per bit\n\t(only for type=='ldpc_{random,group}')")
             ("prime",    po::value<size_t>(&prime),    "prime number for construction of LDPC code\n\t(only for type=='ldpc_group')")
-            ("beta",     po::value<double>(&beta),     "stddev of log-factor entries\n\t(only for type=='hoi', 'potts3d', 'grid' if states>2)")
-            ("mean_w",   po::value<double>(&mean_w),   "mean of pairwise interactions w_{ij}\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
-            ("mean_th",  po::value<double>(&mean_th),  "mean of singleton interactions th_i\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
-            ("sigma_w",  po::value<double>(&sigma_w),  "stddev of pairwise interactions w_{ij}\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
-            ("sigma_th", po::value<double>(&sigma_th), "stddev of singleton interactions th_i\n\t(not for type=='hoi', 'ldpc_*', 'potts3d'")
-            ("noise",    po::value<double>(&noise),    "bitflip probability for binary symmetric channel (only for type=='ldpc')")
+            ("beta",     po::value<Real>(&beta),       "stddev of log-factor entries\n\t(only for type=='hoi', 'potts3d', 'grid' if states>2)")
+            ("mean_w",   po::value<Real>(&mean_w),     "mean of pairwise interactions w_{ij}\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
+            ("mean_th",  po::value<Real>(&mean_th),    "mean of singleton interactions th_i\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
+            ("sigma_w",  po::value<Real>(&sigma_w),    "stddev of pairwise interactions w_{ij}\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
+            ("sigma_th", po::value<Real>(&sigma_th),   "stddev of singleton interactions th_i\n\t(not for type=='hoi', 'ldpc_*', 'potts3d'")
+            ("noise",    po::value<Real>(&noise),      "bitflip probability for binary symmetric channel (only for type=='ldpc')")
             ("states",   po::value<size_t>(&states),   "number of states of each variable (should be 2 for all but type=='grid', 'grid_torus', 'loop', 'potts3d')")
         ;
 
@@ -703,8 +703,8 @@ int main( int argc, char *argv[] ) {
             // p = 29, j = 2, k = 4
 
             // Construct likelihood and paritycheck factors
-            double likelihood[4] = {1.0 - noise, noise, noise, 1.0 - noise};
-            double *paritycheck = new double[1 << k];
+            Real likelihood[4] = {1.0 - noise, noise, noise, 1.0 - noise};
+            Real *paritycheck = new Real[1 << k];
             MakeParityCheck(paritycheck, k, 0.0);
 
             // Create LDPC structure

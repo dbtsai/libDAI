@@ -49,10 +49,10 @@ class CBP : public DAIAlgFG {
         /// Factor beliefs
         std::vector<Factor> _beliefsF;
         /// Log-partition sum
-        double _logZ;
+        Real _logZ;
 
         /// Counts number of clampings at each leaf node
-        double _sum_level;
+        Real _sum_level;
 
         /// Number of leaves of recursion tree
         size_t _num_leaves;
@@ -71,8 +71,8 @@ class CBP : public DAIAlgFG {
          *  beliefs estimates of the children, and returns the improved
          *  estimates in \a lz_out and \a beliefs_out to its parent
          */
-        void runRecurse( InfAlg *bp, double orig_logZ, std::vector<size_t> clamped_vars_list, size_t &num_leaves,
-                         size_t &choose_count, double &sum_level, Real &lz_out, std::vector<Factor> &beliefs_out );
+        void runRecurse( InfAlg *bp, Real orig_logZ, std::vector<size_t> clamped_vars_list, size_t &num_leaves,
+                         size_t &choose_count, Real &sum_level, Real &lz_out, std::vector<Factor> &beliefs_out );
 
         /// Choose the next variable to clamp
         /** Choose the next variable to clamp, given a converged InfAlg (\a bp),
@@ -91,12 +91,12 @@ class CBP : public DAIAlgFG {
         /// Numer of iterations needed
         size_t _iters;
         /// Maximum difference encountered so far
-        double _maxdiff;
+        Real _maxdiff;
 
         /// Sets variable beliefs, factor beliefs and logZ
         /** \param bs should be a concatenation of the variable beliefs followed by the factor beliefs
          */
-        void setBeliefs( const std::vector<Factor> &bs, double logZ );
+        void setBeliefs( const std::vector<Factor> &bs, Real logZ );
 
         /// Constructor helper function
         void construct();
@@ -121,8 +121,8 @@ class CBP : public DAIAlgFG {
         virtual Real logZ() const { return _logZ; }
         virtual void init() {};
         virtual void init( const VarSet & ) {};
-        virtual double run();
-        virtual double maxDiff() const { return _maxdiff; }
+        virtual Real run();
+        virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
         //@}
 
@@ -146,18 +146,18 @@ class CBP : public DAIAlgFG {
             size_t verbose = 0;
 
             /// Tolerance to use in BP
-            double tol;
+            Real tol;
             /// Update style for BP
             UpdateType updates;
             /// Maximum number of iterations for BP
             size_t maxiter;
 
             /// Tolerance to use for controlling recursion depth (\a recurse is REC_LOGZ or REC_BDIFF)
-            double rec_tol;
+            Real rec_tol;
             /// Maximum number of levels of recursion (\a recurse is REC_FIXED)
             size_t max_levels = 10;
             /// If choose==CHOOSE_BBP and maximum adjoint is less than this value, don't recurse
-            double min_max_adj;
+            Real min_max_adj;
             /// Heuristic for choosing clamping variable
             ChooseMethodType choose;
             /// Method for deciding when to stop recursing
@@ -190,17 +190,17 @@ class CBP : public DAIAlgFG {
             /// Verbosity
             size_t verbose;
             /// Tolerance to use in BP
-            double tol;
+            Real tol;
             /// Update style for BP
             UpdateType updates;
             /// Maximum number of iterations for BP
             size_t maxiter;
             /// Tolerance to use for controlling recursion depth (\a recurse is REC_LOGZ or REC_BDIFF)
-            double rec_tol;
+            Real rec_tol;
             /// Maximum number of levels of recursion (\a recurse is REC_FIXED)
             size_t max_levels;
             /// If choose==CHOOSE_BBP and maximum adjoint is less than this value, don't recurse
-            double min_max_adj;
+            Real min_max_adj;
             /// Heuristic for choosing clamping variable
             ChooseMethodType choose;
             /// Method for deciding when to stop recursing
@@ -234,9 +234,9 @@ class CBP : public DAIAlgFG {
         /// Returns maximum number of levels of recursion
         size_t maxClampLevel() { return props.max_levels; }
         /// Returns props.min_max_adj @see CBP::Properties::min_max_adj
-        double minMaxAdj() { return props.min_max_adj; }
+        Real minMaxAdj() { return props.min_max_adj; }
         /// Returns tolerance used for controlling recursion depth
-        double recTol() { return props.rec_tol; }
+        Real recTol() { return props.rec_tol; }
 };
 
 
