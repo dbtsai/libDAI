@@ -308,6 +308,14 @@ class multifor {
  *  Both representations are useful, and the main functionality provided by the State class is to simplify iterating
  *  over the various joint states of a VarSet and to provide access to the current state in both representations.
  *
+ *  As an example, consider the following code snippet which iterates over all joint states of variables \a x0 and \a x1:
+ *  \code
+ *  VarSet vars( x0, x1 );
+ *  for( State S(vars); S.valid(); S++ ) {
+ *      cout << "Linear state: " << S.get() << ", x0 = " << S(x0) << ", x1 = " << S(x1) << endl;
+ *  }
+ *  \endcode
+ *
  *  \note The same functionality could be achieved by simply iterating over the linear state and using VarSet::calcStates,
  *  but the State class offers a more efficient implementation.
  *

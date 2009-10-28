@@ -11,7 +11,6 @@
 
 /// \file
 /// \brief Defines the Property and PropertySet classes
-/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_properties_h
@@ -42,56 +41,99 @@ typedef boost::any  PropertyValue;
 typedef std::pair<PropertyKey, PropertyValue> Property;
 
 
-/// Writes a Property object to an output stream
-std::ostream& operator<< (std::ostream & os, const Property & p);
+/// Writes a Property object (key-value pair) to an output stream
+std::ostream& operator<< ( std::ostream & os, const Property &p );
 
 
 /// Represents a set of properties, mapping keys (of type PropertyKey) to values (of type PropertyValue)
+/** Properties are used for specifying parameters of algorithms in a convenient way, where the values of
+ *  the parameters can be of different types (e.g., strings, doubles, integers, enums). A PropertySet is
+ *  an attempt to mimic the functionality of a Python dictionary object in C++, using the boost::any class. 
+ *
+ *  A PropertySet can be converted to and from a string, using the following format:
+ *
+ *  <tt>[key1=val1,key2=val2,...,keyn=valn]</tt>
+ *
+ *  That is,
+ *  - the whole PropertySet is wrapped in square brackets ("[", "]")
+ *  - all properties in the PropertySet are seperated by a comma (",")
+ *  - each Property consists of:
+ *    - the name of the key
+ *    - an equality sign ("=")
+ *    - its value (represented as a string)
+ *
+ *  Also, a PropertySet provides functionality for converting the representation of
+ *  individual values from some arbitrary type to and from std::string.
+ *
+ *  \note Not all types are automatically supported; if a type is unknown, an UNKNOWN_PROPERTY_TYPE 
+ *  exception is thrown. Adding support for a new type can be done in the body of the
+ *  operator<<(std::ostream &, const Property &).
+ */
 class PropertySet : private std::map<PropertyKey, PropertyValue> {
     public:
+    /// \name Constructors and destructors
+    //@{
         /// Default constructor
         PropertySet() {}
 
-        /// Construct PropertySet from a string
-        PropertySet( const std::string &s ) {
+        /// Construct from a string
+        /** \param s string in the format <tt>"[key1=val1,key2=val2,...,keyn=valn]"</tt>
+         */
+        PropertySet( const std::string& s ) {
             std::stringstream ss;
             ss << s;
             ss >> *this;
         }
+    //@}
 
-        /// Gets a property
-        const PropertyValue & Get(const PropertyKey &key) const {
-            PropertySet::const_iterator x = find(key);
-            if( x == this->end() )
-                DAI_THROWE(OBJECT_NOT_FOUND,"PropertySet::Get cannot find property '" + key + "'");
-            return x->second;
+    /// \name Setting property keys/values
+    //@{
+        /// Sets a property (a key \a key with a corresponding value \a val)
+        PropertySet& Set( const PropertyKey& key, const PropertyValue& val ) { 
+            this->operator[](key) = val; 
+            return *this; 
         }
 
-        /// Sets a property
-        PropertySet & Set(const PropertyKey &key, const PropertyValue &val) { this->operator[](key) = val; return *this; }
-
-        /// Set properties according to those in newProps, overriding properties that already exist with new values
-        PropertySet & Set( const PropertySet &newProps ) {
+        /// Set properties according to \a newProps, overriding properties that already exist with new values
+        PropertySet& Set( const PropertySet& newProps ) {
             const std::map<PropertyKey, PropertyValue> *m = &newProps;
             foreach(value_type i, *m)
                 Set( i.first, i.second );
             return *this;
         }
 
-        /// Gets a property, casted as ValueType
+        /// Shorthand for (temporarily) adding properties
+        /** \par Example:
+            \code
+PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
+            \endcode
+         */
+        PropertySet operator()( const PropertyKey& key, const PropertyValue& val ) const { 
+            PropertySet copy = *this; 
+            return copy.Set(key,val); 
+        }
+
+        /// Sets a property (a key \a key with a corresponding value \a val, which is first converted from \a ValueType to string)
+        /** The implementation makes use of boost::lexical_cast.
+         *  \tparam ValueType Type from which the value should be cast
+         *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
+         */
         template<typename ValueType>
-        ValueType GetAs(const PropertyKey &key) const {
+        PropertySet& setAsString( const PropertyKey& key, ValueType& val ) {
             try {
-                return boost::any_cast<ValueType>(Get(key));
-            } catch( const boost::bad_any_cast & ) {
-                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to desired type.");
-                return ValueType();
+                return Set( key, boost::lexical_cast<std::string>(val) );
+            } catch( boost::bad_lexical_cast & ) {
+                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to string.");
             }
         }
 
-        /// Converts a property from string to ValueType (if necessary)
+        /// Converts the type of the property value corresponding with \a key from string to \a ValueType (if necessary)
+        /** The implementation makes use of boost::lexical_cast
+         *  \tparam ValueType Type to which the value should be cast
+         *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
+         */
         template<typename ValueType>
-        void ConvertTo(const PropertyKey &key) { 
+        void ConvertTo( const PropertyKey& key ) { 
             PropertyValue val = Get(key);
             if( val.type() != typeid(ValueType) ) {
                 DAI_ASSERT( val.type() == typeid(std::string) );
@@ -102,10 +144,73 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
                 }
             }
         }
+    //@}
 
-        /// Converts a property from string to ValueType (if necessary)
+    //@}
+
+    /// \name Queries
+    //@{
+        /// Check if a property with the given \a key is defined
+        bool hasKey( const PropertyKey& key ) const { 
+            PropertySet::const_iterator x = find(key); 
+            return (x != this->end()); 
+        }
+
+        /// Returns a set containing all keys
+        std::set<PropertyKey> allKeys() const {
+            std::set<PropertyKey> res;
+            const_iterator i;
+            for( i = begin(); i != end(); i++ )
+                res.insert( i->first );
+            return res;
+        }
+
+        // OBSOLETE
+        /// Returns a vector containing all keys
+        /** \note Obsolete, to be removed soon
+         */
+        std::vector<PropertyKey> keys() const {
+            std::vector<PropertyKey> result;
+            result.reserve( size() );
+            for( PropertySet::const_iterator i = begin(); i != end(); ++i )
+                result.push_back( i->first );
+            return result;
+        }
+        /// Gets the value corresponding to \a key
+        /** \throw OBJECT_NOT_FOUND if the key cannot be found in \c *this
+         */
+        const PropertyValue& Get( const PropertyKey& key ) const {
+            PropertySet::const_iterator x = find(key);
+            if( x == this->end() )
+                DAI_THROWE(OBJECT_NOT_FOUND,"PropertySet::Get cannot find property '" + key + "'");
+            return x->second;
+        }
+
+        /// Gets the value corresponding to \a key, cast to \a ValueType
+        /** \tparam ValueType Type to which the value should be cast
+         *  \throw OBJECT_NOT_FOUND if the key cannot be found in \c *this
+         *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
+         */
         template<typename ValueType>
-        ValueType getStringAs(const PropertyKey &key) const { 
+        ValueType GetAs( const PropertyKey& key ) const {
+            try {
+                return boost::any_cast<ValueType>(Get(key));
+            } catch( const boost::bad_any_cast & ) {
+                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to desired type.");
+                return ValueType();
+            }
+        }
+
+        /// Gets the value corresponding to \a key, cast to \a ValueType, converting from a string if necessary
+        /** If the type of the value is already equal to \a ValueType, no conversion is done.
+         *  Otherwise, the type of the value should be a std::string, in which case boost::lexical_cast is
+         *  used to convert this to \a ValueType.
+         *  \tparam ValueType Type to which the value should be cast/converted
+         *  \throw OBJECT_NOT_FOUND if the key cannot be found in \c *this
+         *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
+         */
+        template<typename ValueType>
+        ValueType getStringAs( const PropertyKey& key ) const { 
             PropertyValue val = Get(key);
             if( val.type() == typeid(ValueType) ) {
                 return boost::any_cast<ValueType>(val);
@@ -119,46 +224,24 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
                 DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' from string to desired type.");
             return ValueType();
         }
+    //@}
 
-        /// Converts a property from ValueType to string (if necessary)
-        template<typename ValueType>
-        PropertySet & setAsString(const PropertyKey &key, ValueType &val) {
-            try {
-                return Set( key, boost::lexical_cast<std::string>(val) );
-            } catch( boost::bad_lexical_cast & ) {
-                DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to string.");
-            }
-        }
+    /// \name Input/output
+    //@{
+        /// Writes a PropertySet object to an output stream.
+        /** It uses the format <tt>"[key1=val1,key2=val2,...,keyn=valn]"</tt>.
+         *  \note Only a subset of all possible types is supported (see the implementation of this function).
+         *  Adding support for more types has to be done by hand.
+         *  \throw UNKNOWN_PROPERTY_TYPE if the type of a property value is not supported.
+         */
+        friend std::ostream& operator<< ( std::ostream& os, const PropertySet& ps );
 
-        /// Shorthand for (temporarily) adding properties, e.g. PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
-        PropertySet operator()(const PropertyKey &key, const PropertyValue &val) const { PropertySet copy = *this; return copy.Set(key,val); }
-
-        /// Check if a property with the given key exists
-        bool hasKey(const PropertyKey &key) const { PropertySet::const_iterator x = find(key); return (x != this->end()); }
-
-        /// Returns a set containing all keys
-        std::set<PropertyKey> allKeys() const {
-            std::set<PropertyKey> res;
-            const_iterator i;
-            for( i = begin(); i != end(); i++ )
-                res.insert( i->first );
-            return res;
-        }
-
-        /// Returns a vector containing all keys
-        std::vector<PropertyKey> keys() const {
-            std::vector<PropertyKey> result;
-            result.reserve( size() );
-            for( PropertySet::const_iterator i = begin(); i != end(); ++i )
-                result.push_back( i->first );
-            return result;
-        }
-
-        /// Writes a PropertySet object to an output stream
-        friend std::ostream& operator<< (std::ostream & os, const PropertySet & ps);
-
-        /// Reads a PropertySet object from an input stream, storing values as strings
-        friend std::istream& operator>> (std::istream& is, PropertySet & ps);
+        /// Reads a PropertySet object from an input stream.
+        /** It expects a string in the format <tt>"[key1=val1,key2=val2,...,keyn=valn]"</tt>.
+         *  Values are stored as strings.
+         */
+        friend std::istream& operator>> ( std::istream& is, PropertySet& ps );
+    //@}
 };
 
 
