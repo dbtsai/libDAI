@@ -94,6 +94,11 @@ inline Real log( Real x ) {
     return std::log(x);
 }
 
+/// Returns logarithm of \a x, or 0 if \a x == 0
+inline Real log0( Real x ) {
+    return x ? std::log(x) : 0;
+}
+
 /// Returns exponent of \a x
 inline Real exp( Real x ) {
     return std::exp(x);

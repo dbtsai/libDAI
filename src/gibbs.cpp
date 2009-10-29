@@ -176,7 +176,7 @@ Real Gibbs::run() {
     if( props.verbose >= 3 ) {
         for( size_t i = 0; i < nrVars(); i++ ) {
             cerr << "belief for variable " << var(i) << ": " << beliefV(i) << endl;
-            cerr << "counts for variable " << var(i) << ": " << Prob( _var_counts[i].begin(), _var_counts[i].end() ) << endl;
+            cerr << "counts for variable " << var(i) << ": " << Prob( _var_counts[i] ) << endl;
         }
     }
 

@@ -564,7 +564,7 @@ std::vector<size_t> JTree::findMaximum() const {
 
         // Maximise with respect to variable i
         Prob prod = beliefV(i).p();
-        maximum[i] = max_element( prod.begin(), prod.end() ) - prod.begin();
+        maximum[i] = prod.argmax().first;
 
         foreach( const Neighbor &I, nbV(i) )
             if( !visitedFactors[I] )

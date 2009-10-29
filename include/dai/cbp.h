@@ -21,7 +21,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include <dai/daialg.h>
-#include <dai/cbp.h>
 #include <dai/bbp.h>
 
 

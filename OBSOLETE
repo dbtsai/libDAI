@@ -25,4 +25,3 @@ size_t Permute::convert_linear_index( size_t li ) const;
 TProb<T> TProb<T>::sgn() const;
 bool RegionGraph::Check_Counting_Numbers();
 void RegionGraph::Calc_Counting_Numbers();
-std::vector<PropertyKey> PropertySet::keys() const;

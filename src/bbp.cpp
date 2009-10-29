@@ -1151,7 +1151,7 @@ namespace dai {
 
 void BBP::Properties::set(const PropertySet &opts)
 {
-    const std::set<PropertyKey> &keys = opts.allKeys();
+    const std::set<PropertyKey> &keys = opts.keys();
     std::set<PropertyKey>::const_iterator i;
     for(i=keys.begin(); i!=keys.end(); i++) {
         if(*i == "verbose") continue;

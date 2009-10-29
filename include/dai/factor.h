@@ -75,15 +75,6 @@ template <typename T> class TFactor {
         TProb<T>    _p;
 
     public:
-        /// Constant iterator over the values
-        typedef typename TProb<T>::const_iterator const_iterator;
-        /// Iterator over the values
-        typedef typename TProb<T>::iterator iterator;
-        /// Constant reverse iterator over the values
-        typedef typename TProb<T>::const_reverse_iterator const_reverse_iterator;
-        /// Reverse iterator over the values
-        typedef typename TProb<T>::reverse_iterator reverse_iterator;
-
     /// \name Constructors and destructors
     //@{
         /// Constructs factor depending on no variables with value \a p
@@ -174,29 +165,6 @@ template <typename T> class TFactor {
         T strength( const Var &i, const Var &j ) const;
     //@}
 
-    /// @name Iterator interface
-    //@{
-        /// Returns iterator that points to the first value
-        iterator begin() { return _p.begin(); }
-        /// Returns constant iterator that points to the first value
-        const_iterator begin() const { return _p.begin(); }
-
-        /// Returns iterator that points beyond the last value
-        iterator end() { return _p.end(); }
-        /// Returns constant iterator that points beyond the last value
-        const_iterator end() const { return _p.end(); }
-
-        /// Returns reverse iterator that points to the last value
-        reverse_iterator rbegin() { return _p.rbegin(); }
-        /// Returns constant reverse iterator that points to the last value
-        const_reverse_iterator rbegin() const { return _p.rbegin(); }
-
-        /// Returns reverse iterator that points beyond the first value
-        reverse_iterator rend() { return _p.rend(); }
-        /// Returns constant reverse iterator that points beyond the first value
-        const_reverse_iterator rend() const { return _p.rend(); }
-    //@}
-
     /// \name Unary transformations
     //@{
         /// Returns pointwise absolute value
@@ -236,7 +204,7 @@ template <typename T> class TFactor {
         }
 
         /// Returns normalized copy of \c *this, using the specified norm
-        TFactor<T> normalized( typename Prob::NormType norm=Prob::NORMPROB ) const {
+        TFactor<T> normalized( typename TProb<T>::NormType norm=TProb<T>::NORMPROB ) const {
             TFactor<T> result;
             result._vs = _vs;
             result._p = _p.normalized( norm );
@@ -253,7 +221,7 @@ template <typename T> class TFactor {
         TFactor<T>& setUniform () { _p.setUniform(); return *this; }
 
         /// Normalizes factor using the specified norm
-        T normalize( typename Prob::NormType norm=Prob::NORMPROB ) { return _p.normalize( norm ); }
+        T normalize( typename TProb<T>::NormType norm=TProb<T>::NORMPROB ) { return _p.normalize( norm ); }
     //@}
 
     /// \name Operations with scalars
@@ -295,6 +263,7 @@ template <typename T> class TFactor {
         TFactor<T> operator+ (T x) const {
             TFactor<T> result(*this);
             result._p += x;
+            // FIXME First copying and then changing is inefficient
             return result;
         }
 
@@ -302,28 +271,31 @@ template <typename T> class TFactor {
         TFactor<T> operator- (T x) const {
             TFactor<T> result(*this);
             result._p -= x;
+            // FIXME First copying and then changing is inefficient
             return result;
         }
 
         /// Returns product of \c *this with scalar \a x
         TFactor<T> operator* (T x) const {
-            TFactor<T> result = *this;
-            result.p() *= x;
+            TFactor<T> result(*this);
+            result._p *= x;
+            // FIXME First copying and then changing is inefficient
             return result;
         }
 
         /// Returns quotient of \c *this with scalar \a x
         TFactor<T> operator/ (T x) const {
-            TFactor<T> result = *this;
-            result.p() /= x;
+            TFactor<T> result(*this);
+            result._p /= x;
+            // FIXME First copying and then changing is inefficient
             return result;
         }
 
         /// Returns \c *this raised to the power \a x
         TFactor<T> operator^ (T x) const {
-            TFactor<T> result;
-            result._vs = _vs;
-            result._p = _p^x;
+            TFactor<T> result(*this);
+            result._p ^= x;
+            // FIXME First copying and then changing is inefficient
             return result;
         }
     //@}
@@ -436,20 +408,7 @@ template <typename T> class TFactor {
          *  returned corresponds with the factor \f$g : \prod_{l \in L \setminus M} X_l \to [0,\infty)\f$
          *  defined by \f$g(\{x_l\}_{l\in L \setminus M}) = f(\{x_l\}_{l\in L \setminus M}, \{s(x_m)\}_{m\in M})\f$.
          */
-        TFactor<T> slice( const VarSet& vars, size_t varsState ) const {
-            DAI_ASSERT( vars << _vs );
-            VarSet varsrem = _vs / vars;
-            TFactor<T> result( varsrem, T(0) );
-
-            // OPTIMIZE ME
-            IndexFor i_vars (vars, _vs);
-            IndexFor i_varsrem (varsrem, _vs);
-            for( size_t i = 0; i < states(); i++, ++i_vars, ++i_varsrem )
-                if( (size_t)i_vars == varsState )
-                    result._p[i_varsrem] = _p[i];
-
-            return result;
-        }
+        TFactor<T> slice( const VarSet& vars, size_t varsState ) const; 
 
         /// Embeds this factor in a larger VarSet
         /** \pre vars() should be a subset of \a vars 
@@ -474,6 +433,22 @@ template <typename T> class TFactor {
 };
 
 
+template<typename T> TFactor<T> TFactor<T>::slice( const VarSet& vars, size_t varsState ) const {
+    DAI_ASSERT( vars << _vs );
+    VarSet varsrem = _vs / vars;
+    TFactor<T> result( varsrem, T(0) );
+
+    // OPTIMIZE ME
+    IndexFor i_vars (vars, _vs);
+    IndexFor i_varsrem (varsrem, _vs);
+    for( size_t i = 0; i < states(); i++, ++i_vars, ++i_varsrem )
+        if( (size_t)i_vars == varsState )
+            result._p[i_varsrem] = _p[i];
+
+    return result;
+}
+
+
 template<typename T> TFactor<T> TFactor<T>::marginal(const VarSet &vars, bool normed) const {
     VarSet res_vars = vars & _vs;
 
@@ -484,7 +459,7 @@ template<typename T> TFactor<T> TFactor<T>::marginal(const VarSet &vars, bool no
         res._p[i_res] += _p[i];
 
     if( normed )
-        res.normalize( Prob::NORMPROB );
+        res.normalize( TProb<T>::NORMPROB );
 
     return res;
 }
@@ -501,7 +476,7 @@ template<typename T> TFactor<T> TFactor<T>::maxMarginal(const VarSet &vars, bool
             res._p[i_res] = _p[i];
 
     if( normed )
-        res.normalize( Prob::NORMPROB );
+        res.normalize( TProb<T>::NORMPROB );
 
     return res;
 }
@@ -538,7 +513,10 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
 
 /// Apply binary operator pointwise on two factors
 /** \relates TFactor
- *  \tparam binaryOp Function object that accepts two arguments of type \a T and outputs a type \a T
+ *  \tparam binaryOp Type of function object that accepts two arguments of type \a T and outputs a type \a T
+ *  \param f Left operand
+ *  \param g Right operand
+ *  \param op Operation of type \a binaryOp
  */
 template<typename T, typename binaryOp> TFactor<T> pointwiseOp( const TFactor<T> &f, const TFactor<T> &g, binaryOp op ) {
     if( f.vars() == g.vars() ) { // optimizate special case
@@ -576,7 +554,7 @@ template<typename T> std::ostream& operator<< (std::ostream& os, const TFactor<T
 /** \relates TFactor
  *  \pre f.vars() == g.vars()
  */
-template<typename T> T dist( const TFactor<T> &f, const TFactor<T> &g, Prob::DistType dt ) {
+template<typename T> T dist( const TFactor<T> &f, const TFactor<T> &g, typename TProb<T>::DistType dt ) {
     if( f.vars().empty() || g.vars().empty() )
         return -1;
     else {
@@ -615,7 +593,7 @@ template<typename T> T MutualInfo(const TFactor<T> &f) {
     VarSet::const_iterator it = f.vars().begin();
     Var i = *it; it++; Var j = *it;
     TFactor<T> projection = f.marginal(i) * f.marginal(j);
-    return dist( f.normalized(), projection, Prob::DISTKL );
+    return dist( f.normalized(), projection, TProb<T>::DISTKL );
 }
 
 

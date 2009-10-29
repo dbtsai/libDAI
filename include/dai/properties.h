@@ -157,7 +157,7 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
         }
 
         /// Returns a set containing all keys
-        std::set<PropertyKey> allKeys() const {
+        std::set<PropertyKey> keys() const {
             std::set<PropertyKey> res;
             const_iterator i;
             for( i = begin(); i != end(); i++ )
@@ -165,17 +165,6 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
             return res;
         }
 
-        // OBSOLETE
-        /// Returns a vector containing all keys
-        /** \note Obsolete, to be removed soon
-         */
-        std::vector<PropertyKey> keys() const {
-            std::vector<PropertyKey> result;
-            result.reserve( size() );
-            for( PropertySet::const_iterator i = begin(); i != end(); ++i )
-                result.push_back( i->first );
-            return result;
-        }
         /// Gets the value corresponding to \a key
         /** \throw OBJECT_NOT_FOUND if the key cannot be found in \c *this
          */

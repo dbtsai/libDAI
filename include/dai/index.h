@@ -321,7 +321,11 @@ class multifor {
  *
  *  \note A State is very similar to a \link multifor \endlink, but tailored for Var 's and VarSet 's.
  *
- *  \see VarSet::calcState, VarSet::calcStates
+ *  \see VarSet::calcState(), VarSet::calcStates()
+ *
+ *  \todo Rename VarSet::calcState(), VarSet::calcStates() and make them non-member functions;
+ *        make the State class a more prominent part of libDAI (and document it clearly, explaining
+ *        the concept of state); add more optimized variants of the State class like IndexFor (e.g. for TFactor<>::slice()).
  */
 class State {
     private:
@@ -338,11 +342,33 @@ class State {
         /// Default constructor
         State() : state(0), states() {}
 
-        /// Initialize from VarSet, resetting the current state
-        State( const VarSet &vs ) : state(0) {
-            for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ )
-                states[*v] = 0;
+        /// Construct from VarSet \a vs and corresponding linear state \a linearState
+        State( const VarSet &vs, size_t linearState=0 ) : state(linearState), states() {
+            if( linearState == 0 )
+                for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ )
+                    states[*v] = 0;
+            else {
+                for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ ) {
+                    states[*v] = linearState % v->states();
+                    linearState /= v->states();
+                }
+                DAI_ASSERT( linearState == 0 );
+            }
         }
+
+        /// Construct from a std::map<Var, size_t>
+        State( const std::map<Var, size_t> &s ) : state(0), states() {
+            insert( s.begin(), s.end() );
+        }
+
+        /// Constant iterator over the values
+        typedef states_type::const_iterator const_iterator;
+
+        /// Returns constant iterator that points to the first item
+        const_iterator begin() const { return states.begin(); }
+
+        /// Returns constant iterator that points beyond the last item
+        const_iterator end() const { return states.end(); }
 
         /// Return current linear state
         operator size_t() const {
@@ -350,8 +376,22 @@ class State {
             return( state );
         }
 
+        /// Inserts a range of variable-state pairs, changing the current state
+        template<typename InputIterator>
+        void insert( InputIterator b, InputIterator e ) {
+            states.insert( b, e );
+            VarSet vars;
+            for( const_iterator it = begin(); it != end(); it++ )
+                vars |= it->first;
+            state = 0;
+            state = this->operator()( vars );
+        }
+
         /// Return current state represented as a map
         const states_type& get() const { return states; }
+
+        /// Cast into std::map<Var, size_t>
+        operator const states_type& () const { return states; }
 
         /// Return current state of variable \a v, or 0 if \a v is not in \c *this
         size_t operator() ( const Var &v ) const {
