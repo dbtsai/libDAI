@@ -30,18 +30,6 @@
 namespace dai {
 
 
-/// Function object similar to std::divides(), but different in that dividing by zero results in zero
-template<typename T> struct divides0 : public std::binary_function<T, T, T> {
-    /// Returns (\a j == 0 ? 0 : (\a i / \a j))
-    T operator()( const T &i, const T &j ) const {
-        if( j == (T)0 )
-            return (T)0;
-        else
-            return i / j;
-    }
-};
-
-
 /// Represents a (probability) factor.
 /** Mathematically, a \e factor is a function mapping joint states of some
  *  variables to the nonnegative real numbers.
@@ -135,6 +123,9 @@ template <typename T> class TFactor {
         /// Returns constant reference to variable set (i.e., the variables on which the factor depends)
         const VarSet& vars() const { return _vs; }
 
+        /// Returns reference to variable set (i.e., the variables on which the factor depends)
+        VarSet& vars() { return _vs; }
+
         /// Returns the number of possible joint states of the variables on which the factor depends, \f$\prod_{l\in L} S_l\f$
         /** \note This is equal to the length of the value vector.
          */
@@ -169,46 +160,49 @@ template <typename T> class TFactor {
     //@{
         /// Returns pointwise absolute value
         TFactor<T> abs() const {
-            TFactor<T> e;
-            e._vs = _vs;
-            e._p = _p.abs();
-            return e;
+            // Note: the alternative (shorter) way of implementing this,
+            //   return TFactor<T>( _vs, _p.abs() );
+            // is slower because it invokes the copy constructor of TProb<T>
+            TFactor<T> x;
+            x._vs = _vs;
+            x._p = _p.abs();
+            return x;
         }
 
         /// Returns pointwise exponent
         TFactor<T> exp() const {
-            TFactor<T> e;
-            e._vs = _vs;
-            e._p = _p.exp();
-            return e;
+            TFactor<T> x;
+            x._vs = _vs;
+            x._p = _p.exp();
+            return x;
         }
 
         /// Returns pointwise logarithm
         /** If \a zero == \c true, uses <tt>log(0)==0</tt>; otherwise, <tt>log(0)==-Inf</tt>.
          */
         TFactor<T> log(bool zero=false) const {
-            TFactor<T> l;
-            l._vs = _vs;
-            l._p = _p.log(zero);
-            return l;
+            TFactor<T> x;
+            x._vs = _vs;
+            x._p = _p.log(zero);
+            return x;
         }
 
         /// Returns pointwise inverse
         /** If \a zero == \c true, uses <tt>1/0==0</tt>; otherwise, <tt>1/0==Inf</tt>.
          */
         TFactor<T> inverse(bool zero=true) const {
-            TFactor<T> inv;
-            inv._vs = _vs;
-            inv._p = _p.inverse(zero);
-            return inv;
+            TFactor<T> x;
+            x._vs = _vs;
+            x._p = _p.inverse(zero);
+            return x;
         }
 
         /// Returns normalized copy of \c *this, using the specified norm
         TFactor<T> normalized( typename TProb<T>::NormType norm=TProb<T>::NORMPROB ) const {
-            TFactor<T> result;
-            result._vs = _vs;
-            result._p = _p.normalized( norm );
-            return result;
+            TFactor<T> x;
+            x._vs = _vs;
+            x._p = _p.normalized( norm );
+            return x;
         }
     //@}
 
@@ -261,127 +255,158 @@ template <typename T> class TFactor {
     //@{
         /// Returns sum of \c *this and scalar \a x
         TFactor<T> operator+ (T x) const {
-            TFactor<T> result(*this);
-            result._p += x;
-            // FIXME First copying and then changing is inefficient
+            // Note: the alternative (shorter) way of implementing this,
+            //   TFactor<T> result(*this);
+            //   result._p += x;
+            // is slower because it invokes the copy constructor of TFactor<T>
+            TFactor<T> result;
+            result._vs = _vs;
+            result._p = p() + x;
             return result;
         }
 
         /// Returns difference of \c *this and scalar \a x
         TFactor<T> operator- (T x) const {
-            TFactor<T> result(*this);
-            result._p -= x;
-            // FIXME First copying and then changing is inefficient
+            TFactor<T> result;
+            result._vs = _vs;
+            result._p = p() - x;
             return result;
         }
 
         /// Returns product of \c *this with scalar \a x
         TFactor<T> operator* (T x) const {
-            TFactor<T> result(*this);
-            result._p *= x;
-            // FIXME First copying and then changing is inefficient
+            TFactor<T> result;
+            result._vs = _vs;
+            result._p = p() * x;
             return result;
         }
 
         /// Returns quotient of \c *this with scalar \a x
         TFactor<T> operator/ (T x) const {
-            TFactor<T> result(*this);
-            result._p /= x;
-            // FIXME First copying and then changing is inefficient
+            TFactor<T> result;
+            result._vs = _vs;
+            result._p = p() / x;
             return result;
         }
 
         /// Returns \c *this raised to the power \a x
         TFactor<T> operator^ (T x) const {
-            TFactor<T> result(*this);
-            result._p ^= x;
-            // FIXME First copying and then changing is inefficient
+            TFactor<T> result;
+            result._vs = _vs;
+            result._p = p() ^ x;
             return result;
         }
     //@}
 
     /// \name Operations with other factors
     //@{
-        /// Adds \a f to \c *this
+        /// Applies binary operation \a op on two factors, \c *this and \a g
+        /** \tparam binOp Type of function object that accepts two arguments of type \a T and outputs a type \a T
+         *  \param g Right operand
+         *  \param op Operation of type \a binOp
+         */
+        template<typename binOp> TFactor<T>& binaryOp( const TFactor<T> &g, binOp op ) {
+            if( _vs == g._vs ) // optimize special case
+                _p.pwBinaryOp( g._p, op );
+            else {
+                TFactor<T> f(*this); // make a copy
+                _vs |= g._vs;
+                size_t N = _vs.nrStates();
+
+                IndexFor i_f( f._vs, _vs );
+                IndexFor i_g( g._vs, _vs );
+
+                _p.p().clear();
+                _p.p().reserve( N );
+                for( size_t i = 0; i < N; i++, ++i_f, ++i_g )
+                    _p.p().push_back( op( f._p[i_f], g._p[i_g] ) );
+            }
+            return *this;
+        }
+
+        /// Adds \a g to \c *this
         /** The sum of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[f+g : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) + g(x_M).\f]
          */
-        TFactor<T>& operator+= (const TFactor<T>& f) {
-            if( f._vs == _vs ) // optimize special case
-                _p += f._p;
-            else
-                *this = (*this + f);
-            return *this;
-        }
+        TFactor<T>& operator+= (const TFactor<T>& g) { return binaryOp( g, std::plus<T>() ); }
 
-        /// Subtracts \a f from \c *this
+        /// Subtracts \a g from \c *this
         /** The difference of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[f-g : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) - g(x_M).\f]
          */
-        TFactor<T>& operator-= (const TFactor<T>& f) {
-            if( f._vs == _vs ) // optimize special case
-                _p -= f._p;
-            else
-                *this = (*this - f);
-            return *this;
-        }
+        TFactor<T>& operator-= (const TFactor<T>& g) { return binaryOp( g, std::minus<T>() ); }
 
-        /// Multiplies \c *this with \a f
+        /// Multiplies \c *this with \a g
         /** The product of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[fg : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) g(x_M).\f]
          */
-        TFactor<T>& operator*= (const TFactor<T>& f) {
-            if( f._vs == _vs ) // optimize special case
-                _p *= f._p;
-            else
-                *this = (*this * f);
-            return *this;
-        }
+        TFactor<T>& operator*= (const TFactor<T>& g) { return binaryOp( g, std::multiplies<T>() ); }
 
-        /// Divides \c *this by \a f (where division by zero yields zero)
+        /// Divides \c *this by \a g (where division by zero yields zero)
         /** The quotient of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[\frac{f}{g} : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto \frac{f(x_L)}{g(x_M)}.\f]
          */
-        TFactor<T>& operator/= (const TFactor<T>& f) {
-            if( f._vs == _vs ) // optimize special case
-                _p /= f._p;
-            else
-                *this = (*this / f);
-            return *this;
-        }
+        TFactor<T>& operator/= (const TFactor<T>& g) { return binaryOp( g, fo_divides0<T>() ); }
     //@}
 
     /// \name Transformations with other factors
     //@{
-        /// Returns sum of \c *this and \a f
+        /// Returns result of applying binary operation \a op on two factors, \c *this and \a g
+        /** \tparam binOp Type of function object that accepts two arguments of type \a T and outputs a type \a T
+         *  \param g Right operand
+         *  \param op Operation of type \a binOp
+         */
+        template<typename binOp> TFactor<T> binaryTr( const TFactor<T> &g, binOp op ) const {
+            // Note that to prevent a copy to be made, it is crucial 
+            // that the result is declared outside the if-else construct.
+            TFactor<T> result;
+            if( _vs == g._vs ) { // optimize special case
+                result._vs = _vs;
+                result._p = _p.pwBinaryTr( g._p, op );
+            } else {
+                result._vs = _vs | g._vs;
+                size_t N = result._vs.nrStates();
+
+                IndexFor i_f( _vs, result.vars() );
+                IndexFor i_g( g._vs, result.vars() );
+
+                result._p.p().clear();
+                result._p.p().reserve( N );
+                for( size_t i = 0; i < N; i++, ++i_f, ++i_g )
+                    result._p.p().push_back( op( _p[i_f], g._p[i_g] ) );
+            }
+            return result;
+        }
+
+        /// Returns sum of \c *this and \a g
         /** The sum of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[f+g : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) + g(x_M).\f]
          */
-        TFactor<T> operator+ (const TFactor<T>& f) const {
-            return pointwiseOp(*this,f,std::plus<T>());
+        TFactor<T> operator+ (const TFactor<T>& g) const {
+            return binaryTr(g,std::plus<T>());
         }
 
-        /// Returns \c *this minus \a f
+        /// Returns \c *this minus \a g
         /** The difference of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[f-g : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) - g(x_M).\f]
          */
-        TFactor<T> operator- (const TFactor<T>& f) const {
-            return pointwiseOp(*this,f,std::minus<T>());
+        TFactor<T> operator- (const TFactor<T>& g) const {
+            return binaryTr(g,std::minus<T>());
         }
 
-        /// Returns product of \c *this with \a f
+        /// Returns product of \c *this with \a g
         /** The product of two factors is defined as follows: if
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[fg : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto f(x_L) g(x_M).\f]
          */
-        TFactor<T> operator* (const TFactor<T>& f) const {
-            return pointwiseOp(*this,f,std::multiplies<T>());
+        TFactor<T> operator* (const TFactor<T>& g) const {
+            return binaryTr(g,std::multiplies<T>());
         }
 
         /// Returns quotient of \c *this by \a f (where division by zero yields zero)
@@ -389,8 +414,8 @@ template <typename T> class TFactor {
          *  \f$f : \prod_{l\in L} X_l \to [0,\infty)\f$ and \f$g : \prod_{m\in M} X_m \to [0,\infty)\f$, then
          *  \f[\frac{f}{g} : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto \frac{f(x_L)}{g(x_M)}.\f]
          */
-        TFactor<T> operator/ (const TFactor<T>& f) const {
-            return pointwiseOp(*this,f,divides0<T>());
+        TFactor<T> operator/ (const TFactor<T>& g) const {
+            return binaryTr(g,fo_divides0<T>());
         }
     //@}
 
@@ -508,33 +533,6 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
                         }
 
     return std::tanh( 0.25 * std::log( max ) );
-}
-
-
-/// Apply binary operator pointwise on two factors
-/** \relates TFactor
- *  \tparam binaryOp Type of function object that accepts two arguments of type \a T and outputs a type \a T
- *  \param f Left operand
- *  \param g Right operand
- *  \param op Operation of type \a binaryOp
- */
-template<typename T, typename binaryOp> TFactor<T> pointwiseOp( const TFactor<T> &f, const TFactor<T> &g, binaryOp op ) {
-    if( f.vars() == g.vars() ) { // optimizate special case
-        TFactor<T> result(f);
-        for( size_t i = 0; i < result.states(); i++ )
-            result[i] = op( result[i], g[i] );
-        return result;
-    } else {
-        TFactor<T> result( f.vars() | g.vars(), (T)0 );
-
-        IndexFor i1(f.vars(), result.vars());
-        IndexFor i2(g.vars(), result.vars());
-
-        for( size_t i = 0; i < result.states(); i++, ++i1, ++i2 )
-            result[i] = op( f[i1], g[i2] );
-
-        return result;
-    }
 }
 
 
