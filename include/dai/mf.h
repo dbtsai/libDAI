@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines class MF
-/// \todo Improve documentation
+/// \brief Defines class MF which implements the Mean Field algorithm
 
 
 #ifndef __defined_libdai_mf_h
@@ -28,8 +27,15 @@ namespace dai {
 
 
 /// Approximate inference algorithm "Mean Field"
+/** The Mean Field algorithm iteratively calculates approximations of
+ *  single variable marginals (beliefs). The update equation for 
+ *  a single belief \f$b_i\f$ is given by:
+ *    \f[ b_i^{\mathrm{new}}(x_i) \propto \prod_{I\in N_i} \exp \left( \sum_{x_{N_I \setminus \{i\}}} \log f_I(x_I) \prod_{j \in N_I \setminus \{i\}} b_j(x_j) \right) \f]
+ *  These update equations are performed for all variables until convergence.
+ */
 class MF : public DAIAlgFG {
     private:
+        /// Current approximations of single variable marginals
         std::vector<Factor>  _beliefs;
         /// Maximum difference encountered so far
         Real _maxdiff;
@@ -56,15 +62,17 @@ class MF : public DAIAlgFG {
         static const char *Name;
 
     public:
+    /// \name Constructors/destructors
+    //@{
         /// Default constructor
         MF() : DAIAlgFG(), _beliefs(), _maxdiff(0.0), _iters(0U), props() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
+        /// Construct from FactorGraph \a fg and PropertySet \a opts
         MF( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), _maxdiff(0.0), _iters(0U), props() {
             setProperties( opts );
             construct();
         }
-
+    //@}
 
     /// \name General InfAlg interface
     //@{
@@ -82,12 +90,6 @@ class MF : public DAIAlgFG {
         virtual size_t Iterations() const { return _iters; }
     //@}
 
-
-    /// \name Additional interface specific for MF
-    //@{
-        Factor calcNewBelief( size_t i );
-    //@}
-
     /// \name Managing parameters (which are stored in MF::props)
     //@{
         /// Set parameters of this inference algorithm.
@@ -102,7 +104,11 @@ class MF : public DAIAlgFG {
     //@}
 
     private:
+        /// Helper function for constructors
         void construct();
+
+        /// Calculates an updated belief of variable \a i
+        Factor calcNewBelief( size_t i );
 };
 
 
