@@ -133,14 +133,22 @@ class BBP {
         void RegenerateSeqMessageAdjoints();
         //@}
 
-        /// Returns T value; see eqn. (41) in [\ref EaG09]
-        DAI_ACCMUT(Prob & T(size_t i, size_t _I), { return _T[i][_I]; });
-        /// Retunrs U value; see eqn. (42) in [\ref EaG09]
-        DAI_ACCMUT(Prob & U(size_t I, size_t _i), { return _U[I][_i]; });
-        /// Returns S value; see eqn. (43) in [\ref EaG09]
-        DAI_ACCMUT(Prob & S(size_t i, size_t _I, size_t _j), { return _S[i][_I][_j]; });
-        /// Returns R value; see eqn. (44) in [\ref EaG09]
-        DAI_ACCMUT(Prob & R(size_t I, size_t _i, size_t _J), { return _R[I][_i][_J]; });
+        /// Returns reference to T value; see eqn. (41) in [\ref EaG09]
+        Prob & T(size_t i, size_t _I) { return _T[i][_I]; }
+        /// Returns constant reference to T value; see eqn. (41) in [\ref EaG09]
+        const Prob & T(size_t i, size_t _I) const { return _T[i][_I]; }
+        /// Returns reference to U value; see eqn. (42) in [\ref EaG09]
+        Prob & U(size_t I, size_t _i) { return _U[I][_i]; }
+        /// Returns constant reference to U value; see eqn. (42) in [\ref EaG09]
+        const Prob & U(size_t I, size_t _i) const { return _U[I][_i]; }
+        /// Returns reference to S value; see eqn. (43) in [\ref EaG09]
+        Prob & S(size_t i, size_t _I, size_t _j) { return _S[i][_I][_j]; }
+        /// Returns constant reference to S value; see eqn. (43) in [\ref EaG09]
+        const Prob & S(size_t i, size_t _I, size_t _j) const { return _S[i][_I][_j]; }
+        /// Returns reference to R value; see eqn. (44) in [\ref EaG09]
+        Prob & R(size_t I, size_t _i, size_t _J) { return _R[I][_i][_J]; }
+        /// Returns constant reference to R value; see eqn. (44) in [\ref EaG09]
+        const Prob & R(size_t I, size_t _i, size_t _J) const { return _R[I][_i][_J]; }
 
         /// @name Parallel algorithm
         //@{
@@ -243,20 +251,32 @@ class BBP {
         /// Return number of iterations done so far
         size_t doneIters() { return _iters; }
 
-        /// Returns variable factor adjoint
-        DAI_ACCMUT(Prob& adj_psi_V(size_t i), { return _adj_psi_V[i]; });
-        /// Returns factor adjoint
-        DAI_ACCMUT(Prob& adj_psi_F(size_t I), { return _adj_psi_F[I]; });
-        /// Returns variable belief adjoint
-        DAI_ACCMUT(Prob& adj_b_V(size_t i), { return _adj_b_V[i]; });
-        /// Returns factor belief adjoint
-        DAI_ACCMUT(Prob& adj_b_F(size_t I), { return _adj_b_F[I]; });
+        /// Returns reference to variable factor adjoint
+        Prob& adj_psi_V(size_t i) { return _adj_psi_V[i]; }
+        /// Returns constant reference to variable factor adjoint
+        const Prob& adj_psi_V(size_t i) const { return _adj_psi_V[i]; }
+        /// Returns reference to factor adjoint
+        Prob& adj_psi_F(size_t I) { return _adj_psi_F[I]; }
+        /// Returns constant reference to factor adjoint
+        const Prob& adj_psi_F(size_t I) const { return _adj_psi_F[I]; }
+        /// Returns reference to variable belief adjoint
+        Prob& adj_b_V(size_t i) { return _adj_b_V[i]; }
+        /// Returns constant reference to variable belief adjoint
+        const Prob& adj_b_V(size_t i) const { return _adj_b_V[i]; }
+        /// Returns reference to factor belief adjoint
+        Prob& adj_b_F(size_t I) { return _adj_b_F[I]; }
+        /// Returns constant reference to factor belief adjoint
+        const Prob& adj_b_F(size_t I) const { return _adj_b_F[I]; }
 
      protected:
-        /// Returns variable->factor message adjoint
-        DAI_ACCMUT(Prob& adj_n(size_t i, size_t _I), { return _adj_n[i][_I]; });
-        /// Returns factor->variable message adjoint
-        DAI_ACCMUT(Prob& adj_m(size_t i, size_t _I), { return _adj_m[i][_I]; });
+        /// Returns reference to variable->factor message adjoint
+        Prob& adj_n(size_t i, size_t _I) { return _adj_n[i][_I]; }
+        /// Returns constant reference to variable->factor message adjoint
+        const Prob& adj_n(size_t i, size_t _I) const { return _adj_n[i][_I]; }
+        /// Returns reference to factor->variable message adjoint
+        Prob& adj_m(size_t i, size_t _I) { return _adj_m[i][_I]; }
+        /// Returns constant reference to factor->variable message adjoint
+        const Prob& adj_m(size_t i, size_t _I) const { return _adj_m[i][_I]; }
 
      public:
         /// Parameters of this algorithm

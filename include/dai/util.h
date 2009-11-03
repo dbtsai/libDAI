@@ -11,7 +11,6 @@
 
 /// \file
 /// \brief Defines general utility functions and adds an abstraction layer for platform-dependent functionality
-/// \todo Improve documentation
 
 
 #ifndef __defined_libdai_util_h
@@ -29,11 +28,11 @@
 
 
 #if defined(WINDOWS)
-    #include <map>
+    #include <map> // an alternative would be to use boost/tr1/unordered_map.hpp
 #elif defined(CYGWIN)
-    #include <boost/tr1/unordered_map.hpp>
+    #include <boost/tr1/unordered_map.hpp> // only present in boost 1.37 and higher
 #else
-    #include <tr1/unordered_map>
+    #include <tr1/unordered_map> // only present in modern GCC distributions
 #endif
 
 
@@ -55,17 +54,8 @@
 #define DAI_DMSG(str) do {} while(0)
 #endif
 
-/// Produces accessor and mutator methods according to the common pattern.
-/** Example:
- *  \code DAI_ACCMUT(size_t& maxIter(), { return props.maxiter; }); \endcode
- *  \todo At the moment, only the mutator appears in doxygen documentation.
- */
-#define DAI_ACCMUT(x,y)                     \
-      x y;                                  \
-      const x const y;
-
-/// Macro to give error message \a stmt if props.verbose>=\a n
-#define DAI_IFVERB(n, stmt) if(props.verbose>=n) { cerr << stmt; }
+/// Macro to give error message \a stmt if props.verbose >= \a n
+#define DAI_IFVERB(n, stmt) if(props.verbose>=n) { std::cerr << stmt; }
 
 
 #ifdef WINDOWS
@@ -86,7 +76,7 @@
 namespace dai {
 
 
-/// Real number (alias for double, which could be changed to long double if necessary)
+/// Real number (alias for \c double, which could be changed to <tt>long double</tt> if necessary)
 typedef double Real;
 
 /// Returns logarithm of \a x
@@ -106,14 +96,14 @@ inline Real exp( Real x ) {
 
 
 #ifdef WINDOWS
-    /// hash_map is an alias for std::map.
+    /// hash_map is an alias for \c std::map.
     /** Since there is no TR1 unordered_map implementation available yet, we fall back on std::map.
      */
     template <typename T, typename U, typename H = boost::hash<T> >
         class hash_map : public std::map<T,U> {};
 #else
-    /// hash_map is an alias for std::tr1::unordered_map.
-    /** We use the (experimental) TR1 unordered_map implementation included in modern GCC distributions.
+    /// hash_map is an alias for \c std::tr1::unordered_map.
+    /** We use the (experimental) TR1 unordered_map implementation included in modern GCC distributions or in boost versions 1.37 and higher.
      */
     template <typename T, typename U, typename H = boost::hash<T> >
         class hash_map : public std::tr1::unordered_map<T,U,H> {};
@@ -140,16 +130,16 @@ Real rnd_uniform();
 /// Returns a real number from a standard-normal distribution
 Real rnd_stdnormal();
 
-/// Returns a random integer in interval [min, max]
+/// Returns a random integer in interval [\a min, \a max]
 int rnd_int( int min, int max );
 
-/// Returns a random integer in the half-open interval \f$[0,n)\f$
+/// Returns a random integer in the half-open interval [0, \a n)
 inline int rnd( int n) {
     return rnd_int( 0, n-1 );
 }
 
 
-/// Writes a std::vector to a std::ostream
+/// Writes a \c std::vector<> to a \c std::ostream
 template<class T>
 std::ostream& operator << (std::ostream& os, const std::vector<T> & x) {
     os << "(";
@@ -159,7 +149,7 @@ std::ostream& operator << (std::ostream& os, const std::vector<T> & x) {
     return os;
 }
 
-/// Writes a std::set to a std::ostream
+/// Writes a \c std::set<> to a \c std::ostream
 template<class T>
 std::ostream& operator << (std::ostream& os, const std::set<T> & x) {
     os << "{";
@@ -169,7 +159,7 @@ std::ostream& operator << (std::ostream& os, const std::set<T> & x) {
     return os;
 }
 
-/// Writes a std::map to a std::ostream
+/// Writes a \c std::map<> to a \c std::ostream
 template<class T1, class T2>
 std::ostream& operator << (std::ostream& os, const std::map<T1,T2> & x) {
     os << "{";
@@ -179,14 +169,14 @@ std::ostream& operator << (std::ostream& os, const std::map<T1,T2> & x) {
     return os;
 }
 
-/// Writes a std::pair to a std::ostream
+/// Writes a \c std::pair<> to a \c std::ostream
 template<class T1, class T2>
 std::ostream& operator << (std::ostream& os, const std::pair<T1,T2> & x) {
     os << "(" << x.first << ", " << x.second << ")";
     return os;
 }
 
-/// Concatenate two vectors
+/// Concatenates two vectors
 template<class T>
 std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
     std::vector<T> w;
@@ -198,10 +188,23 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
     return w;
 }
 
-/// Split a string into tokens
+/// Split a string into tokens delimited by characters in \a delim
 void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
 
-/// Used to keep track of the progress made by iterative algorithms
+/// Used to keep track of the progress made by iterative algorithms.
+/** A Diffs object stores an array of fixed size, containing the 
+ *  history of certain values (for example, the \f$\ell_\infty\f$ 
+ *  differences between all the old beliefs and the new beliefs 
+ *  in one pass of belief propagation updates). A new value can be
+ *  registered by calling Diffs::push(); the BP algorithm would use
+ *  this to register the difference between the old and a newly 
+ *  calculated belief. The Diffs object keeps track of the maximum 
+ *  value encountered in the last Diffs::maxSize() values registered.
+ *  The maximum value can then be queried by Diffs::maxDiff(). The
+ *  BP algorithm would use this maximum value to compare it with a
+ *  given tolerance, and if the tolerance exceeds the maximum value,
+ *  the algorithm has converged.
+ */
 class Diffs : public std::vector<Real> {
     private:
         size_t _maxsize;
@@ -210,19 +213,22 @@ class Diffs : public std::vector<Real> {
         std::vector<Real>::iterator _maxpos;
     public:
         /// Constructor
+        /** \param maxsize Maximum number of differences to store
+         *  \param def Default value
+         */
         Diffs(long maxsize, Real def) : std::vector<Real>(), _maxsize(maxsize), _def(def) {
             this->reserve(_maxsize);
             _pos = begin();
             _maxpos = begin();
         }
-        /// Returns maximum difference encountered
+        /// Returns maximum difference encountered so far
         Real maxDiff() {
             if( size() < _maxsize )
                 return _def;
             else
                 return( *_maxpos );
         }
-        /// Register new difference x
+        /// Register new difference \a x
         void push(Real x) {
             if( size() < _maxsize ) {
                 push_back(x);
@@ -248,7 +254,7 @@ class Diffs : public std::vector<Real> {
                 }
             }
         }
-        /// Return maximum number of differences stored
+        /// Return maximum number of differences that can be stored
         size_t maxSize() { return _maxsize; }
 };
 

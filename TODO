@@ -2,7 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	util.h
 	daialg.h
 	alldai.h
 	exactinf.h
@@ -27,3 +26,6 @@ multi-dimensional array, e.g., one corresponding
 to the Cartesian product of statespaces of variables)
 and "linear index". This should make it easier to
 document index.h and varset.h
+
+The Diffs object can probably be replaced by a simple
+std::vector.

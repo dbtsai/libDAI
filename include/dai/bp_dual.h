@@ -101,14 +101,22 @@ class BP_dual {
         /// Returns the underlying FactorGraph
         const FactorGraph& fg() const { return _ia->fg(); }
 
-        /// Returns factor -> var message (I->i)
-        DAI_ACCMUT(Prob & msgM( size_t i, size_t _I ), { return _msgs.m[i][_I]; });
-        /// Returns var -> factor message (i->I)
-        DAI_ACCMUT(Prob & msgN( size_t i, size_t _I ), { return _msgs.n[i][_I]; });
-        /// Returns normalizer for msgM
-        DAI_ACCMUT(Real & zM( size_t i, size_t _I ), { return _msgs.Zm[i][_I]; });
-        /// Returns normalizer for msgN
-        DAI_ACCMUT(Real & zN( size_t i, size_t _I ), { return _msgs.Zn[i][_I]; });
+        /// Returns reference to factor -> var message (I->i)
+        Prob & msgM( size_t i, size_t _I ) { return _msgs.m[i][_I]; }
+        /// Returns constant reference to factor -> var message (I->i)
+        const Prob & msgM( size_t i, size_t _I ) const { return _msgs.m[i][_I]; }
+        /// Returns reference to var -> factor message (i->I)
+        Prob & msgN( size_t i, size_t _I ) { return _msgs.n[i][_I]; }
+        /// Returns constant reference to var -> factor message (i->I)
+        const Prob & msgN( size_t i, size_t _I ) const { return _msgs.n[i][_I]; }
+        /// Returns reference to normalizer for msgM
+        Real & zM( size_t i, size_t _I ) { return _msgs.Zm[i][_I]; }
+        /// Returns constant reference to normalizer for msgM
+        const Real & zM( size_t i, size_t _I ) const { return _msgs.Zm[i][_I]; }
+        /// Returns reference to normalizer for msgN
+        Real & zN( size_t i, size_t _I ) { return _msgs.Zn[i][_I]; }
+        /// Returns constant reference to normalizer for msgN
+        const Real & zN( size_t i, size_t _I ) const { return _msgs.Zn[i][_I]; }
 
         /// Returns variable belief
         Factor beliefV( size_t i ) const { return Factor( _ia->fg().var(i), _beliefs.b1[i] ); }

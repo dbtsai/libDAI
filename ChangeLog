@@ -1,3 +1,4 @@
+* Removed DAI_ACCMUT macro because it didn't yield satisfactory doxygen documentation
 * Replaced constructor
     TFactor<T>::TFactor( const VarSet& vars, TIterator begin )
   by two constructors
