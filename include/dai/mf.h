@@ -66,8 +66,8 @@ class MF : public DAIAlgFG {
         }
 
 
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual MF* clone() const { return new MF(*this); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
@@ -80,19 +80,29 @@ class MF : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
-        //@}
+    //@}
 
 
-        /// @name Additional interface specific for MF
-        //@{
+    /// \name Additional interface specific for MF
+    //@{
         Factor calcNewBelief( size_t i );
-        //@}
+    //@}
+
+    /// \name Managing parameters (which are stored in MF::props)
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding MF::props member.
+         */
+        void setProperties( const PropertySet &opts );
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
+        PropertySet getProperties() const;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
+        std::string printProperties() const;
+    //@}
 
     private:
         void construct();
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
 };
 
 

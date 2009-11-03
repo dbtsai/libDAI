@@ -137,8 +137,8 @@ class TreeEP : public JTree {
         TreeEP( const FactorGraph &fg, const PropertySet &opts );
 
 
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual TreeEP* clone() const { return new TreeEP(*this); }
         virtual std::string identify() const;
         virtual Real logZ() const;
@@ -147,20 +147,25 @@ class TreeEP : public JTree {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
-        //@}
+    //@}
 
 
-        /// @name Additional interface specific for TreeEP
-        //@{
-        //@}
+    /// \name Managing parameters (which are stored in TreeEP::props)
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding TreeEP::props member.
+         */
+        void setProperties( const PropertySet &opts );
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
+        PropertySet getProperties() const;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
+        std::string printProperties() const;
+    //@}
 
     private:
         void ConstructRG( const DEdgeVec &tree );
         bool offtree( size_t I ) const { return (fac2OR[I] == -1U); }
-
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
 };
 
 

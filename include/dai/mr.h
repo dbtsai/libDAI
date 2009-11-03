@@ -88,8 +88,8 @@ class MR : public DAIAlgFG {
         MR( const FactorGraph &fg, const PropertySet &opts );
 
 
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual MR* clone() const { return new MR(*this); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
@@ -101,12 +101,20 @@ class MR : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
-        //@}
+    //@}
 
-
-        /// @name Additional interface specific for MR
-        //@{
-        //@}
+    /// \name Managing parameters (which are stored in MR::props)
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding MR::props member.
+         */
+        void setProperties( const PropertySet &opts );
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
+        PropertySet getProperties() const;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
+        std::string printProperties() const;
+    //@}
 
     private:
         void init(size_t Nin, Real *_w, Real *_th);
@@ -128,10 +136,6 @@ class MR : public DAIAlgFG {
         void sum_subs(size_t j, sub_nb A, Real *sum_even, Real *sum_odd);
 
         Real sign(Real a) { return (a >= 0) ? 1.0 : -1.0; }
-
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
 };
 
 

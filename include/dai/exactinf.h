@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines ExactInf class
-/// \todo Improve documentation
+/// \brief Defines ExactInf class, which can be used for exact inference on small factor graphs.
 
 
 #ifndef __defined_libdai_exactinf_h
@@ -28,6 +27,11 @@ namespace dai {
 
 
 /// Exact inference algorithm using brute force enumeration (mainly useful for testing purposes)
+/** Inference is done simply by multiplying all factors together into one large factor,
+ *  and then calculating marginals and partition sum from the product.
+ *  \note This inference method can easily exhaust all available memory; in that case, one
+ *  may try the JTree class instead.
+ */
 class ExactInf : public DAIAlgFG {
     public:
         /// Parameters of this inference algorithm
@@ -40,27 +44,34 @@ class ExactInf : public DAIAlgFG {
         static const char *Name;
 
     private:
+        /// All single variable marginals
         std::vector<Factor> _beliefsV;
+        /// All factor variable marginals
         std::vector<Factor> _beliefsF;
+        /// Logarithm of partition sum
         Real                _logZ;
 
     public:
+    /// \name Constructors/destructors
+    //@{
         /// Default constructor
         ExactInf() : DAIAlgFG(), props(), _beliefsV(), _beliefsF(), _logZ(0) {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
+        /// Construct from FactorGraph \a fg and PropertySet \a opts
         ExactInf( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), props(), _beliefsV(), _beliefsF(), _logZ() {
             setProperties( opts );
             construct();
         }
+    //@}
 
-
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual ExactInf* clone() const { return new ExactInf(*this); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const { return beliefV( findVar( n ) ); }
         virtual Factor belief( const VarSet &ns ) const;
+        virtual Factor beliefV( size_t i ) const { return _beliefsV[i]; }
+        virtual Factor beliefF( size_t I ) const { return _beliefsF[I]; }
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const { return _logZ; }
         virtual void init();
@@ -68,20 +79,24 @@ class ExactInf : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual size_t Iterations() const { DAI_THROW(NOT_IMPLEMENTED); return 0; }
-        //@}
+    //@}
 
-
-        /// @name Additional interface specific for ExactInf
-        //@{
-        Factor beliefV( size_t i ) const { return _beliefsV[i]; }
-        Factor beliefF( size_t I ) const { return _beliefsF[I]; }
-        //@}
+    /// \name Managing parameters (which are stored in ExactInf::props)
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding ExactInf::props member.
+         */
+        void setProperties( const PropertySet &opts );
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
+        PropertySet getProperties() const;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
+        std::string printProperties() const;
+    //@}
 
     private:
+        /// Helper function for constructors
         void construct();
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
 };
 
 

@@ -90,8 +90,8 @@ class HAK : public DAIAlgRG {
         HAK( const RegionGraph &rg, const PropertySet &opts );
 
 
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual HAK* clone() const { return new HAK(*this); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
@@ -103,11 +103,11 @@ class HAK : public DAIAlgRG {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
-        //@}
+    //@}
 
 
-        /// @name Additional interface specific for HAK
-        //@{
+    /// \name Additional interface specific for HAK
+    //@{
         Factor & muab( size_t alpha, size_t _beta ) { return _muab[alpha][_beta]; }
         Factor & muba( size_t alpha, size_t _beta ) { return _muba[alpha][_beta]; }
         const Factor& Qa( size_t alpha ) const { return _Qa[alpha]; };
@@ -115,15 +115,24 @@ class HAK : public DAIAlgRG {
 
         Real doGBP();
         Real doDoubleLoop();
-        //@}
+    //@}
+
+    /// \name Managing parameters (which are stored in HAK::props)
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding HAK::props member.
+         */
+        void setProperties( const PropertySet &opts );
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
+        PropertySet getProperties() const;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
+        std::string printProperties() const;
+    //@}
 
     private:
         void constructMessages();
         void findLoopClusters( const FactorGraph &fg, std::set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars );
-
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
 };
 
 

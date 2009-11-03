@@ -122,13 +122,14 @@ class BP : public DAIAlgFG {
             construct();
         }
 
-
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual BP* clone() const { return new BP(*this); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &ns ) const;
+        virtual Factor beliefV( size_t i ) const;
+        virtual Factor beliefF( size_t I ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;
         virtual void init();
@@ -136,15 +137,10 @@ class BP : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
-        //@}
+    //@}
 
-
-        /// @name Additional interface specific for BP
-        //@{
-        Factor beliefV( size_t i ) const;
-        Factor beliefF( size_t I ) const;
-        //@}
-
+    /// \name Additional interface specific for BP
+    //@{
         /// Calculates the joint state of all variables that has maximum probability
         /** Assumes that run() has been called and that props.inference == MAXPROD
          */
@@ -159,6 +155,20 @@ class BP : public DAIAlgFG {
         void clearSentMessages() {
             _sentMessages.clear();
         }
+    //@}
+
+    /// \name Managing parameters (which are stored in BP::props)
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding BP::props member.
+         */
+        void setProperties( const PropertySet &opts );
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
+        PropertySet getProperties() const;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
+        std::string printProperties() const;
+    //@}
 
     private:
         const Prob & message(size_t i, size_t _I) const { return _edges[i][_I].message; }
@@ -180,10 +190,6 @@ class BP : public DAIAlgFG {
         void calcBeliefF( size_t I, Prob &p ) const;
 
         void construct();
-        /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
 };
 
 

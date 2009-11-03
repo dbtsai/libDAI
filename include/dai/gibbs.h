@@ -60,12 +60,14 @@ class Gibbs : public DAIAlgFG {
         }
 
 
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual Gibbs* clone() const { return new Gibbs(*this); }
         virtual std::string identify() const { return std::string(Name) + printProperties(); }
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &ns ) const;
+        virtual Factor beliefV( size_t i ) const;
+        virtual Factor beliefF( size_t I ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual void init();
@@ -73,21 +75,31 @@ class Gibbs : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual size_t Iterations() const { return props.iters; }
-        //@}
+    //@}
 
 
-        /// @name Additional interface specific for Gibbs
-        //@{
-        Factor beliefV( size_t i ) const;
-        Factor beliefF( size_t I ) const;
+    /// \name Additional interface specific for Gibbs
+    //@{
         void randomizeState();
-        //@}
-
         /// Return reference to current state vector
         std::vector<size_t>& state() { return _state; }
 
         /// Return const reference to current state vector
         const std::vector<size_t>& state() const { return _state; }
+    //@}
+
+    /// \name Managing parameters (which are stored in Gibbs::props)
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding Gibbs::props member.
+         */
+        void setProperties( const PropertySet &opts );
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
+        PropertySet getProperties() const;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
+        std::string printProperties() const;
+    //@}
 
     private:
         void updateCounts();
@@ -97,10 +109,6 @@ class Gibbs : public DAIAlgFG {
         size_t getFactorEntryDiff( size_t I, size_t i );
 
         void construct();
-        /// Set Props according to the PropertySet opts, where the values can be stored as std::strings or as the type of the corresponding Props member
-        void setProperties( const PropertySet &opts );
-        PropertySet getProperties() const;
-        std::string printProperties() const;
 };
 
 

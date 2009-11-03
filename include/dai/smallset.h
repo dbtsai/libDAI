@@ -37,7 +37,7 @@ class SmallSet {
         std::vector<T> _elements;
 
     public:
-    /// @name Constructors and destructors
+    /// \name Constructors and destructors
     //@{
         /// Default constructor (constructs an empty set)
         SmallSet() : _elements() {}
@@ -75,7 +75,7 @@ class SmallSet {
         }
     //@}
 
-    /// @name Operators for set-theoretic operations
+    /// \name Operators for set-theoretic operations
     //@{
         /// Set-minus operator: returns all elements in \c *this, except those in \a x
         SmallSet operator/ ( const SmallSet& x ) const {
@@ -141,7 +141,7 @@ class SmallSet {
         }
     //@}
 
-    /// @name Queries
+    /// \name Queries
     //@{
         /// Returns \c true if \c *this and \a x have elements in common
         bool intersects( const SmallSet& x ) const {
@@ -169,7 +169,7 @@ class SmallSet {
         /// Reverse iterator over the elements
         typedef typename std::vector<T>::reverse_iterator reverse_iterator;
 
-    /// @name Iterator interface
+    /// \name Iterator interface
     //@{
         /// Returns iterator that points to the first element
         iterator begin() { return _elements.begin(); }
@@ -192,7 +192,7 @@ class SmallSet {
         const_reverse_iterator rend() const { return _elements.rend(); }
     //@}
 
-    /// @name Comparison operators
+    /// \name Comparison operators
     //@{
         /// Returns \c true if \a a and \a b are identical
         friend bool operator==( const SmallSet &a, const SmallSet &b ) {

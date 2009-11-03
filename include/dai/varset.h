@@ -40,7 +40,7 @@ namespace dai {
  */
 class VarSet : public SmallSet<Var> {
     public:
-    /// @name Constructors and destructors
+    /// \name Constructors and destructors
     //@{
         /// Default constructor (constructs an empty set)
         VarSet() : SmallSet<Var>() {}
@@ -64,7 +64,7 @@ class VarSet : public SmallSet<Var> {
         VarSet( VarIterator begin, VarIterator end, size_t sizeHint=0 ) : SmallSet<Var>(begin,end,sizeHint) {}
     //@}
 
-    /// @name Queries
+    /// \name Queries
     //@{
         /// Calculates the number of states of this VarSet, which is simply the number of possible joint states of the variables in \c *this.
         /** The number of states of the Cartesian product of the variables in this VarSet
@@ -148,7 +148,7 @@ class VarSet : public SmallSet<Var> {
         }
     //@}
 
-    /// @name Input and output
+    /// \name Input and output
     //@{
         /// Writes a VarSet to an output stream
         friend std::ostream& operator<<( std::ostream &os, const VarSet &vs )  {

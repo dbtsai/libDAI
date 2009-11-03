@@ -247,7 +247,7 @@ template <typename T> class TProb {
         /// Reverse iterator over the elements
         typedef typename std::vector<T>::reverse_iterator reverse_iterator;
 
-    /// @name Iterator interface
+    /// \name Iterator interface
     //@{
         /// Returns iterator that points to the first element
         iterator begin() { return _p.begin(); }

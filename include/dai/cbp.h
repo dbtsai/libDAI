@@ -110,12 +110,14 @@ class CBP : public DAIAlgFG {
         /// Name of this inference algorithm
         static const char *Name;
 
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual CBP* clone() const { return new CBP(*this); }
         virtual std::string identify() const { return std::string(Name) + props.toString(); }
         virtual Factor belief (const Var &n) const { return _beliefsV[findVar(n)]; }
         virtual Factor belief (const VarSet &) const { DAI_THROW(NOT_IMPLEMENTED); }
+        virtual Factor beliefV( size_t i ) const { return _beliefsV[i]; }
+        virtual Factor beliefF( size_t I ) const { return _beliefsF[I]; }
         virtual std::vector<Factor> beliefs() const { return concat(_beliefsV, _beliefsF); }
         virtual Real logZ() const { return _logZ; }
         virtual void init() {};
@@ -123,10 +125,7 @@ class CBP : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
-        //@}
-
-        Factor beliefV( size_t i ) const { return _beliefsV[i]; }
-        Factor beliefF( size_t I ) const { return _beliefsF[I]; }
+    //@}
 
         //----------------------------------------------------------------
 

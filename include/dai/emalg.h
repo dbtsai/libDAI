@@ -215,15 +215,15 @@ class MaximizationStep {
         /// Using all of the currently added expectations, make new factors with maximized parameters and set them in the FactorGraph.
         void maximize( FactorGraph &fg );
 
-        /// @name Iterator interface
-        //@{
+    /// \name Iterator interface
+    //@{
         typedef std::vector<SharedParameters>::iterator iterator;
         typedef std::vector<SharedParameters>::const_iterator const_iterator;
         iterator begin() { return _params.begin(); }
         const_iterator begin() const { return _params.begin(); }
         iterator end() { return _params.end(); }
         const_iterator end() const { return _params.end(); }
-        //@}
+    //@}
 };
 
 
@@ -321,15 +321,15 @@ class EMAlg {
         /// Iterate until termination conditions are satisfied
         void run();
 
-        /// @name Iterator interface
-        //@{
+    /// \name Iterator interface
+    //@{
         typedef std::vector<MaximizationStep>::iterator s_iterator;
         typedef std::vector<MaximizationStep>::const_iterator const_s_iterator;
         s_iterator s_begin() { return _msteps.begin(); }
         const_s_iterator s_begin() const { return _msteps.begin(); }
         s_iterator s_end() { return _msteps.end(); }
         const_s_iterator s_end() const { return _msteps.end(); }
-        //@}
+    //@}
 };
 
 

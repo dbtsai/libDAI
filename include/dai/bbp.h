@@ -40,18 +40,18 @@ std::vector<size_t> getGibbsState( const InfAlg &ia, size_t iters );
 /// Implements BBP (Back-Belief-Propagation) [\ref EaG09]
 class BBP {
     protected:
-        /// @name Inputs
-        //@{
+    /// \name Inputs
+    //@{
         BP_dual _bp_dual;
         const FactorGraph *_fg;
         const InfAlg *_ia;
-        //@}
+    //@}
 
         /// Number of iterations done
         size_t _iters;
 
-        /// @name Outputs
-        //@{
+    /// \name Outputs
+    //@{
         /// Variable factor adjoints
         std::vector<Prob> _adj_psi_V;
         /// Factor adjoints
@@ -64,10 +64,10 @@ class BBP {
         std::vector<Prob> _adj_b_V;
         /// Normalized factor belief adjoints
         std::vector<Prob> _adj_b_F;
-        //@}
+    //@}
 
-        /// @name Helper quantities computed from the BP messages
-        //@{
+    /// \name Helper quantities computed from the BP messages
+    //@{
         /// _T[i][_I] (see eqn. (41) in [\ref EaG09])
         std::vector<std::vector<Prob > > _T;
         /// _U[I][_i] (see eqn. (42) in [\ref EaG09])
@@ -76,7 +76,7 @@ class BBP {
         std::vector<std::vector<std::vector<Prob > > > _S;
         /// _R[I][_i][_J] (see eqn. (44) in [\ref EaG09])
         std::vector<std::vector<std::vector<Prob > > > _R;
-        //@}
+    //@}
 
         /// Unnormalized variable belief adjoints
         std::vector<Prob> _adj_b_V_unnorm;
@@ -97,8 +97,8 @@ class BBP {
         /// Updated normalized factor->variable message adjoint (indexed [i][_I])
         std::vector<std::vector<Prob> > _new_adj_m;
 
-        /// @name Optimized indexing (for performance)
-        //@{
+    /// \name Optimized indexing (for performance)
+    //@{
         /// Calculates _indices, which is a cache of IndexFor @see bp.cpp
         void RegenerateInds();
 
@@ -108,10 +108,10 @@ class BBP {
         std::vector<std::vector<_ind_t> >  _indices;
         /// Returns an index from the cache
         const _ind_t& _index(size_t i, size_t _I) const { return _indices[i][_I]; }
-        //@}
+    //@}
 
-        /// @name Initialization
-        //@{
+    /// \name Initialization
+    //@{
         /// Calculate T values; see eqn. (41) in [\ref EaG09]
         void RegenerateT();
         /// Calculate U values; see eqn. (42) in [\ref EaG09]
@@ -131,7 +131,7 @@ class BBP {
          *  than updating _adj_n (and friends) which are unused in the sequential algorithm.
          */
         void RegenerateSeqMessageAdjoints();
-        //@}
+    //@}
 
         /// Returns reference to T value; see eqn. (41) in [\ref EaG09]
         Prob & T(size_t i, size_t _I) { return _T[i][_I]; }
@@ -150,8 +150,8 @@ class BBP {
         /// Returns constant reference to R value; see eqn. (44) in [\ref EaG09]
         const Prob & R(size_t I, size_t _i, size_t _J) const { return _R[I][_i][_J]; }
 
-        /// @name Parallel algorithm
-        //@{
+    /// \name Parallel algorithm
+    //@{
         /// Calculates new variable->factor message adjoint
         /** Increases variable factor adjoint according to eqn. (27) in [\ref EaG09] and
          *  calculates the new variable->factor message adjoint according to eqn. (29) in [\ref EaG09].
@@ -172,10 +172,10 @@ class BBP {
         void upMsgM( size_t i, size_t _I );
         /// Do one parallel update of all message adjoints
         void doParUpdate();
-        //@}
+    //@}
 
-        /// @name Sequential algorithm
-        //@{
+    /// \name Sequential algorithm
+    //@{
         /// Helper function for sendSeqMsgM: increases factor->variable message adjoint by p and calculates the corresponding unnormalized adjoint
         void incrSeqMsgM( size_t i, size_t _I, const Prob& p );
         //  DISABLED BECAUSE IT IS BUGGY:
@@ -186,7 +186,7 @@ class BBP {
         void sendSeqMsgN( size_t i, size_t _I, const Prob &f );
         /// Implements routine Send-m in Figure 5 in [\ref EaG09]
         void sendSeqMsgM( size_t i, size_t _I );
-        //@}
+    //@}
 
         /// Calculates averaged L-1 norm of unnormalized message adjoints
         Real getUnMsgMag();

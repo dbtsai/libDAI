@@ -78,8 +78,8 @@ class JTree : public DAIAlgRG {
         JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic=true );
 
 
-        /// @name General InfAlg interface
-        //@{
+    /// \name General InfAlg interface
+    //@{
         virtual JTree* clone() const { return new JTree(*this); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
@@ -91,11 +91,11 @@ class JTree : public DAIAlgRG {
         virtual Real run();
         virtual Real maxDiff() const { return 0.0; }
         virtual size_t Iterations() const { return 1UL; }
-        //@}
+    //@}
 
 
-        /// @name Additional interface specific for JTree
-        //@{
+    /// \name Additional interface specific for JTree
+    //@{
         void GenerateJT( const std::vector<VarSet> &Cliques );
 
         /// Returns reference the message from outer region alpha to its _beta'th neighboring inner region
@@ -119,12 +119,20 @@ class JTree : public DAIAlgRG {
         /** Assumes that run() has been called and that props.inference == MAXPROD
          */
         std::vector<std::size_t> findMaximum() const;
-        //@}
+    //@}
 
-    private:
+    /// \name Managing parameters (which are stored in JTree::props)
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding JTree::props member.
+         */
         void setProperties( const PropertySet &opts );
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
         PropertySet getProperties() const;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
         std::string printProperties() const;
+    //@}
 };
 
 

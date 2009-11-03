@@ -77,8 +77,8 @@ class Evidence {
         /// Returns number of stored samples
         size_t nrSamples() const { return _samples.size(); }
 
-        /// @name Iterator interface
-        //@{
+    /// \name Iterator interface
+    //@{
         /// Iterator over the elements
         typedef std::vector<Observation>::iterator iterator;
         /// Constant iterator over the elements
@@ -92,7 +92,7 @@ class Evidence {
         iterator end() { return _samples.end(); }
         /// Returns constant iterator that points beyond the last element
         const_iterator end() const { return _samples.end(); }
-        //@}
+    //@}
 };
 
 

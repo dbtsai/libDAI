@@ -138,7 +138,7 @@ class BipartiteGraph {
         };
 
         // OBSOLETE
-        /// @name Backwards compatibility layer (to be removed soon)
+        /// \name Backwards compatibility layer (to be removed soon)
         //@{
         /// Enable backwards compatibility layer?
         bool _edge_indexed;
@@ -149,7 +149,7 @@ class BipartiteGraph {
         //@}
 
     public:
-    /// @name Constructors and destructors
+    /// \name Constructors and destructors
     //@{
         /// Default constructor (creates an empty bipartite graph)
         BipartiteGraph() : _nb1(), _nb2(), _edge_indexed(false) {}
@@ -167,7 +167,7 @@ class BipartiteGraph {
         }
     //@}
 
-    /// @name Accessors and mutators
+    /// \name Accessors and mutators
     //@{
         /// Returns constant reference to the \a _i2 'th neighbor of node \a i1 of type 1
         const Neighbor & nb1( size_t i1, size_t _i2 ) const {
@@ -218,7 +218,7 @@ class BipartiteGraph {
         }
     //@}
 
-    /// @name Adding nodes and edges
+    /// \name Adding nodes and edges
     //@{
         /// (Re)constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
@@ -288,7 +288,7 @@ class BipartiteGraph {
         void addEdge( size_t n1, size_t n2, bool check = true );
     //@}
 
-    /// @name Erasing nodes and edges
+    /// \name Erasing nodes and edges
     //@{
         /// Removes node \a n1 of type 1 and all incident edges; indices of other nodes are changed accordingly.
         void erase1( size_t n1 );
@@ -300,7 +300,7 @@ class BipartiteGraph {
         void eraseEdge( size_t n1, size_t n2 );
     //@}
 
-    /// @name Queries
+    /// \name Queries
     //@{
         /// Returns number of nodes of type 1
         size_t nr1() const { return _nb1.size(); }
@@ -337,14 +337,14 @@ class BipartiteGraph {
         void checkConsistency() const;
     //@}
 
-    /// @name Input and output
+    /// \name Input and output
     //@{
         /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
     //@}
 
         // OBSOLETE
-    /// @name Backwards compatibility layer (to be removed soon)
+    /// \name Backwards compatibility layer (to be removed soon)
     //@{
         void indexEdges() {
             std::cerr << "Warning: this BipartiteGraph edge interface is obsolete!" << std::endl;
