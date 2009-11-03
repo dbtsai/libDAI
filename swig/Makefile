@@ -20,7 +20,7 @@ _dai.so:		../lib/libdai.a dai.i
 
 dai.oct:		../lib/libdai.a dai.i
 			$(SWIG) -octave -c++ -o dai_wrap.cpp dai.i
-			mkoctfile -I$(INCLUDE_PYTHON) -I$(INCLUDE_BOOST) -I../include -o dai.oct dai_wrap.cpp ../lib/libdai.a
+			mkoctfile -I$(INCLUDE_BOOST) -I../include -o dai.oct dai_wrap.cpp ../lib/libdai.a
 
 .PHONY: clean
 

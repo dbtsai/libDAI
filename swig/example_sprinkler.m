@@ -68,3 +68,16 @@ SprinklerNetwork.ReadFromFile('sprinkler.fg');
 % Output some information about the factorgraph
 fprintf('%d variables\n', SprinklerNetwork.nrVars());
 fprintf('%d factors\n', SprinklerNetwork.nrFactors());
+
+% Calculate joint probability of all four variables
+P = dai.Factor();
+for I = 0:(SprinklerNetwork.nrFactors()-1)
+    P *= SprinklerNetwork.factor(I);
+end
+P.normalize(); % Not necessary: a Bayesian network is already normalized by definition
+
+% Calculate some probabilities
+denom = P.marginal(dai.VarSet(W))(1);
+fprintf('P(W=1) = %f\n', denom);
+fprintf('P(S=1 | W=1) = %f\n', P.marginal(dai.VarSet(S,W))(3) / denom);
+fprintf('P(R=1 | W=1) = %f\n', P.marginal(dai.VarSet(R,W))(3) / denom);

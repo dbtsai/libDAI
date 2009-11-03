@@ -46,22 +46,22 @@
 };
 
 %include "../include/dai/prob.h"
-%template(Prob) dai::TProb<Real>;
-%extend dai::TProb<Real> {
-        inline Real __getitem__(int i) const {return (*self)[i];} /* for python */
-        inline void __setitem__(int i,Real d) {(*self)[i] = d;}   /* for python */
-        inline Real __paren(int i) const {return (*self)[i];}     /* for octave */
-        inline void __paren_asgn(int i,Real d) {(*self)[i] = d;}  /* for octave */
+%template(Prob) dai::TProb<dai::Real>;
+%extend dai::TProb<dai::Real> {
+        inline dai::Real __getitem__(int i) const {return (*self)[i];} /* for python */
+        inline void __setitem__(int i,dai::Real d) {(*self)[i] = d;}   /* for python */
+        inline dai::Real __paren(int i) const {return (*self)[i];}     /* for octave */
+        inline void __paren_asgn(int i,dai::Real d) {(*self)[i] = d;}  /* for octave */
 };
 %include "../include/dai/factor.h"
-%extend dai::TFactor<Real> {
-        inline Real __getitem__(int i) const {return (*self)[i];} /* for python */
-        inline void __setitem__(int i,Real d) {(*self)[i] = d;}   /* for python */
-        inline Real __paren(int i) const {return (*self)[i];}     /* for octave */
-        inline void __paren_asgn(int i,Real d) {(*self)[i] = d;}  /* for octave */
+%extend dai::TFactor<dai::Real> {
+        inline dai::Real __getitem__(int i) const {return (*self)[i];} /* for python */
+        inline void __setitem__(int i,dai::Real d) {(*self)[i] = d;}   /* for python */
+        inline dai::Real __paren(int i) const {return (*self)[i];}     /* for octave */
+        inline void __paren_asgn(int i,dai::Real d) {(*self)[i] = d;}  /* for octave */
 };
 
-%template(Factor) dai::TFactor<Real>;
+%template(Factor) dai::TFactor<dai::Real>;
 %include "../include/dai/bipgraph.h"
 %include "../include/dai/factorgraph.h"
 %include "std_vector.i"
@@ -78,7 +78,7 @@ typedef dai::BipartiteGraph::Neighbor Neighbor;
 %}
 
 %include "../include/dai/index.h"
-%extend dai::MultiFor {
+%extend dai::multifor {
     inline size_t __getitem__(int i) const {
         return (*self)[i];
     }

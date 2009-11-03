@@ -388,10 +388,10 @@ class State {
         }
 
         /// Return current state represented as a map
-        const states_type& get() const { return states; }
+        const std::map<Var,size_t>& get() const { return states; }
 
         /// Cast into std::map<Var, size_t>
-        operator const states_type& () const { return states; }
+        operator const std::map<Var,size_t>& () const { return states; }
 
         /// Return current state of variable \a v, or 0 if \a v is not in \c *this
         size_t operator() ( const Var &v ) const {
