@@ -10,6 +10,7 @@
 
 /// \file
 /// \brief Defines class BBP [\ref EaG09]
+/// \todo Fit more closely into libDAI framework
 /// \todo Improve documentation
 
 

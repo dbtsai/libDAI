@@ -22,6 +22,7 @@
 #include <vector>
 #include <dai/factorgraph.h>
 #include <dai/regiongraph.h>
+#include <dai/properties.h>
 
 
 namespace dai {
@@ -146,6 +147,19 @@ class InfAlg {
         virtual void restoreFactor( size_t I ) = 0;
         /// Restore the factors involving the variables in \a vs from their backup copies
         virtual void restoreFactors( const VarSet &vs ) = 0;
+    //@}
+
+    /// \name Managing parameters
+    //@{
+        /// Set parameters of this inference algorithm.
+        /** The parameters are set according to the PropertySet \a opts. 
+         *  The values can be stored either as std::string or as the type of the corresponding MF::props member.
+         */
+        virtual void setProperties( const PropertySet &opts ) = 0;
+        /// Returns parameters of this inference algorithm converted into a PropertySet.
+        virtual PropertySet getProperties() const = 0;
+        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
+        virtual std::string printProperties() const = 0;
     //@}
 };
 

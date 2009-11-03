@@ -147,21 +147,11 @@ class TreeEP : public JTree {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
+        virtual void setProperties( const PropertySet &opts );
+        virtual PropertySet getProperties() const;
+        virtual std::string printProperties() const;
     //@}
 
-
-    /// \name Managing parameters (which are stored in TreeEP::props)
-    //@{
-        /// Set parameters of this inference algorithm.
-        /** The parameters are set according to \a opts. 
-         *  The values can be stored either as std::string or as the type of the corresponding TreeEP::props member.
-         */
-        void setProperties( const PropertySet &opts );
-        /// Returns parameters of this inference algorithm converted into a PropertySet.
-        PropertySet getProperties() const;
-        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
-        std::string printProperties() const;
-    //@}
 
     private:
         void ConstructRG( const DEdgeVec &tree );

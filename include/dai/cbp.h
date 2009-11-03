@@ -125,6 +125,9 @@ class CBP : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
+        virtual void setProperties( const PropertySet &opts ) { props.set( opts ); }
+        virtual PropertySet getProperties() const { return props.get(); }
+        virtual std::string printProperties() const { return props.toString(); }
     //@}
 
         //----------------------------------------------------------------

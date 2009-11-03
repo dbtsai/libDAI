@@ -1,3 +1,4 @@
+* Extended InfAlg interface with setProperties(), getProperties() and printProperties()
 * Declared class Diffs as obsolete
 * Declared calcPairBeliefsNew() as obsolete (its functionality is now part
   of calcPairBeliefs())

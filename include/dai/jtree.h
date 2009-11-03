@@ -91,6 +91,9 @@ class JTree : public DAIAlgRG {
         virtual Real run();
         virtual Real maxDiff() const { return 0.0; }
         virtual size_t Iterations() const { return 1UL; }
+        virtual void setProperties( const PropertySet &opts );
+        virtual PropertySet getProperties() const;
+        virtual std::string printProperties() const;
     //@}
 
 
@@ -119,19 +122,6 @@ class JTree : public DAIAlgRG {
         /** Assumes that run() has been called and that props.inference == MAXPROD
          */
         std::vector<std::size_t> findMaximum() const;
-    //@}
-
-    /// \name Managing parameters (which are stored in JTree::props)
-    //@{
-        /// Set parameters of this inference algorithm.
-        /** The parameters are set according to \a opts. 
-         *  The values can be stored either as std::string or as the type of the corresponding JTree::props member.
-         */
-        void setProperties( const PropertySet &opts );
-        /// Returns parameters of this inference algorithm converted into a PropertySet.
-        PropertySet getProperties() const;
-        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
-        std::string printProperties() const;
     //@}
 };
 

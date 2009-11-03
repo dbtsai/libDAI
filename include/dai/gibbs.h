@@ -75,6 +75,9 @@ class Gibbs : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual size_t Iterations() const { return props.iters; }
+        virtual void setProperties( const PropertySet &opts );
+        virtual PropertySet getProperties() const;
+        virtual std::string printProperties() const;
     //@}
 
 
@@ -86,19 +89,6 @@ class Gibbs : public DAIAlgFG {
 
         /// Return const reference to current state vector
         const std::vector<size_t>& state() const { return _state; }
-    //@}
-
-    /// \name Managing parameters (which are stored in Gibbs::props)
-    //@{
-        /// Set parameters of this inference algorithm.
-        /** The parameters are set according to \a opts. 
-         *  The values can be stored either as std::string or as the type of the corresponding Gibbs::props member.
-         */
-        void setProperties( const PropertySet &opts );
-        /// Returns parameters of this inference algorithm converted into a PropertySet.
-        PropertySet getProperties() const;
-        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
-        std::string printProperties() const;
     //@}
 
     private:

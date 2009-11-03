@@ -107,6 +107,9 @@ class LC : public DAIAlgFG {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
+        virtual void setProperties( const PropertySet &opts );
+        virtual PropertySet getProperties() const;
+        virtual std::string printProperties() const;
     //@}
 
     /// \name Additional interface specific for LC
@@ -121,19 +124,6 @@ class LC : public DAIAlgFG {
         const Factor &belief (size_t i) const { return _beliefs[i]; };
         const Factor &pancake (size_t i) const { return _pancakes[i]; };
         const Factor &cavitydist (size_t i) const { return _cavitydists[i]; };
-    //@}
-
-    /// \name Managing parameters (which are stored in LC::props)
-    //@{
-        /// Set parameters of this inference algorithm.
-        /** The parameters are set according to \a opts. 
-         *  The values can be stored either as std::string or as the type of the corresponding LC::props member.
-         */
-        void setProperties( const PropertySet &opts );
-        /// Returns parameters of this inference algorithm converted into a PropertySet.
-        PropertySet getProperties() const;
-        /// Returns parameters of this inference algorithm formatted as a string in the format "[key1=val1,key2=val2,...,keyn=valn]".
-        std::string printProperties() const;
     //@}
 };
 
