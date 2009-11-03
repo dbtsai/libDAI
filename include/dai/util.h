@@ -54,7 +54,7 @@
 #define DAI_DMSG(str) do {} while(0)
 #endif
 
-/// Macro to give error message \a stmt if props.verbose >= \a n
+/// Macro to write message \a stmt to \c std::cerr if \a props.verbose >= \a n
 #define DAI_IFVERB(n, stmt) if(props.verbose>=n) { std::cerr << stmt; }
 
 
@@ -202,8 +202,7 @@ void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, 
  *  value encountered in the last Diffs::maxSize() values registered.
  *  The maximum value can then be queried by Diffs::maxDiff(). The
  *  BP algorithm would use this maximum value to compare it with a
- *  given tolerance, and if the tolerance exceeds the maximum value,
- *  the algorithm has converged.
+ *  given tolerance in order to decide whether the algorithm has converged.
  */
 class Diffs : public std::vector<Real> {
     private:
