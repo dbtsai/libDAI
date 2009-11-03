@@ -246,7 +246,8 @@ Real LC::run() {
         cerr << endl;
 
     double tic = toc();
-    Diffs diffs(nrVars(), 1.0);
+    vector<Real> diffs( nrVars(), INFINITY );
+    Real maxDiff = INFINITY;
 
     Real md = InitCavityDists( props.cavainame, props.cavaiopts );
     if( md > _maxdiff )
@@ -290,7 +291,7 @@ Real LC::run() {
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( _iters=0; _iters < props.maxiter && diffs.maxDiff() > props.tol; _iters++ ) {
+    for( _iters=0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
         // Sequential updates
         if( props.updates == Properties::UpdateType::SEQRND )
             random_shuffle( update_seq.begin(), update_seq.end() );
@@ -306,22 +307,23 @@ Real LC::run() {
 
         // compare new beliefs with old ones
         for(size_t i=0; i < nrVars(); i++ ) {
-            diffs.push( dist( belief(i), old_beliefs[i], Prob::DISTLINF ) );
+            diffs[i] = dist( belief(i), old_beliefs[i], Prob::DISTLINF );
             old_beliefs[i] = belief(i);
         }
+        maxDiff = max( diffs );
 
         if( props.verbose >= 3 )
-            cerr << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
-    if( diffs.maxDiff() > _maxdiff )
-        _maxdiff = diffs.maxDiff();
+    if( maxDiff > _maxdiff )
+        _maxdiff = maxDiff;
 
     if( props.verbose >= 1 ) {
-        if( diffs.maxDiff() > props.tol ) {
+        if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-                cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 2 )
                 cerr << Name << "::run:  ";
@@ -329,7 +331,7 @@ Real LC::run() {
         }
     }
 
-    return diffs.maxDiff();
+    return maxDiff;
 }
 
 

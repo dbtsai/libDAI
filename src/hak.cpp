@@ -267,11 +267,12 @@ Real HAK::doGBP() {
         old_beliefs.push_back( belief( var(i) ) );
 
     // Differences in single node beliefs
-    Diffs diffs(nrVars(), 1.0);
+    vector<Real> diffs( nrVars(), INFINITY );
+    Real maxDiff = INFINITY;
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( _iters = 0; _iters < props.maxiter && diffs.maxDiff() > props.tol; _iters++ ) {
+    for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
         for( size_t beta = 0; beta < nrIRs(); beta++ ) {
             foreach( const Neighbor &alpha, nbIR(beta) ) {
                 size_t _beta = alpha.dual;
@@ -346,22 +347,23 @@ Real HAK::doGBP() {
         // Calculate new single variable beliefs and compare with old ones
         for( size_t i = 0; i < nrVars(); i++ ) {
             Factor new_belief = belief( var( i ) );
-            diffs.push( dist( new_belief, old_beliefs[i], Prob::DISTLINF ) );
+            diffs[i] = dist( new_belief, old_beliefs[i], Prob::DISTLINF );
             old_beliefs[i] = new_belief;
         }
+        maxDiff = max( diffs );
 
         if( props.verbose >= 3 )
-            cerr << Name << "::doGBP:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cerr << Name << "::doGBP:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
-    if( diffs.maxDiff() > _maxdiff )
-        _maxdiff = diffs.maxDiff();
+    if( maxDiff > _maxdiff )
+        _maxdiff = maxDiff;
 
     if( props.verbose >= 1 ) {
-        if( diffs.maxDiff() > props.tol ) {
+        if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-            cerr << Name << "::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+            cerr << Name << "::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 2 )
                 cerr << Name << "::doGBP:  ";
@@ -369,7 +371,7 @@ Real HAK::doGBP() {
         }
     }
 
-    return diffs.maxDiff();
+    return maxDiff;
 }
 
 
@@ -399,7 +401,8 @@ Real HAK::doDoubleLoop() {
         old_beliefs.push_back( belief( var(i) ) );
 
     // Differences in single node beliefs
-    Diffs diffs(nrVars(), 1.0);
+    vector<Real> diffs( nrVars(), INFINITY );
+    Real maxDiff = INFINITY;
 
     size_t outer_maxiter   = props.maxiter;
     Real   outer_tol       = props.tol;
@@ -412,7 +415,7 @@ Real HAK::doDoubleLoop() {
 
     size_t outer_iter = 0;
     size_t total_iter = 0;
-    for( outer_iter = 0; outer_iter < outer_maxiter && diffs.maxDiff() > outer_tol; outer_iter++ ) {
+    for( outer_iter = 0; outer_iter < outer_maxiter && maxDiff > outer_tol; outer_iter++ ) {
         // Calculate new outer regions
         for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
             OR(alpha) = org_ORs[alpha];
@@ -427,14 +430,15 @@ Real HAK::doDoubleLoop() {
         // Calculate new single variable beliefs and compare with old ones
         for( size_t i = 0; i < nrVars(); ++i ) {
             Factor new_belief = belief( var( i ) );
-            diffs.push( dist( new_belief, old_beliefs[i], Prob::DISTLINF ) );
+            diffs[i] = dist( new_belief, old_beliefs[i], Prob::DISTLINF );
             old_beliefs[i] = new_belief;
         }
+        maxDiff = max( diffs );
 
         total_iter += Iterations();
 
         if( props.verbose >= 3 )
-            cerr << Name << "::doDoubleLoop:  maxdiff " << diffs.maxDiff() << " after " << total_iter << " passes" << endl;
+            cerr << Name << "::doDoubleLoop:  maxdiff " << maxDiff << " after " << total_iter << " passes" << endl;
     }
 
     // restore _maxiter, _verbose and _maxdiff
@@ -443,8 +447,8 @@ Real HAK::doDoubleLoop() {
     _maxdiff = org_maxdiff;
 
     _iters = total_iter;
-    if( diffs.maxDiff() > _maxdiff )
-        _maxdiff = diffs.maxDiff();
+    if( maxDiff > _maxdiff )
+        _maxdiff = maxDiff;
 
     // Restore original outer regions
     ORs = org_ORs;
@@ -454,10 +458,10 @@ Real HAK::doDoubleLoop() {
         IR(beta).c() = org_IR_cs[beta];
 
     if( props.verbose >= 1 ) {
-        if( diffs.maxDiff() > props.tol ) {
+        if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-                cerr << Name << "::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << Name << "::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
             } else {
                 if( props.verbose >= 3 )
                     cerr << Name << "::doDoubleLoop:  ";
@@ -465,7 +469,7 @@ Real HAK::doDoubleLoop() {
             }
         }
 
-    return diffs.maxDiff();
+    return maxDiff;
 }
 
 

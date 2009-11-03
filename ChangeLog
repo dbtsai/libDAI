@@ -1,3 +1,4 @@
+* Declared class Diffs as obsolete
 * Declared calcPairBeliefsNew() as obsolete (its functionality is now part
   of calcPairBeliefs())
 * Declared calcMarginal2ndO() as obsolete

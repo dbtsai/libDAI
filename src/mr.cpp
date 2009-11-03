@@ -521,7 +521,6 @@ Real MR::run() {
             cerr << "Starting " << identify() << "...";
 
         double tic = toc();
-//        Diffs diffs(nrVars(), 1.0);
 
         M.resize(N);
         for(size_t i=0; i<N; i++)

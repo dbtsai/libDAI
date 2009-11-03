@@ -89,7 +89,7 @@ static vector<Factor> mixBeliefs( Real p, const vector<Factor> &b, const vector<
 
 Real CBP::run() {
     size_t seed = props.rand_seed;
-    if( seed > 0)
+    if( seed > 0 )
         rnd_seed( seed );
 
     InfAlg *bp = getInfAlg();

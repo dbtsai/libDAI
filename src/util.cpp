@@ -48,6 +48,13 @@ double log1p( double x ) {
 namespace dai {
 
 
+Real max( std::vector<Real> v ) {
+    if( v.size() == 0 )
+        return INFINITY;
+    else
+        return *std::max_element( v.begin(), v.end() );
+}
+
 // Returns user+system time in seconds
 double toc() {
 #ifdef WINDOWS

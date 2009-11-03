@@ -72,6 +72,7 @@ class MF : public DAIAlgFG {
         virtual std::string identify() const;
         virtual Factor belief( const Var &n ) const;
         virtual Factor belief( const VarSet &ns ) const;
+        virtual Factor beliefV( size_t i ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;
         virtual void init();
@@ -84,7 +85,7 @@ class MF : public DAIAlgFG {
 
         /// @name Additional interface specific for MF
         //@{
-        Factor beliefV( size_t i ) const;
+        Factor calcNewBelief( size_t i );
         //@}
 
     private:

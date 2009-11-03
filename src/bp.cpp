@@ -232,9 +232,8 @@ Real BP::run() {
         cerr << endl;
 
     double tic = toc();
-    Diffs diffs(nrVars(), 1.0);
-
-    vector<Edge> update_seq;
+    vector<Real> diffs( nrVars(), INFINITY );
+    Real maxDiff = INFINITY;
 
     vector<Factor> old_beliefs;
     old_beliefs.reserve( nrVars() );
@@ -242,13 +241,12 @@ Real BP::run() {
         old_beliefs.push_back( beliefV(i) );
 
     size_t nredges = nrEdges();
-
+    vector<Edge> update_seq;
     if( props.updates == Properties::UpdateType::SEQMAX ) {
         // do the first pass
         for( size_t i = 0; i < nrVars(); ++i )
-            foreach( const Neighbor &I, nbV(i) ) {
+            foreach( const Neighbor &I, nbV(i) )
                 calcNewMessage( i, I.iter );
-            }
     } else {
         update_seq.reserve( nredges );
         /// \todo Investigate whether performance increases by switching the order of following two loops:
@@ -259,7 +257,7 @@ Real BP::run() {
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( _iters=0; _iters < props.maxiter && diffs.maxDiff() > props.tol; ++_iters ) {
+    for( _iters=0; _iters < props.maxiter && maxDiff > props.tol; ++_iters ) {
         if( props.updates == Properties::UpdateType::SEQMAX ) {
             // Residuals-BP by Koller et al.
             for( size_t t = 0; t < nredges; ++t ) {
@@ -303,22 +301,23 @@ Real BP::run() {
         // calculate new beliefs and compare with old ones
         for( size_t i = 0; i < nrVars(); ++i ) {
             Factor nb( beliefV(i) );
-            diffs.push( dist( nb, old_beliefs[i], Prob::DISTLINF ) );
+            diffs[i] = dist( nb, old_beliefs[i], Prob::DISTLINF );
             old_beliefs[i] = nb;
         }
+        maxDiff = max( diffs );
 
         if( props.verbose >= 3 )
-            cerr << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
-    if( diffs.maxDiff() > _maxdiff )
-        _maxdiff = diffs.maxDiff();
+    if( maxDiff > _maxdiff )
+        _maxdiff = maxDiff;
 
     if( props.verbose >= 1 ) {
-        if( diffs.maxDiff() > props.tol ) {
+        if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-                cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+                cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 3 )
                 cerr << Name << "::run:  ";
@@ -326,7 +325,7 @@ Real BP::run() {
         }
     }
 
-    return diffs.maxDiff();
+    return maxDiff;
 }
 
 

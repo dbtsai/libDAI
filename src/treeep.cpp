@@ -372,7 +372,8 @@ Real TreeEP::run() {
         cerr << endl;
 
     double tic = toc();
-    Diffs diffs(nrVars(), 1.0);
+    vector<Real> diffs( nrVars(), INFINITY );
+    Real maxDiff = INFINITY;
 
     vector<Factor> old_beliefs;
     old_beliefs.reserve( nrVars() );
@@ -381,7 +382,7 @@ Real TreeEP::run() {
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( _iters=0; _iters < props.maxiter && diffs.maxDiff() > props.tol; _iters++ ) {
+    for( _iters=0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
         for( size_t I = 0; I < nrFactors(); I++ )
             if( offtree(I) ) {
                 _Q[I].InvertAndMultiply( Qa, Qb );
@@ -392,22 +393,23 @@ Real TreeEP::run() {
         // calculate new beliefs and compare with old ones
         for( size_t i = 0; i < nrVars(); i++ ) {
             Factor nb( belief(var(i)) );
-            diffs.push( dist( nb, old_beliefs[i], Prob::DISTLINF ) );
+            diffs[i] = dist( nb, old_beliefs[i], Prob::DISTLINF );
             old_beliefs[i] = nb;
         }
+        maxDiff = max( diffs );
 
         if( props.verbose >= 3 )
-            cerr << Name << "::run:  maxdiff " << diffs.maxDiff() << " after " << _iters+1 << " passes" << endl;
+            cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
-    if( diffs.maxDiff() > _maxdiff )
-        _maxdiff = diffs.maxDiff();
+    if( maxDiff > _maxdiff )
+        _maxdiff = maxDiff;
 
     if( props.verbose >= 1 ) {
-        if( diffs.maxDiff() > props.tol ) {
+        if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-            cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+            cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 3 )
                 cerr << Name << "::run:  ";
@@ -415,7 +417,7 @@ Real TreeEP::run() {
         }
     }
 
-    return diffs.maxDiff();
+    return maxDiff;
 }
 
 

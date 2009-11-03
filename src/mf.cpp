@@ -84,65 +84,78 @@ void MF::init() {
 }
 
 
-Real MF::run() {
-    double tic = toc();
+Factor MF::calcNewBelief( size_t i ) {
+    Factor result;
+    foreach( const Neighbor &I, nbV(i) ) {
+        Factor henk;
+        foreach( const Neighbor &j, nbF(I) ) // for all j in I \ i
+            if( j != i )
+                henk *= _beliefs[j];
+        Factor piet = factor(I).log(true);
+        piet *= henk;
+        piet = piet.marginal(var(i), false);
+        piet = piet.exp();
+        result *= piet;
+    }
+    result.normalize();
+    return result;
+}
 
+
+Real MF::run() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
 
-    size_t pass_size = _beliefs.size();
-    Diffs diffs(pass_size * 3, 1.0);
+    double tic = toc();
+    vector<Real> diffs( nrVars(), INFINITY );
+    Real maxDiff = INFINITY;
 
-    size_t t=0;
-    for( t=0; t < (props.maxiter*pass_size) && diffs.maxDiff() > props.tol; t++ ) {
-        // choose random Var i
-        size_t i = (size_t) (nrVars() * rnd_uniform());
+    vector<size_t> update_seq;
+    update_seq.reserve( nrVars() );
+    for( size_t i = 0; i < nrVars(); i++ )
+        update_seq.push_back( i );
 
-        Factor jan;
-        Factor piet;
-        foreach( const Neighbor &I, nbV(i) ) {
-            Factor henk;
-            foreach( const Neighbor &j, nbF(I) ) // for all j in I \ i
-                if( j != i )
-                    henk *= _beliefs[j];
-            piet = factor(I).log(true);
-            piet *= henk;
-            piet = piet.marginal(var(i), false);
-            piet = piet.exp();
-            jan *= piet;
+    // do several passes over the network until maximum number of iterations has
+    // been reached or until the maximum belief difference is smaller than tolerance
+    for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
+        random_shuffle( update_seq.begin(), update_seq.end() );
+
+        foreach( const size_t &i, update_seq ) {
+            Factor nb = calcNewBelief( i );
+
+            if( nb.hasNaNs() ) {
+                cerr << Name << "::run():  ERROR: new belief of variable " << var(i) << " has NaNs!" << endl;
+                return 1.0;
+            }
+
+            if( props.damping != 0.0 )
+                nb = (nb^(1.0 - props.damping)) * (_beliefs[i]^props.damping);
+            diffs[i] = dist( nb, _beliefs[i], Prob::DISTLINF );
+
+            _beliefs[i] = nb;
         }
+        maxDiff = max( diffs );
 
-        jan.normalize();
-
-        if( jan.hasNaNs() ) {
-            cerr << Name << "::run():  ERROR: jan has NaNs!" << endl;
-            return 1.0;
-        }
-
-        if( props.damping != 0.0 )
-            jan = (jan^(1.0 - props.damping)) * (_beliefs[i]^props.damping);
-        diffs.push( dist( jan, _beliefs[i], Prob::DISTLINF ) );
-
-        _beliefs[i] = jan;
+        if( props.verbose >= 3 )
+            cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
-    _iters = t / pass_size;
-    if( diffs.maxDiff() > _maxdiff )
-        _maxdiff = diffs.maxDiff();
+    if( maxDiff > _maxdiff )
+        _maxdiff = maxDiff;
 
     if( props.verbose >= 1 ) {
-        if( diffs.maxDiff() > props.tol ) {
+        if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-            cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << diffs.maxDiff() << endl;
+            cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
-            if( props.verbose >= 2 )
+            if( props.verbose >= 3 )
                 cerr << Name << "::run:  ";
-            cerr << "converged in " << t / pass_size << " passes (" << toc() - tic << " seconds)." << endl;
+            cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
 
-    return diffs.maxDiff();
+    return maxDiff;
 }
 
 

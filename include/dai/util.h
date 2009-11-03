@@ -94,6 +94,9 @@ inline Real exp( Real x ) {
     return std::exp(x);
 }
 
+/// Returns maximum value of a std::vector<Real>
+Real max( std::vector<Real> v );
+
 
 #ifdef WINDOWS
     /// hash_map is an alias for \c std::map.
@@ -191,18 +194,9 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
 /// Split a string into tokens delimited by characters in \a delim
 void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
 
+// OBSOLETE
 /// Used to keep track of the progress made by iterative algorithms.
-/** A Diffs object stores an array of fixed size, containing the 
- *  history of certain values (for example, the \f$\ell_\infty\f$ 
- *  differences between all the old beliefs and the new beliefs 
- *  in one pass of belief propagation updates). A new value can be
- *  registered by calling Diffs::push(); the BP algorithm would use
- *  this to register the difference between the old and a newly 
- *  calculated belief. The Diffs object keeps track of the maximum 
- *  value encountered in the last Diffs::maxSize() values registered.
- *  The maximum value can then be queried by Diffs::maxDiff(). The
- *  BP algorithm would use this maximum value to compare it with a
- *  given tolerance in order to decide whether the algorithm has converged.
+/** \note Obsolete, to be removed soon
  */
 class Diffs : public std::vector<Real> {
     private:

@@ -27,3 +27,4 @@ bool RegionGraph::Check_Counting_Numbers();
 void RegionGraph::Calc_Counting_Numbers();
 std::vector<Factor> calcPairBeliefsNew( const InfAlg& obj, const VarSet& vs, bool reInit );
 Factor calcMarginal2ndO( const InfAlg& obj, const VarSet& vs, bool reInit );
+class Diffs;
