@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Main libDAI header file
-/// \todo Improve documentation
+/// \brief Main libDAI header file. It \#includes all other libDAI headers.
 
 
 #ifndef __defined_libdai_alldai_h
@@ -57,8 +56,8 @@
 namespace dai {
 
 
-/// Constructs a new approximate inference algorithm.
-/** \param name The name of the approximate inference algorithm (should be one of the names in DAINames).
+/// Constructs a new inference algorithm.
+/** \param name The name of the inference algorithm (should be one of the names in DAINames).
  *  \param fg The FactorGraph that the algorithm should be applied to.
  *  \param opts A PropertySet specifying the options for the algorithm.
  *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
@@ -66,15 +65,16 @@ namespace dai {
 InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts );
 
 
-/// Constructs a new approximate inference algorithm.
-/** \param nameOpts The name and options of the approximate inference algorithm (should be in the format "name[opts]").
+/// Constructs a new inference algorithm.
+/** \param nameOpts The name and options of the inference algorithm (should be in the format "name[key1=val1,key2=val2,...,keyn=valn]").
  *  \param fg The FactorGraph that the algorithm should be applied to.
  *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
+ *  \todo Support aliases like in testdai
  */
 InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg );
 
 
-/// Contains the names of all approximate inference algorithms compiled into libDAI.
+/// Contains the names of all inference algorithms compiled into libDAI.
 static const char* DAINames[] = {
     ExactInf::Name,
 #ifdef DAI_WITH_BP

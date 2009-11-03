@@ -2,8 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	daialg.h
-	alldai.h
 	exactinf.h
 	mf.h
 	bp.h

@@ -64,7 +64,6 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
 }
 
 
-/// \todo Make alias file non-testdai-specific, and use it in newInfAlgFromString
 InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg ) {
     string::size_type pos = nameOpts.find_first_of('[');
     string name;

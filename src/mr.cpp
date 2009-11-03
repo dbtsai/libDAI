@@ -488,11 +488,11 @@ void MR::init_cor() {
         if( props.inits == Properties::InitType::CLAMPING ) {
             BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", (Real)1.0e-9)("maxiter", (size_t)10000)("verbose", (size_t)0)("logdomain", false));
             bpcav.makeCavity( i );
-            pairq = calcPairBeliefs( bpcav, delta(i), false );
+            pairq = calcPairBeliefs( bpcav, delta(i), false, true );
         } else if( props.inits == Properties::InitType::EXACT ) {
             JTree jtcav(*this, PropertySet()("updates", string("HUGIN"))("verbose", (size_t)0) );
             jtcav.makeCavity( i );
-            pairq = calcPairBeliefs( jtcav, delta(i), false );
+            pairq = calcPairBeliefs( jtcav, delta(i), false, true );
         }
         for( size_t jk = 0; jk < pairq.size(); jk++ ) {
             VarSet::const_iterator kit = pairq[jk].vars().begin();

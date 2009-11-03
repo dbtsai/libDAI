@@ -134,10 +134,12 @@ Real LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet &o
 
         if( props.cavity == Properties::CavityType::FULL )
             Bi = calcMarginal( *cav, cav->fg().delta(i), props.reinit );
-        else if( props.cavity == Properties::CavityType::PAIR )
-            Bi = calcMarginal2ndO( *cav, cav->fg().delta(i), props.reinit );
-        else if( props.cavity == Properties::CavityType::PAIR2 ) {
-            vector<Factor> pairbeliefs = calcPairBeliefsNew( *cav, cav->fg().delta(i), props.reinit );
+        else if( props.cavity == Properties::CavityType::PAIR ) {
+            vector<Factor> pairbeliefs = calcPairBeliefs( *cav, cav->fg().delta(i), props.reinit, false );
+            for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
+                Bi *= pairbeliefs[ij];
+        } else if( props.cavity == Properties::CavityType::PAIR2 ) {
+            vector<Factor> pairbeliefs = calcPairBeliefs( *cav, cav->fg().delta(i), props.reinit, true );
             for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
                 Bi *= pairbeliefs[ij];
         }
