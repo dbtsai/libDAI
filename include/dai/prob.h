@@ -381,7 +381,7 @@ template <typename T> class TProb {
 
         // OBSOLETE
         /// Returns pointwise signum
-        /** \note Obsolete, to be removed soon
+        /** \deprecated Functionality was not widely used
          */
         TProb<T> sgn() const {
             TProb<T> x;
@@ -499,7 +499,7 @@ template <typename T> class TProb {
 
         // OBSOLETE
         /// Sets entries that are smaller (in absolute value) than \a epsilon to 0
-        /** \note Obsolete, to be removed soon
+        /** \deprecated Functionality was not widely used
          */
         TProb<T>& makeZero( T epsilon ) {
             for( size_t i = 0; i < size(); i++ )
@@ -510,7 +510,7 @@ template <typename T> class TProb {
         
         // OBSOLETE
         /// Sets entries that are smaller than \a epsilon to \a epsilon
-        /** \note Obsolete, to be removed soon
+        /** \deprecated Functionality was not widely used
          */
         TProb<T>& makePositive( T epsilon ) {
             for( size_t i = 0; i < size(); i++ )

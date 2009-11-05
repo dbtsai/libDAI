@@ -137,16 +137,22 @@ class BipartiteGraph {
             std::vector<size_t> ind2;       // indices of nodes of type 2
         };
 
-        // OBSOLETE
-        /// \name Backwards compatibility layer (to be removed soon)
+    // OBSOLETE
+    /// \name Backwards compatibility layer (to be removed soon)
         //@{
         /// Enable backwards compatibility layer?
+        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
+         */
         bool _edge_indexed;
         /// Call indexEdges() first to initialize these members
+        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
+         */
         std::vector<Edge> _edges;
         /// Call indexEdges() first to initialize these members
+        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
+         */
         hash_map<Edge,size_t> _vv2e;
-        //@}
+    //@}
 
     public:
     /// \name Constructors and destructors
@@ -346,6 +352,9 @@ class BipartiteGraph {
         // OBSOLETE
     /// \name Backwards compatibility layer (to be removed soon)
     //@{
+        /// Prepare backwards compatibility layer for indexed edges
+        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
+         */
         void indexEdges() {
             std::cerr << "Warning: this BipartiteGraph edge interface is obsolete!" << std::endl;
             _edges.clear();
@@ -368,15 +377,24 @@ class BipartiteGraph {
             _edge_indexed = true;
         }
 
+        /// Returns edge with index \a e
+        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
+         */
         const Edge& edge(size_t e) const {
             DAI_ASSERT(_edge_indexed);
             return _edges[e];
         }
 
+        /// Returns all edges
+        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
+         */
         const std::vector<Edge>& edges() const {
             return _edges;
         }
 
+        /// Converts a pair of node indices to an edge index
+        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
+         */
         size_t VV2E(size_t n1, size_t n2) const {
             DAI_ASSERT(_edge_indexed);
             Edge e(n1,n2);
@@ -385,6 +403,9 @@ class BipartiteGraph {
             return i->second;
         }
 
+        /// Returns number of edges
+        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
+         */
         size_t nr_edges() const {
             DAI_ASSERT(_edge_indexed);
             return _edges.size();

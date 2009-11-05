@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines class BP
-/// \todo Improve documentation
+/// \brief Defines class BP, which implements (Loopy) Belief Propagation
 
 
 #ifndef __defined_libdai_bp_h
@@ -29,24 +28,70 @@ namespace dai {
 
 
 /// Approximate inference algorithm "(Loopy) Belief Propagation"
+/** The Loopy Belief Propagation algorithm uses message passing
+ *  to approximate marginal probability distributions ("beliefs") for variables
+ *  and factors (more precisely, for the subset of variables depending on the factor).
+ *  There are two variants, the sum-product algorithm (corresponding to 
+ *  finite temperature) and the max-product algorithm (corresponding to 
+ *  zero temperature).
+ *
+ *  The messages \f$m_{I\to i}(x_i)\f$ are passed from factors \f$I\f$ to variables \f$i\f$. 
+ *  In case of the sum-product algorith, the update equation is: 
+ *    \f[ m_{I\to i}(x_i) \propto \sum_{x_{I\setminus\{i\}}} f_I(x_I) \prod_{j\in N_I\setminus\{i\}} \prod_{J\in N_j\setminus\{I\}} m_{J\to j}\f]
+ *  and in case of the max-product algorithm:
+ *    \f[ m_{I\to i}(x_i) \propto \max_{x_{I\setminus\{i\}}} f_I(x_I) \prod_{j\in N_I\setminus\{i\}} \prod_{J\in N_j\setminus\{I\}} m_{J\to j}\f]
+ *  In order to improve convergence, the updates can be damped. For improved numerical stability,
+ *  the updates can be done in the log-domain alternatively.
+ *
+ *  After convergence, the variable beliefs are calculated by:
+ *    \f[ b_i(x_i) \propto \prod_{I\in N_i} m_{I\to i}(x_i)\f]
+ *  and the factor beliefs are calculated by:
+ *    \f[ b_I(x_I) \propto f_I(x_I) \prod_{j\in N_I} \prod_{J\in N_j\setminus\{I\}} m_{J\to j}(x_j) \f]
+ *  The logarithm of the partition sum is calculated by:
+ *    \f[ \log Z = \sum_i (1 - |N_i|) \sum_{x_i} b_i(x_i) \log b_i(x_i) - \sum_I \sum_{x_I} b_I(x_I) \log \frac{b_I(x_I)}{f_I(x_I)} \f]
+ *
+ *  There are several predefined update schedules:
+ *    - PARALL parallel updates
+ *    - SEQFIX sequential updates using a fixed sequence
+ *    - SEQRND sequential updates using a random sequence
+ *    - SEQMAX maximum-residual updates [\ref EMK06]
+ *
+ *  For the max-product algorithm, a heuristic way of finding the MAP state (the 
+ *  joint configuration of all variables which has maximum probability) is provided
+ *  by the findMaximum() method, which can be called after convergence.
+ *
+ *  \note There are two implementations, an optimized one (the default) which caches IndexFor objects,
+ *  and a slower, less complicated one which is easier to maintain/understand. The slower one can be 
+ *  enabled by defining DAI_BP_FAST as false in the source file.
+ */
 class BP : public DAIAlgFG {
     private:
+        /// Type used for index cache
         typedef std::vector<size_t> ind_t;
-        typedef std::multimap<Real, std::pair<std::size_t, std::size_t> > LutType;
+        /// Type used for storing edge properties
         struct EdgeProp {
+            /// Index cached for this edge
             ind_t  index;
+            /// Old message living on this edge
             Prob   message;
+            /// New message living on this edge
             Prob   newMessage;
+            /// Residual for this edge
             Real   residual;
         };
+        /// Stores all edge properties
         std::vector<std::vector<EdgeProp> > _edges;
+        /// Type of lookup table (only used for maximum-residual BP)
+        typedef std::multimap<Real, std::pair<std::size_t, std::size_t> > LutType;
+        /// Lookup table (only used for maximum-residual BP)
         std::vector<std::vector<LutType::iterator> > _edge2lut;
+        /// Lookup table (only used for maximum-residual BP)
         LutType _lut;
-        /// Maximum difference encountered so far
+        /// Maximum difference between variable beliefs encountered so far
         Real _maxdiff;
         /// Number of iterations needed
         size_t _iters;
-        /// The history of message updates (only recorded if recordSentMessages is true)
+        /// The history of message updates (only recorded if \a recordSentMessages is \c true)
         std::vector<std::pair<std::size_t, std::size_t> > _sentMessages;
 
     public:
@@ -64,16 +109,16 @@ class BP : public DAIAlgFG {
             /// Maximum number of iterations
             size_t maxiter;
 
-            /// Tolerance
+            /// Tolerance for convergence test
             Real tol;
 
-            /// Do updates in logarithmic domain?
+            /// Whether updates should be done in logarithmic domain or not
             bool logdomain;
 
-            /// Damping constant
+            /// Damping constant (0.0 means no damping, 1.0 is maximum damping)
             Real damping;
 
-            /// Update schedule
+            /// Message update schedule
             UpdateType updates;
 
             /// Type of inference: sum-product or max-product?
@@ -87,8 +132,16 @@ class BP : public DAIAlgFG {
         bool recordSentMessages;
 
     public:
+    /// \name Constructors/destructors
+    //@{
         /// Default constructor
         BP() : DAIAlgFG(), _edges(), _edge2lut(), _lut(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {}
+
+        /// Construct from FactorGraph \a fg and PropertySet \a opts
+        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {
+            setProperties( opts );
+            construct();
+        }
 
         /// Copy constructor
         BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _edge2lut(x._edge2lut),
@@ -115,12 +168,7 @@ class BP : public DAIAlgFG {
             }
             return *this;
         }
-
-        /// Construct from FactorGraph fg and PropertySet opts
-        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {
-            setProperties( opts );
-            construct();
-        }
+    //@}
 
     /// \name General InfAlg interface
     //@{
@@ -145,40 +193,51 @@ class BP : public DAIAlgFG {
     /// \name Additional interface specific for BP
     //@{
         /// Calculates the joint state of all variables that has maximum probability
-        /** Assumes that run() has been called and that props.inference == MAXPROD
+        /** \pre Assumes that run() has been called and that \a props.inference == \c MAXPROD
          */
         std::vector<std::size_t> findMaximum() const;
 
-        /// Returns history of sent messages
+        /// Returns history of which messages have been updated
         const std::vector<std::pair<std::size_t, std::size_t> >& getSentMessages() const {
             return _sentMessages;
         }
 
-        /// Clears history of sent messages
-        void clearSentMessages() {
-            _sentMessages.clear();
-        }
+        /// Clears history of which messages have been updated
+        void clearSentMessages() { _sentMessages.clear(); }
     //@}
 
     private:
+        /// Returns constant reference to message from the \a _I 'th neighbor of variable \a i to variable \a i
         const Prob & message(size_t i, size_t _I) const { return _edges[i][_I].message; }
+        /// Returns reference to message from the \a _I 'th neighbor of variable \a i to variable \a i
         Prob & message(size_t i, size_t _I) { return _edges[i][_I].message; }
-        Prob & newMessage(size_t i, size_t _I) { return _edges[i][_I].newMessage; }
+        /// Returns constant reference to updated message from the \a _I 'th neighbor of variable \a i to variable \a i
         const Prob & newMessage(size_t i, size_t _I) const { return _edges[i][_I].newMessage; }
-        ind_t & index(size_t i, size_t _I) { return _edges[i][_I].index; }
+        /// Returns reference to updated message from the \a _I 'th neighbor of variable \a i to variable \a i
+        Prob & newMessage(size_t i, size_t _I) { return _edges[i][_I].newMessage; }
+        /// Returns constant reference to cached index for the edge between variable \a i and its \a _I 'th neighbor
         const ind_t & index(size_t i, size_t _I) const { return _edges[i][_I].index; }
-        Real & residual(size_t i, size_t _I) { return _edges[i][_I].residual; }
+        /// Returns reference to cached index for the edge between variable \a i and its \a _I 'th neighbor
+        ind_t & index(size_t i, size_t _I) { return _edges[i][_I].index; }
+        /// Returns constant reference to residual for the edge between variable \a i and its \a _I 'th neighbor
         const Real & residual(size_t i, size_t _I) const { return _edges[i][_I].residual; }
+        /// Returns reference to residual for the edge between variable \a i and its \a _I 'th neighbor
+        Real & residual(size_t i, size_t _I) { return _edges[i][_I].residual; }
 
+        /// Calculate the updated message from the \a _I 'th neighbor of variable \a i to variable \a i
         void calcNewMessage( size_t i, size_t _I );
+        /// Replace the "old" message from the \a _I 'th neighbor of variable \a i to variable \a i by the "new" (updated) message
         void updateMessage( size_t i, size_t _I );
+        /// Set the residual (difference between new and old message) for the edge between variable \a i and its \a _I 'th neighbor to \a r
         void updateResidual( size_t i, size_t _I, Real r );
+        /// Finds the edge which has the maximum residual (difference between new and old message)
         void findMaxResidual( size_t &i, size_t &_I );
-        /// Calculates unnormalized belief of variable
+        /// Calculates unnormalized belief of variable \a i
         void calcBeliefV( size_t i, Prob &p ) const;
-        /// Calculates unnormalized belief of factor
+        /// Calculates unnormalized belief of factor \a I
         void calcBeliefF( size_t I, Prob &p ) const;
 
+        /// Helper function for constructors
         void construct();
 };
 

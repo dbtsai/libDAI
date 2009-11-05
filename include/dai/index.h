@@ -98,6 +98,8 @@ class IndexFor {
 
         // OBSOLETE
         /// Conversion to \c long: returns linear index of the current state of indexVars
+        /** \deprecated Will be replaced by an operator size_t()
+         */
         operator long () const {
             return( _index );
         }
@@ -205,7 +207,9 @@ class Permute {
         }
 
         // OBSOLETE
-        /// For backwards compatibility (to be removed soon)
+        /// Calculates a permuted linear index
+        /** \deprecated Renamed into dai::Permute::convertLinearIndex()
+         */
         size_t convert_linear_index( size_t li ) const { return convertLinearIndex(li); }
 
         /// Returns const reference to the permutation

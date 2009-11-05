@@ -196,7 +196,7 @@ void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, 
 
 // OBSOLETE
 /// Used to keep track of the progress made by iterative algorithms.
-/** \note Obsolete, to be removed soon
+/** \deprecated Superfluous, because a simple std::vector<Real> provides the same functionality
  */
 class Diffs : public std::vector<Real> {
     private:

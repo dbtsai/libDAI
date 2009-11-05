@@ -2,7 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	bp.h
 	jtree.h
 	hak.h
 	treeep.h
@@ -15,6 +14,7 @@ Improve documentation:
 	evidence.h
 	emalg.h
 	doc.h
+		- add http to reference about maximum-residual BP
 
 Write a concept/notations page for the documentation,
 explaining the concepts of "state" (index into a 

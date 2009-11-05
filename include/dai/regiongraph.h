@@ -162,7 +162,9 @@ class RegionGraph : public FactorGraph {
         bool checkCountingNumbers() const;
 
         // OBSOLETE
-        /// For backwards compatibility (to be removed soon)
+        /// Check whether the counting numbers are valid
+        /** \deprecated Renamed into dai::RegionGraph::checkCountingNumbers()
+         */
         bool Check_Counting_Numbers() { return checkCountingNumbers(); }
     //@}
 
@@ -208,7 +210,9 @@ class RegionGraph : public FactorGraph {
         void calcCountingNumbers();
 
         // OBSOLETE
-        /// For backwards compatibility (to be removed soon)
+        /// Calculates counting numbers of inner regions based upon counting numbers of outer regions
+        /** \deprecated Renamed into dai::RegionGraph::calcCountingNumbers()
+         */
         void Calc_Counting_Numbers() { calcCountingNumbers(); }
     //@}
 

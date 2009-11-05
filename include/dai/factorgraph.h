@@ -269,14 +269,16 @@ class FactorGraph {
         /// Returns a copy of \c *this, where all factors that are subsumed by some larger factor are merged with the larger factors.
         FactorGraph maximalFactors() const;
 
-        /// Clamp the \a i 'th variable to value \a x (i.e. multiply with a Kronecker delta \f$\delta_{x_v,x}\f$);
+        /// Clamp the \a i 'th variable to value \a x (i.e. multiply with a Kronecker delta \f$\delta_{x_i,x}\f$);
         /** \note This version changes the factor graph structure and thus returns a newly constructed FactorGraph
          *  and keeps the current one constant, contrary to clamp()
          */
         FactorGraph clamped( size_t i, size_t x ) const;
 
         // OBSOLETE
-        /// Only for backwards compatibility (to be removed soon)
+        /// Clamp variable \a v to value \a x (i.e. multiply with a Kronecker delta \f$\delta_{v,x}\f$);
+        /** \deprecated Please use dai::FactorGraph::clamped(size_t,size_t) instead
+         */
         FactorGraph clamped( const Var &v, size_t x ) const {
             std::cerr << "Warning: this FactorGraph::clamped(const Var&,...) interface is obsolete!" << std::endl;
             return clamped( findVar(v), x );
@@ -291,7 +293,9 @@ class FactorGraph {
         virtual void clamp( size_t i, size_t x, bool backup = false );
 
         // OBSOLETE
-        /// Only for backwards compatibility (to be removed soon)
+        /// Clamp variable \a v to value \a x (i.e. multiply with a Kronecker delta \f$\delta_{v, x}\f$)
+        /** \deprecated Please use dai::FactorGraph::clamp(size_t,size_t,bool) instead
+         */
         virtual void clamp( const Var &v, size_t x, bool backup = false ) {
             std::cerr << "Warning: this FactorGraph::clamp(const Var&,...) interface is obsolete!" << std::endl;
             clamp( findVar(v), x, backup );
@@ -342,11 +346,26 @@ class FactorGraph {
         // OBSOLETE
     /// \name Backwards compatibility layer (to be removed soon)
     //@{
-        size_t VV2E(size_t n1, size_t n2) const { return G.VV2E(n1,n2); }
-        const Edge& edge(size_t e) const { return G.edge(e); }
+        /// Prepare backwards compatibility layer for indexed edges
+        /** \deprecated Please use FactorGraph::Neighbor interface instead
+         */
         void indexEdges() { G.indexEdges(); }
-        size_t nr_edges() const { return G.nr_edges(); }
+        /// Returns edge with index \a e
+        /** \deprecated Please use FactorGraph::Neighbor interface instead
+         */
+        const Edge& edge(size_t e) const { return G.edge(e); }
+        /// Returns all edges
+        /** \deprecated Please use FactorGraph::Neighbor interface instead
+         */
         const std::vector<Edge>& edges() const { return G.edges(); }
+        /// Converts a pair of node indices to an edge index
+        /** \deprecated Please use FactorGraph::Neighbor interface instead
+         */
+        size_t VV2E(size_t n1, size_t n2) const { return G.VV2E(n1,n2); }
+        /// Returns number of edges
+        /** \deprecated Please use FactorGraph::Neighbor interface instead
+         */
+        size_t nr_edges() const { return G.nr_edges(); }
     //@}
 
     private:

@@ -225,13 +225,13 @@ template <typename T> class TFactor {
 
         // OBSOLETE
         /// Sets values that are smaller (in absolute value) than \a epsilon to 0
-        /** \note Obsolete, to be removed soon
+        /** \deprecated Functionality was not widely used
          */
         TFactor<T>& makeZero( T epsilon ) { _p.makeZero( epsilon ); return *this; }
 
         // OBSOLETE
         /// Sets values that are smaller than \a epsilon to \a epsilon
-        /** \note Obsolete, to be removed soon
+        /** \deprecated Functionality was not widely used
          */
         TFactor<T>& makePositive( T epsilon ) { _p.makePositive( epsilon ); return *this; }
 

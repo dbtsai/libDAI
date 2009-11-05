@@ -214,6 +214,11 @@
  *  "Generating Random Regular Graphs Quickly",
  *  <em>Combinatorics, Probability and Computing</em> Vol 8, Issue 4, pp. 377-396
  *  http://www.math.uwaterloo.ca/~nwormald/papers/randgen.pdf
+ *
+ *  \anchor EMK06 \ref EMK06
+ *  G. Elidan and I. McGraw and D. Koller (2006):
+ *  "Residual Belief Propagation: Informed Scheduling for Asynchronous Message Passing",
+ *  <em>Proceedings of the 22nd Annual Conference on Uncertainty in Artificial Intelligence (UAI-06)</em>
  */
 
 
