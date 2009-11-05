@@ -89,6 +89,14 @@ Real ExactInf::run() {
 }
 
 
+Factor ExactInf::calcMarginal( const VarSet &vs ) const {
+    Factor P;
+    for( size_t I = 0; I < nrFactors(); I++ )
+        P *= factor(I);
+    return P.marginal( vs, true );
+}
+
+
 vector<Factor> ExactInf::beliefs() const {
     vector<Factor> result = _beliefsV;
     result.insert( result.end(), _beliefsF.begin(), _beliefsF.end() );

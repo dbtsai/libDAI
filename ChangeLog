@@ -1,3 +1,8 @@
+* Renamed Treewidth(const FactorGraph &) into boundTreewidth(const FactorGraph &)
+* Added ExactInf::calcMarginal(const VarSet &)
+* Replaced UEdgeVec by Graph
+* Replaced DEdgeVec by new RootedTree class
+* Moved functionality of GrowRootedTree() into constructor of RootedTree
 * Extended InfAlg interface with setProperties(), getProperties() and printProperties()
 * Declared class Diffs as obsolete
 * Declared calcPairBeliefsNew() as obsolete (its functionality is now part

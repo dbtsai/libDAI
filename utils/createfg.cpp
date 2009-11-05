@@ -264,9 +264,9 @@ void MakeDRegFG( size_t N, size_t d, Real mean_w, Real mean_th, Real sigma_w, Re
     matrix w(N,N,(d*N)/2);
     vector<Real> th(N,0.0);
 
-    UEdgeVec g = RandomDRegularGraph( N, d );
-    for( size_t i = 0; i < g.size(); i++ )
-        w(g[i].n1, g[i].n2) = rnd_stdnormal() * sigma_w + mean_w;
+    Graph g = RandomDRegularGraph( N, d );
+    foreach( const UEdge &e, g )
+        w(e.n1, e.n2) = rnd_stdnormal() * sigma_w + mean_w;
 
     for( size_t i = 0; i < N; i++ )
         th[i] = rnd_stdnormal() * sigma_th + mean_th;

@@ -60,7 +60,7 @@ string TreeEP::printProperties() const {
 }
 
 
-TreeEP::TreeEPSubTree::TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I ) : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(I), _ns(), _nsrem(), _logZ(0.0) {
+TreeEP::TreeEPSubTree::TreeEPSubTree( const RootedTree &subRTree, const RootedTree &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I ) : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(I), _ns(), _nsrem(), _logZ(0.0) {
     _ns = _I->vars();
 
     // Make _Qa, _Qb, _a and _b corresponding to the subtree
@@ -192,7 +192,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
     DAI_ASSERT( fg.isConnected() );
 
     if( opts.hasKey("tree") ) {
-        ConstructRG( opts.GetAs<DEdgeVec>("tree") );
+        ConstructRG( opts.GetAs<RootedTree>("tree") );
     } else {
         if( props.type == Properties::TypeType::ORG || props.type == Properties::TypeType::ALT ) {
             // ORG: construct weighted graph with as weights a crude estimate of the
@@ -241,7 +241,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
 }
 
 
-void TreeEP::ConstructRG( const DEdgeVec &tree ) {
+void TreeEP::ConstructRG( const RootedTree &tree ) {
     vector<VarSet> Cliques;
     for( size_t i = 0; i < tree.size(); i++ )
         Cliques.push_back( VarSet( var(tree[i].n1), var(tree[i].n2) ) );
@@ -321,7 +321,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     for( size_t I = 0; I < nrFactors(); I++ )
         if( offtree(I) ) {
             // find efficient subtree
-            DEdgeVec subTree;
+            RootedTree subTree;
             /*size_t subTreeSize =*/ findEfficientTree( factor(I).vars(), subTree, PreviousRoot );
             PreviousRoot = subTree[0].n1;
             //subTree.resize( subTreeSize );  // FIXME
@@ -333,7 +333,7 @@ void TreeEP::ConstructRG( const DEdgeVec &tree ) {
     // Previous root of first off-tree factor should be the root of the last off-tree factor
     for( size_t I = 0; I < nrFactors(); I++ )
         if( offtree(I) ) {
-            DEdgeVec subTree;
+            RootedTree subTree;
             /*size_t subTreeSize =*/ findEfficientTree( factor(I).vars(), subTree, PreviousRoot );
             PreviousRoot = subTree[0].n1;
             //subTree.resize( subTreeSize ); // FIXME

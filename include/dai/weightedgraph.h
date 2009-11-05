@@ -10,7 +10,7 @@
 
 
 /** \file
- *  \brief Defines some utility functions for (weighted) undirected graphs
+ *  \brief Defines some utility functions for (weighted) undirected graphs, trees and rooted trees.
  *  \todo Improve general support for graphs and trees.
  */
 
@@ -36,9 +36,10 @@ namespace dai {
 /// Represents a directed edge
 class DEdge {
     public:
-        /// First node index
+        /// First node index (source of edge)
         size_t n1;
-        /// Second node index
+
+        /// Second node index (sink of edge)
         size_t n2;
 
         /// Default constructor
@@ -110,30 +111,64 @@ class UEdge {
 };
 
 
-/// Vector of UEdge
-typedef std::vector<UEdge>  UEdgeVec;
+/// Represents an undirected graph, implemented as a std::set of undirected edges
+class Graph : public std::set<UEdge> {
+    public:
+        /// Default constructor
+        Graph() {}
 
-/// Vector of DEdge
-typedef std::vector<DEdge>  DEdgeVec;
+        /// Construct from range of objects that can be cast to DEdge
+        template <class InputIterator>
+        Graph( InputIterator begin, InputIterator end ) {
+            insert( begin, end );
+        }
+};
 
-/// Represents an undirected weighted graph, with weights of type \a T
+
+/// Represents an undirected weighted graph, with weights of type \a T, implemented as a std::map mapping undirected edges to weights
 template<class T> class WeightedGraph : public std::map<UEdge, T> {};
 
-/// Represents an undirected graph
-typedef std::set<UEdge>     Graph;
+
+/// Represents a rooted tree, implemented as a vector of directed edges
+/** By convention, the edges are stored such that they point away from 
+ *  the root and such that edges nearer to the root come before edges
+ *  farther away from the root.
+ */
+class RootedTree : public std::vector<DEdge> {
+    public:
+        /// Default constructor
+        RootedTree() {}
+
+        /// Constructs a rooted tree from a tree and a root
+        /** \pre T has no cycles and contains node \a Root
+         */
+        RootedTree( const Graph &T, size_t Root );
+};
 
 
+// OBSOLETE
+/// Vector of UEdge
+/** \deprecated Please use Graph instead
+ */
+typedef std::vector<UEdge>  UEdgeVec;
+// OBSOLETE
+/// Vector of DEdge
+/** \deprecated Please use RootedTree instead
+ */
+typedef std::vector<DEdge>  DEdgeVec;
+
+// OBSOLETE
 /// Constructs a rooted tree from a tree and a root
 /** \pre T has no cycles and contains node \a Root
+ *  \deprecated Please use RootedTree::RootedTree(const Graph &, size_t) instead
  */
 DEdgeVec GrowRootedTree( const Graph &T, size_t Root );
-
 
 /// Uses Prim's algorithm to construct a minimal spanning tree from the (positively) weighted graph \a G.
 /** Uses implementation in Boost Graph Library.
  */
-template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> &G ) {
-    DEdgeVec result;
+template<typename T> RootedTree MinSpanningTreePrims( const WeightedGraph<T> &G ) {
+    RootedTree result;
     if( G.size() > 0 ) {
         using namespace boost;
         using namespace std;
@@ -164,20 +199,19 @@ template<typename T> DEdgeVec MinSpanningTreePrims( const WeightedGraph<T> &G ) 
                 tree.insert( UEdge( p[i], i ) );
             else
                 root = i;
-        // Order them
-        result = GrowRootedTree( tree, root );
+        // Order them to obtain a rooted tree
+        result = RootedTree( tree, root );
     }
-
     return result;
 }
 
 
-/// Use Prim's algorithm to construct a minimal spanning tree from the (positively) weighted graph \a G.
+/// Use Prim's algorithm to construct a maximal spanning tree from the (positively) weighted graph \a G.
 /** Uses implementation in Boost Graph Library.
  */
-template<typename T> DEdgeVec MaxSpanningTreePrims( const WeightedGraph<T> &G ) {
+template<typename T> RootedTree MaxSpanningTreePrims( const WeightedGraph<T> &G ) {
     if( G.size() == 0 )
-        return DEdgeVec();
+        return RootedTree();
     else {
         T maxweight = G.begin()->second;
         for( typename WeightedGraph<T>::const_iterator it = G.begin(); it != G.end(); it++ )
@@ -201,7 +235,7 @@ template<typename T> DEdgeVec MaxSpanningTreePrims( const WeightedGraph<T> &G ) 
  *  (which becomes uniform in the limit that \a d is small and \a N goes
  *  to infinity).
  */
-UEdgeVec RandomDRegularGraph( size_t N, size_t d );
+Graph RandomDRegularGraph( size_t N, size_t d );
 
 
 } // end of namespace dai

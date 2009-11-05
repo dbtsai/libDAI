@@ -69,7 +69,7 @@ class TreeEP : public JTree {
             private:
                 std::vector<Factor>  _Qa;
                 std::vector<Factor>  _Qb;
-                DEdgeVec             _RTree;
+                RootedTree           _RTree;
                 std::vector<size_t>  _a;        // _Qa[alpha]  <->  superTree.Qa[_a[alpha]]
                 std::vector<size_t>  _b;        // _Qb[beta]   <->  superTree.Qb[_b[beta]]
                                                 // _Qb[beta]   <->  _RTree[beta]
@@ -97,7 +97,7 @@ class TreeEP : public JTree {
                     return *this;
                 }
 
-                TreeEPSubTree( const DEdgeVec &subRTree, const DEdgeVec &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I );
+                TreeEPSubTree( const RootedTree &subRTree, const RootedTree &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I );
                 void init();
                 void InvertAndMultiply( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb );
                 void HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &Qb );
@@ -154,7 +154,7 @@ class TreeEP : public JTree {
 
 
     private:
-        void ConstructRG( const DEdgeVec &tree );
+        void ConstructRG( const RootedTree &tree );
         bool offtree( size_t I ) const { return (fac2OR[I] == -1U); }
 };
 

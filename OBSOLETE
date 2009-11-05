@@ -28,3 +28,7 @@ void RegionGraph::Calc_Counting_Numbers();
 std::vector<Factor> calcPairBeliefsNew( const InfAlg& obj, const VarSet& vs, bool reInit );
 Factor calcMarginal2ndO( const InfAlg& obj, const VarSet& vs, bool reInit );
 class Diffs;
+std::pair<size_t,size_t> Treewidth( const FactorGraph & fg );
+typedef UEdgeVec;
+typedef DEdgeVec;
+DEdgeVec GrowRootedTree( const Graph &T, size_t Root );

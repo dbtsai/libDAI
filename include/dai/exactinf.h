@@ -84,6 +84,15 @@ class ExactInf : public DAIAlgFG {
         virtual std::string printProperties() const;
     //@}
 
+    /// \name Additional interface specific for JTree
+    //@{
+        /// Calculates marginal probability distribution for variables \a vs
+        /** \note The complexity of this calculation is exponential in the number of variables.
+         */
+        Factor calcMarginal( const VarSet &vs ) const;
+    //@}
+
+
     private:
         /// Helper function for constructors
         void construct();
