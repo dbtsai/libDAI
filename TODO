@@ -12,7 +12,6 @@ Improve documentation:
 	evidence.h
 	emalg.h
 	doc.h
-		- merge COPYING
 
 Improve documentation of all .props structs.
 
