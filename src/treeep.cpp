@@ -192,7 +192,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
     DAI_ASSERT( fg.isConnected() );
 
     if( opts.hasKey("tree") ) {
-        ConstructRG( opts.GetAs<RootedTree>("tree") );
+        construct( opts.GetAs<RootedTree>("tree") );
     } else {
         if( props.type == Properties::TypeType::ORG || props.type == Properties::TypeType::ALT ) {
             // ORG: construct weighted graph with as weights a crude estimate of the
@@ -234,14 +234,14 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
             }
 
             // find maximal spanning tree
-            ConstructRG( MaxSpanningTreePrims( wg ) );
+            construct( MaxSpanningTreePrims( wg ) );
         } else
             DAI_THROW(UNKNOWN_ENUM_VALUE);
     }
 }
 
 
-void TreeEP::ConstructRG( const RootedTree &tree ) {
+void TreeEP::construct( const RootedTree &tree ) {
     vector<VarSet> Cliques;
     for( size_t i = 0; i < tree.size(); i++ )
         Cliques.push_back( VarSet( var(tree[i].n1), var(tree[i].n2) ) );

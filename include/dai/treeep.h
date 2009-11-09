@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines class TreeEP
-/// \todo Improve documentation
+/// \brief Defines class TreeEP, which implements Tree Expectation Propagation
 
 
 #ifndef __defined_libdai_treeep_h
@@ -34,7 +33,7 @@
 namespace dai {
 
 
-/// Approximate inference algorithm "TreeEP" by Minka and Qi
+/// Approximate inference algorithm "Tree Expectation Propagation" [\ref MiQ04]
 class TreeEP : public JTree {
     private:
         /// Maximum difference encountered so far
@@ -46,7 +45,13 @@ class TreeEP : public JTree {
         /// Parameters of this inference algorithm
         struct Properties {
             /// Enumeration of possible choices for the tree
-            DAI_ENUM(TypeType,ORG,ALT)
+            /** The two possibilities are:
+             *  - \c ORG: take the maximum spanning tree where the weights are crude
+             *            estimates of the mutual information between the nodes;
+             *  - \c ALT: take the maximum spanning tree where the weights are upper
+             *            bounds on the effective interaction strengths between pairs of nodes.
+             */
+            DAI_ENUM(TypeType,ORG,ALT);
 
             /// Verbosity
             size_t verbose;
@@ -59,12 +64,13 @@ class TreeEP : public JTree {
 
             /// How to choose the tree
             TypeType type;
-        } props; // FIXME: should be props2 because of conflict with JTree::props?
+        } props;
 
         /// Name of this inference method
         static const char *Name;
 
     private:
+        /// Stores the data structures needed to efficiently update the approximation of an off-tree factor
         class TreeEPSubTree {
             private:
                 std::vector<Factor>  _Qa;
@@ -105,6 +111,7 @@ class TreeEP : public JTree {
                 const Factor *& I() { return _I; }
         };
 
+        /// Stores a TreeEPSubTree object for each off-tree factor
         std::map<size_t, TreeEPSubTree>  _Q;
 
     public:
@@ -133,7 +140,7 @@ class TreeEP : public JTree {
             return *this;
         }
 
-        /// Construct from FactorGraph fg and PropertySet opts
+        /// Construct from FactorGraph \a fg and PropertySet \a opts
         TreeEP( const FactorGraph &fg, const PropertySet &opts );
 
 
@@ -154,7 +161,9 @@ class TreeEP : public JTree {
 
 
     private:
-        void ConstructRG( const RootedTree &tree );
+        /// Helper function for constructors
+        void construct( const RootedTree &tree );
+        /// Returns \c true if factor \a I is not part of the tree
         bool offtree( size_t I ) const { return (fac2OR[I] == -1U); }
 };
 

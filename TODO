@@ -2,7 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	treeep.h
 	lc.h
 	mr.h
 	gibbs.h
