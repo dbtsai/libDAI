@@ -2,7 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	hak.h
 	treeep.h
 	lc.h
 	mr.h
@@ -13,8 +12,9 @@ Improve documentation:
 	evidence.h
 	emalg.h
 	doc.h
-		- add http to reference about maximum-residual BP
 		- merge COPYING
+
+Improve documentation of all .props structs.
 
 Write a concept/notations page for the documentation,
 explaining the concepts of "state" (index into a 

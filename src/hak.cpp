@@ -24,7 +24,6 @@ using namespace std;
 const char *HAK::Name = "HAK";
 
 
-
 /// Sets factor entries that lie between 0 and \a epsilon to \a epsilon
 template <class T>
 TFactor<T>& makePositive( TFactor<T> &f, T epsilon ) {
@@ -101,7 +100,7 @@ string HAK::printProperties() const {
 }
 
 
-void HAK::constructMessages() {
+void HAK::construct() {
     // Create outer beliefs
     _Qa.clear();
     _Qa.reserve(nrORs());
@@ -135,16 +134,15 @@ void HAK::constructMessages() {
 HAK::HAK( const RegionGraph &rg, const PropertySet &opts ) : DAIAlgRG(rg), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {
     setProperties( opts );
 
-    constructMessages();
+    construct();
 }
 
 
 void HAK::findLoopClusters( const FactorGraph & fg, std::set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars ) {
     for( VarSet::const_iterator in = vars.begin(); in != vars.end(); in++ ) {
         VarSet ind = fg.delta( fg.findVar( *in ) );
-        if( (newcl.size()) >= 2 && ind.contains( root ) ) {
+        if( (newcl.size()) >= 2 && ind.contains( root ) )
             allcl.insert( newcl | *in );
-        }
         else if( length > 1 )
             findLoopClusters( fg, allcl, newcl | *in, root, length - 1, ind / newcl );
     }
@@ -180,7 +178,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
 
     RegionGraph rg(fg,cl);
     RegionGraph::operator=(rg);
-    constructMessages();
+    construct();
 
     if( props.verbose >= 3 )
         cerr << Name << " regiongraph: " << *this << endl;

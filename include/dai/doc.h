@@ -219,6 +219,7 @@
  *  G. Elidan and I. McGraw and D. Koller (2006):
  *  "Residual Belief Propagation: Informed Scheduling for Asynchronous Message Passing",
  *  <em>Proceedings of the 22nd Annual Conference on Uncertainty in Artificial Intelligence (UAI-06)</em>
+ *  http://uai.sis.pitt.edu/papers/06/UAI2006_0091.pdf
  */
 
 

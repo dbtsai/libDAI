@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines class HAK.
-/// \todo Improve documentation
+/// \brief Defines class HAK, which implements a variant of Generalized Belief Propagation.
 
 
 #ifndef __defined_libdai_hak_h
@@ -28,14 +27,18 @@
 namespace dai {
 
 
-/// Approximate inference algorithm: implementation of single-loop ("Generalized Belief Propagation") and double-loop algorithms by Heskes, Albers and Kappen
+/// Approximate inference algorithm: implementation of single-loop ("Generalized Belief Propagation") and double-loop algorithms by Heskes, Albers and Kappen [\ref HAK03]
 /** \todo Optimize HAK with precalculated indices, similarly to BP.
  */
 class HAK : public DAIAlgRG {
     private:
+        /// Outer region beliefs
         std::vector<Factor>                _Qa;
+        /// Inner region beliefs
         std::vector<Factor>                _Qb;
+        /// Messages from outer to inner regions
         std::vector<std::vector<Factor> >  _muab;
+        /// Messages from inner to outer regions
         std::vector<std::vector<Factor> >  _muba;
         /// Maximum difference encountered so far
         Real _maxdiff;
@@ -63,7 +66,7 @@ class HAK : public DAIAlgRG {
             /// Damping constant
             Real damping;
 
-            /// How to choose the clusters
+            /// How to choose the outer regions
             ClustersType clusters;
 
             /// How to initialize the messages
@@ -72,7 +75,7 @@ class HAK : public DAIAlgRG {
             /// Use single-loop (GBP) or double-loop (HAK)
             bool doubleloop;
 
-            /// Depth of loops (only relevant for clusters == ClustersType::LOOP)
+            /// Depth of loops (only relevant for \a clusters == \c ClustersType::LOOP)
             size_t loopdepth;
         } props;
 
@@ -80,26 +83,34 @@ class HAK : public DAIAlgRG {
         static const char *Name;
 
     public:
+    /// \name Constructors/destructors
+    //@{
         /// Default constructor
         HAK() : DAIAlgRG(), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
+        /// Construct from FactorGraph \a fg and PropertySet \a opts
+        /** The clusters are chosen according to \a opts["clusters"]:
+         *  - MIN minimal clusters, i.e., one outer region for each maximal factor
+         *  - DELTA one outer region for each variable and its Markov blanket
+         *  - LOOP one cluster for each loop of length at most \a opts["loopdepth"], and in addition one cluster for each maximal factor of \a fg
+         */
         HAK( const FactorGraph &fg, const PropertySet &opts );
 
-        /// Construct from RegionGraph rg and PropertySet opts
+        /// Construct from RegionGraph \a rg and PropertySet \a opts
         HAK( const RegionGraph &rg, const PropertySet &opts );
+    //@}
 
 
     /// \name General InfAlg interface
     //@{
         virtual HAK* clone() const { return new HAK(*this); }
         virtual std::string identify() const;
-        virtual Factor belief( const Var &n ) const;
-        virtual Factor belief( const VarSet &ns ) const;
+        virtual Factor belief( const Var &v ) const;
+        virtual Factor belief( const VarSet &vs ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;
         virtual void init();
-        virtual void init( const VarSet &ns );
+        virtual void init( const VarSet &vs );
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
@@ -111,17 +122,33 @@ class HAK : public DAIAlgRG {
 
     /// \name Additional interface specific for HAK
     //@{
+        /// Returns reference to message from outer region \a alpha to its \a _beta 'th neighboring inner region
         Factor & muab( size_t alpha, size_t _beta ) { return _muab[alpha][_beta]; }
+        /// Returns reference to message the \a _beta 'th neighboring inner region of outer region \a alpha to that outer region
         Factor & muba( size_t alpha, size_t _beta ) { return _muba[alpha][_beta]; }
+        /// Returns belief of outer region \a alpha
         const Factor& Qa( size_t alpha ) const { return _Qa[alpha]; };
+        /// Returns belief of inner region \a beta
         const Factor& Qb( size_t beta ) const { return _Qb[beta]; };
 
+        /// Runs single-loop algorithm (algorithm 1 in [\ref HAK03])
         Real doGBP();
+        /// Runs double-loop algorithm (as described in section 4.2 of [\ref HAK03]), which always convergences
         Real doDoubleLoop();
     //@}
 
     private:
-        void constructMessages();
+        /// Helper function for constructors
+        void construct();
+        /// Recursive procedure for finding clusters of variables containing loops of length at most \a length
+        /** \param fg the factor graph
+         *  \param allcl the clusters found so far
+         *  \param newcl partial candidate cluster
+         *  \param root start (and end) point of the loop
+         *  \param length number of variables that may be added to \a newcl
+         *  \param vars neighboring variables of \a newcl
+         *  \return allcl all clusters of variables with loops of length at most \a length passing through root
+         */
         void findLoopClusters( const FactorGraph &fg, std::set<VarSet> &allcl, VarSet newcl, const Var & root, size_t length, VarSet vars );
 };
 
