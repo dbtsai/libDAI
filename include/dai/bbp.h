@@ -258,7 +258,7 @@ class BBP {
     public:
     /// \name Constructors/destructors
     //@{
-        /// Construct from a InfAlg \a ia and a PropertySet \a opts
+        /// Construct BBP object from a InfAlg \a ia and a PropertySet \a opts
         BBP( const InfAlg *ia, const PropertySet &opts ) : _bp_dual(ia), _fg(&(ia->fg())), _ia(ia) {
             props.set(opts);
         }

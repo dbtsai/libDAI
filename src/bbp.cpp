@@ -986,7 +986,7 @@ void BBP::run() {
 }
 
 
-Real numericBBPTest( const InfAlg &bp, const vector<size_t> *state, const PropertySet &bbp_props, const BBPCostFunction &cfn, Real h ) {
+Real numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const PropertySet &bbp_props, const BBPCostFunction &cfn, Real h ) {
     BBP bbp( &bp, bbp_props );
     // calculate the value of the unperturbed cost function
     Real cf0 = cfn.evaluate( bp, state );

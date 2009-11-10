@@ -32,6 +32,48 @@ using boost::shared_ptr;
 const char *CBP::Name = "CBP";
 
 
+/// Given a sorted vector of states \a xis and total state count \a n_states, return a vector of states not in \a xis
+vector<size_t> complement( vector<size_t> &xis, size_t n_states ) {
+    vector<size_t> cmp_xis( 0 );
+    size_t j = 0;
+    for( size_t xi = 0; xi < n_states; xi++ ) {
+        while( j < xis.size() && xis[j] < xi )
+            j++;
+        if( j >= xis.size() || xis[j] > xi )
+            cmp_xis.push_back(xi);
+    }
+    DAI_ASSERT( xis.size()+cmp_xis.size() == n_states );
+    return cmp_xis;
+}
+
+
+/// Computes \f$\frac{\exp(a)}{\exp(a)+\exp(b)}\f$
+Real unSoftMax( Real a, Real b ) {
+    if( a > b )
+        return 1.0 / (1.0 + exp(b-a));
+    else
+        return exp(a-b) / (exp(a-b) + 1.0);
+}
+
+
+/// Computes log of sum of exponents, i.e., \f$\log\left(\exp(a) + \exp(b)\right)\f$
+Real logSumExp( Real a, Real b ) {
+    if( a > b )
+        return a + log1p( exp( b-a ) );
+    else
+        return b + log1p( exp( a-b ) );
+}
+
+
+/// Compute sum of pairwise L-infinity distances of the first \a nv factors in each vector
+Real dist( const vector<Factor> &b1, const vector<Factor> &b2, size_t nv ) {
+    Real d = 0.0;
+    for( size_t k = 0; k < nv; k++ )
+        d += dist( b1[k], b2[k], Prob::DISTLINF );
+    return d;
+}
+
+
 void CBP::setBeliefs( const std::vector<Factor> &bs, Real logZ ) {
     size_t i = 0;
     _beliefsV.clear();
@@ -131,9 +173,9 @@ void CBP::runRecurse( InfAlg *bp, Real orig_logZ, vector<size_t> clamped_vars_li
     vector<size_t> xis;
     Real maxVar = 0.0;
     bool found;
-    bool clampingVar = (Clamping() == Properties::ClampType::CLAMP_VAR);
+    bool clampingVar = (props.clamp == Properties::ClampType::CLAMP_VAR);
 
-    if( Recursion() == Properties::RecurseType::REC_LOGZ && recTol() > 0 && exp( bp->logZ() - orig_logZ ) < recTol() )
+    if( props.recursion == Properties::RecurseType::REC_LOGZ && props.rec_tol > 0 && exp( bp->logZ() - orig_logZ ) < props.rec_tol )
         found = false;
     else
         found = chooseNextClampVar( bp, clamped_vars_list, i, xis, &maxVar );
@@ -198,11 +240,11 @@ void CBP::runRecurse( InfAlg *bp, Real orig_logZ, vector<size_t> clamped_vars_li
     Real p = unSoftMax( lz, cmp_lz );
     Real bp__d = 0.0;
 
-    if( Recursion() == Properties::RecurseType::REC_BDIFF && recTol() > 0 ) {
+    if( props.recursion == Properties::RecurseType::REC_BDIFF && props.rec_tol > 0 ) {
         vector<Factor> combined_b( mixBeliefs( p, b, cmp_b ) );
         Real new_lz = logSumExp( lz,cmp_lz );
         bp__d = dist( bp->beliefs(), combined_b, nrVars() );
-        if( exp( new_lz - orig_logZ) * bp__d < recTol() ) {
+        if( exp( new_lz - orig_logZ) * bp__d < props.rec_tol ) {
             num_leaves++;
             sum_level += clamped_vars_list.size();
             beliefs_out = combined_b;
@@ -224,7 +266,7 @@ void CBP::runRecurse( InfAlg *bp, Real orig_logZ, vector<size_t> clamped_vars_li
     if( props.verbose >= 2 ) {
         Real d = dist( bp->beliefs(), beliefs_out, nrVars() );
         cerr << "Distance (clamping " << i << "): " << d;
-        if( Recursion() == Properties::RecurseType::REC_BDIFF )
+        if( props.recursion == Properties::RecurseType::REC_BDIFF )
             cerr << "; bp_dual predicted " << bp__d;
         cerr << "; max_adjoint = " << maxVar << "; logZ = " << lz_out << " (in " << bp->logZ() << ") (orig " << orig_logZ << "); p = " << p << "; level = " << clamped_vars_list.size() << endl;
     }
@@ -239,10 +281,10 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
     Real tiny = 1.0e-14;
     if( props.verbose >= 3 )
         cerr << "clamped_vars_list" << clamped_vars_list << endl;
-    if( clamped_vars_list.size() >= maxClampLevel() )
+    if( clamped_vars_list.size() >= props.max_levels )
         return false;
-    if( ChooseMethod() == Properties::ChooseMethodType::CHOOSE_RANDOM ) {
-        if( Clamping() == Properties::ClampType::CLAMP_VAR ) {
+    if( props.choose == Properties::ChooseMethodType::CHOOSE_RANDOM ) {
+        if( props.clamp == Properties::ClampType::CLAMP_VAR ) {
             int t = 0, t1 = 100;
             do {
                 i = rnd( nrVars() );
@@ -282,8 +324,8 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
             // DAI_ASSERT(!_clamped_vars.count(i)); // not true for >2-ary variables
             DAI_IFVERB(2, endl<<"CHOOSE_RANDOM chose factor "<<i<<" state "<<xis[0]<<endl);
         }
-    } else if( ChooseMethod() == Properties::ChooseMethodType::CHOOSE_MAXENT ) {
-        if( Clamping() == Properties::ClampType::CLAMP_VAR ) {
+    } else if( props.choose == Properties::ChooseMethodType::CHOOSE_MAXENT ) {
+        if( props.clamp == Properties::ClampType::CLAMP_VAR ) {
             Real max_ent = -1.0;
             int win_k = -1, win_xk = -1;
             for( size_t k = 0; k < nrVars(); k++ ) {
@@ -324,14 +366,14 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                 return false;
             }
         }
-    } else if( ChooseMethod()==Properties::ChooseMethodType::CHOOSE_BP_L1 ||
-               ChooseMethod()==Properties::ChooseMethodType::CHOOSE_BP_CFN ) {
-        bool doL1 = (ChooseMethod() == Properties::ChooseMethodType::CHOOSE_BP_L1);
+    } else if( props.choose==Properties::ChooseMethodType::CHOOSE_BP_L1 ||
+               props.choose==Properties::ChooseMethodType::CHOOSE_BP_CFN ) {
+        bool doL1 = (props.choose == Properties::ChooseMethodType::CHOOSE_BP_L1);
         vector<size_t> state;
-        if( !doL1 && BBP_cost_function().needGibbsState() )
+        if( !doL1 && props.bbp_cfn.needGibbsState() )
             state = getGibbsState( bp->fg(), 2*bp->Iterations() );
         // try clamping each variable manually
-        DAI_ASSERT( Clamping() == Properties::ClampType::CLAMP_VAR );
+        DAI_ASSERT( props.clamp == Properties::ClampType::CLAMP_VAR );
         Real max_cost = 0.0;
         int win_k = -1, win_xk = -1;
         for( size_t k = 0; k < nrVars(); k++ ) {
@@ -347,7 +389,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                     for( size_t j = 0; j < nrVars(); j++ )
                         cost += dist( bp->beliefV(j), bp1->beliefV(j), Prob::DISTL1 );
                 else
-                    cost = BBP_cost_function().evaluate( *bp1, &state );
+                    cost = props.bbp_cfn.evaluate( *bp1, &state );
                 if( cost > max_cost || win_k == -1 ) {
                     max_cost = cost;
                     win_k = k;
@@ -360,15 +402,15 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
         DAI_ASSERT( win_xk >= 0 );
         i = win_k;
         xis.resize( 1, win_xk );
-    } else if( ChooseMethod() == Properties::ChooseMethodType::CHOOSE_BBP ) {
+    } else if( props.choose == Properties::ChooseMethodType::CHOOSE_BBP ) {
         Real mvo;
         if( !maxVarOut )
             maxVarOut = &mvo;
-        bool clampingVar = (Clamping() == Properties::ClampType::CLAMP_VAR);
-        pair<size_t, size_t> cv = bbpFindClampVar( *bp, clampingVar, props.bbp_props, BBP_cost_function(), &mvo );
+        bool clampingVar = (props.clamp == Properties::ClampType::CLAMP_VAR);
+        pair<size_t, size_t> cv = BBPFindClampVar( *bp, clampingVar, props.bbp_props, props.bbp_cfn, &mvo );
 
         // if slope isn't big enough then don't clamp
-        if( mvo < minMaxAdj() )
+        if( mvo < props.min_max_adj )
             return false;
 
         size_t xi = cv.second;
@@ -380,11 +422,11 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
             << ", maxVar = "<< mvo << ")"
         Prob b = ( clampingVar ? bp->beliefV(i).p() : bp->beliefF(i).p());
         if( b[xi] < tiny ) {
-            cerr << "Warning, at level " << clamped_vars_list.size() << ", bbpFindClampVar found unlikely " << VAR_INFO << endl;
+            cerr << "Warning, at level " << clamped_vars_list.size() << ", BBPFindClampVar found unlikely " << VAR_INFO << endl;
             return false;
         }
         if( abs(b[xi] - 1) < tiny ) {
-            cerr << "Warning at level " << clamped_vars_list.size() << ", bbpFindClampVar found overly likely " << VAR_INFO << endl;
+            cerr << "Warning at level " << clamped_vars_list.size() << ", BBPFindClampVar found overly likely " << VAR_INFO << endl;
             return false;
         }
 
@@ -408,14 +450,7 @@ void CBP::printDebugInfo() {
 }
 
 
-//----------------------------------------------------------------
-
-
-/** Function which takes a factor graph as input, runs Gibbs and BP_dual,
- *  creates and runs a BBP object, finds best variable, returns
- *  (variable,state) pair for clamping
- */
-pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, const BBPCostFunction &cfn, Real *maxVarOut ) {
+pair<size_t, size_t> BBPFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, const BBPCostFunction &cfn, Real *maxVarOut ) {
     BBP bbp( &in_bp, bbp_props );
     bbp.initCostFnAdj( cfn, NULL );
     bbp.run();
@@ -472,44 +507,6 @@ pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, con
     if( maxVarOut )
         *maxVarOut = max_var;
     return make_pair( argmax_var, argmax_var_state );
-}
-
-
-vector<size_t> complement( vector<size_t> &xis, size_t n_states ) {
-    vector<size_t> cmp_xis( 0 );
-    size_t j = 0;
-    for( size_t xi = 0; xi < n_states; xi++ ) {
-        while( j < xis.size() && xis[j] < xi )
-            j++;
-        if( j >= xis.size() || xis[j] > xi )
-            cmp_xis.push_back(xi);
-    }
-    DAI_ASSERT( xis.size()+cmp_xis.size() == n_states );
-    return cmp_xis;
-}
-
-
-Real unSoftMax( Real a, Real b ) {
-    if( a > b )
-        return 1.0 / (1.0 + exp(b-a));
-    else
-        return exp(a-b) / (exp(a-b) + 1.0);
-}
-
-
-Real logSumExp( Real a, Real b ) {
-    if( a > b )
-        return a + log1p( exp( b-a ) );
-    else
-        return b + log1p( exp( a-b ) );
-}
-
-
-Real dist( const vector<Factor> &b1, const vector<Factor> &b2, size_t nv ) {
-    Real d = 0.0;
-    for( size_t k = 0; k < nv; k++ )
-        d += dist( b1[k], b2[k], Prob::DISTLINF );
-    return d;
 }
 
 

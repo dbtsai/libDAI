@@ -13,7 +13,6 @@
  *
  *  \todo Improve documentation
  *
- *  \todo Merge COPYING into doxygen documentation
  *  \todo Merge README into doxygen documentation
  *  \todo Document examples, tests and utils
  *
