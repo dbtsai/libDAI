@@ -137,7 +137,7 @@ Real rnd_stdnormal();
 int rnd_int( int min, int max );
 
 /// Returns a random integer in the half-open interval [0, \a n)
-inline int rnd( int n) {
+inline int rnd( int n ) {
     return rnd_int( 0, n-1 );
 }
 

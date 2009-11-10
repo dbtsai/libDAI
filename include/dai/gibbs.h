@@ -9,8 +9,7 @@
 
 
 /// \file
-/// \brief Defines class Gibbs
-/// \todo Improve documentation
+/// \brief Defines class Gibbs, which implements Gibbs sampling
 
 
 #ifndef __defined_libdai_gibbs_h
@@ -26,21 +25,31 @@ namespace dai {
 
 
 /// Approximate inference algorithm "Gibbs sampling"
+/** \author Frederik Eaton
+ */
 class Gibbs : public DAIAlgFG {
     private:
+        /// Type used to store the counts of various states
         typedef std::vector<size_t> _count_t;
+        /// Type used to store the joint state of all variables
         typedef std::vector<size_t> _state_t;
-
+        /// Number of samples counted so far (excluding burn-in)
         size_t _sample_count;
+        /// State counts for each variable
         std::vector<_count_t> _var_counts;
+        /// State counts for each factor
         std::vector<_count_t> _factor_counts;
+        /// Current joint state of all variables
         _state_t _state;
 
     public:
         /// Parameters of this inference algorithm
         struct Properties {
-            /// Number of iterations
+            /// Total number of iterations
             size_t iters;
+
+            /// Number of "burn-in" iterations
+            size_t burnin;
 
             /// Verbosity
             size_t verbose;
@@ -53,7 +62,7 @@ class Gibbs : public DAIAlgFG {
         /// Default constructor
         Gibbs() : DAIAlgFG(), _sample_count(0), _var_counts(), _factor_counts(), _state() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
+        /// Construct from FactorGraph \a fg and PropertySet \a opts
         Gibbs( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _sample_count(0), _var_counts(), _factor_counts(), _state() {
             setProperties( opts );
             construct();
@@ -83,22 +92,27 @@ class Gibbs : public DAIAlgFG {
 
     /// \name Additional interface specific for Gibbs
     //@{
+        /// Draw the current joint state of all variables from a uniform random distribution
         void randomizeState();
-        /// Return reference to current state vector
+        /// Return reference to current state of all variables
         std::vector<size_t>& state() { return _state; }
-
-        /// Return const reference to current state vector
+        /// Return constant reference to current state of all variables
         const std::vector<size_t>& state() const { return _state; }
     //@}
 
     private:
-        void updateCounts();
-        Prob getVarDist( size_t i );
-        void resampleVar( size_t i );
-        size_t getFactorEntry( size_t I );
-        size_t getFactorEntryDiff( size_t I, size_t i );
-
+        /// Helper function for constructors
         void construct();
+        /// Updates all counts (_sample_count, _var_counts, _factor_counts) based on current state
+        void updateCounts();
+        /// Calculate conditional distribution of variable \a i, given the current state
+        Prob getVarDist( size_t i );
+        /// Draw state of variable \a i randomly from its conditional distribution and update the current state
+        void resampleVar( size_t i );
+        /// Calculates linear index into factor \a I corresponding to the current state
+        size_t getFactorEntry( size_t I );
+        /// Calculates the differences between linear indices into factor \a I corresponding with a state change of variable \a i
+        size_t getFactorEntryDiff( size_t I, size_t i );
 };
 
 

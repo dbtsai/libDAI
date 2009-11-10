@@ -31,6 +31,11 @@ void Gibbs::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("iters") );
     props.iters = opts.getStringAs<size_t>("iters");
 
+    if( opts.hasKey("burnin") )
+        props.burnin = opts.getStringAs<size_t>("burnin");
+    else
+        props.burnin = 0;
+
     if( opts.hasKey("verbose") )
         props.verbose = opts.getStringAs<size_t>("verbose");
     else
@@ -41,6 +46,7 @@ void Gibbs::setProperties( const PropertySet &opts ) {
 PropertySet Gibbs::getProperties() const {
     PropertySet opts;
     opts.Set( "iters", props.iters );
+    opts.Set( "burnin", props.burnin );
     opts.Set( "verbose", props.verbose );
     return opts;
 }
@@ -50,6 +56,7 @@ string Gibbs::printProperties() const {
     stringstream s( stringstream::out );
     s << "[";
     s << "iters=" << props.iters << ",";
+    s << "burnin=" << props.burnin << ",";
     s << "verbose=" << props.verbose << "]";
     return s.str();
 }
@@ -74,11 +81,13 @@ void Gibbs::construct() {
 
 
 void Gibbs::updateCounts() {
-    for( size_t i = 0; i < nrVars(); i++ )
-        _var_counts[i][_state[i]]++;
-    for( size_t I = 0; I < nrFactors(); I++ )
-        _factor_counts[I][getFactorEntry(I)]++;
     _sample_count++;
+    if( _sample_count > props.burnin ) {
+        for( size_t i = 0; i < nrVars(); i++ )
+            _var_counts[i][_state[i]]++;
+        for( size_t I = 0; I < nrFactors(); I++ )
+            _factor_counts[I][getFactorEntry(I)]++;
+    }
 }
 
 
@@ -137,14 +146,13 @@ Prob Gibbs::getVarDist( size_t i ) {
 
 
 inline void Gibbs::resampleVar( size_t i ) {
-    // draw randomly from conditional distribution and update _state
     _state[i] = getVarDist(i).draw();
 }
 
 
 void Gibbs::randomizeState() {
     for( size_t i = 0; i < nrVars(); i++ )
-        _state[i] = rnd_int( 0, var(i).states() - 1 );
+        _state[i] = rnd( var(i).states() );
 }
 
 
