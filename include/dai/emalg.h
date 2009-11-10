@@ -27,6 +27,7 @@
 /// \brief Defines classes related to Expectation Maximization: EMAlg, ParameterEstimation, CondProbEstimation and SharedParameters
 /// \todo Describe EM file format
 /// \todo Improve documentation
+/// \author Charles Vaske
 
 
 namespace dai {
@@ -41,6 +42,8 @@ namespace dai {
  *  via the static ParameterEstimation::registerMethod function.
  *  The default registry only contains CondProbEstimation, named
  *  "ConditionalProbEstimation".
+ *
+ *  \author Charles Vaske
  */
 class ParameterEstimation {
     public:
@@ -81,6 +84,8 @@ class ParameterEstimation {
 
 
 /// Estimates the parameters of a conditional probability table, using pseudocounts.
+/** \author Charles Vaske
+ */
 class CondProbEstimation : private ParameterEstimation {
     private:
         /// Number of states of the variable of interest
@@ -137,6 +142,8 @@ class CondProbEstimation : private ParameterEstimation {
  *  class couples one or more factors (together with the specified orderings
  *  of the variables) with a ParameterEstimation object, taking care of the
  *  necessary permutations of the factor entries / parameters.
+ * 
+ *  \author Charles Vaske
  */
 class SharedParameters {
     public:
@@ -195,6 +202,8 @@ class SharedParameters {
 
 
 /// A MaximizationStep groups together several parameter estimation tasks into a single unit.
+/** \author Charles Vaske
+ */
 class MaximizationStep {
     private:
         std::vector<SharedParameters> _params;
@@ -241,6 +250,8 @@ class MaximizationStep {
  *  Having multiple and separate maximization steps allows for maximizing some
  *  parameters, performing another E step, and then maximizing separate
  *  parameters, which may result in faster convergence in some cases.
+ *
+ *  \author Charles Vaske
  */
 class EMAlg {
     private:

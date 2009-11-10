@@ -10,6 +10,7 @@
 
 /// \file
 /// \brief Defines class CBP [\ref EaG09]
+/// \author Frederik Eaton
 /// \todo Improve documentation
 
 
@@ -40,6 +41,8 @@ std::pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar
  *  levels (other stopping criteria are also implemented, see
  *  \a recursion property). The resulting approximate marginals are
  *  combined using logZ estimates.
+ *
+ *  \author Frederik Eaton
  */
 class CBP : public DAIAlgFG {
     private:

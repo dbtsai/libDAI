@@ -2,7 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	bp_dual.h
 	bbp.h
 	cbp.h
 	evidence.h

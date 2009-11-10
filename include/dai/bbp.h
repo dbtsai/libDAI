@@ -12,6 +12,7 @@
 /// \brief Defines class BBP [\ref EaG09]
 /// \todo Fit more closely into libDAI framework
 /// \todo Improve documentation
+/// \author Frederik Eaton
 
 
 #ifndef ___defined_libdai_bbp_h
@@ -39,6 +40,8 @@ std::vector<size_t> getGibbsState( const InfAlg &ia, size_t iters );
 
 
 /// Implements BBP (Back-Belief-Propagation) [\ref EaG09]
+/** \author Frederik Eaton
+ */
 class BBP {
     protected:
     /// \name Inputs

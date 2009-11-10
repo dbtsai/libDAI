@@ -10,9 +10,11 @@
 
 
 /// \file
-/// \brief Defines classes Evidence and Observation
-/// \todo Describe tabular data file format
-/// \todo Improve documentation
+/** \brief Defines classes Evidence and Observation
+ *  \todo Describe tabular data file format
+ *  \todo Improve documentation
+ *  \author Charles Vaske
+ */
 
 
 #ifndef __defined_libdai_evidence_h
@@ -27,6 +29,8 @@ namespace dai {
 
 
 /// Stores observed values of a subset of variables
+/** \author Charles Vaske
+ */  
 class Observation {
     private:
         /// Used to store the state of some variables
@@ -50,6 +54,8 @@ class Observation {
 /// Stores multiple joint observations of sets of variables.
 /** The Evidence class stores multiple samples, where each sample is the joint
  *  observation of the states of some variables.
+ *
+ *  \author Charles Vaske
  */
 class Evidence {
     private:

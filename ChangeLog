@@ -37,12 +37,12 @@
 * Introduced CCNODEBUGFLAGS in Makefile
 * Updated copyright headers
 * Added max-product functionality to JTree
-* [Charlie Vaske] EM bugfix (was using abs() instead of fabs() in 
+* [Charles Vaske] EM bugfix (was using abs() instead of fabs() in 
   determining EM termination, which caused a loss of precision).
-* [Charlie Vaske] New constructor in Permute for canonical variable ordering
-* [Charlie Vaske] New constructor in Factor that reorders variables to canonical ordering
-* [Charlie Vaske] New accessor in Properties for getting all keys
-* [Charlie Vaske] New function for getting inferred parameters
+* [Charles Vaske] New constructor in Permute for canonical variable ordering
+* [Charles Vaske] New constructor in Factor that reorders variables to canonical ordering
+* [Charles Vaske] New accessor in Properties for getting all keys
+* [Charles Vaske] New function for getting inferred parameters
 * Cleaned up error handling by introducing the DAI_THROWE macro
 * Introduced DAI_DEBASSERT macro to abbreviate a common pattern
 * Changed FactorGraph::clamp and DAIAlg::clamp interfaces (the variable to be
@@ -62,7 +62,7 @@ git ae0fc30e10be6683cbfc209dcee56f34234a6cb8
 * Added BipartiteGraph::eraseEdge
 * Removed all the virtual default constructors *::create(), as they are not used.
 * Fixed bug in MaxSpanningTree (it wrongly assumed that the tree was not empty).
-* [Charlie Vaske] Added Expectation Maximization code.
+* [Charles Vaske] Added Expectation Maximization code.
 * Added MatLab QuickStart to README.
 * MEX file dai now also returns variable and factor beliefs.
 * Cleanups and extra documentation of the code contributed by Frederik Eaton

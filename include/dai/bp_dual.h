@@ -9,9 +9,9 @@
 
 
 /// \file
-/// \brief Defines class BP_dual
-/// \todo This replicates a large part of the functionality of BP; would it not be shorter to adapt BP instead?
-/// \todo Improve documentation
+/// \brief Defines class BP_dual, which is used primarily by BBP.
+/// \todo This replicates a large part of the functionality of BP; would it not be more efficient to adapt BP instead?
+/// \author Frederik Eaton
 
 
 #ifndef __defined_libdai_bp_dual_h
@@ -31,9 +31,10 @@ namespace dai {
  *  to variables and messages from variables to factors), and normalizers, given an InfAlg.
  *  These are computed from the variable and factor beliefs of the InfAlg.
  *  This class is used primarily by BBP.
+ *
+ *  \author Frederik Eaton
  */
 class BP_dual {
-
     protected:
         /// Convenience label for storing edge properties
         template<class T>
@@ -72,28 +73,28 @@ class BP_dual {
 
         /// Does all necessary preprocessing
         void init();
-        /// Allocates space for _msgs
+        /// Allocates space for \a _msgs
         void regenerateMessages();
-        /// Allocates space for _beliefs
+        /// Allocates space for \a _beliefs
         void regenerateBeliefs();
 
         /// Calculate all messages from InfAlg beliefs
         void calcMessages();
-        /// Update factor->variable message (i->I)
+        /// Update factor->variable message (\a i -> \a I)
         void calcNewM(size_t i, size_t _I);
-        /// Update variable->factor message (I->i)
+        /// Update variable->factor message (\a I -> \a i)
         void calcNewN(size_t i, size_t _I);
 
         /// Calculate all variable and factor beliefs from messages
         void calcBeliefs();
-        /// Calculate variable belief
+        /// Calculate belief of variable \a i
         void calcBeliefV(size_t i);
-        /// Calculate factor belief
+        /// Calculate belief of factor \a I
         void calcBeliefF(size_t I);
 
     public:
         /// Construct BP_dual object from (converged) InfAlg object's beliefs and factors.
-        /*  A pointer to the the InfAlg object is stored,
+        /** \warning A pointer to the the InfAlg object is stored,
          *  so the object must not be destroyed before the BP_dual is destroyed.
          */
         BP_dual( const InfAlg *ia ) : _ia(ia) { init(); }
@@ -101,31 +102,31 @@ class BP_dual {
         /// Returns the underlying FactorGraph
         const FactorGraph& fg() const { return _ia->fg(); }
 
-        /// Returns reference to factor -> var message (I->i)
+        /// Returns reference to factor->variable message (\a I -> \a i)
         Prob & msgM( size_t i, size_t _I ) { return _msgs.m[i][_I]; }
-        /// Returns constant reference to factor -> var message (I->i)
+        /// Returns constant reference to factor->variable message (\a I -> \a i)
         const Prob & msgM( size_t i, size_t _I ) const { return _msgs.m[i][_I]; }
-        /// Returns reference to var -> factor message (i->I)
+        /// Returns reference to variable -> factor message (\a i -> \a I)
         Prob & msgN( size_t i, size_t _I ) { return _msgs.n[i][_I]; }
-        /// Returns constant reference to var -> factor message (i->I)
+        /// Returns constant reference to variable -> factor message (\a i -> \a I)
         const Prob & msgN( size_t i, size_t _I ) const { return _msgs.n[i][_I]; }
-        /// Returns reference to normalizer for msgM
+        /// Returns reference to normalizer for factor->variable message (\a I -> \a i)
         Real & zM( size_t i, size_t _I ) { return _msgs.Zm[i][_I]; }
-        /// Returns constant reference to normalizer for msgM
+        /// Returns constant reference to normalizer for factor->variable message (\a I -> \a i)
         const Real & zM( size_t i, size_t _I ) const { return _msgs.Zm[i][_I]; }
-        /// Returns reference to normalizer for msgN
+        /// Returns reference to normalizer for variable -> factor message (\a i -> \a I)
         Real & zN( size_t i, size_t _I ) { return _msgs.Zn[i][_I]; }
-        /// Returns constant reference to normalizer for msgN
+        /// Returns constant reference to normalizer for variable -> factor message (\a i -> \a I)
         const Real & zN( size_t i, size_t _I ) const { return _msgs.Zn[i][_I]; }
 
-        /// Returns variable belief
+        /// Returns belief of variable \a i
         Factor beliefV( size_t i ) const { return Factor( _ia->fg().var(i), _beliefs.b1[i] ); }
-        /// Returns factor belief
+        /// Returns belief of factor \a I
         Factor beliefF( size_t I ) const { return Factor( _ia->fg().factor(I).vars(), _beliefs.b2[I] ); }
 
-        /// Returns normalizer for variable belief
+        /// Returns normalizer for belief of variable \a i
         Real beliefVZ( size_t i ) const { return _beliefs.Zb1[i]; }
-        /// Returns normalizer for factor belief
+        /// Returns normalizer for belief of factor \a I
         Real beliefFZ( size_t I ) const { return _beliefs.Zb2[I]; }
 };
 
