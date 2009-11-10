@@ -11,8 +11,7 @@
 
 
 /// \file
-/// \brief Defines class MR
-/// \todo Improve documentation
+/// \brief Defines class MR, which implements loop corrections as proposed by Montanari and Rizzo
 
 
 #ifndef __defined_libdai_mr_h
@@ -32,36 +31,56 @@
 namespace dai {
 
 
-/// Approximate inference algorithm by Montanari and Rizzo
+/// Approximate inference algorithm by Montanari and Rizzo [\ref MoR05]
+/** \author Bastian Wemmenhove wrote the original implementation before it was merged into libDAI
+ */
 class MR : public DAIAlgFG {
     private:
-        bool supported;                                            // is the underlying factor graph supported?
-
-        std::vector<size_t>                             con;       // con[i] = connectivity of spin i
-        std::vector<std::vector<size_t> >               nb;        // nb[i] are the neighbours of spin i
-        std::vector<std::vector<Real> >                 tJ;        // tJ[i][_j] is the tanh of the interaction between spin i and its neighbour nb[i][_j]
-        std::vector<Real>                               theta;     // theta[i] is the local field on spin i
-        std::vector<std::vector<Real> >                 M;         // M[i][_j] is M^{(i)}_j
-        std::vector<std::vector<size_t> >               kindex;    // the _j'th neighbour of spin i has spin i as its kindex[i][_j]'th neighbour
+        /// Is the underlying factor graph supported?
+        bool supported;
+        /// con[i] = connectivity of spin \a i
+        std::vector<size_t>                             con;
+        /// nb[i] are the neighbours of spin \a i
+        std::vector<std::vector<size_t> >               nb;
+        /// tJ[i][_j] is the hyperbolic tangent of the interaction between spin \a i and its neighbour nb[i][_j]
+        std::vector<std::vector<Real> >                 tJ;
+        /// theta[i] is the local field on spin \a i
+        std::vector<Real>                               theta;
+        /// M[i][_j] is \f$ M^{(i)}_j \f$
+        std::vector<std::vector<Real> >                 M;
+        /// The \a _j 'th neighbour of spin \a i has spin \a i as its kindex[i][_j]'th neighbour
+        std::vector<std::vector<size_t> >               kindex;
+        /// Cavity correlations
         std::vector<std::vector<std::vector<Real> > >   cors;
-
+        /// Maximum connectivity
         static const size_t kmax = 31;
+        /// Type used for managing a subset of neighbors
         typedef boost::dynamic_bitset<> sub_nb;
-
+        /// Number of variables (spins)
         size_t N;
-
+        /// Magnetizations
         std::vector<Real> Mag;
-
+        /// Maximum difference encountered so far
         Real _maxdiff;
+        /// Number of iterations needed
         size_t _iters;
 
     public:
         /// Parameters of this inference algorithm
         struct Properties {
             /// Enumeration of different types of update equations
+            /** The possible update equations are:
+             *  - FULL full updates, slow but accurate
+             *  - LINEAR linearized updates, faster but less accurate
+             */
             DAI_ENUM(UpdateType,FULL,LINEAR);
 
             /// Enumeration of different ways of initializing the cavity correlations
+            /** The possible cavity initializations are:
+             *  - RESPPROP using response propagation ("linear response")
+             *  - CLAMPING using clamping and BP
+             *  - EXACT using JunctionTree
+             */
             DAI_ENUM(InitType,RESPPROP,CLAMPING,EXACT);
 
             /// Verbosity
@@ -84,7 +103,7 @@ class MR : public DAIAlgFG {
         /// Default constructor
         MR() : DAIAlgFG(), supported(), con(), nb(), tJ(), theta(), M(), kindex(), cors(), N(), Mag(), _maxdiff(), _iters(), props() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
+        /// Construct from FactorGraph \a fg and PropertySet \a opts
         MR( const FactorGraph &fg, const PropertySet &opts );
 
 
@@ -107,25 +126,67 @@ class MR : public DAIAlgFG {
     //@}
 
     private:
+        /// Returns the signum of \a a
+        Real sign(Real a) { return (a >= 0) ? 1.0 : -1.0; }
+
+        /// Initialize N, con, nb, tJ, theta
         void init(size_t Nin, Real *_w, Real *_th);
+        
+        /// Initialize kindex
         void makekindex();
+        
+        /// Initialize cors
         void init_cor();
+        
+        /// Calculate cors using response propagation
         Real init_cor_resp();
+        
+        /// Iterate update equations for cavity fields
         void solvemcav();
+        
+        /// Calculate magnetizations
         void solveM();
 
+        /// Calculate the product of all tJ[i][_j] for _j in A
+        /** \param i variable index
+         *  \param A subset of neighbors of variable \a i
+         */
         Real _tJ(size_t i, sub_nb A);
-
+        
+        /// Calculate \f$ \Omega^{(i)}_{j,l} \f$ as defined in [\ref MoR05] eqn. (2.15)
         Real Omega(size_t i, size_t _j, size_t _l);
+        
+        /// Calculate \f$ T^{(i)}_A \f$ as defined in [\ref MoR05] eqn. (2.17) with \f$ A = \{l_1,l_2,\dots\} \f$
+        /** \param i variable index
+         *  \param A subset of neighbors of variable \a i
+         */
         Real T(size_t i, sub_nb A);
+        
+        /// Calculates \f$ T^{(i)}_j \f$ where \a j is the \a _j 'th neighbor of \a i
         Real T(size_t i, size_t _j);
+        
+        /// Calculates \f$ \Gamma^{(i)}_{j,l_1l_2} \f$ as defined in [\ref MoR05] eqn. (2.16)
         Real Gamma(size_t i, size_t _j, size_t _l1, size_t _l2);
+        
+        /// Calculates \f$ \Gamma^{(i)}_{l_1l_2} \f$ as defined in [\ref MoK07] on page 1141
         Real Gamma(size_t i, size_t _l1, size_t _l2);
-
+        
+        /// Approximates moments of variables in \a A
+        /** Calculate the moment of variables in \a A from M and cors, neglecting higher order cumulants,
+         *  defined as the sum over all partitions of A into subsets of cardinality two at most of the
+         *  product of the cumulants (either first order, i.e. M, or second order, i.e. cors) of the
+         *  entries of the partitions.
+         *
+         *  \param i variable index
+         *  \param A subset of neighbors of variable \a i
+         */
         Real appM(size_t i, sub_nb A);
+        
+        /// Calculate sum over all even/odd subsets B of \a A of _tJ(j,B) appM(j,B)
+        /** \param j variable index
+         *  \param A subset of neighbors of variable \a j
+         */
         void sum_subs(size_t j, sub_nb A, Real *sum_even, Real *sum_odd);
-
-        Real sign(Real a) { return (a >= 0) ? 1.0 : -1.0; }
 };
 
 

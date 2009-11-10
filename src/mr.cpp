@@ -63,7 +63,6 @@ string MR::printProperties() const {
 }
 
 
-// init N, con, nb, tJ, theta
 void MR::init(size_t Nin, Real *_w, Real *_th) {
     size_t i,j;
 
@@ -90,7 +89,6 @@ void MR::init(size_t Nin, Real *_w, Real *_th) {
 }
 
 
-// calculate cors
 Real MR::init_cor_resp() {
     size_t j,k,l, runx,i2;
     Real variab1, variab2;
@@ -249,11 +247,6 @@ Real MR::init_cor_resp() {
 
 
 Real MR::T(size_t i, sub_nb A) {
-    // i is a variable index
-    // A is a subset of nb[i]
-    //
-    // calculate T{(i)}_A as defined in Rizzo&Montanari e-print (2.17)
-
     sub_nb _nbi_min_A(con[i]);
     _nbi_min_A.set();
     _nbi_min_A &= ~A;
@@ -306,11 +299,6 @@ Real MR::Gamma(size_t i, size_t _l1, size_t _l2) {
 
 
 Real MR::_tJ(size_t i, sub_nb A) {
-    // i is a variable index
-    // A is a subset of nb[i]
-    //
-    // calculate the product of all tJ[i][_j] for _j in A
-
     sub_nb::size_type _j = A.find_first();
     if( _j == sub_nb::npos )
         return 1.0;
@@ -320,14 +308,6 @@ Real MR::_tJ(size_t i, sub_nb A) {
 
 
 Real MR::appM(size_t i, sub_nb A) {
-    // i is a variable index
-    // A is a subset of nb[i]
-    //
-    // calculate the moment of variables in A from M and cors, neglecting higher order cumulants,
-    // defined as the sum over all partitions of A into subsets of cardinality two at most of the
-    // product of the cumulants (either first order, i.e. M, or second order, i.e. cors) of the
-    // entries of the partitions
-
     sub_nb::size_type _j = A.find_first();
     if( _j == sub_nb::npos )
         return 1.0;
@@ -347,11 +327,6 @@ Real MR::appM(size_t i, sub_nb A) {
 
 
 void MR::sum_subs(size_t j, sub_nb A, Real *sum_even, Real *sum_odd) {
-    // j is a variable index
-    // A is a subset of nb[j]
-
-    // calculate sum over all even/odd subsets B of A of _tJ(j,B) appM(j,B)
-
     *sum_even = 0.0;
     *sum_odd = 0.0;
 
@@ -607,7 +582,7 @@ MR::MR( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), support
         }
 
     if( !supported )
-        return;
+        DAI_THROWE(NOT_IMPLEMENTED,"MR only supports binary variables with low connectivity");
 
     // check whether all interactions are pairwise or single
     for( size_t I = 0; I < fg.nrFactors(); I++ )
@@ -617,7 +592,7 @@ MR::MR( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), support
         }
 
     if( !supported )
-        return;
+        DAI_THROWE(NOT_IMPLEMENTED,"MR does not support higher order interactions (only single and pairwise are supported)");
 
     // create w and th
     size_t Nin = fg.nrVars();

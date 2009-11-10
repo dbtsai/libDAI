@@ -2,7 +2,6 @@ To do for the next release (0.2.3):
 
 Improve documentation:
 
-	mr.h
 	gibbs.h
 	bp_dual.h
 	bbp.h
@@ -12,6 +11,8 @@ Improve documentation:
 	doc.h
 
 Improve documentation of all .props structs.
+
+Improve documentation of inference algorithm constructors (indicate constraints on factor graph)
 
 Write a concept/notations page for the documentation,
 explaining the concepts of "state" (index into a 
