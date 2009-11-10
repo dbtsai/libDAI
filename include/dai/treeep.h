@@ -11,6 +11,7 @@
 
 /// \file
 /// \brief Defines class TreeEP, which implements Tree Expectation Propagation
+/// \todo Clean up the TreeEP code
 
 
 #ifndef __defined_libdai_treeep_h

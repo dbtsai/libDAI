@@ -69,34 +69,34 @@ int main( int argc, char *argv[] ) {
                     updates = BBP::Properties::UpdateType::PAR;
                     break;
             }
-            bbp_cfn_t cfn;
+            BBPCostFunction cfn;
             switch( (t / 5) % 9 ) {
                 case 0:
-                    cfn = bbp_cfn_t::CFN_GIBBS_B;
+                    cfn = BBPCostFunction::CFN_GIBBS_B;
                     break;
                 case 1:
-                    cfn = bbp_cfn_t::CFN_GIBBS_B2;
+                    cfn = BBPCostFunction::CFN_GIBBS_B2;
                     break;
                 case 2:
-                    cfn = bbp_cfn_t::CFN_GIBBS_EXP;
+                    cfn = BBPCostFunction::CFN_GIBBS_EXP;
                     break;
                 case 3:
-                    cfn = bbp_cfn_t::CFN_GIBBS_B_FACTOR;
+                    cfn = BBPCostFunction::CFN_GIBBS_B_FACTOR;
                     break;
                 case 4:
-                    cfn = bbp_cfn_t::CFN_GIBBS_B2_FACTOR;
+                    cfn = BBPCostFunction::CFN_GIBBS_B2_FACTOR;
                     break;
                 case 5:
-                    cfn = bbp_cfn_t::CFN_GIBBS_EXP_FACTOR;
+                    cfn = BBPCostFunction::CFN_GIBBS_EXP_FACTOR;
                     break;
                 case 6:
-                    cfn = bbp_cfn_t::CFN_VAR_ENT;
+                    cfn = BBPCostFunction::CFN_VAR_ENT;
                     break;
                 case 7:
-                    cfn = bbp_cfn_t::CFN_FACTOR_ENT;
+                    cfn = BBPCostFunction::CFN_FACTOR_ENT;
                     break;
                 case 8:
-                    cfn = bbp_cfn_t::CFN_BETHE_ENT;
+                    cfn = BBPCostFunction::CFN_BETHE_ENT;
                     break;
             }
 

@@ -95,7 +95,7 @@
             return os;\
         }\
 \
-    private:\
+    protected:\
         value v;\
 };
 

@@ -30,7 +30,7 @@ namespace dai {
 
 /// Find a variable to clamp using BBP (goes with maximum adjoint)
 /// \see BBP
-std::pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, bbp_cfn_t cfn, Real *maxVarOut );
+std::pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, const BBPCostFunction &cfn, Real *maxVarOut );
 
 
 /// Class for CBP (Clamped Belief Propagation)
@@ -63,7 +63,7 @@ class CBP : public DAIAlgFG {
         boost::shared_ptr<std::ofstream> _clamp_ofstream;
 
         /// Returns BBP cost function used
-        bbp_cfn_t BBP_cost_function() { return props.bbp_cfn; }
+        BBPCostFunction BBP_cost_function() { return props.bbp_cfn; }
 
         /// Prints beliefs, variables and partition sum, in case of a debugging build
         void printDebugInfo();
@@ -171,7 +171,7 @@ class CBP : public DAIAlgFG {
             /// Properties to pass to BBP
             PropertySet bbp_props;
             /// Cost function to use for BBP
-            bbp_cfn_t bbp_cfn;
+            BBPCostFunction bbp_cfn;
             /// Random seed
             size_t rand_seed = 0;
 
@@ -214,7 +214,7 @@ class CBP : public DAIAlgFG {
             /// Properties to pass to BBP
             PropertySet bbp_props;
             /// Cost function to use for BBP
-            bbp_cfn_t bbp_cfn;
+            BBPCostFunction bbp_cfn;
             /// Random seed
             size_t rand_seed;
             /// If non-empty, write clamping choices to this file

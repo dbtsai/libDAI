@@ -16,7 +16,7 @@
 
 #include <dai/util.h>
 #include <dai/properties.h>
-
+#include <dai/gibbs.h>
 #include <dai/bp.h>
 #include <dai/cbp.h>
 #include <dai/bbp.h>
@@ -328,8 +328,8 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                ChooseMethod()==Properties::ChooseMethodType::CHOOSE_BP_CFN ) {
         bool doL1 = (ChooseMethod() == Properties::ChooseMethodType::CHOOSE_BP_L1);
         vector<size_t> state;
-        if( !doL1 && needGibbsState( BBP_cost_function() ) )
-            state = getGibbsState( *bp, 2*bp->Iterations() );
+        if( !doL1 && BBP_cost_function().needGibbsState() )
+            state = getGibbsState( bp->fg(), 2*bp->Iterations() );
         // try clamping each variable manually
         DAI_ASSERT( Clamping() == Properties::ClampType::CLAMP_VAR );
         Real max_cost = 0.0;
@@ -347,7 +347,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                     for( size_t j = 0; j < nrVars(); j++ )
                         cost += dist( bp->beliefV(j), bp1->beliefV(j), Prob::DISTL1 );
                 else
-                    cost = getCostFn( *bp1, BBP_cost_function(), &state );
+                    cost = BBP_cost_function().evaluate( *bp1, &state );
                 if( cost > max_cost || win_k == -1 ) {
                     max_cost = cost;
                     win_k = k;
@@ -415,9 +415,9 @@ void CBP::printDebugInfo() {
  *  creates and runs a BBP object, finds best variable, returns
  *  (variable,state) pair for clamping
  */
-pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, bbp_cfn_t cfn, Real *maxVarOut ) {
+pair<size_t, size_t> bbpFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, const BBPCostFunction &cfn, Real *maxVarOut ) {
     BBP bbp( &in_bp, bbp_props );
-    initBBPCostFnAdj( bbp, in_bp, cfn, NULL );
+    bbp.initCostFnAdj( cfn, NULL );
     bbp.run();
 
     // find and return the (variable,state) with the largest adj_psi_V
@@ -581,7 +581,7 @@ void CBP::Properties::set(const PropertySet &opts)
     recursion = opts.getStringAs<RecurseType>("recursion");
     clamp = opts.getStringAs<ClampType>("clamp");
     bbp_props = opts.getStringAs<PropertySet>("bbp_props");
-    bbp_cfn = opts.getStringAs<bbp_cfn_t>("bbp_cfn");
+    bbp_cfn = opts.getStringAs<BBPCostFunction>("bbp_cfn");
     if(opts.hasKey("rand_seed")) {
         rand_seed = opts.getStringAs<size_t>("rand_seed");
     } else {
