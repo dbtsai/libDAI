@@ -10,8 +10,7 @@
 
 
 /// \file
-/// \brief Defines class LC
-/// \todo Improve documentation
+/// \brief Defines class LC, which implements loop corrections for approximate inference
 
 
 #ifndef __defined_libdai_lc_h
@@ -29,30 +28,40 @@
 namespace dai {
 
 
-/// Approximate inference algorithm "Loop Corrected Belief Propagation" by Mooij and Kappen
+/// Approximate inference algorithm "Loop Corrected Belief Propagation" [\ref MoK07]
 class LC : public DAIAlgFG {
     private:
-        std::vector<Factor>      _pancakes;      // used by all LC types (psi_I is stored in the pancake)
-        std::vector<Factor>      _cavitydists;   // used by all LC types to store the approximate cavity distribution
-        /// _phis[i][_I] corresponds to \f$ \phi^{\setminus i}_I(x_{I \setminus i}) \f$
-        std::vector<std::vector<Factor> >      _phis;
-
+        /// Stores for each variable the approximate cavity distribution multiplied with the omitted factors
+        std::vector<Factor> _pancakes;
+        /// Stores for each variable the approximate cavity distribution
+        std::vector<Factor> _cavitydists;
+        /// _phis[i][_I] corresponds to \f$ \phi^{\setminus i}_I(x_{I \setminus i}) \f$ in the paper
+        std::vector<std::vector<Factor> > _phis;
         /// Single variable beliefs
-        std::vector<Factor>      _beliefs;
-
+        std::vector<Factor> _beliefs;
         /// Maximum difference encountered so far
-        Real                    _maxdiff;
+        Real _maxdiff;
         /// Number of iterations needed
-        size_t                  _iters;
+        size_t _iters;
 
     public:
         /// Parameters of this inference algorithm
         struct Properties {
             /// Enumeration of possible ways to initialize the cavities
+            /** The following initialization methods are defined:
+             *  - FULL calculates the marginal using calcMarginal()
+             *  - PAIR calculates only second order interactions using calcPairBeliefs() with \a accurate == \c false
+             *  - PAIR2 calculates only second order interactions using calcPairBeliefs() with \a accurate == \c true
+             *  - UNIFORM uses a uniform distribution
+             */
             DAI_ENUM(CavityType,FULL,PAIR,PAIR2,UNIFORM);
 
             /// Enumeration of different update schedules
-            DAI_ENUM(UpdateType,SEQFIX,SEQRND,NONE);
+            /** The following update schedules are defined:
+             *  - SEQFIX sequential fixed schedule
+             *  - SEQRND sequential random schedule
+             */
+            DAI_ENUM(UpdateType,SEQFIX,SEQRND);
 
             /// Verbosity
             size_t verbose;
@@ -63,7 +72,7 @@ class LC : public DAIAlgFG {
             /// Tolerance
             Real tol;
 
-            /// Complete or partial reinit of cavity graphs?
+            /// Complete or partial reinitialization of cavity graphs?
             bool reinit;
 
             /// Damping constant
@@ -76,10 +85,10 @@ class LC : public DAIAlgFG {
             UpdateType updates;
 
             /// Name of the algorithm used to initialize the cavity distributions
-            std::string cavainame;      // FIXME: needs assignment operator?
+            std::string cavainame;
 
             /// Parameters for the algorithm used to initialize the cavity distributions
-            PropertySet cavaiopts;      // FIXME: needs assignment operator?
+            PropertySet cavaiopts;
         } props;
 
         /// Name of this inference algorithm
@@ -89,7 +98,9 @@ class LC : public DAIAlgFG {
         /// Default constructor
         LC() : DAIAlgFG(), _pancakes(), _cavitydists(), _phis(), _beliefs(), _maxdiff(), _iters(), props() {}
 
-        /// Construct from FactorGraph fg and PropertySet opts
+        /// Construct from FactorGraph \a fg and PropertySet \a opts
+        /** \see Properties
+         */
         LC( const FactorGraph &fg, const PropertySet &opts );
 
 
@@ -114,15 +125,23 @@ class LC : public DAIAlgFG {
 
     /// \name Additional interface specific for LC
     //@{
+        /// Approximates the cavity distribution of variable \a i, using the inference algorithm \a name with parameters \a opts
         Real CalcCavityDist( size_t i, const std::string &name, const PropertySet &opts );
+        /// Approximates all cavity distributions using inference algorithm \a name with parameters \a opts
         Real InitCavityDists( const std::string &name, const PropertySet &opts );
+        /// Sets approximate cavity distributions to \a Q
         long SetCavityDists( std::vector<Factor> &Q );
-
+        /// Updates the belief of the Markov blanket of variable \a i based upon the information from its \a _I 'th neighboring factor
         Factor NewPancake (size_t i, size_t _I, bool & hasNaNs);
-
+        /// Calculates the belief of variable \a i
         void CalcBelief (size_t i);
+        /// Returns the belief of variable \a i
+        /** \deprecated Please use dai::LC::beliefV() instead
+         */
         const Factor &belief (size_t i) const { return _beliefs[i]; };
+        /// Returns the belief of the Markov blanket of variable \a i (including the variable itself)
         const Factor &pancake (size_t i) const { return _pancakes[i]; };
+        /// Returns the approximate cavity distribution for variable \a i
         const Factor &cavitydist (size_t i) const { return _cavitydists[i]; };
     //@}
 };
