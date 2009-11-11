@@ -16,6 +16,7 @@
 namespace dai {
 
 
+// Initialize static private member of ParameterEstimation
 std::map<std::string, ParameterEstimation::ParamEstFactory> *ParameterEstimation::_registry = NULL;
 
 
@@ -62,10 +63,8 @@ Prob CondProbEstimation::estimate() {
     // normalize pseudocounts
     for( size_t parent = 0; parent < _stats.size(); parent += _target_dim ) {
         // calculate norm
-        Real norm = 0.0;
         size_t top = parent + _target_dim;
-        for( size_t i = parent; i < top; ++i )
-            norm += _stats[i];
+        Real norm = std::accumulate( &(_stats[parent]), &(_stats[top]), 0.0 );
         if( norm != 0.0 )
             norm = 1.0 / norm;
         // normalize
@@ -116,8 +115,16 @@ void SharedParameters::setPermsAndVarSetsFromVarOrders() {
 }
 
 
-SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg_varlookup )
-  : _varsets(), _perms(), _varorders(), _estimation(NULL), _deleteEstimation(true)
+SharedParameters::SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation, bool ownPE )
+  : _varsets(), _perms(), _varorders(varorders), _estimation(estimation), _ownEstimation(ownPE)
+{
+    // Calculate the necessary permutations and varsets
+    setPermsAndVarSetsFromVarOrders();
+}
+
+
+SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg )
+  : _varsets(), _perms(), _varorders(), _estimation(NULL), _ownEstimation(true)
 {
     // Read the desired parameter estimation method from the stream
     std::string est_method;
@@ -146,7 +153,7 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg_varl
         iss.str( fields[0] );
         size_t factor;
         iss >> factor;
-        const VarSet &vs = fg_varlookup.factor(factor).vars();
+        const VarSet &vs = fg.factor(factor).vars();
         if( fields.size() != vs.size() + 1 )
             DAI_THROW(INVALID_EMALG_FILE);
 
@@ -169,23 +176,6 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg_varl
         _varorders[factor] = var_order;
     }
 
-    // Calculate the necessary permutations
-    setPermsAndVarSetsFromVarOrders();
-}
-
-
-SharedParameters::SharedParameters( const SharedParameters &sp )
-  : _varsets(sp._varsets), _perms(sp._perms), _varorders(sp._varorders), _estimation(sp._estimation), _deleteEstimation(sp._deleteEstimation)
-{
-    // If sp owns its _estimation object, we should clone it instead
-    if( _deleteEstimation )
-        _estimation = _estimation->clone();
-}
-
-
-SharedParameters::SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation, bool deletePE )
-  : _varsets(), _perms(), _varorders(varorders), _estimation(estimation), _deleteEstimation(deletePE)
-{
     // Calculate the necessary permutations
     setPermsAndVarSetsFromVarOrders();
 }

@@ -356,6 +356,21 @@
  *  \f$x_1 = 0, x_3 = 0, x_2 = 1\f$, the second observation being
  *  \f$x_1 = 1, x_3 = 0, x_2 = 1\f$, and the third observation being
  *  \f$x_1 = 1, x_2 = 1\f$ (where the state of \f$x_3\f$ is missing).
+ *
+ *  \section fileformats-sharedparameters Shared parameters section in EM file
+ *
+ *  This section describes the file format of part of an .em file, namely a
+ *  section describing one SharedParameters object.
+ *
+ *  The first line should consist of the name of a ParameterEstimation subclass
+ *  and its parameters in the format of a PropertySet. For example:
+ *
+ *  <pre>
+ *  ConditionalProbEstimation [target_dim=2,total_dim=4,pseudo_count=1]
+ *  </pre>
+ *
+ *  The next line contains the number of factors that share parameters.
+ *  Then, possibly seperated by empty lines, we for each factor FIXME
  */
 
 /** \page license License

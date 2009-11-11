@@ -30,13 +30,20 @@
 namespace dai {
 
 
-/// Interface for a parameter estimation method.
-/** This parameter estimation interface is based on sufficient statistics.
+/// Base class for parameter estimation methods.
+/** This class defines the general interface of parameter estimation methods.
+ *
+ *  Implementations of this interface (see e.g. CondProbEstimation) should 
+ *  register a factory function (virtual constructor) via the static 
+ *  registerMethod() function.
+ *  This factory function should return a pointer to a newly constructed 
+ *  object, whose type is a subclass of ParameterEstimation, and gets as 
+ *  input a PropertySet of parameters. After a subclass has been registered, 
+ *  instances of it can be constructed using the construct() method.
+ *
  *  Implementations are responsible for collecting data from a probability
  *  vector passed to it from a SharedParameters container object.
  *
- *  Implementations of this interface should register a factory function
- *  via the static ParameterEstimation::registerMethod function.
  *  The default registry only contains CondProbEstimation, named
  *  "ConditionalProbEstimation".
  *
@@ -44,18 +51,23 @@ namespace dai {
  */
 class ParameterEstimation {
     public:
-        /// A pointer to a factory function.
+        /// Type of pointer to factory function.
         typedef ParameterEstimation* (*ParamEstFactory)( const PropertySet& );
 
         /// Virtual destructor for deleting pointers to derived classes.
         virtual ~ParameterEstimation() {}
+
         /// Virtual copy constructor.
         virtual ParameterEstimation* clone() const = 0;
 
-        /// General factory method for construction of ParameterEstimation subclasses.
+        /// General factory method that constructs the desired ParameterEstimation subclass
+        /** \param method Name of the subclass that should be constructed;
+         *  \param p Parameters passed to constructor of subclass.
+         *  \note \a method should either be in the default registry or should be registered first using registerMethod().
+         */
         static ParameterEstimation* construct( const std::string &method, const PropertySet &p );
 
-        /// Register a subclass so that it can be used with ParameterEstimation::construct.
+        /// Register a subclass so that it can be used with construct().
         static void registerMethod( const std::string &method, const ParamEstFactory &f ) {
             if( _registry == NULL )
                 loadDefaultRegistry();
@@ -65,7 +77,7 @@ class ParameterEstimation {
         /// Estimate the factor using the accumulated sufficient statistics and reset.
         virtual Prob estimate() = 0;
 
-        /// Accumulate the sufficient statistics for p.
+        /// Accumulate the sufficient statistics for \a p.
         virtual void addSufficientStatistics( const Prob &p ) = 0;
 
         /// Returns the size of the Prob that should be passed to addSufficientStatistics.
@@ -96,18 +108,18 @@ class CondProbEstimation : private ParameterEstimation {
         /// Constructor
         /** For a conditional probability \f$ P( X | Y ) \f$,
          *  \param target_dimension should equal \f$ | X | \f$
-         *  \param pseudocounts has length \f$ |X| \cdot |Y| \f$
+         *  \param pseudocounts are the initial pseudocounts, of length \f$ |X| \cdot |Y| \f$
          */
         CondProbEstimation( size_t target_dimension, const Prob &pseudocounts );
 
         /// Virtual constructor, using a PropertySet.
         /** Some keys in the PropertySet are required.
          *  For a conditional probability \f$ P( X | Y ) \f$,
-         *     - target_dimension should be equal to \f$ | X | \f$
-         *     - total_dimension should be equal to \f$ |X| \cdot |Y| \f$
+         *     - \a target_dimension should be equal to \f$ | X | \f$
+         *     - \a total_dimension should be equal to \f$ |X| \cdot |Y| \f$
          *
          *  An optional key is:
-         *     - pseudo_count, which specifies the initial counts (defaults to 1)
+         *     - \a pseudo_count which specifies the initial counts (defaults to 1)
          */
         static ParameterEstimation* factory( const PropertySet &p );
 
@@ -123,20 +135,20 @@ class CondProbEstimation : private ParameterEstimation {
          */
         virtual Prob estimate();
 
-        /// Accumulate sufficient statistics from the expectations in p.
+        /// Accumulate sufficient statistics from the expectations in \a p
         virtual void addSufficientStatistics( const Prob &p );
 
-        /// Returns the required size for arguments to addSufficientStatistics.
+        /// Returns the required size for arguments to addSufficientStatistics().
         virtual size_t probSize() const { return _stats.size(); }
 };
 
 
-/// A single factor or set of factors whose parameters should be estimated.
+/// Represents a single factor or set of factors whose parameters should be estimated.
 /** To ensure that parameters can be shared between different factors during
  *  EM learning, each factor's values are reordered to match a desired variable
  *  ordering. The ordering of the variables in a factor may therefore differ
  *  from the canonical ordering used in libDAI. The SharedParameters
- *  class couples one or more factors (together with the specified orderings
+ *  class combines one or more factors (together with the specified orderings
  *  of the variables) with a ParameterEstimation object, taking care of the
  *  necessary permutations of the factor entries / parameters.
  * 
@@ -144,7 +156,7 @@ class CondProbEstimation : private ParameterEstimation {
  */
 class SharedParameters {
     public:
-        /// Convenience label for an index into a factor in a FactorGraph.
+        /// Convenience label for an index of a factor in a FactorGraph.
         typedef size_t FactorIndex;
         /// Convenience label for a grouping of factor orientations.
         typedef std::map<FactorIndex, std::vector<Var> > FactorOrientations;
@@ -158,32 +170,43 @@ class SharedParameters {
         FactorOrientations _varorders;
         /// Parameter estimation method to be used
         ParameterEstimation *_estimation;
-        /// Indicates whether the object pointed to by _estimation should be deleted upon destruction
-        bool _deleteEstimation;
+        /// Indicates whether \c *this gets ownership of _estimation
+        bool _ownEstimation;
 
         /// Calculates the permutation that permutes the variables in varorder into the canonical ordering
+        /** \param varorder Given ordering of variables
+         *  \param outVS Contains variables in \varorder represented as a VarSet
+         *  \return Permute object for permuting variables in varorder into the canonical libDAI ordering
+         */
         static Permute calculatePermutation( const std::vector<Var> &varorder, VarSet &outVS );
 
-        /// Initializes _varsets and _perms from _varorders
+        /// Initializes _varsets and _perms from _varorders and checks whether their state spaces correspond with _estimation.probSize()
         void setPermsAndVarSetsFromVarOrders();
 
     public:
-        /// Copy constructor
-        SharedParameters( const SharedParameters &sp );
-
         /// Constructor
         /** \param varorders  all the factor orientations for this parameter
          *  \param estimation a pointer to the parameter estimation method
-         *  \param deletePE whether the parameter estimation object should be deleted in the destructor
+         *  \param ownPE whether the constructed object gets ownership of \a estimation
          */
-        SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation, bool deletePE=false );
+        SharedParameters( const FactorOrientations &varorders, ParameterEstimation *estimation, bool ownPE=false );
 
-        /// Constructor for making an object from a stream and a factor graph
-        SharedParameters( std::istream &is, const FactorGraph &fg_varlookup );
+        /// Construct a SharedParameters object from a stream \a is and a factor graph \a fg
+        /** \see \ref fileformats-sharedparameters
+         */
+        SharedParameters( std::istream &is, const FactorGraph &fg );
+
+        /// Copy constructor
+        SharedParameters( const SharedParameters &sp ) : _varsets(sp._varsets), _perms(sp._perms), _varorders(sp._varorders), _estimation(sp._estimation), _ownEstimation(sp._ownEstimation) {
+            // If sp owns its _estimation object, we should clone it instead of copying the pointer
+            if( _ownEstimation )
+                _estimation = _estimation->clone();
+        }
 
         /// Destructor
         ~SharedParameters() {
-            if( _deleteEstimation )
+            // If we own the _estimation object, we should delete it now
+            if( _ownEstimation )
                 delete _estimation;
         }
 

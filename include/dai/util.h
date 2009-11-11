@@ -191,7 +191,7 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
     return w;
 }
 
-/// Split a string into tokens delimited by characters in \a delim
+/// Split a string into tokens delimited by one of the characters in \a delim
 void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
 
 // OBSOLETE
