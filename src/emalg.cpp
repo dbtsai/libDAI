@@ -210,22 +210,6 @@ void SharedParameters::setParameters( FactorGraph &fg ) {
 }
 
 
-void SharedParameters::collectParameters( const FactorGraph &fg, std::vector<Real> &outVals, std::vector<Var> &outVarOrder ) {
-    FactorOrientations::iterator it = _varorders.begin();
-    if( it == _varorders.end() )
-        return;
-    FactorIndex I = it->first;
-    for( std::vector<Var>::const_iterator var_it = _varorders[I].begin(); var_it != _varorders[I].end(); ++var_it )
-        outVarOrder.push_back( *var_it );
-
-    const Factor &f = fg.factor(I);
-    DAI_ASSERT( f.vars() == _varsets[I] );
-    const Permute &perm = _perms[I];
-    for( size_t val_index = 0; val_index < f.states(); ++val_index )
-        outVals.push_back( f[perm.convertLinearIndex(val_index)] );
-}
-
-
 MaximizationStep::MaximizationStep( std::istream &is, const FactorGraph &fg_varlookup ) : _params() {
     size_t num_params = -1;
     is >> num_params;

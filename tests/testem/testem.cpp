@@ -56,7 +56,7 @@ int main( int argc, char** argv ) {
 
     while( !em.hasSatisfiedTermConditions() ) {
         Real l = em.iterate();
-        cout << "Iteration " << em.getCurrentIters() << " likelihood: " << l <<endl;
+        cout << "Iteration " << em.Iterations() << " likelihood: " << l <<endl;
     }
 
     cout << endl << "Inferred Factor Graph:" << endl << "######################" << endl;

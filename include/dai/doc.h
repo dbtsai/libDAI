@@ -357,20 +357,48 @@
  *  \f$x_1 = 1, x_3 = 0, x_2 = 1\f$, and the third observation being
  *  \f$x_1 = 1, x_2 = 1\f$ (where the state of \f$x_3\f$ is missing).
  *
- *  \section fileformats-sharedparameters Shared parameters section in EM file
+ *  \section fileformats-emalg Expectation Maximization (.em) file format
  *
- *  This section describes the file format of part of an .em file, namely a
- *  section describing one SharedParameters object.
+ *  This section describes the file format of .em files, which are used
+ *  to specify a particular EM algorithm. The .em files are complementary
+ *  to .fg files; in other words, an .em file without a corresponding .fg 
+ *  file is useless. Furthermore, one also needs a corresponding .tab file
+ *  containing the data used for parameter learning.
  *
- *  The first line should consist of the name of a ParameterEstimation subclass
+ *  An .em file starts with a line specifying the number of maximization steps.
+ *  Then, for each maximization step, its description follows in the format
+ *  described in the next section.
+ *
+ *  \subsection fileformats-emalg-maximizationstep Maximization Step section in EM file
+ *
+ *  A maximization step section of an .em file starts with a single line
+ *  describing the number of shared parameters sections that will follow.
+ *  Then, precisely that number of shared parameters sections follow, 
+ *  where each of those sections follows the format described in the next
+ *  subsection.
+ *
+ *  \subsection fileformats-sharedparameters Shared parameters section in EM file
+ *
+ *  A shared parameters section of an .em file starts with a single line
+ *  consisting of the name of a ParameterEstimation subclass
  *  and its parameters in the format of a PropertySet. For example:
  *
  *  <pre>
  *  ConditionalProbEstimation [target_dim=2,total_dim=4,pseudo_count=1]
  *  </pre>
  *
- *  The next line contains the number of factors that share parameters.
- *  Then, possibly seperated by empty lines, we for each factor FIXME
+ *  The next line contains the number of factors that share their parameters.
+ *  Then, each of these factors is specified on separate lines (possibly 
+ *  seperated by empty lines), where each line consists of several fields
+ *  seperated by a space or a tab character. The first field contains 
+ *  the index of the factor in the factor graph. The 
+ *  following fields specify the ordering of the variables on which that
+ *  factor depends, i.e., they form a permutation of the labels of the
+ *  variables belonging to that factor. The permutation corresponds to the
+ *  mapping from the ordering of the variables that is used in the 
+ *  SharedParameters object to the canonical ordering of the variables
+ *  (i.e., sorted ascendingly according to their labels) which is used in
+ *  the internal representation of the Factor object.
  */
 
 /** \page license License
