@@ -221,9 +221,11 @@
  */
 
 
-/** \page fileformat libDAI factorgraph file format
+/** \page fileformats libDAI file formats
  *
- *  This page describes the .fg fileformat used in libDAI to store factor graphs.
+ *  \section fileformats-factorgraph Factor graph (.fg) file format
+ *
+ *  This section describes the .fg file format used in libDAI to store factor graphs.
  *  Markov Random Fields are special cases of factor graphs, as are Bayesian
  *  networks. A factor graph can be specified as follows: for each factor, one has
  *  to specify which variables occur in the factor, what their respective
@@ -251,22 +253,24 @@
  *  values the fastest (similar to MATLAB indexing of multidimensional arrays). An
  *  example block describing one factor is:
  *
- *  3\n
- *  4 8 7\n
- *  3 2 2\n
- *  11\n
- *  0 0.1\n
- *  1 3.5\n
- *  2 2.8\n
- *  3 6.3\n
- *  4 8.4\n
- *  6 7.4\n
- *  7 2.4\n
- *  8 8.9\n
- *  9 1.3\n
- *  10 1.6\n
- *  12 6.4\n
- *  11 2.6\n
+ *  <pre>
+ *  3
+ *  4 8 7
+ *  3 2 2
+ *  11
+ *  0 0.1
+ *  1 3.5
+ *  2 2.8
+ *  3 6.3
+ *  4 8.4
+ *  6 7.4
+ *  7 2.4
+ *  8 8.9
+ *  9 1.3
+ *  10 1.6
+ *  12 6.4
+ *  11 2.6
+ *  </pre>
  *
  *  which corresponds to the following factor:
  *
@@ -289,16 +293,16 @@
  *  \end{array}
  *  \f]
  *
- *  Note that the value of x_4 changes fastest, followed by that of x_8, and x_7
+ *  Note that the value of \f$x_4\f$ changes fastest, followed by that of \f$x_8\f$, and \f$x_7\f$
  *  varies the slowest, corresponding to the second line of the block ("4 8 7").
- *  Further, x_4 can take on three values, and x_8 and x_7 each have two possible
+ *  Further, \f$x_4\f$ can take on three values, and \f$x_8\f$ and \f$x_7\f$ each have two possible
  *  values, as described in the third line of the block ("3 2 2"). The table
  *  contains 11 non-zero entries (all except for the fifth entry). Note that the
  *  eleventh and twelveth entries are interchanged.
  *
  *  A final note: the internal representation in libDAI of the factor above is
  *  different, because the variables are ordered according to their indices
- *  (i.e., the ordering would be x_4 x_7 x_8) and the values of the table are
+ *  (i.e., the ordering would be \f$x_4 x_7 x_8\f$) and the values of the table are
  *  stored accordingly, with the variable having the smallest index changing
  *  fastest:
  *
@@ -320,10 +324,41 @@
  *   2 & 1 & 1  &  2.6
  *  \end{array}
  *  \f]
+ *
+ *
+ *  \section fileformats-evidence Evidence (.tab) file format
+ *
+ *  This page describes the .tab fileformat used in libDAI to store "evidence",
+ *  i.e., a data set consisting of multiple samples, where each sample is the 
+ *  observed joint state of some variables.
+ *
+ *  A .tab file is a tabular data file, consisting of a header line followed by
+ *  one line for each data sample. Each line should have the same number of columns,
+ *  where columns are separated by one tab character. Each column corresponds to 
+ *  a variable. The header line consists of the variable labels (corresponding to 
+ *  Var::label()). The other lines are observed joint states of the variables, i.e.,
+ *  each line corresponds to a joint observation of the variables, and each column
+ *  of a line contains the state of the variable associated with that column.
+ *  Missing data is handled simply by having two consecutive tab characters, 
+ *  without any characters in between.
+ *
+ *  \par  Example:
+ *
+ *  <pre>
+ *  1       3       2
+ *  0       0       1
+ *  1       0       1
+ *  1               1
+ *  </pre>
+ *
+ *  This would correspond to a data set consisting of three observations concerning
+ *  the variables with labels 1, 3 and 2; the first observation being
+ *  \f$x_1 = 0, x_3 = 0, x_2 = 1\f$, the second observation being
+ *  \f$x_1 = 1, x_3 = 0, x_2 = 1\f$, and the third observation being
+ *  \f$x_1 = 1, x_2 = 1\f$ (where the state of \f$x_3\f$ is missing).
  */
 
-
- /** \page license License
+/** \page license License
 
 <b>libDAI is licensed under the GNU General Public License version 2, or
 (at your option) any later version. The complete license text is

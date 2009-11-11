@@ -20,17 +20,6 @@
 namespace dai {
 
 
-void Observation::addObservation( Var node, size_t setting ) {
-    _obs[node] = setting;
-}
-
-
-void Observation::applyEvidence( InfAlg &alg ) const {
-    for( std::map<Var, size_t>::const_iterator i = _obs.begin(); i != _obs.end(); ++i )
-        alg.clamp( alg.fg().findVar(i->first), i->second );
-}
-
-
 void Evidence::addEvidenceTabFile( std::istream &is, FactorGraph &fg ) {
     std::map<std::string, Var> varMap;
     for( std::vector<Var>::const_iterator v = fg.vars().begin(); v != fg.vars().end(); ++v ) {
@@ -77,7 +66,7 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
                 size_t state = atoi( fields[i].c_str() );
                 if( state >= vars[i].states() )
                     DAI_THROW(INVALID_EVIDENCE_FILE);
-                sampleData.addObservation( vars[i], state );
+                sampleData[vars[i]] = state;
             }
         }
         _samples.push_back( sampleData );

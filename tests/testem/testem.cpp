@@ -49,7 +49,7 @@ int main( int argc, char** argv ) {
 
     cout << "Number of samples: " << e.nrSamples() << endl;
     for( Evidence::iterator ps = e.begin(); ps != e.end(); ps++ )
-        cout << "Sample #" << (ps - e.begin()) << " has " << ps->observations().size() << " observations." << endl;
+        cout << "Sample #" << (ps - e.begin()) << " has " << ps->size() << " observations." << endl;
 
     ifstream emstream( argv[3] );
     EMAlg em(e, *inf, emstream);

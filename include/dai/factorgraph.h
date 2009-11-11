@@ -320,22 +320,22 @@ class FactorGraph {
     /// \name Input/Output
     //@{
         /// Reads a factor graph from a file
-        /** \see \ref fileformat
+        /** \see \ref fileformats-factorgraph
          */
         void ReadFromFile( const char *filename );
 
         /// Writes a factor graph to a file
-        /** \see \ref fileformat
+        /** \see \ref fileformats-factorgraph
          */
         void WriteToFile( const char *filename, size_t precision=15 ) const;
 
         /// Writes a factor graph to an output stream
-        /** \see \ref fileformat
+        /** \see \ref fileformats-factorgraph
          */
         friend std::ostream& operator<< (std::ostream &os, const FactorGraph &fg );
 
         /// Reads a factor graph from an input stream
-        /** \see \ref fileformat
+        /** \see \ref fileformats-factorgraph
          */
         friend std::istream& operator>> (std::istream &is, FactorGraph &fg );
 
