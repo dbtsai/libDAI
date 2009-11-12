@@ -26,9 +26,9 @@ namespace dai {
 
 
 /// Represents a discrete random variable.
-/** A Var stores the \a label of the variable (an integer-valued unique ID)
- *  and the number of possible values (\a states) of that variable. Two
- *  Var objects with the same label are assumed to be identical (i.e., it
+/** A Var stores the \a label of the variable (a nonnegative integer-valued
+ *  unique ID) and the number of possible values (\a states) of that variable. 
+ *  Two Var objects with the same label are assumed to be identical (i.e., it
  *  is assumed that they have the same number of possible states).
  *
  *  In the documentation, we use the following notational conventions. The discrete
@@ -40,7 +40,7 @@ namespace dai {
 class Var {
     private:
         /// Label of the variable (its unique ID)
-        long    _label;
+        size_t  _label;
 
         /// Number of possible values
         size_t  _states;
@@ -49,12 +49,12 @@ class Var {
         /// Default constructor (creates a variable with label -1 and 0 states)
         Var() : _label(-1), _states(0) {}
         /// Constructs a variable with a given label and number of states
-        Var( long label, size_t states ) : _label(label), _states(states) {}
+        Var( size_t label, size_t states ) : _label(label), _states(states) {}
 
         /// Returns the label
-        long label() const { return _label; }
+        size_t label() const { return _label; }
         /// Returns reference to label
-        long & label() { return _label; }
+        size_t& label() { return _label; }
 
         /// Returns the number of states
         size_t states () const { return _states; }

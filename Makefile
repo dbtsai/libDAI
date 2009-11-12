@@ -292,6 +292,7 @@ endif
 
 doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 	doxygen doxygen.conf
+	DAI_VERSION=$(DAI_VERSION) DAI_DATE=$(DAI_DATE) scripts/makeREADME
 
 TAGS:
 	etags src/*.cpp include/dai/*.h tests/*.cpp utils/*.cpp

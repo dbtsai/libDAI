@@ -211,7 +211,9 @@ class CBP : public DAIAlgFG {
         virtual bool chooseNextClampVar( InfAlg* bp, std::vector<size_t> &clamped_vars_list, size_t &i, std::vector<size_t> &xis, Real *maxVarOut );
 
         /// Return the InfAlg to use at each step of the recursion.
-        /// \todo At present, CBP::getInfAlg() only returns a BP instance
+        /** \todo At present, CBP::getInfAlg() only returns a BP instance; 
+         *  it should be possible to select other inference algorithms via a property
+         */
         InfAlg* getInfAlg();
 
         /// Sets variable beliefs, factor beliefs and log partition sum to the specified values

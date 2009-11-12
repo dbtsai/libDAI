@@ -150,7 +150,6 @@ Real CBP::run() {
 }
 
 
-/// \todo Eventually this allow other inference algorithms that BP to be selected, via a property
 InfAlg* CBP::getInfAlg() {
     PropertySet bpProps;
     bpProps.Set("updates", props.updates);
@@ -204,7 +203,9 @@ void CBP::runRecurse( InfAlg *bp, Real orig_logZ, vector<size_t> clamped_vars_li
     // compute complement of 'xis'
     vector<size_t> cmp_xis = complement( xis, clampingVar ? var(i).states() : factor(i).states() );
 
-    /// \todo could do this more efficiently with a nesting version of saveProbs/undoProbs
+    /// \idea dai::CBP::runRecurse() could be implemented more efficiently with a nesting version of backupFactors/restoreFactors
+    // this improvement could also be done locally: backup the clamped factor in a local variable,
+    // and restore it just before we return.
     Real lz;
     vector<Factor> b;
     InfAlg *bp_c = bp->clone();

@@ -1,173 +1,143 @@
-libDAI - A free/open source C++ library for Discrete Approximate Inference methods
-==================================================================================
+libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
-v 0.2.2 - September 30, 2008
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-----------------------------------------------------------------------------------
+Version:  git commit 76cf77837c617f54202590125c7a566ae443d0ab
+Date:     Thu Nov 12 10:52:51 2009 +0100
+See also: http://www.libdai.org
 
-This file is part of libDAI - http://www.libdai.org/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-libDAI is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+License
 
-libDAI is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+libDAI is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+libDAI is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with libDAI in the file COPYING. 
-If not, see http://www.gnu.org/licenses/
+along with libDAI in the file COPYING. If not, see http://www.gnu.org/licenses/
 
-----------------------------------------------------------------------------------
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
-Copyright (C) 2002-2007  Radboud University Nijmegen, The Netherlands
-Copyright (C) 2002       Martijn Leisink  [martijn@mbfys.kun.nl]
-
-with contributions from:
-
-Martijn Leisink
-Giuseppe Passino
-Frederik Eaton
-Charlie Vaske
-Bastian Wemmenhove
-Christian Wojek
-Claudio Lima
-Jiuxiang Hu
-Peter Gober
-Patrick Pletscher
-Sebastian Nowozin
-
-----------------------------------------------------------------------------------
+Citing libDAI
 
 If you write a scientific paper describing research that made substantive use
-of this program, please (a) mention the fashion in which this software was
-used, including the version number, with a citation to the literature, to allow
-replication; (b) mention this software in the Acknowledgements section. The
-appropriate citation is: 
+of this program, please:
 
-J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete 
-Approximate Inference methods", http://www.libdai.org
+  • mention the fashion in which this software was used, including the version
+    number, with a citation to the literature, to allow replication;
+  • mention this software in the Acknowledgements section. An appropriate
+    citation would be:
+    J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for
+    Discrete Approximate Inference methods", http://www.libdai.org
 
-Moreover, as a personal note, I would appreciate it if you would email me 
-(joris.mooij@libdai.org) with citations of papers referencing this work.
+Moreover, as a personal note, I would appreciate it if you would email
+(citations of) papers referencing this work to joris dot mooij at libdai dot
+org.
 
-----------------------------------------------------------------------------------
-
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 About libDAI
-------------
-libDAI is a free/open source C++ library (licensed under GPL) that provides
+
+libDAI is a free/open source C++ library (licensed under GPLv2+) that provides
 implementations of various (approximate) inference methods for discrete
 graphical models. libDAI supports arbitrary factor graphs with discrete
 variables; this includes discrete Markov Random Fields and Bayesian Networks.
 
-The library is targeted at researchers; to be able to use the library, a good
+The library is targeted at researchers. To be able to use the library, a good
 understanding of graphical models is needed.
 
+Features
+
+Currently, libDAI supports the following (approximate) inference methods:
+
+  • Exact inference by brute force enumeration;
+  • Exact inference by junction-tree methods;
+  • Mean Field;
+  • Loopy Belief Propagation [KFL01];
+  • Tree Expectation Propagation [MiQ04];
+  • Generalized Belief Propagation [YFW05];
+  • Double-loop GBP [HAK03];
+  • Various variants of Loop Corrected Belief Propagation [MoK07, MoR05];
+  • Gibbs sampler;
+  • Conditioned BP [EaG09].
+
+These inference methods can be used to calculate partition sums, marginals over
+subsets of variables, and MAP states (the joint state of variables that has
+maximum probability).
+
+In addition, libDAI supports parameter learning of conditional probability
+tables by Expectation Maximization.
 
 Limitations
------------
+
 libDAI is not intended to be a complete package for approximate inference.
 Instead, it should be considered as an "inference engine", providing various
 inference methods. In particular, it contains no GUI, currently only supports
 its own file format for input and output (although support for standard file
 formats may be added later), and provides very limited visualization
-functionalities.
-
-
-Features
---------
-Currently, libDAI supports the following (approximate) inference methods:
-
-    * Exact inference by brute force enumeration;
-    * Exact inference by junction-tree methods;
-    * Mean Field;
-    * Loopy Belief Propagation [KFL01];
-    * Tree Expectation Propagation [MiQ04];
-    * Generalized Belief Propagation [YFW05];
-    * Double-loop GBP [HAK03];
-    * Various variants of Loop Corrected Belief Propagation [MoK07, MoR05];
-    * Gibbs sampler;
-    * Conditioned BP [EaG09].
-
-These inference methods can be used to calculate partition sums, marginals
-over subsets of variables, and MAP states (the joint state of variables that
-has maximum probability).
-
-In addition, libDAI supports parameter learning of conditional probability
-tables by Expectation Maximization.
-
+functionalities. The only learning method supported currently is Expectation
+Maximization (or Maximum Likelihood if no data is missing) for learning factor
+parameters.
 
 Why C++?
---------
+
 Because libDAI is implemented in C++, it is very fast compared with
 implementations in MatLab (a factor 1000 faster is not uncommon). libDAI does
 provide a (limited) MatLab interface for easy integration with MatLab.
 
-
-Releases
---------
-Releases can be obtained from www.libdai.org
-License: GNU Public License v2 (or higher).
-
-libDAI-0.2      December 1, 2006
-libDAI-0.2.1    May 26, 2008
-libDAI-0.2.2    September 30, 2008
-
-
-Acknowledgments
----------------
-This work is part of the Interactive Collaborative Information Systems (ICIS) 
-project, supported by the Dutch Ministry of Economic Affairs, grant BSIK03024. 
-I would like to thank Martijn Leisink for providing the basis on which libDAI has been built.
-
-
-Documentation
--------------
-Some doxygen documentation is available. Install doxygen and use "make doc" to build the
-documentation. If the documentation is not clear enough, feel free to send me an email 
-(or even better, to improve the documentation!).
-
-A description of the factor graph (.fg) file format can be found in the file FILEFORMAT.
-
-
 Compatibility
--------------
+
 The code has been developed under Debian GNU/Linux with the GCC compiler suite.
 libDAI compiles successfully with g++ versions 3.4, 4.1, 4.2 and 4.3.
 
-libDAI has also been successfully compiled with MS Visual Studio 2008 under Windows
-(but not all build targets are supported yet) and with Cygwin under Windows.
+libDAI has also been successfully compiled with MS Visual Studio 2008 under
+Windows (but not all build targets are supported yet) and with Cygwin under
+Windows.
 
 Finally, libDAI has been compiled successfully on MacOS X.
 
+Downloading libDAI
 
-Quick start (linux/cygwin/Mac OS X)
------------------------------------
+The libDAI sources and documentation can be downloaded from the libDAI website:
+http://www.libdai.org.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Building libDAI under UNIX variants (Linux / Cygwin / Mac OS X)
+
 You need:
-- a recent version of gcc (at least version 3.4)
-- GNU make
-- doxygen
-- graphviz
-- recent boost C++ libraries (at least version 1.34, or 1.37 for cygwin;
-  version 1.37 shipped with Ubuntu 9.04 is known not to work)
 
-On Debian/Ubuntu, you can easily install all these packages with a single command:
-"apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev"
+  • a recent version of gcc (at least version 3.4)
+  • GNU make
+  • doxygen
+  • graphviz
+  • recent boost C++ libraries (at least version 1.34, or 1.37 for cygwin;
+    version 1.37 shipped with Ubuntu 9.04 is known not to work)
+
+On Debian/Ubuntu, you can easily install all these packages with a single
+command:
+
+  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev
+
 (root permissions needed).
 
-On Mac OS X (10.4 is known to work), these packages can be installed easily via MacPorts.
-First, install MacPorts according to the instructions at http://www.macports.org/
-Then, a simple "sudo port install gmake boost doxygen graphviz"
+On Mac OS X (10.4 is known to work), these packages can be installed easily via
+MacPorts. If MacPorts is not already installed, install it according to the
+instructions at http://www.macports.org/. Then, a simple
+
+  sudo port install gmake boost doxygen graphviz
+
 should be enough to install everything that is needed.
 
-On Cygwin, the prebuilt Cygwin package boost-1.33.1-x is known not to work.
-You can however obtain the latest boost version (you need at least 1.37.0)
-from http://www.boost.org/ and compile/install it with:
+On Cygwin, the prebuilt Cygwin package boost-1.33.1-x is known not to work. You
+can however obtain the latest boost version (you need at least 1.37.0) from
+http://www.boost.org/ and compile/install it with:
 
   ./configure
   make
@@ -175,62 +145,75 @@ from http://www.boost.org/ and compile/install it with:
 
 
 To build the libDAI source, first copy a template Makefile.* to Makefile.conf
-(for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). 
-Then, edit the Makefile.conf template to adapt it to your local setup.
-Especially directories may differ from system to system. Finally, run
-    
-    make
+(for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). Then,
+edit the Makefile.conf template to adapt it to your local setup. Especially
+directories may differ from system to system. Finally, run
+
+  make
+
+The build includes a regression test, which may take a while to complete.
 
 If the build was successful, you can test the example program:
 
-    ./example tests/alarm.fg
+  examples/example tests/alarm.fg
 
 or the more elaborate test program:
 
-    tests/testdai --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX
+  tests/testdai --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Quick start (Windows)
----------------------
+Building libDAI under Windows
+
 You need:
-- A recent version of MicroSoft Visual Studio (2008 works)
-- recent boost C++ libraries (version 1.34 or higher)
-- GNU make (can be obtained from http://gnuwin32.sourceforge.net)
+
+  • A recent version of MicroSoft Visual Studio (2008 works)
+  • recent boost C++ libraries (version 1.34 or higher)
+  • GNU make (can be obtained from http://gnuwin32.sourceforge.net)
+
 For the regression test, you need:
-- GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
 
-To build the source, copy Makefile.WINDOWS to Makefile.conf. Then, edit 
-Makefile.conf to adapt it to your local setup. Finally, run (from the command line)
-    
-    make
+  • GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
+
+To build the source, copy Makefile.WINDOWS to Makefile.conf. Then, edit
+Makefile.conf to adapt it to your local setup. Finally, run (from the command
+line)
+
+  make
+
+The build includes a regression test, which may take a while to complete.
 
 If the build was successful, you can test the example program:
 
-    example tests\alarm.fg
+  example tests\alarm.fg
 
 or the more elaborate test program:
 
-    tests\testdai --aliases tests\aliases.conf --filename tests\alarm.fg --methods JTREE_HUGIN BP_SEQMAX
+  tests\testdai --aliases tests\aliases.conf --filename tests\alarm.fg --methods JTREE_HUGIN BP_SEQMAX
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Quick start (MatLab)
---------------------
+Building the libDAI MatLab interface
+
 You need:
-- MatLab
-- The platform-dependent requirements described above
+
+  • MatLab
+  • The platform-dependent requirements described above
 
 First, you need to build the libDAI source as described above for your
 platform. By default, the MatLab interface is disabled, so before compiling the
 source, you have to enable it in the Makefile.conf by setting
-"WITH_MATLAB=true". Also, you have to configure the MatLab-specific parts of
-Makefile.conf to match your system (in particular, the Makefile variables ME,
-MATLABDIR and MEX). The MEX file extension depends on your platform; for a
-64-bit linux x86_64 system this would be "ME=.mexa64", for a 32-bit linux x86
-system this would be "ME=.mexglx". If you are unsure about your MEX file
-extension: it needs to be the same as what the MatLab command "mexext" returns.
-The required MEX files are built by issuing
 
-    make
+  WITH_MATLAB=true
+
+Also, you have to configure the MatLab-specific parts of Makefile.conf to match
+your system (in particular, the Makefile variables ME, MATLABDIR and MEX). The
+MEX file extension depends on your platform; for a 64-bit linux x86_64 system
+this would be "ME=.mexa64", for a 32-bit linux x86 system "ME=.mexglx". If you
+are unsure about your MEX file extension: it needs to be the same as what the
+MatLab command "mexext" returns. The required MEX files are built by issuing
+
+  make
 
 from the command line. The MatLab interface is much less powerful than using
 libDAI from C++. There are two reasons for this: (i) it is boring to write MEX
@@ -242,11 +225,24 @@ A simple example of how to use the MatLab interface is the following (entered
 at the MatLab prompt), which performs exact inference by the junction tree
 algorithm and approximate inference by belief propagation on the ALARM network:
 
-    cd path_to_libdai/matlab
-    [psi] = dai_readfg ('../examples/alarm.fg');
-    [logZ,q,md,qv,qf] = dai (psi, 'JTREE', '[updates=HUGIN,verbose=0]')
-    [logZ,q,md,qv,qf] = dai (psi, 'BP', '[updates=SEQMAX,tol=1e-9,maxiter=10000,logdomain=0]')
+  cd path_to_libdai/matlab
+  [psi] = dai_readfg ('../examples/alarm.fg');
+  [logZ,q,md,qv,qf] = dai (psi, 'JTREE', '[updates=HUGIN,verbose=0]')
+  [logZ,q,md,qv,qf] = dai (psi, 'BP', '[updates=SEQMAX,tol=1e-9,maxiter=10000,logdomain=0]')
 
 where "path_to_libdai" has to be replaced with the directory in which libDAI
-was installed. For other algorithms and their parameters, see
+was installed. For other algorithms and some default parameters, see the file
 tests/aliases.conf.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Building the documentation
+
+Install doxygen and use
+
+  make doc
+
+to build the documentation. If the documentation is not clear enough, feel free
+to send me an email (or even better, to improve the documentation and send a
+patch!).
+

@@ -86,3 +86,7 @@ SWIG=swig
 INCLUDE_PYTHON=/usr/include/python2.5
 # Location of Boost C++ library header files
 INCLUDE_BOOST=/usr/include/boost
+
+# VERSION AND DATE
+DAI_VERSION="not set"
+DAI_DATE="not set"

@@ -326,10 +326,6 @@ class multifor {
  *  \note A State is very similar to a \link multifor \endlink, but tailored for Var 's and VarSet 's.
  *
  *  \see VarSet::calcState(), VarSet::calcStates()
- *
- *  \todo Rename VarSet::calcState(), VarSet::calcStates() and make them non-member functions;
- *        make the State class a more prominent part of libDAI (and document it clearly, explaining
- *        the concept of state); add more optimized variants of the State class like IndexFor (e.g. for TFactor<>::slice()).
  */
 class State {
     private:

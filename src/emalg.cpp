@@ -22,7 +22,7 @@ std::map<std::string, ParameterEstimation::ParamEstFactory> *ParameterEstimation
 
 void ParameterEstimation::loadDefaultRegistry() {
     _registry = new std::map<std::string, ParamEstFactory>();
-    (*_registry)["ConditionalProbEstimation"] = CondProbEstimation::factory;
+    (*_registry)["CondProbEstimation"] = CondProbEstimation::factory;
 }
 
 
@@ -146,7 +146,7 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg )
         var_order.reserve( vs.size() );
         for( size_t fi = 1; fi < fields.size(); ++fi ) {
             // Lookup a single variable by label
-            long label;
+            size_t label;
             std::istringstream labelparse( fields[fi] );
             labelparse >> label;
             VarSet::const_iterator vsi = vs.begin();

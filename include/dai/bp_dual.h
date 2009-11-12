@@ -10,7 +10,7 @@
 
 /// \file
 /// \brief Defines class BP_dual, which is used primarily by BBP.
-/// \todo This replicates a large part of the functionality of BP; would it not be more efficient to adapt BP instead?
+/// \idea BP_dual replicates a large part of the functionality of BP; would it not be more efficient to adapt BP instead?
 /// \author Frederik Eaton
 
 

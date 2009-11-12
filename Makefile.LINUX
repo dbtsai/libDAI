@@ -86,3 +86,7 @@ SWIG=swig
 INCLUDE_PYTHON=/usr/include/python2.5
 # Location of Boost C++ library header files
 INCLUDE_BOOST=/usr/include/boost
+
+# VERSION AND DATE
+DAI_VERSION="git $(shell git log | head -1)"
+DAI_DATE="$(shell git log | head -3 | tail -1 | sed 's/Date:   //')"

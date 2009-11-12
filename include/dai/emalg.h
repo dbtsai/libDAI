@@ -45,7 +45,7 @@ namespace dai {
  *  vector passed to it from a SharedParameters container object.
  *
  *  The default registry only contains CondProbEstimation, named
- *  "ConditionalProbEstimation".
+ *  "CondProbEstimation".
  *
  *  \author Charles Vaske
  */
@@ -293,6 +293,9 @@ class MaximizationStep {
  *  parameters, which may result in faster convergence in some cases.
  *
  *  \author Charles Vaske
+ *
+ *  \todo Expand the sprinkler example such that it generates a sample of the probability distribution,
+ *  and add another example that estimates the factor parameters of the sprinkler network using EM from this sample.
  */
 class EMAlg {
     private:

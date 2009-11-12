@@ -29,7 +29,7 @@ namespace dai {
 
 
 /// InfAlg is an abstract base class, defining the common interface of all inference algorithms in libDAI.
-/** \todo General marginalization functions like calcMarginal() now copy a complete InfAlg object. Instead,
+/** \idea General marginalization functions like calcMarginal() now copy a complete InfAlg object. Instead,
  *  it would make more sense that they construct a new object without copying the FactorGraph or RegionGraph.
  *  Or they can simply be made methods of the general InfAlg class.
  *  \idea Use a PropertySet as output of an InfAlg, instead of functions like maxDiff() and Iterations().
@@ -177,7 +177,7 @@ class InfAlg {
  *  from a DAIAlg<FactorGraph> or from a DAIAlg<RegionGraph>.
  *
  *  \tparam GRM Should be castable to FactorGraph
- *  \todo A DAIAlg should not inherit from a FactorGraph or RegionGraph, but should
+ *  \idea A DAIAlg should not inherit from a FactorGraph or RegionGraph, but should
  *  store a reference to the graphical model object. This prevents needless copying
  *  of (possibly large) data structures. Disadvantage: the caller must not change
  *  the graphical model between calls to the inference algorithm (maybe a smart_ptr

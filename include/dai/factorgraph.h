@@ -55,10 +55,12 @@ namespace dai {
  *  So basically, a FactorGraph consists of a BipartiteGraph, a vector of Var 's
  *  and a vector of TFactor 's.
  *
- *  \todo Alternative implementation of undo factor changes: the only things that have to be
+ *  \idea Alternative implementation of undo factor changes: the only things that have to be
  *  undone currently are setting a factor to 1 and setting a factor to a Kronecker delta. This
  *  could also be implemented in the TFactor itself, which could maintain its state
- *  (ones/delta/full) and act accordingly.
+ *  (ones/delta/full) and act accordingly. Update: it seems that the proposed functionality 
+ *  would not be enough for CBP, for which it would make more sense to add more levels of
+ *  backup/restore.
  */ 
 class FactorGraph {
     public:
@@ -402,6 +404,13 @@ FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fac
     // create graph structure
     constructGraph( nrEdges );
 }
+
+
+/** \example example.cpp
+ *  This example illustrates how to read a factor graph from a file and how to
+ *  run several inference algorithms (junction tree, loopy belief propagation,
+ *  and the max-product algorithm) on it.
+ */
 
 
 } // end of namespace dai

@@ -11,6 +11,8 @@
 
 /// \file
 /// \brief Defines class HAK, which implements a variant of Generalized Belief Propagation.
+/// \todo Implement Bethe approximation as a standard region graph choice in HAK.
+/// \idea Implement more general region graphs and corresponding Generalized Belief Propagation updates as described in [\ref YFW05].
 
 
 #ifndef __defined_libdai_hak_h
@@ -28,8 +30,6 @@ namespace dai {
 
 
 /// Approximate inference algorithm: implementation of single-loop ("Generalized Belief Propagation") and double-loop algorithms by Heskes, Albers and Kappen [\ref HAK03]
-/** \todo Optimize HAK with precalculated indices, similarly to BP.
- */
 class HAK : public DAIAlgRG {
     private:
         /// Outer region beliefs

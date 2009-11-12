@@ -1,3 +1,9 @@
+* README is now created automatically from doxygen documentation
+* Makefile macros DAI_VERSION and DAI_DATE have been introduced,
+  in order to store this information in a central place
+* Renamed "ConditionalProbEstimation" into "CondProbEstimation"
+* Variable labels are now nonnegative (of type size_t)
+* Tiny change to .tab file format (added empty line after header)
 * Renamed Treewidth(const FactorGraph &) into boundTreewidth(const FactorGraph &)
 * Added ExactInf::calcMarginal(const VarSet &)
 * Replaced UEdgeVec by Graph

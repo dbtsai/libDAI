@@ -53,6 +53,10 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
         vars.push_back( elem->second );
     }
 
+    getline(is,line);
+    if( is.fail() || line.size() > 0 )
+        DAI_THROWE(INVALID_EVIDENCE_FILE,"Expecting empty line");
+
     // Read samples
     while( getline(is, line) ) {
         line_number++;

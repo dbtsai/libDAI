@@ -116,7 +116,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
         cerr << "Reading " << nr_Factors << " factors..." << endl;
 
     getline (is,line);
-    if( is.fail() )
+    if( is.fail() || line.size() > 0 )
         DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Expecting empty line");
 
     map<long,size_t> vardims;

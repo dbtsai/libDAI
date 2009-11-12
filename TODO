@@ -1,9 +1,5 @@
 To do for the next release (0.2.3):
 
-Improve documentation:
-
-	doc.h
-
 Improve documentation of all .props structs.
 
 Write a concept/notations page for the documentation,
@@ -12,3 +8,19 @@ multi-dimensional array, e.g., one corresponding
 to the Cartesian product of statespaces of variables)
 and "linear index". This should make it easier to
 document index.h and varset.h
+
+Rename VarSet::calcState(), VarSet::calcStates() and make them non-member functions;
+make the State class a more prominent part of libDAI (and document it clearly, explaining
+the concept of state); add more optimized variants of the State class like IndexFor (e.g. for TFactor<>::slice()).
+
+- Merge NIPS MLOSS workshop sheet info
+
+- Merge website info
+
+
+Finally:
+
+- Set DAI_VERSION and DAI_DATE correctly (all occurences)
+- Build documentation and make a copy
+- Find out how to tag the git commit
+- Make a tarball which does not include the .git stuff
