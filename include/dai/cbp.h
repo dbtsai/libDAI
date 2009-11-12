@@ -177,6 +177,9 @@ class CBP : public DAIAlgFG {
             std::string clamp_outfile;
 
             /// Set members from PropertySet
+            /** \throw UNKNOWN_PROPERTY_TYPE if a Property key is not recognized
+             *  \throw NOT_ALL_PROPERTIES_SPECIFIED if an expected Property is missing
+             */
             void set(const PropertySet &opts);
             /// Get members into PropertySet
             PropertySet get() const;
@@ -211,8 +214,9 @@ class CBP : public DAIAlgFG {
         /// \todo At present, CBP::getInfAlg() only returns a BP instance
         InfAlg* getInfAlg();
 
-        /// Sets variable beliefs, factor beliefs and log partition sum
+        /// Sets variable beliefs, factor beliefs and log partition sum to the specified values
         /** \param bs should be a concatenation of the variable beliefs followed by the factor beliefs
+         *  \param logZ log partition sum
          */
         void setBeliefs( const std::vector<Factor> &bs, Real logZ );
 

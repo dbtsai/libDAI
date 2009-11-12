@@ -189,7 +189,8 @@ Real TreeEP::TreeEPSubTree::logZ( const std::vector<Factor> &Qa, const std::vect
 TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opts("updates",string("HUGIN")), false), _maxdiff(0.0), _iters(0), props(), _Q() {
     setProperties( opts );
 
-    DAI_ASSERT( fg.isConnected() );
+    if( !isConnected() )
+       DAI_THROW(FACTORGRAPH_NOT_CONNECTED);
 
     if( opts.hasKey("tree") ) {
         construct( opts.GetAs<RootedTree>("tree") );

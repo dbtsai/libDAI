@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines class ClusterGraph, which is mainly useful for the junction tree algorithm
+/// \brief Defines class ClusterGraph, which is used by JTree, TreeEP and HAK
 
 
 #ifndef __defined_libdai_clustergraph_h

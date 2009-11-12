@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines classes Region, FRegion and RegionGraph.
+/// \brief Defines classes Region, FRegion and RegionGraph, which implement a particular subclass of region graphs.
 
 
 #ifndef __defined_libdai_regiongraph_h

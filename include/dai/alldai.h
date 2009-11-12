@@ -61,6 +61,7 @@ namespace dai {
  *  \param fg The FactorGraph that the algorithm should be applied to.
  *  \param opts A PropertySet specifying the options for the algorithm.
  *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
+ *  \throw UNKNOWN_DAI_ALGORITHM if the requested name is not known/compiled in.
  */
 InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts );
 
@@ -69,7 +70,8 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
 /** \param nameOpts The name and options of the inference algorithm (should be in the format "name[key1=val1,key2=val2,...,keyn=valn]").
  *  \param fg The FactorGraph that the algorithm should be applied to.
  *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
- *  \todo Support aliases like in testdai
+ *  \throw UNKNOWN_DAI_ALGORITHM if the requested name is not known/compiled in.
+ *  \todo Support aliases like in testdai.cpp
  */
 InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg );
 

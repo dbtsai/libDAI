@@ -78,25 +78,9 @@ Prob CondProbEstimation::estimate() {
 }
 
 
-Permute SharedParameters::calculatePermutation( const std::vector<Var> &varorder, VarSet &outVS ) {
-    // Collect all labels and dimensions, and order them in vs
-    std::vector<size_t> dims;
-    dims.reserve( varorder.size() );
-    std::vector<long> labels;
-    labels.reserve( varorder.size() );
-    for( size_t i = 0; i < varorder.size(); i++ ) {
-        dims.push_back( varorder[i].states() );
-        labels.push_back( varorder[i].label() );
-        outVS |= varorder[i];
-    }
-
-    // Construct the sigma array for the permutation object
-    std::vector<size_t> sigma;
-    sigma.reserve( dims.size() );
-    for( VarSet::iterator set_iterator = outVS.begin(); sigma.size() < dims.size(); ++set_iterator )
-        sigma.push_back( find(labels.begin(), labels.end(), set_iterator->label()) - labels.begin() );
-
-    return Permute( dims, sigma );
+Permute SharedParameters::calculatePermutation( const std::vector<Var> &varOrder, VarSet &outVS ) {
+    outVS = VarSet( varOrder.begin(), varOrder.end(), varOrder.size() );
+    return Permute( varOrder );
 }
 
 
@@ -148,14 +132,14 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg )
 
         // Lookup the factor in the factorgraph
         if( fields.size() < 1 )
-            DAI_THROW(INVALID_EMALG_FILE);
+            DAI_THROWE(INVALID_EMALG_FILE,"Empty line unexpected");
         std::istringstream iss;
         iss.str( fields[0] );
         size_t factor;
         iss >> factor;
         const VarSet &vs = fg.factor(factor).vars();
         if( fields.size() != vs.size() + 1 )
-            DAI_THROW(INVALID_EMALG_FILE);
+            DAI_THROWE(INVALID_EMALG_FILE,"Number of fields does not match factor size");
 
         // Construct the vector of Vars
         std::vector<Var> var_order;
@@ -170,7 +154,7 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg )
                 if( vsi->label() == label )
                     break;
             if( vsi == vs.end() )
-                DAI_THROW(INVALID_EMALG_FILE);
+                DAI_THROWE(INVALID_EMALG_FILE,"Specified variables do not match the factor variables");
             var_order.push_back( *vsi );
         }
         _varorders[factor] = var_order;
@@ -189,7 +173,7 @@ void SharedParameters::collectSufficientStatistics( InfAlg &alg ) {
         Factor b = alg.belief(vs);
         Prob p( b.states(), 0.0 );
         for( size_t entry = 0; entry < b.states(); ++entry )
-            p[entry] = b[perm.convertLinearIndex(entry)];
+            p[entry] = b[perm.convertLinearIndex(entry)]; // apply inverse permutation
         _estimation->addSufficientStatistics( p );
     }
 }
@@ -291,7 +275,7 @@ Real EMAlg::iterate( MaximizationStep &mstep ) {
     for( Evidence::const_iterator e = _evidence.begin(); e != _evidence.end(); ++e ) {
         InfAlg* clamped = _estep.clone();
         // Apply evidence
-        for( Observation::const_iterator i = e->begin(); i != e->end(); ++i )
+        for( Evidence::Observation::const_iterator i = e->begin(); i != e->end(); ++i )
             clamped->clamp( clamped->fg().findVar(i->first), i->second );
         clamped->init();
         clamped->run();

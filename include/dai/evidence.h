@@ -24,10 +24,6 @@
 namespace dai {
 
 
-/// Stores joint state of a set of variables
-typedef std::map<Var, size_t> Observation;
-
-
 /// Stores a data set consisting of multiple samples, where each sample is the observed joint state of some variables.
 /** \note Each sample can describe the joint state of a different set of variables,
  *  in order to be able to deal with missing data.
@@ -35,6 +31,10 @@ typedef std::map<Var, size_t> Observation;
  *  \author Charles Vaske
  */
 class Evidence {
+    public:
+        /// Stores joint state of a set of variables
+        typedef std::map<Var, size_t> Observation;
+
     private:
         /// Each sample is an observed joint state of some variables
         std::vector<Observation> _samples;
@@ -50,6 +50,7 @@ class Evidence {
         /** \param is Input stream in .tab file format, describing joint observations of variables in \a fg
          *  \param fg Factor graph describing the corresponding variables
          *  \see \ref fileformats-evidence
+         *  \throw INVALID_EVIDENCE_FILE if the input stream is not valid
          */
         void addEvidenceTabFile( std::istream& is, FactorGraph& fg );
 

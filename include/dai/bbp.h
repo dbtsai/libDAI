@@ -369,6 +369,9 @@ class BBP {
             UpdateType updates;
 
             /// Set members from PropertySet
+            /** \throw UNKNOWN_PROPERTY_TYPE if a Property key is not recognized
+             *  \throw NOT_ALL_PROPERTIES_SPECIFIED if an expected Property is missing
+             */
             void set(const PropertySet &opts);
             /// Get members into PropertySet
             PropertySet get() const;

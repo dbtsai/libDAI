@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines the FactorGraph class
+/// \brief Defines the FactorGraph class, which represents factor graphs (e.g., Bayesian networks or Markov random fields)
 
 
 #ifndef __defined_libdai_factorgraph_h
@@ -246,18 +246,24 @@ class FactorGraph {
         }
 
         /// Makes a backup of the \a I 'th factor
+        /** \throw MULTIPLE_UNDO if a backup already exists
+         */
         void backupFactor( size_t I );
 
         /// Restores the \a I 'th factor from the backup (it should be backed up first)
         void restoreFactor( size_t I );
 
         /// Backup the factors specified by indices in \a facs
+        /** \throw MULTIPLE_UNDO if a backup already exists
+         */
         virtual void backupFactors( const std::set<size_t> & facs );
 
         /// Restore all factors to the backup copies
         virtual void restoreFactors();
 
         /// Makes a backup of all factors connected to a set of variables
+        /** \throw MULTIPLE_UNDO if a backup already exists
+         */
         void backupFactors( const VarSet &ns );
 
         /// Restores all factors connected to a set of variables from their backups
@@ -321,11 +327,14 @@ class FactorGraph {
     //@{
         /// Reads a factor graph from a file
         /** \see \ref fileformats-factorgraph
+         *  \throw CANNOT_READ_FILE if the file cannot be opened
+         *  \throw INVALID_FACTORGRAPH_FILE if the file is not valid
          */
         void ReadFromFile( const char *filename );
 
         /// Writes a factor graph to a file
         /** \see \ref fileformats-factorgraph
+         *  \throw CANNOT_WRITE_FILE if the file cannot be written
          */
         void WriteToFile( const char *filename, size_t precision=15 ) const;
 
@@ -336,6 +345,7 @@ class FactorGraph {
 
         /// Reads a factor graph from an input stream
         /** \see \ref fileformats-factorgraph
+         *  \throw INVALID_FACTORGRAPH_FILE if the input stream is not valid
          */
         friend std::istream& operator>> (std::istream &is, FactorGraph &fg );
 

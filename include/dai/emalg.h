@@ -24,7 +24,7 @@
 
 
 /// \file
-/// \brief Defines classes related to Expectation Maximization: EMAlg, ParameterEstimation, CondProbEstimation and SharedParameters
+/// \brief Defines classes related to Expectation Maximization (EMAlg, ParameterEstimation, CondProbEstimation and SharedParameters)
 
 
 namespace dai {
@@ -64,6 +64,7 @@ class ParameterEstimation {
         /** \param method Name of the subclass that should be constructed;
          *  \param p Parameters passed to constructor of subclass.
          *  \note \a method should either be in the default registry or should be registered first using registerMethod().
+         *  \throw UNKNOWN_PARAMETER_ESTIMATION_METHOD if the requested \a method is not registered.
          */
         static ParameterEstimation* construct( const std::string &method, const PropertySet &p );
 
@@ -164,7 +165,7 @@ class SharedParameters {
     private:
         /// Maps factor indices to the corresponding VarSets
         std::map<FactorIndex, VarSet> _varsets;
-        /// Maps factor indices to the corresponding Permute objects that permute the desired ordering into the canonical ordering
+        /// Maps factor indices to the corresponding Permute objects that permute the canonical ordering into the desired ordering
         std::map<FactorIndex, Permute> _perms;
         /// Maps factor indices to the corresponding desired variable orderings
         FactorOrientations _varorders;
@@ -173,12 +174,12 @@ class SharedParameters {
         /// Indicates whether \c *this gets ownership of _estimation
         bool _ownEstimation;
 
-        /// Calculates the permutation that permutes the variables in varorder into the canonical ordering
-        /** \param varorder Given ordering of variables
-         *  \param outVS Contains variables in \varorder represented as a VarSet
-         *  \return Permute object for permuting variables in varorder into the canonical libDAI ordering
+        /// Calculates the permutation that permutes the canonical ordering into the desired ordering
+        /** \param varOrder Desired ordering of variables
+         *  \param outVS Contains variables in \a varOrder represented as a VarSet
+         *  \return Permute object for permuting variables in varOrder from the canonical libDAI ordering into the desired ordering
          */
-        static Permute calculatePermutation( const std::vector<Var> &varorder, VarSet &outVS );
+        static Permute calculatePermutation( const std::vector<Var> &varOrder, VarSet &outVS );
 
         /// Initializes _varsets and _perms from _varorders and checks whether their state spaces correspond with _estimation.probSize()
         void setPermsAndVarSetsFromVarOrders();
@@ -193,6 +194,7 @@ class SharedParameters {
 
         /// Construct a SharedParameters object from an input stream \a is and a factor graph \a fg
         /** \see \ref fileformats-emalg-sharedparameters
+         *  \throw INVALID_EMALG_FILE if the input stream is not valid
          */
         SharedParameters( std::istream &is, const FactorGraph &fg );
 
@@ -234,6 +236,7 @@ class SharedParameters {
  */
 class MaximizationStep {
     private:
+        /// Vector of parameter estimation tasks of which this maximization step consists
         std::vector<SharedParameters> _params;
 
     public:

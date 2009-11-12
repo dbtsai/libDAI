@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines abstract base class InfAlg, its descendant DAIAlg<>, the specializations DAIAlgFG and DAIAlgRG and some generic inference methods.
+/// \brief Defines the general interface for inference methods in libDAI (classes InfAlg, DaiAlg<>, DaiAlgFG and DaiAlgRG).
 
 
 #ifndef __defined_libdai_daialg_h
@@ -67,6 +67,7 @@ class InfAlg {
         /// Initializes all data structures corresponding to some set of variables.
         /** This method can be used to do a partial initialization after a part of the factor graph has changed.
          *  Instead of initializing all data structures, it only initializes those involving the variables in \a vs.
+         *  \throw NOT_IMPLEMENTED if not implemented/supported
          */
         virtual void init( const VarSet &vs ) = 0;
 
@@ -82,6 +83,7 @@ class InfAlg {
 
         /// Returns the (approximate) marginal probability distribution of a set of variables.
         /** \note Before this method is called, run() should have been called.
+         *  \throw NOT_IMPLEMENTED if not implemented/supported
          */
         virtual Factor belief( const VarSet &vs ) const = 0;
 
@@ -141,8 +143,12 @@ class InfAlg {
     /// \name Backup/restore mechanism for factors
     //@{
         /// Make a backup copy of factor \a I
+        /** \throw MULTIPLE_UNDO if a backup already exists
+         */
         virtual void backupFactor( size_t I ) = 0;
         /// Make backup copies of all factors involving the variables in \a vs
+        /** \throw MULTIPLE_UNDO if a backup already exists
+         */
         virtual void backupFactors( const VarSet &vs ) = 0;
 
         /// Restore factor \a I from its backup copy

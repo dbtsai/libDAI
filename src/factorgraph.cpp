@@ -117,7 +117,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
 
     getline (is,line);
     if( is.fail() )
-        DAI_THROW(INVALID_FACTORGRAPH_FILE);
+        DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Expecting empty line");
 
     map<long,size_t> vardims;
     for( size_t I = 0; I < nr_Factors; I++ ) {
@@ -153,7 +153,8 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
             cerr << "  dimensions: " << dims << endl;
 
         // add the Factor
-        VarSet I_vars;
+        vector<Var> Ivars;
+        Ivars.reserve( nr_members );
         for( size_t mi = 0; mi < nr_members; mi++ ) {
             map<long,size_t>::iterator vdi = vardims.find( labels[mi] );
             if( vdi != vardims.end() ) {
@@ -162,23 +163,12 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
                     DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Variable with label " + boost::lexical_cast<string>(labels[mi]) + " has inconsistent dimensions.");
             } else
                 vardims[labels[mi]] = dims[mi];
-            I_vars |= Var(labels[mi], dims[mi]);
+            Ivars.push_back( Var(labels[mi], dims[mi]) );
         }
-        facs.push_back( Factor( I_vars, (Real)0 ) );
+        facs.push_back( Factor( VarSet( Ivars.begin(), Ivars.end(), Ivars.size() ), (Real)0 ) );
 
-        // calculate permutation sigma (internally, members are sorted)
-        vector<size_t> sigma(nr_members,0);
-        VarSet::iterator j = I_vars.begin();
-        for( size_t mi = 0; mi < nr_members; mi++,j++ ) {
-            long search_for = j->label();
-            vector<long>::iterator j_loc = find(labels.begin(),labels.end(),search_for);
-            sigma[mi] = j_loc - labels.begin();
-        }
-        if( verbose >= 3 )
-            cerr << "  sigma: " << sigma << endl;
-
-        // calculate multindices
-        Permute permindex( dims, sigma );
+        // calculate permutation object
+        Permute permindex( Ivars );
 
         // read values
         size_t nr_nonzeros;
@@ -197,8 +187,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
                 getline(is,line);
             is >> val;
 
-            // store value, but permute indices first according
-            // to internal representation
+            // store value, but permute indices first according to internal representation
             facs.back()[permindex.convertLinearIndex( li )] = val;
         }
     }

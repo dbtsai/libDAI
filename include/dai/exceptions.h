@@ -60,7 +60,7 @@
 /// Assertion mechanism similar to DAI_ASSERT which is only active if DAI_DEBUG is defined
 #define DAI_DEBASSERT(x) do {DAI_ASSERT(x);} while(0)
 #else
-#define DAI_DEBASSERT(X) do {} while(0)
+#define DAI_DEBASSERT(x) do {} while(0)
 #endif
 
 

@@ -104,6 +104,9 @@ class MR : public DAIAlgFG {
         MR() : DAIAlgFG(), supported(), con(), nb(), tJ(), theta(), M(), kindex(), cors(), N(), Mag(), _maxdiff(), _iters(), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
+        /** \note This implementation only deals with binary variables and pairwise interactions.
+         *  \throw NOT_IMPLEMENTED if \a fg has factors depending on three or more variables or has variables with more than two possible states.
+         */
         MR( const FactorGraph &fg, const PropertySet &opts );
 
 
@@ -185,6 +188,8 @@ class MR : public DAIAlgFG {
         /// Calculate sum over all even/odd subsets B of \a A of _tJ(j,B) appM(j,B)
         /** \param j variable index
          *  \param A subset of neighbors of variable \a j
+         *  \param sum_even on return, will contain the sum over all even subsets
+         *  \param sum_odd on return, will contain the sum over all odd subsets
          */
         void sum_subs(size_t j, sub_nb A, Real *sum_even, Real *sum_odd);
 };

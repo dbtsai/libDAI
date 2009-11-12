@@ -377,7 +377,7 @@
  *  where each of those sections follows the format described in the next
  *  subsection.
  *
- *  \subsection fileformats-sharedparameters Shared parameters section in EM file
+ *  \subsection fileformats-emalg-sharedparameters Shared parameters section in EM file
  *
  *  A shared parameters section of an .em file starts with a single line
  *  consisting of the name of a ParameterEstimation subclass
@@ -391,14 +391,17 @@
  *  Then, each of these factors is specified on separate lines (possibly 
  *  seperated by empty lines), where each line consists of several fields
  *  seperated by a space or a tab character. The first field contains 
- *  the index of the factor in the factor graph. The 
- *  following fields specify the ordering of the variables on which that
- *  factor depends, i.e., they form a permutation of the labels of the
- *  variables belonging to that factor. The permutation corresponds to the
- *  mapping from the ordering of the variables that is used in the 
- *  SharedParameters object to the canonical ordering of the variables
- *  (i.e., sorted ascendingly according to their labels) which is used in
- *  the internal representation of the Factor object.
+ *  the index of the factor in the factor graph. The following fields should
+ *  contain the variable labels of the variables on which that factor depends, 
+ *  in a specific ordering. This ordering can be different from the canonical 
+ *  ordering of the variables used internally in libDAI (which would be sorted 
+ *  ascendingly according to the variable labels). The odering of the variables
+ *  specifies the implicit ordering of the shared parameters: when iterating
+ *  over all shared parameters, the corresponding index of the first variable
+ *  changes fastest (in the inner loop), and the corresponding index of the
+ *  last variable changes slowest (in the outer loop). By choosing the right
+ *  ordering, it is possible to let different factors (depending on different
+ *  variables) share parameters in parameter learning using EM.
  */
 
 /** \page license License

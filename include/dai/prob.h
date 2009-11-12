@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines TProb<> and Prob classes which represent (probability) vectors
+/// \brief Defines TProb<> and Prob classes which represent (probability) vectors (e.g., probability distributions of discrete random variables)
 
 
 #ifndef __defined_libdai_prob_h
@@ -424,6 +424,8 @@ template <typename T> class TProb {
         }
 
         /// Returns normalized copy of \c *this, using the specified norm
+        /** \throw NOT_NORMALIZABLE if the norm is zero
+         */
         TProb<T> normalized( NormType norm = NORMPROB ) const {
             T Z = 0;
             if( norm == NORMPROB )
@@ -475,6 +477,8 @@ template <typename T> class TProb {
         }
 
         /// Normalizes vector using the specified norm
+        /** \throw NOT_NORMALIZABLE if the norm is zero
+         */
         T normalize( NormType norm=NORMPROB ) {
             T Z = 0;
             if( norm == NORMPROB )

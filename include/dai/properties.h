@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines the Property and PropertySet classes
+/// \brief Defines the Property and PropertySet classes, which are mainly used for managing parameters of inference algorithms
 
 
 #ifndef __defined_libdai_properties_h
@@ -228,6 +228,7 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
         /// Reads a PropertySet object from an input stream.
         /** It expects a string in the format <tt>"[key1=val1,key2=val2,...,keyn=valn]"</tt>.
          *  Values are stored as strings.
+         *  \throw MALFORMED_PROPERTY if the string is not in the expected format
          */
         friend std::istream& operator>> ( std::istream& is, PropertySet& ps );
     //@}

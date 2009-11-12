@@ -72,6 +72,7 @@ class TreeEP : public JTree {
 
     private:
         /// Stores the data structures needed to efficiently update the approximation of an off-tree factor
+        /// \todo Write documentation
         class TreeEPSubTree {
             private:
                 std::vector<Factor>  _Qa;
@@ -142,6 +143,9 @@ class TreeEP : public JTree {
         }
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
+        /** \note The factor graph has to be connected.
+         *  \throw FACTORGRAPH_NOT_CONNECTED if \a fg is not connected
+         */
         TreeEP( const FactorGraph &fg, const PropertySet &opts );
 
 

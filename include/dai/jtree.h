@@ -90,6 +90,7 @@ class JTree : public DAIAlgRG {
         /** \param fg factor graph (which has to be connected);
          *  \param opts parameters;
          *  \param automatic if \c true, construct the junction tree automatically, using the MinFill heuristic.
+         *  \throw FACTORGRAPH_NOT_CONNECTED if \a fg is not connected
          */
         JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic=true );
     //@}

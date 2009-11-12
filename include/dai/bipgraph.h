@@ -10,7 +10,7 @@
 
 
 /// \file
-/// \brief Defines the BipartiteGraph class
+/// \brief Defines the BipartiteGraph class, which represents a bipartite graph
 
 
 #ifndef __defined_libdai_bipgraph_h
@@ -133,8 +133,10 @@ class BipartiteGraph {
 
         /// Used internally by isTree()
         struct levelType {
-            std::vector<size_t> ind1;       // indices of nodes of type 1
-            std::vector<size_t> ind2;       // indices of nodes of type 2
+            /// Indices of nodes of type 1
+            std::vector<size_t> ind1;       
+            /// Indices of nodes of type 2
+            std::vector<size_t> ind2;
         };
 
     // OBSOLETE
