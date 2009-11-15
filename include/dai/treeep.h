@@ -43,7 +43,7 @@ class TreeEP : public JTree {
         size_t                _iters;
 
     public:
-        /// Parameters of this inference algorithm
+        /// Parameters for TreeEP
         struct Properties {
             /// Enumeration of possible choices for the tree
             /** The two possibilities are:
@@ -54,13 +54,13 @@ class TreeEP : public JTree {
              */
             DAI_ENUM(TypeType,ORG,ALT);
 
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
 
             /// Maximum number of iterations
             size_t maxiter;
 
-            /// Tolerance
+            /// Tolerance for convergence test
             Real tol;
 
             /// How to choose the tree
@@ -143,7 +143,8 @@ class TreeEP : public JTree {
         }
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \note The factor graph has to be connected.
+        /** \param opts Parameters @see Properties
+         *  \note The factor graph has to be connected.
          *  \throw FACTORGRAPH_NOT_CONNECTED if \a fg is not connected
          */
         TreeEP( const FactorGraph &fg, const PropertySet &opts );

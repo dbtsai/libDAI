@@ -46,24 +46,29 @@ class HAK : public DAIAlgRG {
         size_t _iters;
 
     public:
-        /// Parameters of this inference algorithm
+        /// Parameters for HAK
         struct Properties {
             /// Enumeration of possible cluster choices
+            /** The following cluster choices are defined:
+             *   - MIN minimal clusters, i.e., one outer region for each maximal factor
+             *   - DELTA one outer region for each variable and its Markov blanket
+             *   - LOOP one cluster for each loop of length at most \a Properties::loopdepth, and in addition one cluster for each maximal factor
+             */
             DAI_ENUM(ClustersType,MIN,DELTA,LOOP);
 
             /// Enumeration of possible message initializations
             DAI_ENUM(InitType,UNIFORM,RANDOM);
 
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
 
             /// Maximum number of iterations
             size_t maxiter;
 
-            /// Tolerance
+            /// Tolerance for convergence test
             Real tol;
 
-            /// Damping constant
+            /// Damping constant (0.0 means no damping, 1.0 is maximum damping)
             Real damping;
 
             /// How to choose the outer regions
@@ -89,10 +94,7 @@ class HAK : public DAIAlgRG {
         HAK() : DAIAlgRG(), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** The clusters are chosen according to \a opts["clusters"]:
-         *  - MIN minimal clusters, i.e., one outer region for each maximal factor
-         *  - DELTA one outer region for each variable and its Markov blanket
-         *  - LOOP one cluster for each loop of length at most \a opts["loopdepth"], and in addition one cluster for each maximal factor of \a fg
+        /** \param opts Parameters @see Properties
          */
         HAK( const FactorGraph &fg, const PropertySet &opts );
 

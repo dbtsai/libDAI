@@ -1,7 +1,5 @@
 To do for the next release (0.2.3):
 
-Improve documentation of all .props structs.
-
 Write a concept/notations page for the documentation,
 explaining the concepts of "state" (index into a 
 multi-dimensional array, e.g., one corresponding

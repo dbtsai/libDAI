@@ -61,6 +61,8 @@ class CBP : public DAIAlgFG {
 
     public:
         /// Construct CBP object from FactorGraph \a fg and PropertySet \a opts
+        /** \param opts Parameters @see Properties
+         */
         CBP( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg) {
             props.set( opts );
             construct();
@@ -91,7 +93,7 @@ class CBP : public DAIAlgFG {
 
         //----------------------------------------------------------------
 
-        /// Parameters of this inference algorithm
+        /// Parameters for CBP
         /* PROPERTIES(props,CBP) {
             /// Enumeration of possible update schedules
             typedef BP::Properties::UpdateType UpdateType;
@@ -102,17 +104,17 @@ class CBP : public DAIAlgFG {
             /// Enumeration of possible clampings: variables or factors
             DAI_ENUM(ClampType,CLAMP_VAR,CLAMP_FACTOR);
 
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose = 0;
 
-            /// Tolerance to use in BP
+            /// Tolerance for BP convergence test
             Real tol;
             /// Update style for BP
             UpdateType updates;
             /// Maximum number of iterations for BP
             size_t maxiter;
 
-            /// Tolerance to use for controlling recursion depth (\a recurse is REC_LOGZ or REC_BDIFF)
+            /// Tolerance used for controlling recursion depth (\a recurse is REC_LOGZ or REC_BDIFF)
             Real rec_tol;
             /// Maximum number of levels of recursion (\a recurse is REC_FIXED)
             size_t max_levels = 10;
@@ -147,15 +149,15 @@ class CBP : public DAIAlgFG {
             DAI_ENUM(ChooseMethodType,CHOOSE_RANDOM,CHOOSE_MAXENT,CHOOSE_BBP,CHOOSE_BP_L1,CHOOSE_BP_CFN);
             /// Enumeration of possible clampings: variables or factors
             DAI_ENUM(ClampType,CLAMP_VAR,CLAMP_FACTOR);
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
-            /// Tolerance to use in BP
+            /// Tolerance for BP convergence test
             Real tol;
             /// Update style for BP
             UpdateType updates;
             /// Maximum number of iterations for BP
             size_t maxiter;
-            /// Tolerance to use for controlling recursion depth (\a recurse is REC_LOGZ or REC_BDIFF)
+            /// Tolerance used for controlling recursion depth (\a recurse is REC_LOGZ or REC_BDIFF)
             Real rec_tol;
             /// Maximum number of levels of recursion (\a recurse is REC_FIXED)
             size_t max_levels;

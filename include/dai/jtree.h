@@ -59,21 +59,29 @@ class JTree : public DAIAlgRG {
         /// Inner region beliefs
         std::vector<Factor> Qb;
 
-        /// Parameters of this inference algorithm
+        /// Parameters for JTree
         struct Properties {
             /// Enumeration of possible JTree updates
+            /** There are two types of updates:
+             *  - HUGIN similar to those in HUGIN
+             *  - SHSH Shafer-Shenoy type
+             */
             DAI_ENUM(UpdateType,HUGIN,SHSH);
 
             /// Enumeration of inference variants
+            /** There are two inference variants:
+             *  - SUMPROD Sum-Product
+             *  - MAXPROD Max-Product (equivalent to Min-Sum)
+             */
             DAI_ENUM(InfType,SUMPROD,MAXPROD);
 
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
 
-            /// Type of updates: HUGIN or Shafer-Shenoy
+            /// Type of updates
             UpdateType updates;
 
-            /// Type of inference: sum-product or max-product
+            /// Type of inference
             InfType inference;
         } props;
 
@@ -88,7 +96,7 @@ class JTree : public DAIAlgRG {
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
         /** \param fg factor graph (which has to be connected);
-         *  \param opts parameters;
+         ** \param opts Parameters @see Properties
          *  \param automatic if \c true, construct the junction tree automatically, using the MinFill heuristic.
          *  \throw FACTORGRAPH_NOT_CONNECTED if \a fg is not connected
          */

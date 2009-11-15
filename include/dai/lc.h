@@ -45,7 +45,7 @@ class LC : public DAIAlgFG {
         size_t _iters;
 
     public:
-        /// Parameters of this inference algorithm
+        /// Parameters for LC
         struct Properties {
             /// Enumeration of possible ways to initialize the cavities
             /** The following initialization methods are defined:
@@ -63,19 +63,19 @@ class LC : public DAIAlgFG {
              */
             DAI_ENUM(UpdateType,SEQFIX,SEQRND);
 
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
 
             /// Maximum number of iterations
             size_t maxiter;
 
-            /// Tolerance
+            /// Tolerance for convergence test
             Real tol;
 
             /// Complete or partial reinitialization of cavity graphs?
             bool reinit;
 
-            /// Damping constant
+            /// Damping constant (0.0 means no damping, 1.0 is maximum damping)
             Real damping;
 
             /// How to initialize the cavities
@@ -99,7 +99,7 @@ class LC : public DAIAlgFG {
         LC() : DAIAlgFG(), _pancakes(), _cavitydists(), _phis(), _beliefs(), _maxdiff(), _iters(), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \see Properties
+        /** \param opts Parameters @see Properties
          */
         LC( const FactorGraph &fg, const PropertySet &opts );
 

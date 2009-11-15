@@ -65,7 +65,7 @@ class BBP {
         BP_dual _bp_dual;
         /// Pointer to the factor graph
         const FactorGraph *_fg;
-        /// Pointer to the approximate inference algorithm
+        /// Pointer to the approximate inference algorithm (currently, only BP objects are supported)
         const InfAlg *_ia;
     //@}
 
@@ -259,6 +259,9 @@ class BBP {
     /// \name Constructors/destructors
     //@{
         /// Construct BBP object from a InfAlg \a ia and a PropertySet \a opts
+        /** \param ia should be a BP object or something compatible
+         *  \param opts Parameters @see Properties
+         */
         BBP( const InfAlg *ia, const PropertySet &opts ) : _bp_dual(ia), _fg(&(ia->fg())), _ia(ia) {
             props.set(opts);
         }
@@ -327,18 +330,24 @@ class BBP {
     //@}
 
     public:
-        /// Parameters of this algorithm
+        /// Parameters for BBP
         /* PROPERTIES(props,BBP) {
-           /// Enumeration of possible update schedules
+           /// \brief Enumeration of possible update schedules
+           /// - SEQ_FIX fixed sequential updates
+           /// - SEQ_MAX maximum residual updates (inspired by [\ref EMK06])
+           /// - SEQ_BP_REV schedule used by BP, but reversed
+           /// - SEQ_BP_FWD schedule used by BP
+           /// - PAR parallel updates
            DAI_ENUM(UpdateType,SEQ_FIX,SEQ_MAX,SEQ_BP_REV,SEQ_BP_FWD,PAR);
 
-           /// Verbosity
+           /// Verbosity (amount of output sent to stderr)
            size_t verbose;
 
            /// Maximum number of iterations
            size_t maxiter;
 
-           /// Tolerance (not used for updates = SEQ_BP_REV, SEQ_BP_FWD)
+           /// Tolerance for convergence test
+           /// \note Not used for updates = SEQ_BP_REV, SEQ_BP_FWD
            Real tol;
 
            /// Damping constant (0 for none); damping = 1 - lambda where lambda is the damping constant used in [\ref EaG09]
@@ -356,12 +365,21 @@ class BBP {
 */
         struct Properties {
             /// Enumeration of possible update schedules
+            /** The following update schedules are defined:
+             *  - SEQ_FIX fixed sequential updates
+             *  - SEQ_MAX maximum residual updates (inspired by [\ref EMK06])
+             *  - SEQ_BP_REV schedule used by BP, but reversed
+             *  - SEQ_BP_FWD schedule used by BP
+             *  - PAR parallel updates
+             */
             DAI_ENUM(UpdateType,SEQ_FIX,SEQ_MAX,SEQ_BP_REV,SEQ_BP_FWD,PAR);
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
             /// Maximum number of iterations
             size_t maxiter;
-            /// Tolerance (not used for updates = SEQ_BP_REV, SEQ_BP_FWD)
+            /// Tolerance for convergence test
+            /** \note Not used for updates = SEQ_BP_REV, SEQ_BP_FWD
+             */
             Real tol;
             /// Damping constant (0 for none); damping = 1 - lambda where lambda is the damping constant used in [\ref EaG09]
             Real damping;

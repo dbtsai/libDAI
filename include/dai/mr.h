@@ -66,7 +66,7 @@ class MR : public DAIAlgFG {
         size_t _iters;
 
     public:
-        /// Parameters of this inference algorithm
+        /// Parameters for MR
         struct Properties {
             /// Enumeration of different types of update equations
             /** The possible update equations are:
@@ -83,10 +83,10 @@ class MR : public DAIAlgFG {
              */
             DAI_ENUM(InitType,RESPPROP,CLAMPING,EXACT);
 
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
 
-            /// Tolerance
+            /// Tolerance for convergence test
             Real tol;
 
             /// Update equations
@@ -104,7 +104,8 @@ class MR : public DAIAlgFG {
         MR() : DAIAlgFG(), supported(), con(), nb(), tJ(), theta(), M(), kindex(), cors(), N(), Mag(), _maxdiff(), _iters(), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \note This implementation only deals with binary variables and pairwise interactions.
+        /** \param opts Parameters @see Properties
+         *  \note This implementation only deals with binary variables and pairwise interactions.
          *  \throw NOT_IMPLEMENTED if \a fg has factors depending on three or more variables or has variables with more than two possible states.
          */
         MR( const FactorGraph &fg, const PropertySet &opts );

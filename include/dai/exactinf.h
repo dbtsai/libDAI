@@ -34,9 +34,9 @@ namespace dai {
  */
 class ExactInf : public DAIAlgFG {
     public:
-        /// Parameters of this inference algorithm
+        /// Parameters for ExactInf
         struct Properties {
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
         } props;
 
@@ -58,6 +58,8 @@ class ExactInf : public DAIAlgFG {
         ExactInf() : DAIAlgFG(), props(), _beliefsV(), _beliefsF(), _logZ(0) {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
+        /** \param opts Parameters @see Properties
+         */
         ExactInf( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), props(), _beliefsV(), _beliefsF(), _logZ() {
             setProperties( opts );
             construct();

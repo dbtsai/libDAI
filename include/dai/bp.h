@@ -50,12 +50,6 @@ namespace dai {
  *  The logarithm of the partition sum is calculated by:
  *    \f[ \log Z = \sum_i (1 - |N_i|) \sum_{x_i} b_i(x_i) \log b_i(x_i) - \sum_I \sum_{x_I} b_I(x_I) \log \frac{b_I(x_I)}{f_I(x_I)} \f]
  *
- *  There are several predefined update schedules:
- *    - PARALL parallel updates
- *    - SEQFIX sequential updates using a fixed sequence
- *    - SEQRND sequential updates using a random sequence
- *    - SEQMAX maximum-residual updates [\ref EMK06]
- *
  *  For the max-product algorithm, a heuristic way of finding the MAP state (the 
  *  joint configuration of all variables which has maximum probability) is provided
  *  by the findMaximum() method, which can be called after convergence.
@@ -95,15 +89,25 @@ class BP : public DAIAlgFG {
         std::vector<std::pair<std::size_t, std::size_t> > _sentMessages;
 
     public:
-        /// Parameters of this inference algorithm
+        /// Parameters for BP
         struct Properties {
             /// Enumeration of possible update schedules
+            /** The following update schedules have been defined:
+             *  - PARALL parallel updates
+             *  - SEQFIX sequential updates using a fixed sequence
+             *  - SEQRND sequential updates using a random sequence
+             *  - SEQMAX maximum-residual updates [\ref EMK06]
+             */
             DAI_ENUM(UpdateType,SEQFIX,SEQRND,SEQMAX,PARALL);
 
             /// Enumeration of inference variants
+            /** There are two inference variants:
+             *  - SUMPROD Sum-Product
+             *  - MAXPROD Max-Product (equivalent to Min-Sum)
+             */
             DAI_ENUM(InfType,SUMPROD,MAXPROD);
 
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
 
             /// Maximum number of iterations
@@ -121,7 +125,7 @@ class BP : public DAIAlgFG {
             /// Message update schedule
             UpdateType updates;
 
-            /// Type of inference: sum-product or max-product?
+            /// Inference variant
             InfType inference;
         } props;
 
@@ -138,6 +142,8 @@ class BP : public DAIAlgFG {
         BP() : DAIAlgFG(), _edges(), _edge2lut(), _lut(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
+        /** \param opts Parameters @see Properties
+         */
         BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {
             setProperties( opts );
             construct();

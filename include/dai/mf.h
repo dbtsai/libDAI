@@ -43,18 +43,18 @@ class MF : public DAIAlgFG {
         size_t _iters;
 
     public:
-        /// Parameters of this inference algorithm
+        /// Parameters for MF
         struct Properties {
-            /// Verbosity
+            /// Verbosity (amount of output sent to stderr)
             size_t verbose;
 
             /// Maximum number of iterations
             size_t maxiter;
 
-            /// Tolerance
+            /// Tolerance for convergence test
             Real tol;
 
-            /// Damping constant
+            /// Damping constant (0.0 means no damping, 1.0 is maximum damping)
             Real damping;
         } props;
 
@@ -68,6 +68,8 @@ class MF : public DAIAlgFG {
         MF() : DAIAlgFG(), _beliefs(), _maxdiff(0.0), _iters(0U), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
+        /** \param opts Parameters @see Properties
+         */
         MF( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _beliefs(), _maxdiff(0.0), _iters(0U), props() {
             setProperties( opts );
             construct();
