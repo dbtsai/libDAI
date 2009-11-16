@@ -137,11 +137,29 @@ template <typename T> class TFactor {
         /// Returns maximum of all values
         T max() const { return _p.max(); }
 
+        // OBSOLETE
+        /// Returns maximum of all values
+        /** \deprecated Please use max() instead
+         */
+        T maxVal() const { return max(); }
+
         /// Returns minimum of all values
         T min() const { return _p.min(); }
 
+        // OBSOLETE
+        /// Returns minimum of all values
+        /** \deprecated Please use min() instead
+         */
+        T minVal() const { return min(); }
+
         /// Returns sum of all values
         T sum() const { return _p.sum(); }
+
+        // OBSOLETE
+        /// Returns sum of all values
+        /** \deprecated Please use sum() instead
+         */
+        T totalSum() const { return sum(); }
 
         /// Returns maximum absolute value of all values
         T maxAbs() const { return _p.maxAbs(); }
@@ -186,6 +204,12 @@ template <typename T> class TFactor {
             x._p = _p.log(zero);
             return x;
         }
+        
+        // OBSOLETE
+        /// Returns pointwise logarithm (or 0 if argument is 0)
+        /** \deprecated Please use log() instead with \a zero == \c true
+         */
+        TFactor<T> log0() const { return log(true); }
 
         /// Returns pointwise inverse
         /** If \a zero == \c true, uses <tt>1/0==0</tt>; otherwise, <tt>1/0==Inf</tt>.
@@ -351,6 +375,12 @@ template <typename T> class TFactor {
          *  \f[\frac{f}{g} : \prod_{l\in L\cup M} X_l \to [0,\infty) : x \mapsto \frac{f(x_L)}{g(x_M)}.\f]
          */
         TFactor<T>& operator/= (const TFactor<T>& g) { return binaryOp( g, fo_divides0<T>() ); }
+
+        // OBSOLETE
+        /// Divides \c *this by \a g (where division by zero yields zero)
+        /** \deprecated Please use operator/= instead
+          */
+        TFactor<T>& divide (const TFactor<T>& g) { return (*this /= g); }
     //@}
 
     /// \name Transformations with other factors
@@ -417,6 +447,12 @@ template <typename T> class TFactor {
         TFactor<T> operator/ (const TFactor<T>& g) const {
             return binaryTr(g,fo_divides0<T>());
         }
+
+        // OBSOLETE
+        /// Returns quotient of \c *this by \a f (where division by zero yields zero)
+        /** \deprecated Please use operator/ instead
+         */
+        TFactor<T> divided_by (const TFactor<T>& g) const { return (*this / g); }
     //@}
 
     /// \name Miscellaneous operations
@@ -451,6 +487,12 @@ template <typename T> class TFactor {
 
         /// Returns marginal on \a vars, obtained by summing out all variables except those in \a vars, and normalizing the result if \a normed == \c true
         TFactor<T> marginal(const VarSet &vars, bool normed=true) const;
+
+        // OBSOLETE
+        /// Returns partial sum on \a vars, obtained by summing out all variables except those in \a vars
+        /** \deprecated Please use marginal() instead with \a normed == \c false
+         */
+        TFactor<T> partSum(const VarSet &vars) const { return marginal(vars,false); }
 
         /// Returns max-marginal on \a vars, obtained by maximizing all variables except those in \a vars, and normalizing the result if \a normed == \c true
         TFactor<T> maxMarginal(const VarSet &vars, bool normed=true) const;

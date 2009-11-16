@@ -1,163 +1,155 @@
-* Replaced VarSet::calcState() by non-member calcLinearState()
-* Replaced VarSet::calcStates() by non-member calcState()
-* README is now created automatically from doxygen documentation
-* Makefile macros DAI_VERSION and DAI_DATE have been introduced,
-  in order to store this information in a central place
-* Renamed "ConditionalProbEstimation" into "CondProbEstimation"
-* Variable labels are now nonnegative (of type size_t)
-* Tiny change to .tab file format (added empty line after header)
-* Renamed Treewidth(const FactorGraph &) into boundTreewidth(const FactorGraph &)
-* Added ExactInf::calcMarginal(const VarSet &)
-* Replaced UEdgeVec by Graph
-* Replaced DEdgeVec by new RootedTree class
-* Moved functionality of GrowRootedTree() into constructor of RootedTree
-* Extended InfAlg interface with setProperties(), getProperties() and printProperties()
-* Declared class Diffs as obsolete
-* Declared calcPairBeliefsNew() as obsolete (its functionality is now part
-  of calcPairBeliefs())
-* Declared calcMarginal2ndO() as obsolete
-* Removed DAI_ACCMUT macro because it didn't yield satisfactory doxygen documentation
-* Replaced constructor
-    TFactor<T>::TFactor( const VarSet& vars, TIterator begin )
-  by two constructors
-    TFactor<T>::TFactor( const VarSet& vars, const T* p )
-    TFactor<T>::TFactor( const VarSet& vars, const std::vector<S> &x )
-* Fixed bugs (min and max were reversed) in
-  TFactor<T> min( const TFactor<T> &, const TFactor<T> & )
-  TFactor<T> max( const TFactor<T> &, const TFactor<T> & )
-* Renamed RegionGraph::Check_Counting_Numbers into
-  RegionGraph::checkCountingNumbers
-  (and provided an alias for backwards compatibility)
-* Renamed RegionGraph::Calc_Counting_Numbers into
-  RegionGraph::calcCountingNumbers
-  (and provided an alias for backwards compatibility)
-* Renamed Permute::convert_linear_index into Permute::convertLinearIndex
-  (and provided an alias for backwards compatibility)
-* Added examples/example_permute.cpp
-* Added TProb<T>::divided_by(const TProb<T>&) const
-* Fixed bug in BipartiteGraph::eraseEdge()
-* Added python and octave ports for examples/example_sprinkler.cpp
-* [Patrick Pletscher] Added SWIG wrapper code for python and octave
-* Added init parameter to HAK/GBP to allow for random initialization
-* Replaced the standard assert() macro by DAI_ASSERT, which throws a
-  dai::Exception and is even active if NDEBUG is defined
-* Added a constructor TProb<T>::TProb<T>( const std::vector<S> &v )
-* Introduced CCNODEBUGFLAGS in Makefile
+New features:
+* Complete doxygen documentation (although more detailed documentation still
+  has to be written)
+* [Charles Vaske] Added parameter learning for conditional probabilities by 
+  Expectation Maximization
+* [Patrick Pletscher] Added SWIG wrapper code for experimental python and 
+  octave interfaces
+* Added Max-Product functionality to JTree
+* [Frederik Eaton] Added Back-Belief-Propagation
+* [Frederik Eaton] Added approximate inference method "Clamped Belief Propagation"
+* [Frederik Eaton] Added approximate inference method "Gibbs sampling"
+
+Code cleanup:
 * Updated copyright headers
-* Added max-product functionality to JTree
-* [Charles Vaske] EM bugfix (was using abs() instead of fabs() in 
-  determining EM termination, which caused a loss of precision).
-* [Charles Vaske] New constructor in Permute for canonical variable ordering
-* [Charles Vaske] New constructor in Factor that reorders variables to canonical ordering
-* [Charles Vaske] New accessor in Properties for getting all keys
-* [Charles Vaske] New function for getting inferred parameters
 * Cleaned up error handling by introducing the DAI_THROWE macro
 * Introduced DAI_DEBASSERT macro to abbreviate a common pattern
-* Changed FactorGraph::clamp and DAIAlg::clamp interfaces (the variable to be
-  clamped is now indicated by its index, not as a Var) and marked the old
-  interface as obsolete
-* [Patrick Pletscher] Fixed performance issue in FactorGraph::clamp
-* [Sebastian Nowozin] MEX file dai now also optionally returns the MAP state
-  (only for BP)
-* [Sebastian Nowozin] Fixed memory leak in MEX file dai
+* Replaced the standard assert() macro by DAI_ASSERT, which throws a
+  dai::Exception and is even active if NDEBUG is defined
+* Removed all the virtual default constructors *::create(), as they are not used
+* [Frederik Eaton] Removed unnecessary copy constructors and assignment operators
+* [Frederik Eaton] Change cout to cerr in warnings and error messages
 
-git ae0fc30e10be6683cbfc209dcee56f34234a6cb8
---------------------------------------------
-* Added work-around for bug in Boost Graph Library
-* Improvements of TFactor<T>:
+Miscellaneous improvements:
+* BipartiteGraph:
+  - Added eraseEdge( size_t n1, size_t n2 )
+  - [Frederik Eaton] Improved documentation of Neighbor
+* TProb<T>:
+  - Added divided_by(const TProb<T>&) const
+  - Added constructor TProb<T>( const std::vector<S> &v )
+  - Added size_t draw(), which draws a random index
+  - [Frederik Eaton] Added setUniform()
+  - [Frederik Eaton] Added sumAbs()
+  - [Frederik Eaton] Added argmax()
+  - [Giuseppe Passino] Added begin(), end()
+* TFactor<T>:
+  - [Giuseppe Passino] Added begin(), end()
+  - [Charles Vaske] Added TFactor( const std::vector<Var> &vars, const std::vector<T> &p ),
+    which reorders variables to canonical ordering before storing the table
+  - Added constructor TFactor<T>( const VarSet &vars, const std::vector<S> &v )
   - Extended functionality of TFactor<T>::operators +,-,+=,-= to handle different VarSets
   - Added TFactor<T>::maxMarginal (similar to marginal but with max instead of sum)
-* Added BipartiteGraph::eraseEdge
-* Removed all the virtual default constructors *::create(), as they are not used.
-* Fixed bug in MaxSpanningTree (it wrongly assumed that the tree was not empty).
-* [Charles Vaske] Added Expectation Maximization code.
-* Added MatLab QuickStart to README.
-* MEX file dai now also returns variable and factor beliefs.
-* Cleanups and extra documentation of the code contributed by Frederik Eaton
-* Removed erroneous 'inline' directives in gibbs.cpp
+* State:
+  - [Giuseppe Passino] Added prefix ++ operator
+* Permute:
+  - [Charles Vaske] Added constructor in Permute for canonical variable ordering
+* FactorGraph:
+  - [Frederik Eaton] Added clampVar()
+  - [Frederik Eaton] Added clampFactor()
+  - [Giuseppe Passino] Added begin(), end()
+* PropertySet:
+  - Added keys(), for getting all keys
+  - [Frederik Eaton] Added default constructor
+  - [Frederik Eaton] Added constructor from string
+* InfAlg:
+  - Added setProperties(), getProperties() and printProperties()
+  - [Frederik Eaton] Added beliefV(), beliefF()
+* ExactInf:
+  - Added calcMarginal(const VarSet &)
+* HAK:
+  - Added "init" parameter to allow for random initialization
+* BP:
+  - [Giuseppe Passino] Added findMaximum(), which can be used after running
+    max-product BP to construct a global state with maximum probability
+* JTree:
+  - Added findMaximum(), which can be used after running
+    max-product JTree to construct a global state with maximum probability
+* MatLab interface:
+  - MEX file dai now also returns variable and factor beliefs
+  - [Sebastian Nowozin] MEX file dai now also optionally returns the MAP state
+    (only for BP and JTree)
+* README is now created automatically from doxygen documentation
 * [Frederik Eaton] Added script for automatically generating properties code (used by CBP and BBP)
-* [Frederik Eaton] Updated doxygen.conf to version 1.5.9
 * [Frederik Eaton] Added newInfAlgFromString to alldai.h/cpp
-* [Frederik Eaton] Added FactorGraph::clampVar and FactorGraph::clampFactor
-* [Frederik Eaton] Changed BP to be able to record order in which messages are sent (for use by BBP)
-* [Frederik Eaton] Improved documentation of BipartiteGraph::Neighbor
-* [Frederik Eaton]: Extended InfAlg interface with beliefV() and beliefF() methods;
-* [Frederik Eaton]: Improved PropertySet class:
-  - Added default constructor
-  - Allow construction from string
-  - Added method allKeys() to produce list of keys
-  - In getStringAs(), check for typeid(ValueType) before typeid(std::string)
-    (this fixes a strange bug for empty string property)
-* [Frederik Eaton]: Added some utility macros (DAI_PV, DAI_DMSG, DAI_ACCMUT, DAI_IFVERB)
-  and functions (concat(),rnd()) to include/dai/util.h
-* [Frederik Eaton] Added backwards compatibility layer for edge interface to
-  BipartiteGraph and FactorGraph (which will be obsoleted soon)
-* [Frederik Eaton] Added BP_dual, BBP and CBP algorithms
-* [Frederik Eaton] Added Gibbs::state() accessors/mutators
-* [Frederik Eaton] Fixed Gibbs::getVarDist(size_t) to return uniform
-  distribution if no state is allowed
+* [Frederik Eaton] Added some utility macros (DAI_PV, DAI_DMSG, DAI_IFVERB)
+  and functions (concat(),rnd()) to util.h
+* Changed output stream operator<< for Var and VarSet
 * [Frederik Eaton] Improved parsing code in tests/testdai to allow recursive
   alias substitutions
-* Interface changes:
-    TProb<T>::minVal()     -> TProb<T>::min()
-    TFactor<T>::minVal()   -> TFactor<T>::min()
-    TProb<T>::maxVal()     -> TProb<T>::max()
-    TFactor<T>::maxVal()   -> TFactor<T>::max()
-    TProb<T>::totalSum()   -> TProb<T>sum()
-    TFactor<T>::totalSum() -> TFactor<T>::sum()
-* [Frederik Eaton] Added methods setUniform (), sumAbs(), argmax() to TProb<T>
-* [Frederik Eaton] Added TAGS, lib targets to Makefile
-* [Frederik Eaton] Add useful aliases to aliases.conf
-* [Frederik Eaton] Removed unnecessary copy constructors and assignment
-  operators
-* [Frederik Eaton] Change cout to cerr in warnings and error messages
+* [Frederik Eaton] Added useful aliases to aliases.conf
 * [Giuseppe Passino] Optimised maximum-residual BP by using a reversed ordered
   set instead of the linear search (which can yield enormous speedups - a
   factor 500 has been measured on a binary Ising grid with 128x128 variables!)
 * Added debug assertions to Var which check for inconsistent dimensions of
   variables with the same labels
-* [Giuseppe Passino] Added prefix ++ operator to State (State::operator++())
-* [Giuseppe Passino] Added iterators to FactorGraph (FactorGraph::begin,
-  FactorGraph::end)
-* [Giuseppe Passino] Added iterators to TFactor (TFactor::begin, TFactor::end)
-* [Giuseppe Passino] Added iterators to TProb (TProb::begin, TProb::end)
-* [Giuseppe Passino] Added BP::findMaximum(), which can be used after running
-  max-product BP to construct a global state with maximum probability
-* Improved Makefile (libDAI now also builds out-of-the-box on MacOSX,
-  thanks to Dan Preston; merged Makefile.win and Makefile.shared into Makefile)
-* Fixed bug in calcMarginal, calcPairBeliefs, calcPairBeliefsNew where
-  states with zero probability mass were clamped, leading to NaNs or assertion
-  errors (thanks to Dan Preston for reporting this)
 * toc() now returns POSIX system time with maximum accuracy of microseconds
 * Exception objects now remember their error code
-* Added examples/example_sprinkler.cpp
-* [Peter Gober] Made libDAI build out-of-the-box on Cygwin.
-* [Frederik Eaton] Added Gibbs sampler to algorithms
-* Improved documentation of include/dai/{bipgraph.h, prob.h, smallset.h,
-  var.h, varset.h, factor.h, enum.h} and of examples/example.cpp
-  Merged TODO and FILEFORMAT into doxygen documentation
-* examples/
+* Examples:
   - Moved example.cpp to examples/
   - Added examples/example_bipgraph.cpp
   - Added examples/example_varset.cpp
-* Interface changes:
-  - Replaced TProb<T>::log0() by TProb<T>::log(true)
-  - Replaced TProb<T>::takeLog0() by TProb<T>::takeLog(true)
-  - Replaced TFactor<T>::log0() by TFactor<T>::log(true)
-  - Removed TProb<T>::hasNonPositives()
-  - Renamed smallSet<T> to SmallSet<T>
-  - Removed TFactor<T>::divided_by, use operator/ instead
-  - Removed TFactor<T>::divide, use operator/= instead
-  - Removed TFactor<T>::partSum(const VarSet&), use marginal(const VarSet&,true) instead
-  - Improved constructors of TProb and TFactor to use iterators instead of pointers
-* Miscellaneous small changes and cleanups:
-  - Changed regression test so that it also works under Windows
-  - Changed output stream operator<< for Var and VarSet
-  - Added TProb::draw() function, which draws a random index
-  - Cleanup of matlab interface code
-  - Small improvement of utils/fginfo
-  - Small cleanup of BP code
+  - Added examples/example_sprinkler.cpp
+  - Added examples/example_permute.cpp
+  - Added python and octave ports for examples/example_sprinkler.cpp
+
+Build system:
+* Improved Makefile:
+  - Merged Makefile.win and Makefile.shared into Makefile
+  - Macros DAI_VERSION and DAI_DATE have been introduced,
+    in order to store this information in a central place
+  - Introduced CCNODEBUGFLAGS in Makefile
   - Switched Makefile.win to GNU Make syntax
+  - [Frederik Eaton] Added TAGS, lib targets to Makefile
+* Compatibility:
+  - [Peter Gober] libDAI can now be built on Cygwin
+  - [Dan Preston] libDAI can now be built on Mac OS X
+  - Changed regression test so that it also works under Windows
+
+Interface changes (the old interface is marked obsolete and will be removed in the next release):
+* Replaced VarSet::calcState() by non-member calcLinearState()
+* Replaced VarSet::calcStates() by non-member calcState()
+* Variable labels are now nonnegative (of type size_t)
+* Renamed Treewidth(const FactorGraph &) into boundTreewidth(const FactorGraph &)
+* Replaced UEdgeVec by Graph
+* Replaced DEdgeVec by new RootedTree class
+* Moved functionality of GrowRootedTree() into constructor of RootedTree
+* Merged calcPairBeliefsNew() into calcPairBeliefs()
+* Removed calcMarginal2ndO()
+* Renamed RegionGraph::Check_Counting_Numbers into RegionGraph::checkCountingNumbers
+* Renamed RegionGraph::Calc_Counting_Numbers into RegionGraph::calcCountingNumbers
+* Renamed Permute::convert_linear_index into Permute::convertLinearIndex
+* Changed FactorGraph::clamp and DAIAlg::clamp interfaces (the variable to be
+  clamped is now indicated by its index, not as a Var)
+* Replaced TProb<T>::log0() by TProb<T>::log(true)
+* Replaced TProb<T>::takeLog0() by TProb<T>::takeLog(true)
+* Removed TProb<T>::hasNonPositives()
+* Replaced TFactor<T>::log0() by TFactor<T>::log(true)
+* Removed TFactor<T>::divided_by, use operator/ instead
+* Removed TFactor<T>::divide, use operator/= instead
+* Removed TFactor<T>::partSum(const VarSet&), use marginal(const VarSet&,false) instead
+* Renamed smallSet<T> to SmallSet<T>
+* Renamed TProb<T>::minVal() to TProb<T>::min()
+* Renamed TProb<T>::maxVal() to TProb<T>::max()
+* Renamed TProb<T>::totalSum() to TProb<T>sum()
+* Renamed TFactor<T>::minVal() to TFactor<T>::min()
+* Renamed TFactor<T>::maxVal() to TFactor<T>::max()
+* Renamed TFactor<T>::totalSum() to TFactor<T>::sum()
+* Removed class Diffs
+* [Frederik Eaton] Added backwards compatibility layer for edge interface to
+  BipartiteGraph and FactorGraph (which will be obsoleted soon)
+
+Bug fixes:
+* Fixed reversal of min and max in 
+  TFactor<T> min( const TFactor<T> &, const TFactor<T> & )
+  TFactor<T> max( const TFactor<T> &, const TFactor<T> & )
+* [Sebastian Nowozin] Fixed memory leak in MEX file dai
+* [Frederik Eaton] In PropertySet::getStringAs(), check for typeid(ValueType) 
+  before typeid(std::string) (this fixes a strange bug for empty string property)
+* Added work-around for bug in Boost Graph Library
+* Fixed bug in MaxSpanningTree (it wrongly assumed that the tree was not empty).
+* Fixed bug in calcMarginal and calcPairBeliefs where states with zero probability 
+  mass were clamped, leading to NaNs or assertion errors (thanks to Dan Preston 
+  for reporting this)
 
 
 libDAI-0.2.2 (2008-09-30)
