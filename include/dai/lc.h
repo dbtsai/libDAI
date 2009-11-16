@@ -135,10 +135,6 @@ class LC : public DAIAlgFG {
         Factor NewPancake (size_t i, size_t _I, bool & hasNaNs);
         /// Calculates the belief of variable \a i
         void CalcBelief (size_t i);
-        /// Returns the belief of variable \a i
-        /** \deprecated Please use dai::LC::beliefV() instead
-         */
-        const Factor &belief (size_t i) const { return _beliefs[i]; };
         /// Returns the belief of the Markov blanket of variable \a i (including the variable itself)
         const Factor &pancake (size_t i) const { return _pancakes[i]; };
         /// Returns the approximate cavity distribution for variable \a i

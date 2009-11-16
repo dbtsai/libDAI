@@ -183,12 +183,6 @@ class JTree : public DAIAlgRG {
 std::pair<size_t,size_t> boundTreewidth( const FactorGraph & fg );
 
 
-/// Calculates upper bound to the treewidth of a FactorGraph, using the MinFill heuristic
-/** \deprecated Renamed into boundTreewidth()
- */
-std::pair<size_t,size_t> treewidth( const FactorGraph & fg );
-
-
 } // end of namespace dai
 
 

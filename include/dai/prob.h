@@ -307,29 +307,11 @@ template <typename T> class TProb {
         /// Returns maximum value of all entries
         T max() const { return accumulate( (T)(-INFINITY), fo_max<T>(), fo_id<T>() ); }
 
-        // OBSOLETE
-        /// Returns maximum value of all entries
-        /** \deprecated Please use max() instead
-         */
-        T maxVal() const { return max(); }
-
         /// Returns minimum value of all entries
         T min() const { return accumulate( (T)INFINITY, fo_min<T>(), fo_id<T>() ); }
 
-        // OBSOLETE
-        /// Returns minimum value of all entries
-        /** \deprecated Please use min() instead
-         */
-        T minVal() const { return min(); }
-
         /// Returns sum of all entries
         T sum() const { return accumulate( (T)0, std::plus<T>(), fo_id<T>() ); }
-
-        // OBSOLETE
-        /// Returns sum of all entries
-        /** \deprecated Please use sum() instead
-         */
-        T totalSum() const { return sum(); }
 
         /// Return sum of absolute value of all entries
         T sumAbs() const { return accumulate( (T)0, std::plus<T>(), fo_abs<T>() ); }
@@ -351,20 +333,6 @@ template <typename T> class TProb {
         /// Returns \c true if one or more entries are negative
         bool hasNegatives() const {
             return (std::find_if( _p.begin(), _p.end(), std::bind2nd( std::less<T>(), (T)0 ) ) != _p.end());
-        }
-
-        // OBSOLETE
-        /// Returns \c true if one or more entries are non-positive
-        /** \deprecated Functionality was not widely used
-         */
-        bool hasNonPositives() const {
-            bool found = false;
-            for( typename std::vector<T>::const_iterator x = _p.begin(); x != _p.end(); x++ )
-                if( *x <= (T)0 ) {
-                    found = true;
-                    break;
-                }
-            return found;
         }
 
         /// Returns a pair consisting of the index of the maximum value and the maximum value itself
@@ -411,24 +379,6 @@ template <typename T> class TProb {
             return r;
         }
 
-        // OBSOLETE
-        /// Returns pointwise signum
-        /** \deprecated Functionality was not widely used
-         */
-        TProb<T> sgn() const {
-            TProb<T> x;
-            x._p.reserve( size() );
-            for( size_t i = 0; i < size(); i++ ) {
-                T s = 0;
-                if( _p[i] > 0 )
-                    s = 1;
-                else if( _p[i] < 0 )
-                    s = -1;
-                x._p.push_back( s );
-            }
-            return x;
-        }
-
         /// Returns pointwise absolute value
         TProb<T> abs() const { return pwUnaryTr( fo_abs<T>() ); }
 
@@ -445,12 +395,6 @@ template <typename T> class TProb {
                 return pwUnaryTr( fo_log<T>() );
         }
         
-        // OBSOLETE
-        /// Returns pointwise logarithm (or zero if argument is zero)
-        /** \deprecated Please use log() instead with \a zero == \c true
-         */
-        TProb<T> log0() const { return log(true); }
-
         /// Returns pointwise inverse
         /** If \a zero == \c true, uses <tt>1/0==0</tt>; otherwise, <tt>1/0==Inf</tt>.
          */
@@ -514,12 +458,6 @@ template <typename T> class TProb {
                 return pwUnaryOp( fo_log<T>() );
         }
 
-        // OBSOLETE
-        /// Applies logarithm pointwise
-        /** \deprecated Please use takeLog() instead, with \a zero == \c true
-         */
-        const TProb<T>& takeLog0() { return takeLog(true); }
-
         /// Normalizes vector using the specified norm
         /** \throw NOT_NORMALIZABLE if the norm is zero
          */
@@ -542,28 +480,6 @@ template <typename T> class TProb {
         /// Sets all entries to \a x
         TProb<T> & fill(T x) {
             std::fill( _p.begin(), _p.end(), x );
-            return *this;
-        }
-
-        // OBSOLETE
-        /// Sets entries that are smaller (in absolute value) than \a epsilon to 0
-        /** \deprecated Functionality was not widely used
-         */
-        TProb<T>& makeZero( T epsilon ) {
-            for( size_t i = 0; i < size(); i++ )
-                if( (_p[i] < epsilon) && (_p[i] > -epsilon) )
-                    _p[i] = 0;
-            return *this;
-        }
-        
-        // OBSOLETE
-        /// Sets entries that are smaller than \a epsilon to \a epsilon
-        /** \deprecated Functionality was not widely used
-         */
-        TProb<T>& makePositive( T epsilon ) {
-            for( size_t i = 0; i < size(); i++ )
-                if( (0 < _p[i]) && (_p[i] < epsilon) )
-                    _p[i] = epsilon;
             return *this;
         }
 

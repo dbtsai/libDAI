@@ -269,7 +269,7 @@ Real LC::run() {
 
     vector<Factor> old_beliefs;
     for(size_t i=0; i < nrVars(); i++ )
-        old_beliefs.push_back(belief(i));
+        old_beliefs.push_back(beliefV(i));
 
     bool hasNaNs = false;
     for( size_t i=0; i < nrVars(); i++ )
@@ -307,8 +307,8 @@ Real LC::run() {
 
         // compare new beliefs with old ones
         for(size_t i=0; i < nrVars(); i++ ) {
-            diffs[i] = dist( belief(i), old_beliefs[i], Prob::DISTLINF );
-            old_beliefs[i] = belief(i);
+            diffs[i] = dist( beliefV(i), old_beliefs[i], Prob::DISTLINF );
+            old_beliefs[i] = beliefV(i);
         }
         maxDiff = max( diffs );
 

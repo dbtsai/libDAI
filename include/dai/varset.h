@@ -137,16 +137,6 @@ class VarSet : public SmallSet<Var> {
                 states *= n->states();
             return states;
         }
-
-        /// Calculates the linear index in the Cartesian product of the variables in \c *this that corresponds to a particular joint assignment of the variables, specified by \a state.
-        /** \deprecated Please use dai::calcLinearState() instead
-         */
-        size_t calcState( const std::map<Var, size_t> &state ) const { return dai::calcLinearState( *this, state ); }
-
-        /// Calculates the joint assignment of the variables in \c *this corresponding to the linear index \a linearState.
-        /** \deprecated Please use dai::calcState() instead
-         */
-        std::map<Var, size_t> calcStates( size_t linearState ) const { return dai::calcState( *this, linearState ); }
     //@}
 
     /// \name Input and output

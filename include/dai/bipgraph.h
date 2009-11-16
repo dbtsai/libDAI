@@ -139,28 +139,11 @@ class BipartiteGraph {
             std::vector<size_t> ind2;
         };
 
-    // OBSOLETE
-    /// \name Backwards compatibility layer (to be removed soon)
-        //@{
-        /// Enable backwards compatibility layer?
-        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
-         */
-        bool _edge_indexed;
-        /// Call indexEdges() first to initialize these members
-        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
-         */
-        std::vector<Edge> _edges;
-        /// Call indexEdges() first to initialize these members
-        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
-         */
-        hash_map<Edge,size_t> _vv2e;
-    //@}
-
     public:
     /// \name Constructors and destructors
     //@{
         /// Default constructor (creates an empty bipartite graph)
-        BipartiteGraph() : _nb1(), _nb2(), _edge_indexed(false) {}
+        BipartiteGraph() : _nb1(), _nb2() {}
 
         /// Constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
@@ -170,7 +153,7 @@ class BipartiteGraph {
          *  \param end Points just beyond the last edge.
          */
         template<typename EdgeInputIterator>
-        BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ), _edge_indexed(false) {
+        BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ) {
             construct( nr1, nr2, begin, end );
         }
     //@}
@@ -349,69 +332,6 @@ class BipartiteGraph {
     //@{
         /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
-    //@}
-
-        // OBSOLETE
-    /// \name Backwards compatibility layer (to be removed soon)
-    //@{
-        /// Prepare backwards compatibility layer for indexed edges
-        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
-         */
-        void indexEdges() {
-            std::cerr << "Warning: this BipartiteGraph edge interface is obsolete!" << std::endl;
-            _edges.clear();
-            _vv2e.clear();
-            size_t i=0;
-            foreach(const Neighbors &nb1s, _nb1) {
-                foreach(const Neighbor &n2, nb1s) {
-                    Edge e(i, n2.node);
-                    _edges.push_back(e);
-                }
-                i++;
-            }
-            sort(_edges.begin(), _edges.end()); // unnecessary?
-
-            i=0;
-            foreach(const Edge& e, _edges) {
-                _vv2e[e] = i++;
-            }
-
-            _edge_indexed = true;
-        }
-
-        /// Returns edge with index \a e
-        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
-         */
-        const Edge& edge(size_t e) const {
-            DAI_ASSERT(_edge_indexed);
-            return _edges[e];
-        }
-
-        /// Returns all edges
-        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
-         */
-        const std::vector<Edge>& edges() const {
-            return _edges;
-        }
-
-        /// Converts a pair of node indices to an edge index
-        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
-         */
-        size_t VV2E(size_t n1, size_t n2) const {
-            DAI_ASSERT(_edge_indexed);
-            Edge e(n1,n2);
-            hash_map<Edge,size_t>::const_iterator i = _vv2e.find(e);
-            DAI_ASSERT(i != _vv2e.end());
-            return i->second;
-        }
-
-        /// Returns number of edges
-        /** \deprecated Please use the BipartiteGraph::Neighbor interface instead
-         */
-        size_t nr_edges() const {
-            DAI_ASSERT(_edge_indexed);
-            return _edges.size();
-        }
     //@}
 };
 

@@ -160,12 +160,6 @@ class RegionGraph : public FactorGraph {
          *  that contain the variable equals one.
          */
         bool checkCountingNumbers() const;
-
-        // OBSOLETE
-        /// Check whether the counting numbers are valid
-        /** \deprecated Renamed into dai::RegionGraph::checkCountingNumbers()
-         */
-        bool Check_Counting_Numbers() { return checkCountingNumbers(); }
     //@}
 
     /// \name Operations
@@ -208,12 +202,6 @@ class RegionGraph : public FactorGraph {
          *  region if its variables are a subset of the variables of its parent region).
          */
         void calcCountingNumbers();
-
-        // OBSOLETE
-        /// Calculates counting numbers of inner regions based upon counting numbers of outer regions
-        /** \deprecated Renamed into dai::RegionGraph::calcCountingNumbers()
-         */
-        void Calc_Counting_Numbers() { calcCountingNumbers(); }
     //@}
 
     /// \name Input/output

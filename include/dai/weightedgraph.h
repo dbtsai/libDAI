@@ -146,24 +146,6 @@ class RootedTree : public std::vector<DEdge> {
 };
 
 
-// OBSOLETE
-/// Vector of UEdge
-/** \deprecated Please use Graph instead
- */
-typedef std::vector<UEdge>  UEdgeVec;
-// OBSOLETE
-/// Vector of DEdge
-/** \deprecated Please use RootedTree instead
- */
-typedef std::vector<DEdge>  DEdgeVec;
-
-// OBSOLETE
-/// Constructs a rooted tree from a tree and a root
-/** \pre T has no cycles and contains node \a Root
- *  \deprecated Please use RootedTree::RootedTree(const Graph &, size_t) instead
- */
-DEdgeVec GrowRootedTree( const Graph &T, size_t Root );
-
 /// Uses Prim's algorithm to construct a minimal spanning tree from the (positively) weighted graph \a G.
 /** Uses implementation in Boost Graph Library.
  */

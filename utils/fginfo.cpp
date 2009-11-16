@@ -93,7 +93,7 @@ int main( int argc, char *argv[] ) {
         cout << "Binary variables?      " << fg.isBinary() << endl;
         cout << "Pairwise interactions? " << fg.isPairwise() << endl;
         if( calc_tw ) {
-            std::pair<size_t,size_t> tw = treewidth(fg);
+            std::pair<size_t,size_t> tw = boundTreewidth(fg);
             cout << "Treewidth:           " << tw.first << endl;
             cout << "Largest cluster for JTree has " << tw.second << " states " << endl;
         }

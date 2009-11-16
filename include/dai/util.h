@@ -194,63 +194,6 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
 /// Split a string into tokens delimited by one of the characters in \a delim
 void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
 
-// OBSOLETE
-/// Used to keep track of the progress made by iterative algorithms.
-/** \deprecated Redundant, because a simple std::vector<Real> provides the same functionality
- */
-class Diffs : public std::vector<Real> {
-    private:
-        size_t _maxsize;
-        Real _def;
-        std::vector<Real>::iterator _pos;
-        std::vector<Real>::iterator _maxpos;
-    public:
-        /// Constructor
-        /** \param maxsize Maximum number of differences to store
-         *  \param def Default value
-         */
-        Diffs(long maxsize, Real def) : std::vector<Real>(), _maxsize(maxsize), _def(def) {
-            this->reserve(_maxsize);
-            _pos = begin();
-            _maxpos = begin();
-        }
-        /// Returns maximum difference encountered so far
-        Real maxDiff() {
-            if( size() < _maxsize )
-                return _def;
-            else
-                return( *_maxpos );
-        }
-        /// Register new difference \a x
-        void push(Real x) {
-            if( size() < _maxsize ) {
-                push_back(x);
-                _pos = end();
-                if( size() > 1 ) {
-                    if( *_maxpos < back() ) {
-                        _maxpos = end();
-                        _maxpos--;
-                    }
-                } else {
-                    _maxpos = begin();
-                }
-            } else {
-                if( _pos == end() )
-                    _pos = begin();
-                if( _maxpos == _pos ) {
-                    *_pos++ = x;
-                    _maxpos = max_element(begin(),end());
-                } else {
-                    if( x > *_maxpos )
-                        _maxpos = _pos;
-                    *_pos++ = x;
-                }
-            }
-        }
-        /// Return maximum number of differences that can be stored
-        size_t maxSize() { return _maxsize; }
-};
-
 
 } // end of namespace dai
 

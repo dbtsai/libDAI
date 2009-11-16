@@ -128,12 +128,6 @@ class InfAlg {
          */
         virtual void clamp( size_t i, size_t x, bool backup = false ) = 0;
 
-        // OBSOLETE
-        /// Clamp variable \a v to value \a x (i.e. multiply with a Kronecker delta \f$\delta_{v, x}\f$)
-        /** \deprecated Please use dai::InfAlg::clamp(size_t,size_t,bool) instead
-         */
-        virtual void clamp( const Var &v, size_t x, bool backup = false ) = 0;
-
         /// Sets all factors interacting with variable with index \a i to one.
         /** If \a backup == \c true, make a backup of all factors that are changed.
          */
@@ -211,15 +205,6 @@ class DAIAlg : public InfAlg, public GRM {
          */
         void clamp( size_t i, size_t x, bool backup = false ) { GRM::clamp( i, x, backup ); }
 
-        // OBSOLETE
-        /// Clamp variable \a v to value \a x (i.e. multiply with a Kronecker delta \f$\delta_{v, x}\f$)
-        /** \deprecated Please use dai::DAIAlg<>::clamp(size_t,size_t,bool) instead
-         */
-        void clamp( const Var &v, size_t x, bool backup = false ) {
-            GRM::clamp( v, x, backup );
-            std::cerr << "Warning: this DAIAlg<...>::clamp(const Var&,...) interface is obsolete!" << std::endl;
-        }
-
         /// Sets all factors interacting with variable with index \a i to one.
         /** If \a backup == \c true, make a backup of all factors that are changed.
          */
@@ -270,18 +255,6 @@ Factor calcMarginal( const InfAlg& obj, const VarSet& vs, bool reInit );
  *  \param accurate if \c true, uses a slower but more accurate approximation algorithm
  */
 std::vector<Factor> calcPairBeliefs( const InfAlg& obj, const VarSet& vs, bool reInit, bool accurate=false );
-
-// OBSOLETE
-/// Calculates beliefs for all pairs of variables in \a vs using inference algorithm \a obj.
-/** \deprecated Please use dai::calcPairBeliefs() instead with \a accurate == \c true
- */
-std::vector<Factor> calcPairBeliefsNew( const InfAlg& obj, const VarSet& vs, bool reInit );
-
-// OBSOLETE
-/// Calculates marginal probability distribution for \a vs up to second order interactions using inference algorithm \a obj
-/** \deprecated Functionality is not widely used
- */
-Factor calcMarginal2ndO( const InfAlg& obj, const VarSet& vs, bool reInit );
 
 
 } // end of namespace dai
