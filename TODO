@@ -1,8 +1,5 @@
 To do for the next release (0.2.3):
 
-- Test under Windows
-- Test under Cygwin
-- Test under Ubuntu
 - Update ChangeLog head
 - Set DAI_VERSION and DAI_DATE correctly (all occurences)
 - Build documentation and make a copy

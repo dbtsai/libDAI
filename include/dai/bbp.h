@@ -105,14 +105,14 @@ class BBP {
         /// Unnormalized factor belief adjoints
         std::vector<Prob> _adj_b_F_unnorm;
 
-        /// _T[i][_I] (see eqn. (41) in [\ref EaG09])
-        std::vector<std::vector<Prob > > _T;
-        /// _U[I][_i] (see eqn. (42) in [\ref EaG09])
-        std::vector<std::vector<Prob > > _U;
-        /// _S[i][_I][_j] (see eqn. (43) in [\ref EaG09])
-        std::vector<std::vector<std::vector<Prob > > > _S;
-        /// _R[I][_i][_J] (see eqn. (44) in [\ref EaG09])
-        std::vector<std::vector<std::vector<Prob > > > _R;
+        /// _Tmsg[i][_I] (see eqn. (41) in [\ref EaG09])
+        std::vector<std::vector<Prob > > _Tmsg;
+        /// _Umsg[I][_i] (see eqn. (42) in [\ref EaG09])
+        std::vector<std::vector<Prob > > _Umsg;
+        /// _Smsg[i][_I][_j] (see eqn. (43) in [\ref EaG09])
+        std::vector<std::vector<std::vector<Prob > > > _Smsg;
+        /// _Rmsg[I][_i][_J] (see eqn. (44) in [\ref EaG09])
+        std::vector<std::vector<std::vector<Prob > > > _Rmsg;
 
         /// Number of iterations done
         size_t _iters;
@@ -165,21 +165,21 @@ class BBP {
     /// \name Accessors/mutators
     //@{
         /// Returns reference to T value; see eqn. (41) in [\ref EaG09]
-        Prob & T(size_t i, size_t _I) { return _T[i][_I]; }
+        Prob & T(size_t i, size_t _I) { return _Tmsg[i][_I]; }
         /// Returns constant reference to T value; see eqn. (41) in [\ref EaG09]
-        const Prob & T(size_t i, size_t _I) const { return _T[i][_I]; }
+        const Prob & T(size_t i, size_t _I) const { return _Tmsg[i][_I]; }
         /// Returns reference to U value; see eqn. (42) in [\ref EaG09]
-        Prob & U(size_t I, size_t _i) { return _U[I][_i]; }
+        Prob & U(size_t I, size_t _i) { return _Umsg[I][_i]; }
         /// Returns constant reference to U value; see eqn. (42) in [\ref EaG09]
-        const Prob & U(size_t I, size_t _i) const { return _U[I][_i]; }
+        const Prob & U(size_t I, size_t _i) const { return _Umsg[I][_i]; }
         /// Returns reference to S value; see eqn. (43) in [\ref EaG09]
-        Prob & S(size_t i, size_t _I, size_t _j) { return _S[i][_I][_j]; }
+        Prob & S(size_t i, size_t _I, size_t _j) { return _Smsg[i][_I][_j]; }
         /// Returns constant reference to S value; see eqn. (43) in [\ref EaG09]
-        const Prob & S(size_t i, size_t _I, size_t _j) const { return _S[i][_I][_j]; }
+        const Prob & S(size_t i, size_t _I, size_t _j) const { return _Smsg[i][_I][_j]; }
         /// Returns reference to R value; see eqn. (44) in [\ref EaG09]
-        Prob & R(size_t I, size_t _i, size_t _J) { return _R[I][_i][_J]; }
+        Prob & R(size_t I, size_t _i, size_t _J) { return _Rmsg[I][_i][_J]; }
         /// Returns constant reference to R value; see eqn. (44) in [\ref EaG09]
-        const Prob & R(size_t I, size_t _i, size_t _J) const { return _R[I][_i][_J]; }
+        const Prob & R(size_t I, size_t _i, size_t _J) const { return _Rmsg[I][_i][_J]; }
 
         /// Returns reference to variable->factor message adjoint
         Prob& adj_n(size_t i, size_t _I) { return _adj_n[i][_I]; }
