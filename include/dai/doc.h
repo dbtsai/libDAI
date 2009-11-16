@@ -11,6 +11,13 @@
 /** \file
  *  \brief Contains additional doxygen documentation
  *
+ *  \todo Write a concept/notations page for the documentation,
+ *  explaining the concepts of "state" (index into a 
+ *  multi-dimensional array, e.g., one corresponding
+ *  to the Cartesian product of statespaces of variables)
+ *  and "linear index". This should make it easier to
+ *  document index.h and varset.h
+ *
  *  \todo Document tests and utils
  *
  *  \todo Add FAQ
@@ -52,7 +59,7 @@
  *
  *  <hr size="1">
  *  \section about About libDAI
- *  libDAI is a free/open source C++ library (licensed under GPLv2+) that provides
+ *  libDAI is a free/open source C++ library (licensed under GPL 2+) that provides
  *  implementations of various (approximate) inference methods for discrete
  *  graphical models. libDAI supports arbitrary factor graphs with discrete
  *  variables; this includes discrete Markov Random Fields and Bayesian
@@ -60,6 +67,17 @@
  *
  *  The library is targeted at researchers. To be able to use the library, a
  *  good understanding of graphical models is needed.
+ *
+ *  The best way to use libDAI is by writing C++ code that invokes the library;
+ *  in addition, part of the functionality is accessibly by using the
+ *  - command line interface
+ *  - (limited) MatLab interface
+ *  - (experimental) python interface
+ *  - (experimental) octave interface.
+ *
+ *  libDAI can be used to implement novel (approximate) inference algorithms
+ *  and to easily compare the accuracy and performance with existing algorithms
+ *  that have been implemented already.
  *
  *  \section features Features
  *  Currently, libDAI supports the following (approximate) inference methods:
@@ -92,10 +110,26 @@
  *  is Expectation Maximization (or Maximum Likelihood if no data is missing)
  *  for learning factor parameters.
  *
- *  \section language Why C++?
+ *  \section rationale Rationale
+ *
+ *  In my opinion, the lack of open source "reference" implementations hampers
+ *  progress in research on approximate inference. Methods differ widely in terms
+ *  of quality and performance characteristics, which also depend in different
+ *  ways on various properties of the graphical models. Finding the best
+ *  approximate inference method for a particular application therefore often
+ *  requires empirical comparisons. However, implementing and debugging these
+ *  methods takes a lot of time which could otherwise be spent on research. I hope
+ *  that this code will aid researchers to be able to easily compare various
+ *  (existing as well as new) approximate inference methods, in this way
+ *  accelerating research and stimulating real-world applications of approximate
+ *  inference.
+ *
+ *  \section language Language
  *  Because libDAI is implemented in C++, it is very fast compared with
  *  implementations in MatLab (a factor 1000 faster is not uncommon).
  *  libDAI does provide a (limited) MatLab interface for easy integration with MatLab.
+ *  It also provides a command line interface and experimental python and octave 
+ *  interfaces (thanks to Patrick Pletscher).
  *
  *  \section compatibility Compatibility
  *  
@@ -110,6 +144,10 @@
  *  \section download Downloading libDAI
  *  The libDAI sources and documentation can be downloaded from the libDAI website:
  *  http://www.libdai.org.
+ *
+ *  \section support Mailing list
+ *  The Google group "libDAI" (http://groups.google.com/group/libdai)
+ *  can be used for getting support and discussing development issues.
  */
 
 
@@ -143,10 +181,11 @@
  *    - mention the fashion in which this software was
  *      used, including the version number, with a citation to the literature, 
  *      to allow replication; 
- *    - mention this software in the Acknowledgements section. An
- *      appropriate citation would be:\n
- *      J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete 
- *      Approximate Inference methods", http://www.libdai.org
+ *    - mention this software in the Acknowledgements section. 
+ *
+ *  An appropriate citation would be:\n
+ *  J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete 
+ *  Approximate Inference methods", http://www.libdai.org
  *
  *  Moreover, as a personal note, I would appreciate it if you would email
  *  (citations of) papers referencing this work to joris dot mooij at libdai dot org.
@@ -265,15 +304,150 @@
  *  <hr size="1">
  *  \section build-doxygen Building the documentation
  *
- *  Install doxygen and use
+ *  Install doxygen, graphviz and a TeX distribution and use
  *  <pre>  make doc</pre>
  *  to build the documentation. If the documentation is not clear enough, feel free 
  *  to send me an email (or even better, to improve the documentation and send a patch!).
+ *  The documentation can also be browsed online at http://www.libdai.org.
  */
 
 
 /** \page changelog Change Log
  *  \verbinclude ChangeLog
+ */
+
+
+/** \page inference Graphical models and approximate inference
+ *
+ *  \section inference-graphicalmodels Graphical models
+ *
+ *  Commonly used graphical models are Bayesian networks and Markov random fields.
+ *  In libDAI, both types of graphical models are represented by a slightly more 
+ *  general type of graphical model: a factor graph [\ref KFL01].
+ *
+ *  \dot
+ *  digraph bayesnet {
+ *    size="1,1";
+ *    x0 [label="0"];
+ *    x1 [label="1"];
+ *    x2 [label="2"];
+ *    x3 [label="3"];
+ *    x4 [label="4"];
+ *    x0 -> x1;
+ *    x0 -> x2;
+ *    x1 -> x3;
+ *    x1 -> x4;
+ *    x2 -> x4;
+ *  }
+ *  \enddot
+ *
+ *  \f[ P(\mathbf{x}) = \prod_{i\in\mathcal{V}} P(x_i \,|\, x_{\mathrm{pa}(i)}) \f]
+ *  where \f$\mathrm{pa}(i)\f$ are the parents of node \a i in a DAG.
+ *
+ *  \dot
+ *  graph mrf {
+ *    size="1.5,1.5";
+ *    x0 [label="0"];
+ *    x1 [label="1"];
+ *    x2 [label="2"];
+ *    x3 [label="3"];
+ *    x4 [label="4"];
+ *    x0 -- x1;
+ *    x0 -- x2;
+ *    x1 -- x2;
+ *    x1 -- x3;
+ *    x1 -- x4;
+ *    x2 -- x4;
+ *  }
+ *  \enddot
+ *
+ *  \f[ P(\mathbf{x}) = \frac{1}{Z} \prod_{C\in\mathcal{C}} \psi_C(x_C) \f]
+ *  where \f$ \mathcal{C} \f$ are the cliques of an undirected graph, 
+ *  \f$ \psi_C(x_C) \f$ are "potentials" or "compatibility functions", and
+ *  \f$ Z \f$ is the partition sum which properly normalizes the probability
+ *  distribution.
+ *
+ *  \dot
+ *  graph factorgraph {
+ *    size="1.8,1";
+ *    x0 [label="0"];
+ *    x1 [label="1"];
+ *    x2 [label="2"];
+ *    x3 [label="3"];
+ *    x4 [label="4"];
+ *    f01 [shape="box",label=""];
+ *    f02 [shape="box",label=""];
+ *    f13 [shape="box",label=""];
+ *    f124 [shape="box",label=""];
+ *    x0 -- f01;
+ *    x1 -- f01;
+ *    x0 -- f02;
+ *    x2 -- f02;
+ *    x1 -- f13;
+ *    x3 -- f13;
+ *    x1 -- f124;
+ *    x2 -- f124;
+ *    x4 -- f124;
+ *  }
+ *  \enddot
+ *
+ *  \f[ P(\mathbf{x}) = \frac{1}{Z} \prod_{I\in \mathcal{F}} f_I(x_I) \f]
+ *  where \f$ \mathcal{F} \f$ are the factor nodes of a factor graph (a 
+ *  bipartite graph consisting of variable nodes and factor nodes), 
+ *  \f$ f_I(x_I) \f$ are the factors, and \f$ Z \f$ is the partition sum
+ *  which properly normalizes the probability distribution.
+ *
+ *  Looking at the expressions for the joint probability distributions,
+ *  it is obvious that Bayesian networks and Markov random fields can 
+ *  both be easily represented as factor graphs. Factor graphs most
+ *  naturally express the factorization structure of a probability
+ *  distribution, and hence are a convenient representation for approximate
+ *  inference algorithms, which all try to exploit this factorization.
+ *  This is why libDAI uses a factor graph as representation of a 
+ *  graphical model, implemented in the dai::FactorGraph class.
+ *
+ *  \section inference-inference Inference tasks
+ *
+ *  Given a factor graph, specified by the variable nodes \f$\{x_i\}_{i\in\mathcal{V}}\f$
+ *  the factor nodes \f$ \mathcal{F} \f$, the graph structure, and the factors
+ *  \f$\{f_I(x_I)\}_{I\in\mathcal{F}}\f$, the following tasks are important:
+ *
+ *  - Calculating the partition sum:
+ *    \f[ Z = \sum_{\mathbf{x}_{\mathcal{V}}} \prod_{I \in \mathcal{F}} f_I(x_I) \f]
+ *  - Calculating the marginal distribution of a subset of variables
+ *    \f$\{x_i\}_{i\in A}\f$: 
+ *    \f[ P(\mathbf{x}_{A}) = \frac{1}{Z} \sum_{\mathbf{x}_{\mathcal{V}\setminus A}} \prod_{I \in \mathcal{F}} f_I(x_I) \f]
+ *  - Calculating the MAP state which has the maximum probability mass:
+ *    \f[ \mathrm{argmax}_{\mathbf{x}}\,\prod_{I\in\mathcal{F}} f_I(x_I) \f]
+ *
+ *  libDAI offers several inference algorithms, which solve (a subset of) these tasks either 
+ *  approximately or exactly, for factor graphs with discrete variables. The following
+ *  algorithms are implemented:
+ *  
+ *  Exact inference:
+ *  - Brute force enumeration: dai::ExactInf
+ *  - Junction-tree method: dai::JTree
+ *
+ *  Approximate inference:
+ *  - Mean Field: dai::MF
+ *  - (Loopy) Belief Propagation: dai::BP [\ref KFL01]
+ *  - Tree Expectation Propagation: dai::TreeEP [\ref MiQ04]
+ *  - Generalized Belief Propagation: dai::HAK [\ref YFW05]
+ *  - Double-loop GBP: dai::HAK [\ref HAK03]
+ *  - Loop Corrected Belief Propagation: dai::MR [\ref MoR05] and dai::LC [\ref MoK07]
+ *  - Gibbs sampling: dai::Gibbs
+ *  - Conditioned BP: dai::CBP [\ref EaG09]
+ *
+ *  Not all inference tasks are implemented by each method: calculating MAP states
+ *  is only possible with dai::JTree and dai::BP, calculating partition sums is
+ *  not possible with dai::MR, dai::LC and dai::Gibbs.
+ *
+ *  \section inference-learning Parameter learning
+ *
+ *  In addition, libDAI supports parameter learning of conditional probability
+ *  tables by Expectation Maximization (or Maximum Likelihood, if there is no
+ *  missing data). This is implemented in dai::EMAlg.
+ *  
  */
 
 
@@ -582,5 +756,3 @@
  *  this is compile-time polymorphism, whereas tests/testdai needs runtime polymorphism.
  *  Therefore this is probably a bad idea.
  */
-
-

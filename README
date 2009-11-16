@@ -2,8 +2,8 @@ libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Version:  git commit 7982eafde7cecc6ee4105461337667980203e4d2
-Date:     Thu Nov 12 16:36:54 2009 +0100
+Version:  git commit b088d4b1057d9105210d3f04c7ca66c21423158b
+Date:     Sun Nov 15 19:10:39 2009 +0100
 See also: http://www.libdai.org
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -31,10 +31,11 @@ of this program, please:
 
   • mention the fashion in which this software was used, including the version
     number, with a citation to the literature, to allow replication;
-  • mention this software in the Acknowledgements section. An appropriate
-    citation would be:
-    J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for
-    Discrete Approximate Inference methods", http://www.libdai.org
+  • mention this software in the Acknowledgements section.
+
+An appropriate citation would be:
+J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete
+Approximate Inference methods", http://www.libdai.org
 
 Moreover, as a personal note, I would appreciate it if you would email
 (citations of) papers referencing this work to joris dot mooij at libdai dot
@@ -44,13 +45,25 @@ org.
 
 About libDAI
 
-libDAI is a free/open source C++ library (licensed under GPLv2+) that provides
+libDAI is a free/open source C++ library (licensed under GPL 2+) that provides
 implementations of various (approximate) inference methods for discrete
 graphical models. libDAI supports arbitrary factor graphs with discrete
 variables; this includes discrete Markov Random Fields and Bayesian Networks.
 
 The library is targeted at researchers. To be able to use the library, a good
 understanding of graphical models is needed.
+
+The best way to use libDAI is by writing C++ code that invokes the library; in
+addition, part of the functionality is accessibly by using the
+
+  • command line interface
+  • (limited) MatLab interface
+  • (experimental) python interface
+  • (experimental) octave interface.
+
+libDAI can be used to implement novel (approximate) inference algorithms and to
+easily compare the accuracy and performance with existing algorithms that have
+been implemented already.
 
 Features
 
@@ -85,11 +98,26 @@ functionalities. The only learning method supported currently is Expectation
 Maximization (or Maximum Likelihood if no data is missing) for learning factor
 parameters.
 
-Why C++?
+Rationale
+
+In my opinion, the lack of open source "reference" implementations hampers
+progress in research on approximate inference. Methods differ widely in terms
+of quality and performance characteristics, which also depend in different ways
+on various properties of the graphical models. Finding the best approximate
+inference method for a particular application therefore often requires
+empirical comparisons. However, implementing and debugging these methods takes
+a lot of time which could otherwise be spent on research. I hope that this code
+will aid researchers to be able to easily compare various (existing as well as
+new) approximate inference methods, in this way accelerating research and
+stimulating real-world applications of approximate inference.
+
+Language
 
 Because libDAI is implemented in C++, it is very fast compared with
 implementations in MatLab (a factor 1000 faster is not uncommon). libDAI does
-provide a (limited) MatLab interface for easy integration with MatLab.
+provide a (limited) MatLab interface for easy integration with MatLab. It also
+provides a command line interface and experimental python and octave interfaces
+(thanks to Patrick Pletscher).
 
 Compatibility
 
@@ -106,6 +134,11 @@ Downloading libDAI
 
 The libDAI sources and documentation can be downloaded from the libDAI website:
 http://www.libdai.org.
+
+Mailing list
+
+The Google group "libDAI" (http://groups.google.com/group/libdai) can be used
+for getting support and discussing development issues.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -238,11 +271,11 @@ tests/aliases.conf.
 
 Building the documentation
 
-Install doxygen and use
+Install doxygen, graphviz and a TeX distribution and use
 
   make doc
 
 to build the documentation. If the documentation is not clear enough, feel free
 to send me an email (or even better, to improve the documentation and send a
-patch!).
+patch!). The documentation can also be browsed online at http://www.libdai.org.
 
