@@ -49,7 +49,7 @@ namespace dai {
  *  ordering, which is defined by the one-to-one correspondence of a joint state
  *  in \f$\prod_{l\in L} X_l\f$ with a linear index in
  *  \f$\{0,1,\dots,\prod_{l\in L} S_l-1\}\f$ according to the mapping \f$\sigma\f$
- *  induced by VarSet::calcState(const std::map<Var,size_t> &).
+ *  induced by dai::calcLinearState().
  *
  *  \tparam T Should be a scalar that is castable from and to double and should support elementary arithmetic operations.
  *  \todo Define a better fileformat for .fg files (maybe using XML)?

@@ -36,8 +36,8 @@ namespace dai {
  *      IndexFor i( indexVars, forVars );
  *      size_t iter = 0;
  *      for( ; i.valid(); i++, iter++ ) {
- *          cout << "State of forVars: " << forVars.calcStates( iter ) << "; ";
- *          cout << "state of indexVars: " << indexVars.calcStates( long(i) ) << endl;
+ *          cout << "State of forVars: " << calcState( forVars, iter ) << "; ";
+ *          cout << "state of indexVars: " << calcState( indexVars, long(i) ) << endl;
  *      }
  *  \endcode
  *  loops over all joint states of the variables in \a forVars,
@@ -320,12 +320,12 @@ class multifor {
  *  }
  *  \endcode
  *
- *  \note The same functionality could be achieved by simply iterating over the linear state and using VarSet::calcStates,
+ *  \note The same functionality could be achieved by simply iterating over the linear state and using dai::calcState(),
  *  but the State class offers a more efficient implementation.
  *
  *  \note A State is very similar to a \link multifor \endlink, but tailored for Var 's and VarSet 's.
  *
- *  \see VarSet::calcState(), VarSet::calcStates()
+ *  \see dai::calcLinearState(), dai::calcState()
  *
  *  \idea Make the State class a more prominent part of libDAI 
  *  (and document it clearly, explaining the concept of state); 

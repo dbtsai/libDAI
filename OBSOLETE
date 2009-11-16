@@ -33,3 +33,5 @@ typedef UEdgeVec;
 typedef DEdgeVec;
 DEdgeVec GrowRootedTree( const Graph &T, size_t Root );
 const Factor& LC::belief(size_t);
+size_t VarSet::calcState( const std::map<Var, size_t> &state ) const;
+std::map<Var, size_t> VarSet::calcStates( size_t linearState ) const;

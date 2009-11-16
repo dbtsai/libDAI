@@ -40,23 +40,23 @@ int main() {
             states[x1] = s1;
 
             // output states of x0, x1 and corresponding state of X
-            cout << "    " << s0 << "              " << s1 << "              " << X.calcState(states) << endl;
+            cout << "    " << s0 << "              " << s1 << "              " << calcLinearState(X,states) << endl;
 
-            // VarSet::calcStates is the inverse of VarSet::calcState
-            DAI_ASSERT( X.calcStates(X.calcState(states)) == states );
+            // calcState() is the inverse of calcLinearState()
+            DAI_ASSERT( calcState(X, calcLinearState(X, states)) == states );
         }
 
     cout << endl << "And vice versa:" << endl;
     cout << "  state of x0:   state of x1:   (linear) state of X:" << endl;
     for( size_t S = 0; S < X.nrStates(); S++ ) { // for all (joint) states of X
         // calculate states of x0 and x1 corresponding to state S of X
-        map<Var,size_t> states = X.calcStates(S);
+        map<Var,size_t> states = calcState(X,S);
 
         // output state of X and corresponding states of x0, x1
         cout << "    " << states[x0] << "              " << states[x1] << "              " << S << endl;
 
-        // VarSet::calcState is the inverse of VarSet::calcStates
-        DAI_ASSERT( X.calcState(X.calcStates(S)) == S );
+        // calcLinearState() is the inverse of calcState()
+        DAI_ASSERT( calcLinearState(X, calcState(X,S)) == S );
     }
 
     cout << endl << "Iterating over all joint states using the State class:" << endl;

@@ -120,6 +120,9 @@ lib: $(LIB)/libdai$(LE)
 bipgraph$(OE) : $(SRC)/bipgraph.cpp $(HEADERS)
 	$(CC) -c $(SRC)/bipgraph.cpp
 
+varset$(OE) : $(SRC/varset.cpp $(HEADERS)
+	$(CC) -c $(SRC)/varset.cpp
+
 daialg$(OE) : $(SRC)/daialg.cpp $(HEADERS)
 	$(CC) -c $(SRC)/daialg.cpp
 
@@ -257,13 +260,13 @@ utils/fginfo$(EE) : utils/fginfo.cpp $(HEADERS) $(LIB)/libdai$(LE)
 ##########
 
 ifneq ($(OS),WINDOWS)
-$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
+$(LIB)/libdai$(LE) : bipgraph$(OE) varset$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 	-mkdir -p lib
-	ar rcus $(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
+	ar rcus $(LIB)/libdai$(LE) bipgraph$(OE) varset$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 else
-$(LIB)/libdai$(LE) : bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
+$(LIB)/libdai$(LE) : bipgraph$(OE) varset$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 	-mkdir lib
-	lib /out:$(LIB)/libdai$(LE) bipgraph$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
+	lib /out:$(LIB)/libdai$(LE) bipgraph$(OE) varset$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS)
 endif
 
 

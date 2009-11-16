@@ -1,6 +1,5 @@
 To do for the next release (0.2.3):
 
-- Rename VarSet::calcState(), VarSet::calcStates() and make them non-member functions.
 - Update ChangeLog
 
 Finally:

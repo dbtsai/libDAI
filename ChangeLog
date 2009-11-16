@@ -1,3 +1,5 @@
+* Replaced VarSet::calcState() by non-member calcLinearState()
+* Replaced VarSet::calcStates() by non-member calcState()
 * README is now created automatically from doxygen documentation
 * Makefile macros DAI_VERSION and DAI_DATE have been introduced,
   in order to store this information in a central place
