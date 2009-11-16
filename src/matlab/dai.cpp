@@ -14,6 +14,7 @@
 #include "mex.h"
 #include <dai/alldai.h>
 #include <dai/bp.h>
+#include <dai/jtree.h>
 
 
 using namespace std;

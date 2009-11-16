@@ -354,6 +354,8 @@ int main( int argc, char *argv[] ) {
                         md = me;
                     if( isnan( ae ) )
                         md = ae;
+                    if( md == INFINITY )
+                        md = 1.0;
                     cout << md << "\t";
                 } else
                     cout << "N/A    \t";

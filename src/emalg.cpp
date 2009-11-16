@@ -64,7 +64,7 @@ Prob CondProbEstimation::estimate() {
     for( size_t parent = 0; parent < _stats.size(); parent += _target_dim ) {
         // calculate norm
         size_t top = parent + _target_dim;
-        Real norm = std::accumulate( &(_stats[parent]), &(_stats[top]), 0.0 );
+        Real norm = std::accumulate( &(_stats[parent]), &(_stats[parent]) + _target_dim, 0.0 );
         if( norm != 0.0 )
             norm = 1.0 / norm;
         // normalize

@@ -95,7 +95,7 @@ inline Real exp( Real x ) {
 }
 
 /// Returns maximum value of a std::vector<Real>
-Real max( std::vector<Real> v );
+Real max( const std::vector<Real> &v );
 
 
 #ifdef WINDOWS

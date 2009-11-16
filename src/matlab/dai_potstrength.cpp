@@ -34,7 +34,7 @@ using namespace dai;
 
 
 void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
-    long ilabel, jlabel;
+    size_t ilabel, jlabel;
 
     // Check for proper number of arguments
     if ((nrhs != NR_IN) || (nlhs != NR_OUT)) {
@@ -49,8 +49,8 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
 
     // Get input parameters
     Factor psi = mx2Factor(PSI_IN);
-    ilabel = (long)*mxGetPr(I_IN);
-    jlabel = (long)*mxGetPr(J_IN);
+    ilabel = (size_t)*mxGetPr(I_IN);
+    jlabel = (size_t)*mxGetPr(J_IN);
 
     // Find variable in psi with label ilabel
     Var i;

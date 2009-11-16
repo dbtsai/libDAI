@@ -48,7 +48,7 @@ double log1p( double x ) {
 namespace dai {
 
 
-Real max( std::vector<Real> v ) {
+Real max( const std::vector<Real> &v ) {
     if( v.size() == 0 )
         return INFINITY;
     else

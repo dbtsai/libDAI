@@ -56,7 +56,7 @@ CC=cl
 # Output filename option of the compiler
 CCO=/Fe
 # Flags for the C++ compiler
-CCFLAGS=/EHsc -DWINDOWS
+CCFLAGS=/EHsc -DWINDOWS -DNOMINMAX
 # Flags to add in debugging mode (if DEBUG=true)
 CCDEBUGFLAGS=/Ox /Zi -DDAI_DEBUG
 # Flags to add in non-debugging mode (if DEBUG=false)
