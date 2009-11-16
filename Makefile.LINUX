@@ -88,5 +88,5 @@ INCLUDE_PYTHON=/usr/include/python2.5
 INCLUDE_BOOST=/usr/include/boost
 
 # VERSION AND DATE
-DAI_VERSION="git $(shell git log | head -1)"
-DAI_DATE="$(shell git log | head -3 | tail -1 | sed 's/Date:   //')"
+DAI_VERSION=0.2.3
+DAI_DATE="November 16, 2009"

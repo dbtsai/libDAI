@@ -54,8 +54,8 @@
 
 /** \mainpage Reference manual for libDAI - A free/open source C++ library for Discrete Approximate Inference methods
  *  \author Joris Mooij
- *  \version DAI_VERSION
- *  \date DAI_DATE
+ *  \version 0.2.3
+ *  \date November 16, 2009
  *
  *  <hr size="1">
  *  \section about About libDAI
@@ -184,8 +184,8 @@
  *    - mention this software in the Acknowledgements section. 
  *
  *  An appropriate citation would be:\n
- *  J. M. Mooij (2008) "libDAI 0.2.2: A free/open source C++ library for Discrete 
- *  Approximate Inference methods", http://www.libdai.org
+ *  J. M. Mooij (2009) "libDAI 0.2.3: A free/open source C++ library for Discrete 
+ *  Approximate Inference", http://www.libdai.org
  *
  *  Moreover, as a personal note, I would appreciate it if you would email
  *  (citations of) papers referencing this work to joris dot mooij at libdai dot org.

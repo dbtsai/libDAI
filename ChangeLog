@@ -1,3 +1,6 @@
+libDAI-0.2.3 (2009-11-16)
+-------------------------
+
 New features:
 * Complete doxygen documentation (although more detailed documentation still
   has to be written)
@@ -106,37 +109,45 @@ Build system:
   - Changed regression test so that it also works under Windows
 
 Interface changes (the old interface is marked obsolete and will be removed in the next release):
-* Replaced VarSet::calcState() by non-member calcLinearState()
-* Replaced VarSet::calcStates() by non-member calcState()
-* Variable labels are now nonnegative (of type size_t)
-* Renamed Treewidth(const FactorGraph &) into boundTreewidth(const FactorGraph &)
-* Replaced UEdgeVec by Graph
-* Replaced DEdgeVec by new RootedTree class
-* Moved functionality of GrowRootedTree() into constructor of RootedTree
-* Merged calcPairBeliefsNew() into calcPairBeliefs()
-* Removed calcMarginal2ndO()
-* Renamed RegionGraph::Check_Counting_Numbers into RegionGraph::checkCountingNumbers
-* Renamed RegionGraph::Calc_Counting_Numbers into RegionGraph::calcCountingNumbers
-* Renamed Permute::convert_linear_index into Permute::convertLinearIndex
-* Changed FactorGraph::clamp and DAIAlg::clamp interfaces (the variable to be
-  clamped is now indicated by its index, not as a Var)
-* Replaced TProb<T>::log0() by TProb<T>::log(true)
-* Replaced TProb<T>::takeLog0() by TProb<T>::takeLog(true)
-* Removed TProb<T>::hasNonPositives()
-* Replaced TFactor<T>::log0() by TFactor<T>::log(true)
-* Removed TFactor<T>::divided_by, use operator/ instead
-* Removed TFactor<T>::divide, use operator/= instead
-* Removed TFactor<T>::partSum(const VarSet&), use marginal(const VarSet&,false) instead
-* Renamed smallSet<T> to SmallSet<T>
-* Renamed TProb<T>::minVal() to TProb<T>::min()
-* Renamed TProb<T>::maxVal() to TProb<T>::max()
-* Renamed TProb<T>::totalSum() to TProb<T>sum()
-* Renamed TFactor<T>::minVal() to TFactor<T>::min()
-* Renamed TFactor<T>::maxVal() to TFactor<T>::max()
-* Renamed TFactor<T>::totalSum() to TFactor<T>::sum()
-* Removed class Diffs
-* [Frederik Eaton] Added backwards compatibility layer for edge interface to
-  BipartiteGraph and FactorGraph (which will be obsoleted soon)
+* Var:
+  - Variable labels are now nonnegative (of type size_t)
+* VarSet:
+  - Replaced calcState() by non-member calcLinearState()
+  - Replaced calcStates() by non-member calcState()
+* Permute:
+  - Renamed convert_linear_index into convertLinearIndex
+* TProb<>:
+  - Replaced log0() by log(true)
+  - Replaced takeLog0() by takeLog(true)
+  - Removed hasNonPositives()
+  - Renamed minVal() to min()
+  - Renamed maxVal() to max()
+  - Renamed totalSum() to sum()
+* TFactor<>:
+  - Replaced log0() by TFactor<T>::log(true)
+  - Removed divided_by, use operator/ instead
+  - Removed divide, use operator/= instead
+  - Removed partSum(const VarSet&), use marginal(const VarSet&,false) instead
+  - Renamed minVal() to min()
+  - Renamed maxVal() to max()
+  - Renamed totalSum() to sum()
+* FactorGraph:
+  - Changed clamp and clamp interfaces (the variable to be
+    clamped is now indicated by its index, not as a Var)
+* RegionGraph:
+  - Renamed Check_Counting_Numbers into checkCountingNumbers
+  - Renamed Calc_Counting_Numbers into calcCountingNumbers
+* Miscellaneous:
+  - Renamed Treewidth(const FactorGraph &) into boundTreewidth(const FactorGraph &)
+  - Replaced UEdgeVec by Graph
+  - Replaced DEdgeVec by new RootedTree class
+  - Moved functionality of GrowRootedTree() into constructor of RootedTree
+  - Merged calcPairBeliefsNew() into calcPairBeliefs()
+  - Removed calcMarginal2ndO()
+  - Renamed smallSet<T> to SmallSet<T>
+  - Removed class Diffs
+  - [Frederik Eaton] Added backwards compatibility layer for edge interface to
+    BipartiteGraph and FactorGraph (which will be obsoleted soon)
 
 Bug fixes:
 * Fixed reversal of min and max in 

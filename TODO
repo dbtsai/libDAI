@@ -1,7 +1,0 @@
-To do for the next release (0.2.3):
-
-- Update ChangeLog head
-- Set DAI_VERSION and DAI_DATE correctly (all occurences)
-- Build documentation and make a copy
-- Find out how to tag the git commit
-- Make a tarball which does not include the .git stuff
