@@ -91,7 +91,7 @@
  *  - Various variants of Loop Corrected Belief Propagation
  *    [\ref MoK07, \ref MoR05];
  *  - Gibbs sampler;
- *  - Conditioned BP [\ref EaG09].
+ *  - Clamped Belief Propagation [\ref EaG09].
  *
  *  These inference methods can be used to calculate partition sums, marginals
  *  over subsets of variables, and MAP states (the joint state of variables that
@@ -436,7 +436,7 @@
  *  - Double-loop GBP: dai::HAK [\ref HAK03]
  *  - Loop Corrected Belief Propagation: dai::MR [\ref MoR05] and dai::LC [\ref MoK07]
  *  - Gibbs sampling: dai::Gibbs
- *  - Conditioned BP: dai::CBP [\ref EaG09]
+ *  - Clamped Belief Propagation: dai::CBP [\ref EaG09]
  *
  *  Not all inference tasks are implemented by each method: calculating MAP states
  *  is only possible with dai::JTree and dai::BP, calculating partition sums is
