@@ -88,7 +88,3 @@ SWIG=swig
 INCLUDE_PYTHON=C:\python2.5
 # Location of Boost C++ library header files
 INCLUDE_BOOST=C:\boost_1_36_0
-
-# VERSION AND DATE
-DAI_VERSION=0.2.3
-DAI_DATE="November 16, 2009"

@@ -11,6 +11,10 @@
 # Load the local configuration from Makefile.conf
 include Makefile.conf
 
+# Set version and date
+DAI_VERSION="git HEAD"
+DAI_DATE="November 16, 2009 - or later"
+
 # Directories of libDAI sources
 # Location libDAI headers
 INC=include/dai
