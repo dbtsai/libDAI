@@ -338,7 +338,8 @@ class BBP {
     public:
         /// Parameters for BBP
         /* PROPERTIES(props,BBP) {
-           /// \brief Enumeration of possible update schedules
+           /// Enumeration of possible update schedules
+           /// The following update schedules are defined:
            /// - SEQ_FIX fixed sequential updates
            /// - SEQ_MAX maximum residual updates (inspired by [\ref EMK06])
            /// - SEQ_BP_REV schedule used by BP, but reversed
@@ -393,7 +394,7 @@ class BBP {
             UpdateType updates;
 
             /// Set members from PropertySet
-            /** \throw UNKNOWN_PROPERTY_TYPE if a Property key is not recognized
+            /** \throw UNKNOWN_PROPERTY if a Property key is not recognized
              *  \throw NOT_ALL_PROPERTIES_SPECIFIED if an expected Property is missing
              */
             void set(const PropertySet &opts);

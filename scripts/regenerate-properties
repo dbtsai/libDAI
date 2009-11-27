@@ -189,7 +189,7 @@ EOF
   $text .= <<EOF;
 
             /// Set members from PropertySet
-            /** \\throw UNKNOWN_PROPERTY_TYPE if a Property key is not recognized
+            /** \\throw UNKNOWN_PROPERTY if a Property key is not recognized
              *  \\throw NOT_ALL_PROPERTIES_SPECIFIED if an expected Property is missing
              */
             void set(const PropertySet &opts);
@@ -206,36 +206,40 @@ namespace dai {
 void ${class}::Properties::set(const PropertySet &opts)
 {
     const std::set<PropertyKey> &keys = opts.keys();
-    std::set<PropertyKey>::const_iterator i;
-    for(i=keys.begin(); i!=keys.end(); i++) {
+    std::string errormsg;
+    for( std::set<PropertyKey>::const_iterator i = keys.begin(); i != keys.end(); i++ ) {
 EOF
   for my $v (@vars) {
     my ($type,$name,$default,$cmt) = @$v;
     $stext .= <<EOF;
-        if(*i == "$name") continue;
+        if( *i == "$name" ) continue;
 EOF
   }
   $stext .= <<EOF;
-        DAI_THROWE(UNKNOWN_PROPERTY_TYPE, "$class: Unknown property " + *i);
+        errormsg = errormsg + "$class: Unknown property " + *i + "\\n";
     }
+    if( !errormsg.empty() )
+        DAI_THROWE(UNKNOWN_PROPERTY, errormsg);
 EOF
   for my $v (@vars) {
     my ($type,$name,$default,$cmt) = @$v;
     if(!defined $default) {
       $stext .= <<EOF;
-    if(!opts.hasKey("$name"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"$class: Missing property \\\"$name\\\" for method \\\"\Q$class\E\\\"");
+    if( !opts.hasKey("$name") )
+        errormsg = errormsg + "$class: Missing property \\\"$name\\\" for method \\\"\Q$class\E\\\"\\n";
 EOF
     }
 
   }
   $stext .= <<EOF;
+    if( !errormsg.empty() )
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,errormsg);
 EOF
   for my $v (@vars) {
     my ($type,$name,$default,$cmt) = @$v;
     if(defined $default) {
       $stext .= <<EOF;
-    if(opts.hasKey("$name")) {
+    if( opts.hasKey("$name") ) {
         $name = opts.getStringAs<$type>("$name");
     } else {
         $name = $default;

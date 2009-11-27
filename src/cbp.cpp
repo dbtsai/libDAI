@@ -522,45 +522,49 @@ namespace dai {
 void CBP::Properties::set(const PropertySet &opts)
 {
     const std::set<PropertyKey> &keys = opts.keys();
-    std::set<PropertyKey>::const_iterator i;
-    for(i=keys.begin(); i!=keys.end(); i++) {
-        if(*i == "verbose") continue;
-        if(*i == "tol") continue;
-        if(*i == "updates") continue;
-        if(*i == "maxiter") continue;
-        if(*i == "rec_tol") continue;
-        if(*i == "max_levels") continue;
-        if(*i == "min_max_adj") continue;
-        if(*i == "choose") continue;
-        if(*i == "recursion") continue;
-        if(*i == "clamp") continue;
-        if(*i == "bbp_props") continue;
-        if(*i == "bbp_cfn") continue;
-        if(*i == "rand_seed") continue;
-        if(*i == "clamp_outfile") continue;
-        DAI_THROWE(UNKNOWN_PROPERTY_TYPE, "CBP: Unknown property " + *i);
+    std::string errormsg;
+    for( std::set<PropertyKey>::const_iterator i = keys.begin(); i != keys.end(); i++ ) {
+        if( *i == "verbose" ) continue;
+        if( *i == "tol" ) continue;
+        if( *i == "updates" ) continue;
+        if( *i == "maxiter" ) continue;
+        if( *i == "rec_tol" ) continue;
+        if( *i == "max_levels" ) continue;
+        if( *i == "min_max_adj" ) continue;
+        if( *i == "choose" ) continue;
+        if( *i == "recursion" ) continue;
+        if( *i == "clamp" ) continue;
+        if( *i == "bbp_props" ) continue;
+        if( *i == "bbp_cfn" ) continue;
+        if( *i == "rand_seed" ) continue;
+        if( *i == "clamp_outfile" ) continue;
+        errormsg = errormsg + "CBP: Unknown property " + *i + "\n";
     }
-    if(!opts.hasKey("tol"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"tol\" for method \"CBP\"");
-    if(!opts.hasKey("updates"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"updates\" for method \"CBP\"");
-    if(!opts.hasKey("maxiter"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"maxiter\" for method \"CBP\"");
-    if(!opts.hasKey("rec_tol"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"rec_tol\" for method \"CBP\"");
-    if(!opts.hasKey("min_max_adj"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"min_max_adj\" for method \"CBP\"");
-    if(!opts.hasKey("choose"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"choose\" for method \"CBP\"");
-    if(!opts.hasKey("recursion"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"recursion\" for method \"CBP\"");
-    if(!opts.hasKey("clamp"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"clamp\" for method \"CBP\"");
-    if(!opts.hasKey("bbp_props"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"bbp_props\" for method \"CBP\"");
-    if(!opts.hasKey("bbp_cfn"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"CBP: Missing property \"bbp_cfn\" for method \"CBP\"");
-    if(opts.hasKey("verbose")) {
+    if( !errormsg.empty() )
+        DAI_THROWE(UNKNOWN_PROPERTY, errormsg);
+    if( !opts.hasKey("tol") )
+        errormsg = errormsg + "CBP: Missing property \"tol\" for method \"CBP\"\n";
+    if( !opts.hasKey("updates") )
+        errormsg = errormsg + "CBP: Missing property \"updates\" for method \"CBP\"\n";
+    if( !opts.hasKey("maxiter") )
+        errormsg = errormsg + "CBP: Missing property \"maxiter\" for method \"CBP\"\n";
+    if( !opts.hasKey("rec_tol") )
+        errormsg = errormsg + "CBP: Missing property \"rec_tol\" for method \"CBP\"\n";
+    if( !opts.hasKey("min_max_adj") )
+        errormsg = errormsg + "CBP: Missing property \"min_max_adj\" for method \"CBP\"\n";
+    if( !opts.hasKey("choose") )
+        errormsg = errormsg + "CBP: Missing property \"choose\" for method \"CBP\"\n";
+    if( !opts.hasKey("recursion") )
+        errormsg = errormsg + "CBP: Missing property \"recursion\" for method \"CBP\"\n";
+    if( !opts.hasKey("clamp") )
+        errormsg = errormsg + "CBP: Missing property \"clamp\" for method \"CBP\"\n";
+    if( !opts.hasKey("bbp_props") )
+        errormsg = errormsg + "CBP: Missing property \"bbp_props\" for method \"CBP\"\n";
+    if( !opts.hasKey("bbp_cfn") )
+        errormsg = errormsg + "CBP: Missing property \"bbp_cfn\" for method \"CBP\"\n";
+    if( !errormsg.empty() )
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,errormsg);
+    if( opts.hasKey("verbose") ) {
         verbose = opts.getStringAs<size_t>("verbose");
     } else {
         verbose = 0;
@@ -569,7 +573,7 @@ void CBP::Properties::set(const PropertySet &opts)
     updates = opts.getStringAs<UpdateType>("updates");
     maxiter = opts.getStringAs<size_t>("maxiter");
     rec_tol = opts.getStringAs<Real>("rec_tol");
-    if(opts.hasKey("max_levels")) {
+    if( opts.hasKey("max_levels") ) {
         max_levels = opts.getStringAs<size_t>("max_levels");
     } else {
         max_levels = 10;
@@ -580,12 +584,12 @@ void CBP::Properties::set(const PropertySet &opts)
     clamp = opts.getStringAs<ClampType>("clamp");
     bbp_props = opts.getStringAs<PropertySet>("bbp_props");
     bbp_cfn = opts.getStringAs<BBPCostFunction>("bbp_cfn");
-    if(opts.hasKey("rand_seed")) {
+    if( opts.hasKey("rand_seed") ) {
         rand_seed = opts.getStringAs<size_t>("rand_seed");
     } else {
         rand_seed = 0;
     }
-    if(opts.hasKey("clamp_outfile")) {
+    if( opts.hasKey("clamp_outfile") ) {
         clamp_outfile = opts.getStringAs<std::string>("clamp_outfile");
     } else {
         clamp_outfile = "";

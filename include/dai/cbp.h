@@ -179,7 +179,7 @@ class CBP : public DAIAlgFG {
             std::string clamp_outfile;
 
             /// Set members from PropertySet
-            /** \throw UNKNOWN_PROPERTY_TYPE if a Property key is not recognized
+            /** \throw UNKNOWN_PROPERTY if a Property key is not recognized
              *  \throw NOT_ALL_PROPERTIES_SPECIFIED if an expected Property is missing
              */
             void set(const PropertySet &opts);

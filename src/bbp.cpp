@@ -1141,25 +1141,29 @@ namespace dai {
 void BBP::Properties::set(const PropertySet &opts)
 {
     const std::set<PropertyKey> &keys = opts.keys();
-    std::set<PropertyKey>::const_iterator i;
-    for(i=keys.begin(); i!=keys.end(); i++) {
-        if(*i == "verbose") continue;
-        if(*i == "maxiter") continue;
-        if(*i == "tol") continue;
-        if(*i == "damping") continue;
-        if(*i == "updates") continue;
-        DAI_THROWE(UNKNOWN_PROPERTY_TYPE, "BBP: Unknown property " + *i);
+    std::string errormsg;
+    for( std::set<PropertyKey>::const_iterator i = keys.begin(); i != keys.end(); i++ ) {
+        if( *i == "verbose" ) continue;
+        if( *i == "maxiter" ) continue;
+        if( *i == "tol" ) continue;
+        if( *i == "damping" ) continue;
+        if( *i == "updates" ) continue;
+        errormsg = errormsg + "BBP: Unknown property " + *i + "\n";
     }
-    if(!opts.hasKey("verbose"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"verbose\" for method \"BBP\"");
-    if(!opts.hasKey("maxiter"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"maxiter\" for method \"BBP\"");
-    if(!opts.hasKey("tol"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"tol\" for method \"BBP\"");
-    if(!opts.hasKey("damping"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"damping\" for method \"BBP\"");
-    if(!opts.hasKey("updates"))
-        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,"BBP: Missing property \"updates\" for method \"BBP\"");
+    if( !errormsg.empty() )
+        DAI_THROWE(UNKNOWN_PROPERTY, errormsg);
+    if( !opts.hasKey("verbose") )
+        errormsg = errormsg + "BBP: Missing property \"verbose\" for method \"BBP\"\n";
+    if( !opts.hasKey("maxiter") )
+        errormsg = errormsg + "BBP: Missing property \"maxiter\" for method \"BBP\"\n";
+    if( !opts.hasKey("tol") )
+        errormsg = errormsg + "BBP: Missing property \"tol\" for method \"BBP\"\n";
+    if( !opts.hasKey("damping") )
+        errormsg = errormsg + "BBP: Missing property \"damping\" for method \"BBP\"\n";
+    if( !opts.hasKey("updates") )
+        errormsg = errormsg + "BBP: Missing property \"updates\" for method \"BBP\"\n";
+    if( !errormsg.empty() )
+        DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,errormsg);
     verbose = opts.getStringAs<size_t>("verbose");
     maxiter = opts.getStringAs<size_t>("maxiter");
     tol = opts.getStringAs<Real>("tol");

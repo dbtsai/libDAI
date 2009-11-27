@@ -24,6 +24,7 @@ namespace dai {
         "Unknown DAI algorithm",
         "Unrecognized parameter estimation method",
         "Unknown Property type",
+        "Unknown Property",
         "Malformed Property",
         "Not all mandatory Properties specified",
         "Cannot read file",

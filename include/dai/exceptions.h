@@ -83,6 +83,7 @@ class Exception : public std::runtime_error {
                    UNKNOWN_DAI_ALGORITHM,
                    UNKNOWN_PARAMETER_ESTIMATION_METHOD,
                    UNKNOWN_PROPERTY_TYPE,
+                   UNKNOWN_PROPERTY,
                    MALFORMED_PROPERTY,
                    NOT_ALL_PROPERTIES_SPECIFIED,
                    CANNOT_READ_FILE,
