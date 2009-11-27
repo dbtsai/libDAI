@@ -158,6 +158,12 @@ class SmallSet {
 
         /// Returns whether \c *this is empty
         bool empty() const { return _elements.size() == 0; }
+
+        /// Returns reference to the elements
+        std::vector<T>& elements() { return _elements; }
+
+        /// Returns constant reference to the elements
+        const std::vector<T>& elements() const { return _elements; }
     //@}
 
         /// Constant iterator over the elements
