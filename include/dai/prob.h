@@ -135,6 +135,16 @@ template<typename T> struct fo_KL : public std::binary_function<T, T, T> {
 };
 
 
+/// Function object useful for calculating the Hellinger distance
+template<typename T> struct fo_Hellinger : public std::binary_function<T, T, T> {
+    /// Returns (sqrt(\a p) - sqrt(\a q))^2
+    T operator()( const T &p, const T &q ) const {
+        T x = sqrt(p) - sqrt(q);
+        return x * x;
+    }
+};
+
+
 /// Function object that returns x to the power y
 template<typename T> struct fo_pow : public std::binary_function<T, T, T> {
     /// Returns (\a x ^ \a y)
@@ -201,8 +211,9 @@ template <typename T> class TProb {
          *  - DISTLINF is the \f$\ell_\infty\f$ distance (maximum absolute value of pointwise difference);
          *  - DISTTV is the total variation distance (half of the \f$\ell_1\f$ distance);
          *  - DISTKL is the Kullback-Leibler distance (\f$\sum_i p_i (\log p_i - \log q_i)\f$).
+         *  - DISTHEL is the Hellinger distance (\f$\frac{1}{2}\sum_i (\sqrt{p_i}-\sqrt{q_i})^2\f$).
          */
-        typedef enum { DISTL1, DISTLINF, DISTTV, DISTKL } DistType;
+        typedef enum { DISTL1, DISTLINF, DISTTV, DISTKL, DISTHEL } DistType;
 
     /// \name Constructors and destructors
     //@{
@@ -661,6 +672,8 @@ template<typename T> T dist( const TProb<T> &p, const TProb<T> &q, typename TPro
             return p.innerProduct( q, (T)0, std::plus<T>(), fo_absdiff<T>() ) / 2;
         case TProb<T>::DISTKL:
             return p.innerProduct( q, (T)0, std::plus<T>(), fo_KL<T>() );
+        case TProb<T>::DISTHEL:
+            return p.innerProduct( q, (T)0, std::plus<T>(), fo_Hellinger<T>() ) / 2;
         default:
             DAI_THROW(UNKNOWN_ENUM_VALUE);
             return INFINITY;
