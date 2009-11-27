@@ -390,6 +390,9 @@ template <typename T> class TProb {
             return r;
         }
 
+        /// Returns negative of \c *this
+        TProb<T> operator- () const { return pwUnaryTr( std::negate<T>() ); }
+
         /// Returns pointwise absolute value
         TProb<T> abs() const { return pwUnaryTr( fo_abs<T>() ); }
 
