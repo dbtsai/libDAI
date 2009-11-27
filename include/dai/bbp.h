@@ -38,6 +38,12 @@ DAI_ENUM(BBPCostFunctionBase,CFN_GIBBS_B,CFN_GIBBS_B2,CFN_GIBBS_EXP,CFN_GIBBS_B_
 /// Predefined cost functions that can be used with BBP
 class BBPCostFunction : public BBPCostFunctionBase {
     public:
+        /// Default constructor
+        BBPCostFunction() : BBPCostFunctionBase() {}
+
+        /// Construct from BBPCostFunctionBase \a x
+        BBPCostFunction( const BBPCostFunctionBase &x ) : BBPCostFunctionBase(x) {}
+
         /// Returns whether this cost function depends on having a Gibbs state
         bool needGibbsState() const;
 
