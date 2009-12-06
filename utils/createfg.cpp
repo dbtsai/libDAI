@@ -559,12 +559,16 @@ int main( int argc, char *argv[] ) {
             cout << "# sigma_w = " << sigma_w << endl;
             cout << "# sigma_th = " << sigma_th << endl;
         } else if( type == GRID_TYPE || type == GRID_TORUS_TYPE ) {
+#define NEED_ARG(name, desc) do { if(!vm.count(name)) throw "Please specify " desc " with --" name; } while(0);
             if( states > 2 ) {
-                if( !vm.count("N") || !vm.count("beta") )
-                    throw "Please specify all required arguments";
+                NEED_ARG("N", "number of nodes");
+                NEED_ARG("beta", "stddev of log-factor entries");
             } else {
-                if( !vm.count("N") || !vm.count("mean_w") || !vm.count("mean_th") || !vm.count("sigma_w") || !vm.count("sigma_th") )
-                    throw "Please specify all required arguments";
+                NEED_ARG("N", "number of nodes");
+                NEED_ARG("mean_w", "mean of pairwise interactions");
+                NEED_ARG("mean_th", "mean of singleton interactions");
+                NEED_ARG("sigma_w", "stddev of pairwise interactions");
+                NEED_ARG("sigma_th", "stddev of singleton interactions");
             }
 
             size_t n = (size_t)sqrt((long double)N);
