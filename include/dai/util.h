@@ -31,6 +31,8 @@
     #include <map> // an alternative would be to use boost/tr1/unordered_map.hpp
 #elif defined(CYGWIN)
     #include <boost/tr1/unordered_map.hpp> // only present in boost 1.37 and higher
+#elif defined(MACOSX)
+    #include <boost/tr1/unordered_map.hpp> // only present in boost 1.37 and higher
 #else
     #include <tr1/unordered_map> // only present in modern GCC distributions
 #endif
