@@ -477,7 +477,10 @@ void BP::updateMessage( size_t i, size_t _I ) {
         if( props.updates == Properties::UpdateType::SEQMAX )
             updateResidual( i, _I, 0.0 );
     } else {
-        message(i,_I) = (message(i,_I) ^ props.damping) * (newMessage(i,_I) ^ (1.0 - props.damping));
+        if( props.logdomain )
+            message(i,_I) = (message(i,_I) * props.damping) + (newMessage(i,_I) * (1.0 - props.damping));
+        else
+            message(i,_I) = (message(i,_I) ^ props.damping) * (newMessage(i,_I) ^ (1.0 - props.damping));
         if( props.updates == Properties::UpdateType::SEQMAX )
             updateResidual( i, _I, dist( newMessage(i,_I), message(i,_I), Prob::DISTLINF ) );
     }

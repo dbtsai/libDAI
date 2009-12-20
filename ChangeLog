@@ -1,3 +1,14 @@
+* [Alexander Gerhard Schwing] Fixed error in BP that occured with damping
+  and using log-domain updates
+* Fixed FTBFS errors on MACOSX (thanks to Sebastian Riedel for reporting this bug)
+* [Frederik Eaton] Two small patches for src/jtree.cpp and utils/createfg.cpp
+* Fixed regression in scripts/regenerate-properties (now all errors are 
+  gathered before throwing the exception, as used to be the case)
+* [Frederik Eaton] Added constructors for BBPCostFunction
+* [Frederik Eaton] Added accessor/mutator for the elements of a SmallSet<>
+* [Frederik Eaton] Added unary minus to TProb<>
+* [Frederik Eaton] Added Hellinger distance to TProb<>::DistType
+* Some small modifications to AUTHORS and main page of documentation
 * Removed obsolete/deprecated stuff
 
 
