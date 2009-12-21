@@ -54,9 +54,9 @@ ME=.mexglx
 # Compile using GNU C++ Compiler
 CC=g++
 # Output filename option of the compiler
-CCO=-o
+CCO=-o 
 # Flags for the C++ compiler
-CCFLAGS=-Wno-deprecated -Wall -W -Wextra -fpic
+CCFLAGS=-Wno-deprecated -Wall -W -Wextra -fPIC -DMACOSX
 # Flags to add in debugging mode (if DEBUG=true)
 CCDEBUGFLAGS=-O3 -g -DDAI_DEBUG
 # Flags to add in non-debugging mode (if DEBUG=false)
