@@ -26,6 +26,9 @@
 #ifdef DAI_WITH_BP
     #include <dai/bp.h>
 #endif
+#ifdef DAI_WITH_FBP
+    #include <dai/fbp.h>
+#endif
 #ifdef DAI_WITH_MF
     #include <dai/mf.h>
 #endif
@@ -81,6 +84,9 @@ static const char* DAINames[] = {
     ExactInf::Name,
 #ifdef DAI_WITH_BP
     BP::Name,
+#endif
+#ifdef DAI_WITH_FBP
+    FBP::Name,
 #endif
 #ifdef DAI_WITH_MF
     MF::Name,

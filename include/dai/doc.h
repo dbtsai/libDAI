@@ -85,6 +85,7 @@
  *  - Exact inference by junction-tree methods;
  *  - Mean Field;
  *  - Loopy Belief Propagation [\ref KFL01];
+ *  - Fractional Belief Propagation [\ref WiH03];
  *  - Tree Expectation Propagation [\ref MiQ04];
  *  - Generalized Belief Propagation [\ref YFW05];
  *  - Double-loop GBP [\ref HAK03];
@@ -703,6 +704,18 @@
  *  "Residual Belief Propagation: Informed Scheduling for Asynchronous Message Passing",
  *  <em>Proceedings of the 22nd Annual Conference on Uncertainty in Artificial Intelligence (UAI-06)</em>
  *  http://uai.sis.pitt.edu/papers/06/UAI2006_0091.pdf
+ *
+ *  \anchor WiH03 \ref WiH03
+ *  W. Wiegerinck and T. Heskes (2003):
+ *  "Fractional Belief Propagation",
+ *  <em>Advances in Neural Information Processing Systems</em> (NIPS) 15, pp. 438-445.
+ *  http://books.nips.cc/papers/files/nips15/LT16.pdf
+ *
+ *  \anchor Min05 \ref Min05
+ *  T. Minka (2005):
+ *  "Divergence measures and message passing",
+ *  <em>MicroSoft Research Technical Report</em> MSR-TR-2005-173,
+ *  http://research.microsoft.com/en-us/um/people/minka/papers/message-passing/minka-divergence.pdf
  */
 
 

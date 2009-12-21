@@ -56,6 +56,10 @@ ifdef WITH_BP
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_BP
   OBJECTS:=$(OBJECTS) bp$(OE)
 endif
+ifdef WITH_FBP
+  CCFLAGS:=$(CCFLAGS) -DDAI_WITH_FBP
+  OBJECTS:=$(OBJECTS) fbp$(OE)
+endif
 ifdef WITH_MF
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MF
   OBJECTS:=$(OBJECTS) mf$(OE)
@@ -135,6 +139,9 @@ exactinf$(OE) : $(SRC)/exactinf.cpp $(INC)/exactinf.h $(HEADERS)
 
 bp$(OE) : $(SRC)/bp.cpp $(INC)/bp.h $(HEADERS)
 	$(CC) -c $(SRC)/bp.cpp
+
+fbp$(OE) : $(SRC)/fbp.cpp $(INC)/fbp.h $(HEADERS)
+	$(CC) -c $(SRC)/fbp.cpp
 
 bp_dual$(OE) : $(SRC)/bp_dual.cpp $(INC)/bp_dual.h $(HEADERS)
 	$(CC) -c $(SRC)/bp_dual.cpp
@@ -299,7 +306,7 @@ endif
 
 doc : $(INC)/*.h $(SRC)/*.cpp examples/*.cpp doxygen.conf
 	doxygen doxygen.conf
-	DAI_VERSION=$(DAI_VERSION) DAI_DATE=$(DAI_DATE) scripts/makeREADME
+	# DAI_VERSION=$(DAI_VERSION) DAI_DATE=$(DAI_DATE) scripts/makeREADME
 
 TAGS:
 	etags src/*.cpp include/dai/*.h tests/*.cpp utils/*.cpp

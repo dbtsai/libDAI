@@ -73,6 +73,7 @@ Currently, libDAI supports the following (approximate) inference methods:
   • Exact inference by junction-tree methods;
   • Mean Field;
   • Loopy Belief Propagation [KFL01];
+  • Fractional Belief Propagation [WiH03];
   • Tree Expectation Propagation [MiQ04];
   • Generalized Belief Propagation [YFW05];
   • Double-loop GBP [HAK03];

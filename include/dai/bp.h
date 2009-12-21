@@ -37,9 +37,9 @@ namespace dai {
  *
  *  The messages \f$m_{I\to i}(x_i)\f$ are passed from factors \f$I\f$ to variables \f$i\f$. 
  *  In case of the sum-product algorith, the update equation is: 
- *    \f[ m_{I\to i}(x_i) \propto \sum_{x_{I\setminus\{i\}}} f_I(x_I) \prod_{j\in N_I\setminus\{i\}} \prod_{J\in N_j\setminus\{I\}} m_{J\to j}\f]
+ *    \f[ m_{I\to i}(x_i) \propto \sum_{x_{N_I\setminus\{i\}}} f_I(x_I) \prod_{j\in N_I\setminus\{i\}} \prod_{J\in N_j\setminus\{I\}} m_{J\to j}\f]
  *  and in case of the max-product algorithm:
- *    \f[ m_{I\to i}(x_i) \propto \max_{x_{I\setminus\{i\}}} f_I(x_I) \prod_{j\in N_I\setminus\{i\}} \prod_{J\in N_j\setminus\{I\}} m_{J\to j}\f]
+ *    \f[ m_{I\to i}(x_i) \propto \max_{x_{N_I\setminus\{i\}}} f_I(x_I) \prod_{j\in N_I\setminus\{i\}} \prod_{J\in N_j\setminus\{I\}} m_{J\to j}\f]
  *  In order to improve convergence, the updates can be damped. For improved numerical stability,
  *  the updates can be done in the log-domain alternatively.
  *
@@ -59,7 +59,7 @@ namespace dai {
  *  enabled by defining DAI_BP_FAST as false in the source file.
  */
 class BP : public DAIAlgFG {
-    private:
+    protected:
         /// Type used for index cache
         typedef std::vector<size_t> ind_t;
         /// Type used for storing edge properties
@@ -212,7 +212,7 @@ class BP : public DAIAlgFG {
         void clearSentMessages() { _sentMessages.clear(); }
     //@}
 
-    private:
+    protected:
         /// Returns constant reference to message from the \a _I 'th neighbor of variable \a i to variable \a i
         const Prob & message(size_t i, size_t _I) const { return _edges[i][_I].message; }
         /// Returns reference to message from the \a _I 'th neighbor of variable \a i to variable \a i
@@ -231,7 +231,7 @@ class BP : public DAIAlgFG {
         Real & residual(size_t i, size_t _I) { return _edges[i][_I].residual; }
 
         /// Calculate the updated message from the \a _I 'th neighbor of variable \a i to variable \a i
-        void calcNewMessage( size_t i, size_t _I );
+        virtual void calcNewMessage( size_t i, size_t _I );
         /// Replace the "old" message from the \a _I 'th neighbor of variable \a i to variable \a i by the "new" (updated) message
         void updateMessage( size_t i, size_t _I );
         /// Set the residual (difference between new and old message) for the edge between variable \a i and its \a _I 'th neighbor to \a r
@@ -241,10 +241,10 @@ class BP : public DAIAlgFG {
         /// Calculates unnormalized belief of variable \a i
         void calcBeliefV( size_t i, Prob &p ) const;
         /// Calculates unnormalized belief of factor \a I
-        void calcBeliefF( size_t I, Prob &p ) const;
+        virtual void calcBeliefF( size_t I, Prob &p ) const;
 
         /// Helper function for constructors
-        void construct();
+        virtual void construct();
 };
 
 
