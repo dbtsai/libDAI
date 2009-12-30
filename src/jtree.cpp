@@ -184,8 +184,11 @@ Factor JTree::belief( const VarSet &vs ) const {
         for( alpha = Qa.begin(); alpha != Qa.end(); alpha++ )
             if( alpha->vars() >> vs )
                 break;
-        DAI_ASSERT( alpha != Qa.end() );
-        return( alpha->marginal(vs) );
+        if( alpha == Qa.end() ) {
+            DAI_THROW(BELIEF_NOT_AVAILABLE);
+            return Factor();
+        } else
+            return( alpha->marginal(vs) );
     }
 }
 

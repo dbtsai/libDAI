@@ -79,6 +79,7 @@ class Exception : public std::runtime_error {
                    ASSERTION_FAILED,
                    IMPOSSIBLE_TYPECAST,
                    OBJECT_NOT_FOUND,
+                   BELIEF_NOT_AVAILABLE,
                    UNKNOWN_ENUM_VALUE,
                    UNKNOWN_DAI_ALGORITHM,
                    UNKNOWN_PARAMETER_ESTIMATION_METHOD,

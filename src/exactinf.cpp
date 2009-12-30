@@ -114,7 +114,8 @@ Factor ExactInf::belief( const VarSet &ns ) const {
         for( I = 0; I < nrFactors(); I++ )
             if( factor(I).vars() >> ns )
                 break;
-        DAI_ASSERT( I != nrFactors() );
+        if( I == nrFactors() )
+            DAI_THROW(BELIEF_NOT_AVAILABLE);
         return beliefF(I).marginal(ns);
     }
 }

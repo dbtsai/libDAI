@@ -171,7 +171,7 @@ Factor MF::belief (const VarSet &ns) const {
     if( ns.size() == 1 )
         return belief( *(ns.begin()) );
     else {
-        DAI_ASSERT( ns.size() == 1 );
+        DAI_THROW(BELIEF_NOT_AVAILABLE);
         return Factor();
     }
 }

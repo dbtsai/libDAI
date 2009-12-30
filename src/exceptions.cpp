@@ -20,6 +20,7 @@ namespace dai {
         "Assertion failed",
         "Impossible typecast",
         "Requested object not found",
+        "Requested belief not available",
         "Unknown ENUM value",
         "Unknown DAI algorithm",
         "Unrecognized parameter estimation method",

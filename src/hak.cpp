@@ -105,7 +105,7 @@ void HAK::construct() {
     _Qa.clear();
     _Qa.reserve(nrORs());
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
-        _Qa.push_back( Factor( OR(alpha).vars() ) );
+        _Qa.push_back( Factor( OR(alpha) ) );
 
     // Create inner beliefs
     _Qb.clear();
@@ -191,12 +191,14 @@ string HAK::identify() const {
 
 
 void HAK::init( const VarSet &ns ) {
-    for( vector<Factor>::iterator alpha = _Qa.begin(); alpha != _Qa.end(); alpha++ )
-        if( alpha->vars().intersects( ns ) ) {
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ )
+        if( _Qa[alpha].vars().intersects( ns ) ) {
             if( props.init == Properties::InitType::UNIFORM )
-                alpha->fill( 1.0 / alpha->states() );
+                _Qa[alpha].setUniform();
             else
-                alpha->randomize();
+                _Qa[alpha].randomize();
+            _Qa[alpha] *= OR(alpha);
+            _Qa[alpha].normalize();
         }
 
     for( size_t beta = 0; beta < nrIRs(); beta++ )
@@ -220,24 +222,27 @@ void HAK::init( const VarSet &ns ) {
 
 
 void HAK::init() {
-    for( vector<Factor>::iterator alpha = _Qa.begin(); alpha != _Qa.end(); alpha++ )
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
         if( props.init == Properties::InitType::UNIFORM )
-            alpha->fill( 1.0 / alpha->states() );
+            _Qa[alpha].setUniform();
         else
-            alpha->randomize();
+            _Qa[alpha].randomize();
+        _Qa[alpha] *= OR(alpha);
+        _Qa[alpha].normalize();
+    }
 
-    for( vector<Factor>::iterator beta = _Qb.begin(); beta != _Qb.end(); beta++ )
+    for( size_t beta = 0; beta < nrIRs(); beta++ )
         if( props.init == Properties::InitType::UNIFORM )
-            beta->fill( 1.0 / beta->states() );
+            _Qb[beta].setUniform();
         else
-            beta->randomize();
+            _Qb[beta].randomize();
 
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         foreach( const Neighbor &beta, nbOR(alpha) ) {
             size_t _beta = beta.iter;
             if( props.init == Properties::InitType::UNIFORM ) {
-                muab( alpha, _beta ).fill( 1.0 / muab( alpha, _beta ).states() );
-                muba( alpha, _beta ).fill( 1.0 / muab( alpha, _beta ).states() );
+                muab( alpha, _beta ).setUniform();
+                muba( alpha, _beta ).setUniform();
             } else {
                 muab( alpha, _beta ).randomize();
                 muba( alpha, _beta ).randomize();
@@ -491,7 +496,8 @@ Factor HAK::belief( const VarSet &ns ) const {
         for( alpha = _Qa.begin(); alpha != _Qa.end(); alpha++ )
             if( alpha->vars() >> ns )
                 break;
-        DAI_ASSERT( alpha != _Qa.end() );
+        if( alpha == _Qa.end() )
+            DAI_THROW(BELIEF_NOT_AVAILABLE);
         return( alpha->marginal(ns) );
     }
 }

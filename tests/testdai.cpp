@@ -33,7 +33,8 @@ class TestDAI {
         vector<Real>    err;
 
     public:
-        vector<Factor>  q;
+        vector<Factor>  varmargs;
+        vector<Factor>  marginals;
         Real            logZ;
         Real            maxdiff;
         double          time;
@@ -42,14 +43,14 @@ class TestDAI {
         bool            has_maxdiff;
         bool            has_iters;
 
-        TestDAI( const FactorGraph &fg, const string &_name, const PropertySet &opts ) : obj(NULL), name(_name), err(), q(), logZ(0.0), maxdiff(0.0), time(0), iters(0U), has_logZ(false), has_maxdiff(false), has_iters(false) {
+        TestDAI( const FactorGraph &fg, const string &_name, const PropertySet &opts ) : obj(NULL), name(_name), err(), varmargs(), marginals(), logZ(0.0), maxdiff(0.0), time(0), iters(0U), has_logZ(false), has_maxdiff(false), has_iters(false) {
             double tic = toc();
             if( name == "LDPC" ) {
                 Prob zero(2,0.0);
                 zero[0] = 1.0;
-                q.clear();
                 for( size_t i = 0; i < fg.nrVars(); i++ )
-                    q.push_back( Factor(Var(i,2), zero) );
+                    varmargs.push_back( Factor(fg.var(i), zero) );
+                marginals = varmargs;
                 logZ = 0.0;
                 maxdiff = 0.0;
                 iters = 1;
@@ -71,13 +72,6 @@ class TestDAI {
                 return obj->identify();
             else
                 return "NULL";
-        }
-
-        vector<Factor> allBeliefs() {
-            vector<Factor> result;
-            for( size_t i = 0; i < obj->fg().nrVars(); i++ )
-                result.push_back( obj->belief( obj->fg().var(i) ) );
-            return result;
         }
 
         void doDAI() {
@@ -117,22 +111,26 @@ class TestDAI {
                         throw;
                 }
 
-                q = allBeliefs();
+                varmargs.clear();
+                for( size_t i = 0; i < obj->fg().nrVars(); i++ )
+                    varmargs.push_back( obj->beliefV( i ) );
+
+                marginals = obj->beliefs();
             };
         }
 
         void calcErrs( const TestDAI &x ) {
             err.clear();
-            err.reserve( q.size() );
-            for( size_t i = 0; i < q.size(); i++ )
-                err.push_back( dist( q[i], x.q[i], Prob::DISTTV ) );
+            err.reserve( varmargs.size() );
+            for( size_t i = 0; i < varmargs.size(); i++ )
+                err.push_back( dist( varmargs[i], x.varmargs[i], Prob::DISTTV ) );
         }
 
         void calcErrs( const vector<Factor> &x ) {
             err.clear();
-            err.reserve( q.size() );
-            for( size_t i = 0; i < q.size(); i++ )
-                err.push_back( dist( q[i], x[i], Prob::DISTTV ) );
+            err.reserve( varmargs.size() );
+            for( size_t i = 0; i < varmargs.size(); i++ )
+                err.push_back( dist( varmargs[i], x[i], Prob::DISTTV ) );
         }
 
         Real maxErr() {
@@ -201,6 +199,9 @@ Real clipReal( Real x, Real minabs ) {
 }
 
 
+DAI_ENUM(MarginalsOutputType,NONE,VAR,ALL);
+
+
 int main( int argc, char *argv[] ) {
     string filename;
     string aliases;
@@ -208,7 +209,7 @@ int main( int argc, char *argv[] ) {
     Real tol;
     size_t maxiter;
     size_t verbose;
-    bool marginals = false;
+    MarginalsOutputType marginals;
     bool report_iters = true;
     bool report_time = true;
 
@@ -225,7 +226,7 @@ int main( int argc, char *argv[] ) {
         ("tol", po::value< Real >(&tol), "Override tolerance")
         ("maxiter", po::value< size_t >(&maxiter), "Override maximum number of iterations")
         ("verbose", po::value< size_t >(&verbose), "Override verbosity")
-        ("marginals", po::value< bool >(&marginals), "Output single node marginals?")
+        ("marginals", po::value< MarginalsOutputType >(&marginals), "Output marginals? (NONE,VAR,ALL)")
         ("report-time", po::value< bool >(&report_time), "Report calculation time")
         ("report-iters", po::value< bool >(&report_iters), "Report iterations needed")
     ;
@@ -282,7 +283,7 @@ int main( int argc, char *argv[] ) {
         FactorGraph fg;
         fg.ReadFromFile( filename.c_str() );
 
-        vector<Factor> q0;
+        vector<Factor> varmargs0;
         Real logZ0 = 0.0;
 
         cout.setf( ios_base::scientific );
@@ -310,21 +311,21 @@ int main( int argc, char *argv[] ) {
                 meth.second.Set("maxiter",maxiter);
             if( vm.count("verbose") )
                 meth.second.Set("verbose",verbose);
-            TestDAI piet(fg, meth.first, meth.second );
-            piet.doDAI();
+            TestDAI testdai(fg, meth.first, meth.second );
+            testdai.doDAI();
             if( m == 0 ) {
-                q0 = piet.q;
-                logZ0 = piet.logZ;
+                varmargs0 = testdai.varmargs;
+                logZ0 = testdai.logZ;
             }
-            piet.calcErrs(q0);
+            testdai.calcErrs(varmargs0);
 
             cout.width( 39 );
             cout << left << methods[m] << "\t";
             if( report_time )
-                cout << right << piet.time << "\t";
+                cout << right << testdai.time << "\t";
             if( report_iters ) {
-                if( piet.has_iters ) {
-                    cout << piet.iters << "\t";
+                if( testdai.has_iters ) {
+                    cout << testdai.iters << "\t";
                 } else {
                     cout << "N/A  \t";
                 }
@@ -334,22 +335,22 @@ int main( int argc, char *argv[] ) {
                 cout.setf( ios_base::scientific );
                 cout.precision( 3 );
 
-                Real me = clipReal( piet.maxErr(), 1e-9 );
+                Real me = clipReal( testdai.maxErr(), 1e-9 );
                 cout << me << "\t";
 
-                Real ae = clipReal( piet.avgErr(), 1e-9 );
+                Real ae = clipReal( testdai.avgErr(), 1e-9 );
                 cout << ae << "\t";
 
-                if( piet.has_logZ ) {
+                if( testdai.has_logZ ) {
                     cout.setf( ios::showpos );
-                    Real le = clipReal( piet.logZ / logZ0 - 1.0, 1e-9 );
+                    Real le = clipReal( testdai.logZ / logZ0 - 1.0, 1e-9 );
                     cout << le << "\t";
                     cout.unsetf( ios::showpos );
                 } else
                     cout << "N/A       \t";
 
-                if( piet.has_maxdiff ) {
-                    Real md = clipReal( piet.maxdiff, 1e-9 );
+                if( testdai.has_maxdiff ) {
+                    Real md = clipReal( testdai.maxdiff, 1e-9 );
                     if( isnan( me ) )
                         md = me;
                     if( isnan( ae ) )
@@ -362,9 +363,12 @@ int main( int argc, char *argv[] ) {
             }
             cout << endl;
 
-            if( marginals ) {
-                for( size_t i = 0; i < piet.q.size(); i++ )
-                    cout << "# " << piet.q[i] << endl;
+            if( marginals == MarginalsOutputType::VAR ) {
+                for( size_t i = 0; i < testdai.varmargs.size(); i++ )
+                    cout << "# " << testdai.varmargs[i] << endl;
+            } else if( marginals == MarginalsOutputType::ALL ) {
+                for( size_t I = 0; I < testdai.marginals.size(); I++ )
+                    cout << "# " << testdai.marginals[I] << endl;
             }
         }
 

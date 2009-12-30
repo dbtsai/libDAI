@@ -1,3 +1,8 @@
+* Fixed bug in HAK for trivial region graphs (with only one outer region
+  and no inner regions), reported by Alejandro Lage.
+* tests/testdai option "marginals" now has three possible values: NONE
+  outputs no marginals, VAR only variable marginals, and ALL outputs all
+  marginals calculated by the algorithm.
 * [Frederik Eaton] Added Fractional Belief Propagation
 * [Alexander Gerhard Schwing] Fixed error in BP that occured with damping
   and using log-domain updates
