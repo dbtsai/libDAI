@@ -188,7 +188,7 @@ void FBP::calcBeliefF( size_t I, Prob &p ) const {
 
 void FBP::construct() {
     BP::construct();
-    constructScaleParams();
+    _scale_factor.resize( nrFactors(), 1.0 );
 }
 
 
