@@ -443,7 +443,7 @@ Factor BP::belief( const VarSet &ns ) const {
 
 Real BP::logZ() const {
     Real sum = 0.0;
-    for(size_t i = 0; i < nrVars(); ++i )
+    for( size_t i = 0; i < nrVars(); ++i )
         sum += (1.0 - nbV(i).size()) * beliefV(i).entropy();
     for( size_t I = 0; I < nrFactors(); ++I )
         sum -= dist( beliefF(I), factor(I), Prob::DISTKL );

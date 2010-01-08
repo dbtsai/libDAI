@@ -4,7 +4,8 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2009 Frederik Eaton
+ *  Copyright (C) 2009  Frederik Eaton
+ *  Copyright (C) 2009  Joris Mooij  [joris dot mooij at libdai dot org]
  */
 
 
@@ -25,6 +26,23 @@ const char *FBP::Name = "FBP";
 
 string FBP::identify() const {
     return string(Name) + printProperties();
+}
+
+
+/* This code has been copied from bp.cpp, except where comments indicate FBP-specific behaviour */
+Real FBP::logZ() const {
+    Real sum = 0.0;
+    for( size_t I = 0; I < nrFactors(); I++ ) {
+        sum += (beliefF(I) * factor(I).log(true)).sum();  // FBP
+        sum += scaleF(I) * beliefF(I).entropy();  // FBP
+    }
+    for( size_t i = 0; i < nrVars(); ++i ) {
+        Real c_i = 0.0;
+        foreach( const Neighbor &I, nbV(i) )
+            c_i += scaleF(I);
+        sum += (1.0 - c_i) * beliefV(i).entropy();  // FBP
+    }
+    return sum;
 }
 
 

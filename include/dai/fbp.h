@@ -47,7 +47,6 @@ namespace dai {
  *  and the factor beliefs are calculated by:
  *    \f[ b_I(x_I) \propto f_I(x_I)^{1/c_I} \prod_{j \in N_I} m_{I\to j}^{1-1/c_I} \prod_{J\in N_j\setminus\{I\}} m_{J\to j} \f]
  *
- *  \todo Implement logZ
  *  \todo Add nice way to set scale parameters
  *
  *  \author Frederik Eaton
@@ -80,6 +79,7 @@ class FBP : public BP {
     //@{
         virtual FBP* clone() const { return new FBP(*this); }
         virtual std::string identify() const;
+        virtual Real logZ() const;
     //@}
 
     /// \name FBP accessors/mutators for scale parameters
