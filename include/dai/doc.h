@@ -261,9 +261,9 @@
  *  The build includes a regression test, which may take a while to complete.
  *
  *  If the build was successful, you can test the example program:
- *  <pre>  example tests\alarm.fg</pre>
+ *  <pre>  examples\\example tests\\alarm.fg</pre>
  *  or the more elaborate test program:
- *  <pre>  tests\\testdai --aliases tests\aliases.conf --filename tests\alarm.fg --methods JTREE_HUGIN BP_SEQMAX</pre>
+ *  <pre>  tests\\testdai --aliases tests\\aliases.conf --filename tests\\alarm.fg --methods JTREE_HUGIN BP_SEQMAX</pre>
  *
  *
  *  <hr size="1">

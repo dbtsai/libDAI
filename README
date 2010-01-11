@@ -1,12 +1,12 @@
 libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-------------------------------------------------------------------------------
 
 Version:  git HEAD
 Date:     November 16, 2009 - or later
 See also: http://www.libdai.org
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-------------------------------------------------------------------------------
 
 License
 
@@ -22,16 +22,16 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with libDAI in the file COPYING. If not, see http://www.gnu.org/licenses/
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-------------------------------------------------------------------------------
 
 Citing libDAI
 
 If you write a scientific paper describing research that made substantive use
 of this program, please:
 
-  • mention the fashion in which this software was used, including the version
+  * mention the fashion in which this software was used, including the version
     number, with a citation to the literature, to allow replication;
-  • mention this software in the Acknowledgements section.
+  * mention this software in the Acknowledgements section.
 
 An appropriate citation would be:
 J. M. Mooij (2009) "libDAI 0.2.3: A free/open source C++ library for Discrete
@@ -41,7 +41,7 @@ Moreover, as a personal note, I would appreciate it if you would email
 (citations of) papers referencing this work to joris dot mooij at libdai dot
 org.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-------------------------------------------------------------------------------
 
 About libDAI
 
@@ -56,10 +56,10 @@ understanding of graphical models is needed.
 The best way to use libDAI is by writing C++ code that invokes the library; in
 addition, part of the functionality is accessibly by using the
 
-  • command line interface
-  • (limited) MatLab interface
-  • (experimental) python interface
-  • (experimental) octave interface.
+  * command line interface
+  * (limited) MatLab interface
+  * (experimental) python interface
+  * (experimental) octave interface.
 
 libDAI can be used to implement novel (approximate) inference algorithms and to
 easily compare the accuracy and performance with existing algorithms that have
@@ -69,17 +69,17 @@ Features
 
 Currently, libDAI supports the following (approximate) inference methods:
 
-  • Exact inference by brute force enumeration;
-  • Exact inference by junction-tree methods;
-  • Mean Field;
-  • Loopy Belief Propagation [KFL01];
-  • Fractional Belief Propagation [WiH03];
-  • Tree Expectation Propagation [MiQ04];
-  • Generalized Belief Propagation [YFW05];
-  • Double-loop GBP [HAK03];
-  • Various variants of Loop Corrected Belief Propagation [MoK07, MoR05];
-  • Gibbs sampler;
-  • Clamped Belief Propagation [EaG09].
+  * Exact inference by brute force enumeration;
+  * Exact inference by junction-tree methods;
+  * Mean Field;
+  * Loopy Belief Propagation [KFL01];
+  * Fractional Belief Propagation [WiH03];
+  * Tree Expectation Propagation [MiQ04];
+  * Generalized Belief Propagation [YFW05];
+  * Double-loop GBP [HAK03];
+  * Various variants of Loop Corrected Belief Propagation [MoK07, MoR05];
+  * Gibbs sampler;
+  * Clamped Belief Propagation [EaG09].
 
 These inference methods can be used to calculate partition sums, marginals over
 subsets of variables, and MAP states (the joint state of variables that has
@@ -141,17 +141,17 @@ Mailing list
 The Google group "libDAI" (http://groups.google.com/group/libdai) can be used
 for getting support and discussing development issues.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-------------------------------------------------------------------------------
 
 Building libDAI under UNIX variants (Linux / Cygwin / Mac OS X)
 
 You need:
 
-  • a recent version of gcc (at least version 3.4)
-  • GNU make
-  • doxygen
-  • graphviz
-  • recent boost C++ libraries (at least version 1.34, or 1.37 for cygwin;
+  * a recent version of gcc (at least version 3.4)
+  * GNU make
+  * doxygen
+  * graphviz
+  * recent boost C++ libraries (at least version 1.34, or 1.37 for cygwin;
     version 1.37 shipped with Ubuntu 9.04 is known not to work)
 
 On Debian/Ubuntu, you can easily install all these packages with a single
@@ -195,19 +195,19 @@ or the more elaborate test program:
 
   tests/testdai --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-------------------------------------------------------------------------------
 
 Building libDAI under Windows
 
 You need:
 
-  • A recent version of MicroSoft Visual Studio (2008 works)
-  • recent boost C++ libraries (version 1.34 or higher)
-  • GNU make (can be obtained from http://gnuwin32.sourceforge.net)
+  * A recent version of MicroSoft Visual Studio (2008 works)
+  * recent boost C++ libraries (version 1.34 or higher)
+  * GNU make (can be obtained from http://gnuwin32.sourceforge.net)
 
 For the regression test, you need:
 
-  • GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
+  * GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
 
 To build the source, copy Makefile.WINDOWS to Makefile.conf. Then, edit
 Makefile.conf to adapt it to your local setup. Finally, run (from the command
@@ -219,20 +219,20 @@ The build includes a regression test, which may take a while to complete.
 
 If the build was successful, you can test the example program:
 
-  example tests\alarm.fg
+  examples\example tests\alarm.fg
 
 or the more elaborate test program:
 
   tests\testdai --aliases tests\aliases.conf --filename tests\alarm.fg --methods JTREE_HUGIN BP_SEQMAX
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-------------------------------------------------------------------------------
 
 Building the libDAI MatLab interface
 
 You need:
 
-  • MatLab
-  • The platform-dependent requirements described above
+  * MatLab
+  * The platform-dependent requirements described above
 
 First, you need to build the libDAI source as described above for your
 platform. By default, the MatLab interface is disabled, so before compiling the
@@ -268,7 +268,7 @@ where "path_to_libdai" has to be replaced with the directory in which libDAI
 was installed. For other algorithms and some default parameters, see the file
 tests/aliases.conf.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-------------------------------------------------------------------------------
 
 Building the documentation
 
