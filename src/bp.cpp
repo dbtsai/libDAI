@@ -232,13 +232,15 @@ Real BP::run() {
         cerr << endl;
 
     double tic = toc();
-    vector<Real> diffs( nrVars(), INFINITY );
     Real maxDiff = INFINITY;
 
-    vector<Factor> old_beliefs;
-    old_beliefs.reserve( nrVars() );
+    vector<Factor> oldBeliefsV, oldBeliefsF;
+    oldBeliefsV.reserve( nrVars() );
     for( size_t i = 0; i < nrVars(); ++i )
-        old_beliefs.push_back( beliefV(i) );
+        oldBeliefsV.push_back( beliefV(i) );
+    oldBeliefsF.reserve( nrFactors() );
+    for( size_t I = 0; I < nrFactors(); ++I )
+        oldBeliefsF.push_back( beliefF(I) );
 
     size_t nredges = nrEdges();
     vector<Edge> update_seq;
@@ -299,12 +301,17 @@ Real BP::run() {
         }
 
         // calculate new beliefs and compare with old ones
+        maxDiff = -INFINITY;
         for( size_t i = 0; i < nrVars(); ++i ) {
-            Factor nb( beliefV(i) );
-            diffs[i] = dist( nb, old_beliefs[i], Prob::DISTLINF );
-            old_beliefs[i] = nb;
+            Factor b( beliefV(i) );
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], Prob::DISTLINF ) );
+            oldBeliefsV[i] = b;
         }
-        maxDiff = max( diffs );
+        for( size_t I = 0; I < nrFactors(); ++I ) {
+            Factor b( beliefF(I) );
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], Prob::DISTLINF ) );
+            oldBeliefsF[I] = b;
+        }
 
         if( props.verbose >= 3 )
             cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
@@ -411,11 +418,6 @@ Factor BP::beliefF( size_t I ) const {
 }
 
 
-Factor BP::belief( const Var &n ) const {
-    return( beliefV( findVar( n ) ) );
-}
-
-
 vector<Factor> BP::beliefs() const {
     vector<Factor> result;
     for( size_t i = 0; i < nrVars(); ++i )
@@ -427,8 +429,10 @@ vector<Factor> BP::beliefs() const {
 
 
 Factor BP::belief( const VarSet &ns ) const {
-    if( ns.size() == 1 )
-        return belief( *(ns.begin()) );
+    if( ns.size() == 0 )
+        return Factor();
+    else if( ns.size() == 1 )
+        return beliefV( findVar( *(ns.begin() ) ) );
     else {
         size_t I;
         for( I = 0; I < nrFactors(); I++ )

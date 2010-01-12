@@ -115,8 +115,9 @@ class MR : public DAIAlgFG {
     //@{
         virtual MR* clone() const { return new MR(*this); }
         virtual std::string identify() const;
-        virtual Factor belief( const Var &n ) const;
-        virtual Factor belief( const VarSet &/*ns*/ ) const { DAI_THROW(NOT_IMPLEMENTED); return Factor(); }
+        virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
+        virtual Factor belief( const VarSet &/*vs*/ ) const { DAI_THROW(NOT_IMPLEMENTED); return Factor(); }
+        virtual Factor beliefV( size_t i ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual void init() {}

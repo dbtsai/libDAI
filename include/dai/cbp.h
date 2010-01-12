@@ -75,8 +75,8 @@ class CBP : public DAIAlgFG {
     //@{
         virtual CBP* clone() const { return new CBP(*this); }
         virtual std::string identify() const { return std::string(Name) + props.toString(); }
-        virtual Factor belief (const Var &n) const { return _beliefsV[findVar(n)]; }
-        virtual Factor belief (const VarSet &) const { DAI_THROW(NOT_IMPLEMENTED); }
+        virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
+        virtual Factor belief( const VarSet & ) const { DAI_THROW(NOT_IMPLEMENTED); }
         virtual Factor beliefV( size_t i ) const { return _beliefsV[i]; }
         virtual Factor beliefF( size_t I ) const { return _beliefsF[I]; }
         virtual std::vector<Factor> beliefs() const { return concat(_beliefsV, _beliefsF); }

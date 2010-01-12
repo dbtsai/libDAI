@@ -107,8 +107,6 @@ Real MF::run() {
         cerr << "Starting " << identify() << "...";
 
     double tic = toc();
-    vector<Real> diffs( nrVars(), INFINITY );
-    Real maxDiff = INFINITY;
 
     vector<size_t> update_seq;
     update_seq.reserve( nrVars() );
@@ -117,9 +115,11 @@ Real MF::run() {
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
+    Real maxDiff = INFINITY;
     for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
         random_shuffle( update_seq.begin(), update_seq.end() );
 
+        maxDiff = -INFINITY;
         foreach( const size_t &i, update_seq ) {
             Factor nb = calcNewBelief( i );
 
@@ -130,11 +130,10 @@ Real MF::run() {
 
             if( props.damping != 0.0 )
                 nb = (nb^(1.0 - props.damping)) * (_beliefs[i]^props.damping);
-            diffs[i] = dist( nb, _beliefs[i], Prob::DISTLINF );
 
+            maxDiff = std::max( maxDiff, dist( nb, _beliefs[i], Prob::DISTLINF ) );
             _beliefs[i] = nb;
         }
-        maxDiff = max( diffs );
 
         if( props.verbose >= 3 )
             cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
@@ -160,25 +159,19 @@ Real MF::run() {
 
 
 Factor MF::beliefV( size_t i ) const {
-    Factor piet;
-    piet = _beliefs[i];
-    piet.normalize();
-    return(piet);
+    return _beliefs[i].normalized();
 }
 
 
 Factor MF::belief (const VarSet &ns) const {
-    if( ns.size() == 1 )
-        return belief( *(ns.begin()) );
+    if( ns.size() == 0 )
+        return Factor();
+    else if( ns.size() == 1 )
+        return beliefV( findVar( *(ns.begin()) ) );
     else {
         DAI_THROW(BELIEF_NOT_AVAILABLE);
         return Factor();
     }
-}
-
-
-Factor MF::belief (const Var &n) const {
-    return( beliefV( findVar( n ) ) );
 }
 
 
@@ -193,9 +186,9 @@ vector<Factor> MF::beliefs() const {
 Real MF::logZ() const {
     Real s = 0.0;
 
-    for(size_t i=0; i < nrVars(); i++ )
+    for( size_t i = 0; i < nrVars(); i++ )
         s -= beliefV(i).entropy();
-    for(size_t I=0; I < nrFactors(); I++ ) {
+    for( size_t I = 0; I < nrFactors(); I++ ) {
         Factor henk;
         foreach( const Neighbor &j, nbF(I) )  // for all j in I
             henk *= _beliefs[j];

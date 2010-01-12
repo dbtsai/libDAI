@@ -108,7 +108,7 @@ Factor ExactInf::belief( const VarSet &ns ) const {
     if( ns.size() == 0 )
         return Factor();
     else if( ns.size() == 1 ) {
-        return belief( *(ns.begin()) );
+        return beliefV( findVar( *(ns.begin()) ) );
     } else {
         size_t I;
         for( I = 0; I < nrFactors(); I++ )

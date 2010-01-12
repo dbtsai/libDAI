@@ -108,8 +108,7 @@ class JTree : public DAIAlgRG {
     //@{
         virtual JTree* clone() const { return new JTree(*this); }
         virtual std::string identify() const;
-        virtual Factor belief( const Var &n ) const;
-        virtual Factor belief( const VarSet &ns ) const;
+        virtual Factor belief( const VarSet &vs ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;
         virtual void init() {}

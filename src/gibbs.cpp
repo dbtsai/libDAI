@@ -205,11 +205,6 @@ Factor Gibbs::beliefF( size_t I ) const {
 }
 
 
-Factor Gibbs::belief( const Var &n ) const {
-    return( beliefV( findVar( n ) ) );
-}
-
-
 vector<Factor> Gibbs::beliefs() const {
     vector<Factor> result;
     for( size_t i = 0; i < nrVars(); ++i )
@@ -221,8 +216,10 @@ vector<Factor> Gibbs::beliefs() const {
 
 
 Factor Gibbs::belief( const VarSet &ns ) const {
-    if( ns.size() == 1 )
-        return belief( *(ns.begin()) );
+    if( ns.size() == 0 )
+        return Factor();
+    else if( ns.size() == 1 )
+        return beliefV( findVar( *(ns.begin()) ) );
     else {
         size_t I;
         for( I = 0; I < nrFactors(); I++ )

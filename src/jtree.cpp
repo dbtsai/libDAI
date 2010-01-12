@@ -203,11 +203,6 @@ vector<Factor> JTree::beliefs() const {
 }
 
 
-Factor JTree::belief( const Var &v ) const {
-    return belief( (VarSet)v );
-}
-
-
 void JTree::runHUGIN() {
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         Qa[alpha] = OR(alpha);

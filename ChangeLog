@@ -1,3 +1,4 @@
+* Strengthened convergence criteria of various algorithms
 * Implemented FBP::logZ()
 * Fixed bug in HAK for trivial region graphs (with only one outer region
   and no inner regions), reported by Alejandro Lage.

@@ -246,8 +246,6 @@ Real LC::run() {
         cerr << endl;
 
     double tic = toc();
-    vector<Real> diffs( nrVars(), INFINITY );
-    Real maxDiff = INFINITY;
 
     Real md = InitCavityDists( props.cavainame, props.cavaiopts );
     if( md > _maxdiff )
@@ -267,9 +265,9 @@ Real LC::run() {
         CalcBelief(i);
     }
 
-    vector<Factor> old_beliefs;
-    for(size_t i=0; i < nrVars(); i++ )
-        old_beliefs.push_back(beliefV(i));
+    vector<Factor> oldBeliefsV;
+    for( size_t i = 0; i < nrVars(); i++ )
+        oldBeliefsV.push_back( beliefV(i) );
 
     bool hasNaNs = false;
     for( size_t i=0; i < nrVars(); i++ )
@@ -291,7 +289,8 @@ Real LC::run() {
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( _iters=0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
+    Real maxDiff = INFINITY;
+    for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
         // Sequential updates
         if( props.updates == Properties::UpdateType::SEQRND )
             random_shuffle( update_seq.begin(), update_seq.end() );
@@ -306,11 +305,11 @@ Real LC::run() {
         }
 
         // compare new beliefs with old ones
-        for(size_t i=0; i < nrVars(); i++ ) {
-            diffs[i] = dist( beliefV(i), old_beliefs[i], Prob::DISTLINF );
-            old_beliefs[i] = beliefV(i);
+        maxDiff = -INFINITY;
+        for( size_t i = 0; i < nrVars(); i++ ) {
+            maxDiff = std::max( maxDiff, dist( beliefV(i), oldBeliefsV[i], Prob::DISTLINF ) );
+            oldBeliefsV[i] = beliefV(i);
         }
-        maxDiff = max( diffs );
 
         if( props.verbose >= 3 )
             cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;

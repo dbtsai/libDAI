@@ -369,21 +369,20 @@ void TreeEP::init() {
 Real TreeEP::run() {
     if( props.verbose >= 1 )
         cerr << "Starting " << identify() << "...";
-    if( props.verbose >= 3)
+    if( props.verbose >= 3 )
         cerr << endl;
 
     double tic = toc();
-    vector<Real> diffs( nrVars(), INFINITY );
-    Real maxDiff = INFINITY;
 
-    vector<Factor> old_beliefs;
-    old_beliefs.reserve( nrVars() );
+    vector<Factor> oldBeliefsV;
+    oldBeliefsV.reserve( nrVars() );
     for( size_t i = 0; i < nrVars(); i++ )
-        old_beliefs.push_back(belief(var(i)));
+        oldBeliefsV.push_back( beliefV(i) );
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
-    for( _iters=0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
+    Real maxDiff = INFINITY;
+    for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
         for( size_t I = 0; I < nrFactors(); I++ )
             if( offtree(I) ) {
                 _Q[I].InvertAndMultiply( Qa, Qb );
@@ -392,12 +391,12 @@ Real TreeEP::run() {
             }
 
         // calculate new beliefs and compare with old ones
+        maxDiff = -INFINITY;
         for( size_t i = 0; i < nrVars(); i++ ) {
-            Factor nb( belief(var(i)) );
-            diffs[i] = dist( nb, old_beliefs[i], Prob::DISTLINF );
-            old_beliefs[i] = nb;
+            Factor nb( beliefV(i) );
+            maxDiff = std::max( maxDiff, dist( nb, oldBeliefsV[i], Prob::DISTLINF ) );
+            oldBeliefsV[i] = nb;
         }
-        maxDiff = max( diffs );
 
         if( props.verbose >= 3 )
             cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;

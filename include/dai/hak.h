@@ -107,7 +107,6 @@ class HAK : public DAIAlgRG {
     //@{
         virtual HAK* clone() const { return new HAK(*this); }
         virtual std::string identify() const;
-        virtual Factor belief( const Var &v ) const;
         virtual Factor belief( const VarSet &vs ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;

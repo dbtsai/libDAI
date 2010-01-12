@@ -547,15 +547,13 @@ void MR::makekindex() {
 }
 
 
-Factor MR::belief( const Var &n ) const {
+Factor MR::beliefV( size_t i ) const {
     if( supported ) {
-        size_t i = findVar( n );
-
         Prob x(2);
         x[0] = 0.5 - Mag[i] / 2.0;
         x[1] = 0.5 + Mag[i] / 2.0;
 
-        return Factor( n, x );
+        return Factor( var(i), x );
     } else
         return Factor();
 }

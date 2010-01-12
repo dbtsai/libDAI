@@ -264,17 +264,18 @@ Real HAK::doGBP() {
         DAI_ASSERT( nbIR(beta).size() + IR(beta).c() != 0.0 );
 
     // Keep old beliefs to check convergence
-    vector<Factor> old_beliefs;
-    old_beliefs.reserve( nrVars() );
+    vector<Factor> oldBeliefsV;
+    oldBeliefsV.reserve( nrVars() );
     for( size_t i = 0; i < nrVars(); i++ )
-        old_beliefs.push_back( belief( var(i) ) );
-
-    // Differences in single node beliefs
-    vector<Real> diffs( nrVars(), INFINITY );
-    Real maxDiff = INFINITY;
+        oldBeliefsV.push_back( beliefV(i) );
+    vector<Factor> oldBeliefsF;
+    oldBeliefsF.reserve( nrFactors() );
+    for( size_t I = 0; I < nrFactors(); I++ )
+        oldBeliefsF.push_back( beliefF(I) );
 
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
+    Real maxDiff = INFINITY;
     for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
         for( size_t beta = 0; beta < nrIRs(); beta++ ) {
             foreach( const Neighbor &alpha, nbIR(beta) ) {
@@ -348,12 +349,17 @@ Real HAK::doGBP() {
         }
 
         // Calculate new single variable beliefs and compare with old ones
-        for( size_t i = 0; i < nrVars(); i++ ) {
-            Factor new_belief = belief( var( i ) );
-            diffs[i] = dist( new_belief, old_beliefs[i], Prob::DISTLINF );
-            old_beliefs[i] = new_belief;
+        maxDiff = -INFINITY;
+        for( size_t i = 0; i < nrVars(); ++i ) {
+            Factor b = beliefV(i);
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], Prob::DISTLINF ) );
+            oldBeliefsV[i] = b;
         }
-        maxDiff = max( diffs );
+        for( size_t I = 0; I < nrFactors(); ++I ) {
+            Factor b = beliefF(I);
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], Prob::DISTLINF ) );
+            oldBeliefsF[I] = b;
+        }
 
         if( props.verbose >= 3 )
             cerr << Name << "::doGBP:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
@@ -398,14 +404,14 @@ Real HAK::doDoubleLoop() {
     }
 
     // Keep old beliefs to check convergence
-    vector<Factor> old_beliefs;
-    old_beliefs.reserve( nrVars() );
+    vector<Factor> oldBeliefsV;
+    oldBeliefsV.reserve( nrVars() );
     for( size_t i = 0; i < nrVars(); i++ )
-        old_beliefs.push_back( belief( var(i) ) );
-
-    // Differences in single node beliefs
-    vector<Real> diffs( nrVars(), INFINITY );
-    Real maxDiff = INFINITY;
+        oldBeliefsV.push_back( beliefV(i) );
+    vector<Factor> oldBeliefsF;
+    oldBeliefsF.reserve( nrFactors() );
+    for( size_t I = 0; I < nrFactors(); I++ )
+        oldBeliefsF.push_back( beliefF(I) );
 
     size_t outer_maxiter   = props.maxiter;
     Real   outer_tol       = props.tol;
@@ -418,6 +424,7 @@ Real HAK::doDoubleLoop() {
 
     size_t outer_iter = 0;
     size_t total_iter = 0;
+    Real maxDiff = INFINITY;
     for( outer_iter = 0; outer_iter < outer_maxiter && maxDiff > outer_tol; outer_iter++ ) {
         // Calculate new outer regions
         for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
@@ -431,12 +438,17 @@ Real HAK::doDoubleLoop() {
             return 1.0;
 
         // Calculate new single variable beliefs and compare with old ones
+        maxDiff = -INFINITY;
         for( size_t i = 0; i < nrVars(); ++i ) {
-            Factor new_belief = belief( var( i ) );
-            diffs[i] = dist( new_belief, old_beliefs[i], Prob::DISTLINF );
-            old_beliefs[i] = new_belief;
+            Factor b = beliefV(i);
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], Prob::DISTLINF ) );
+            oldBeliefsV[i] = b;
         }
-        maxDiff = max( diffs );
+        for( size_t I = 0; I < nrFactors(); ++I ) {
+            Factor b = beliefF(I);
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], Prob::DISTLINF ) );
+            oldBeliefsF[I] = b;
+        }
 
         total_iter += Iterations();
 
@@ -500,11 +512,6 @@ Factor HAK::belief( const VarSet &ns ) const {
             DAI_THROW(BELIEF_NOT_AVAILABLE);
         return( alpha->marginal(ns) );
     }
-}
-
-
-Factor HAK::belief( const Var &n ) const {
-    return belief( (VarSet)n );
 }
 
 

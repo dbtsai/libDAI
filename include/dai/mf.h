@@ -80,8 +80,8 @@ class MF : public DAIAlgFG {
     //@{
         virtual MF* clone() const { return new MF(*this); }
         virtual std::string identify() const;
-        virtual Factor belief( const Var &n ) const;
-        virtual Factor belief( const VarSet &ns ) const;
+        virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
+        virtual Factor belief( const VarSet &vs ) const;
         virtual Factor beliefV( size_t i ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;
