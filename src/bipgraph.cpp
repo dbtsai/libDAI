@@ -10,6 +10,8 @@
 
 
 #include <dai/bipgraph.h>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/connected_components.hpp>
 
 
 namespace dai {
@@ -153,12 +155,28 @@ std::vector<size_t> BipartiteGraph::delta2( size_t n2, bool include ) const {
 
 
 bool BipartiteGraph::isConnected() const {
-    // TODO: use BGL, like:
-    // std::vector<int> component( num_vertices( g ) );
-    // int num_comp = connected_components( g, make_iterator_property_map(component.begin(), get(vertex_index, g)) );
     if( nr1() == 0 ) {
         return true;
     } else {
+        using namespace boost;
+        typedef adjacency_list< vecS, vecS, undirectedS, property<vertex_distance_t, int> > boostGraph;
+        typedef pair<size_t, size_t> E;
+
+        // Copy graph structure into boostGraph object
+        size_t N = nr1();
+        vector<E> edges;
+        edges.reserve( nrEdges() );
+        for( size_t n1 = 0; n1 < nr1(); n1++ )
+            foreach( const Neighbor &n2, nb1(n1) )
+                edges.push_back( E( n1, n2.node + N ) );
+        boostGraph g( edges.begin(), edges.end(), nr1() + nr2() );
+
+        // Construct connected components using Boost Graph Library
+        std::vector<int> component( num_vertices( g ) );
+        int num_comp = connected_components( g, make_iterator_property_map(component.begin(), get(vertex_index, g)) );
+
+        return (num_comp == 1);
+        /*
         std::vector<bool> incomponent1( nr1(), false );
         std::vector<bool> incomponent2( nr2(), false );
 
@@ -201,7 +219,7 @@ bool BipartiteGraph::isConnected() const {
             if( !incomponent2[n2] )
                 all_connected = false;
 
-        return all_connected;
+        return all_connected;*/
     }
 }
 

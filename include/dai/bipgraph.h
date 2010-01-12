@@ -153,7 +153,7 @@ class BipartiteGraph {
          *  \param end Points just beyond the last edge.
          */
         template<typename EdgeInputIterator>
-        BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1( nr1 ), _nb2( nr2 ) {
+        BipartiteGraph( size_t nr1, size_t nr2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1(), _nb2() {
             construct( nr1, nr2, begin, end );
         }
     //@}
@@ -317,8 +317,6 @@ class BipartiteGraph {
         std::vector<size_t> delta2( size_t n2, bool include = false ) const;
 
         /// Returns true if the graph is connected
-        /** \todo Should be optimized by invoking boost::graph library
-         */
         bool isConnected() const;
 
         /// Returns true if the graph is a tree, i.e., if it is singly connected and connected.
