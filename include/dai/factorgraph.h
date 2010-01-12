@@ -370,6 +370,12 @@ FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fac
  */
 
 
+/** \example example_sprinkler.cpp
+ *  This example illustrates how to manually construct a factor graph and
+ *  write it to a file.
+ */
+
+
 } // end of namespace dai
 
 

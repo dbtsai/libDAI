@@ -326,6 +326,7 @@
  *  In libDAI, both types of graphical models are represented by a slightly more 
  *  general type of graphical model: a factor graph [\ref KFL01].
  *
+ *  An example of a Bayesian network is: 
  *  \dot
  *  digraph bayesnet {
  *    size="1,1";
@@ -341,10 +342,11 @@
  *    x2 -> x4;
  *  }
  *  \enddot
- *
+ *  The probability distribution of a Bayesian network factorizes as:
  *  \f[ P(\mathbf{x}) = \prod_{i\in\mathcal{V}} P(x_i \,|\, x_{\mathrm{pa}(i)}) \f]
  *  where \f$\mathrm{pa}(i)\f$ are the parents of node \a i in a DAG.
  *
+ *  The same probability distribution can be represented as a Markov random field:
  *  \dot
  *  graph mrf {
  *    size="1.5,1.5";
@@ -362,12 +364,14 @@
  *  }
  *  \enddot
  *
+ *  The probability distribution of a Markov random field factorizes as:
  *  \f[ P(\mathbf{x}) = \frac{1}{Z} \prod_{C\in\mathcal{C}} \psi_C(x_C) \f]
  *  where \f$ \mathcal{C} \f$ are the cliques of an undirected graph, 
  *  \f$ \psi_C(x_C) \f$ are "potentials" or "compatibility functions", and
  *  \f$ Z \f$ is the partition sum which properly normalizes the probability
  *  distribution.
  *
+ *  Finally, the same probability distribution can be represented as a factor graph:
  *  \dot
  *  graph factorgraph {
  *    size="1.8,1";
@@ -392,6 +396,7 @@
  *  }
  *  \enddot
  *
+ *  The probability distribution of a factor graph factorizes as:
  *  \f[ P(\mathbf{x}) = \frac{1}{Z} \prod_{I\in \mathcal{F}} f_I(x_I) \f]
  *  where \f$ \mathcal{F} \f$ are the factor nodes of a factor graph (a 
  *  bipartite graph consisting of variable nodes and factor nodes), 
@@ -631,7 +636,7 @@
  *  contain the variable labels of the variables on which that factor depends, 
  *  in a specific ordering. This ordering can be different from the canonical 
  *  ordering of the variables used internally in libDAI (which would be sorted 
- *  ascendingly according to the variable labels). The odering of the variables
+ *  ascendingly according to the variable labels). The ordering of the variables
  *  specifies the implicit ordering of the shared parameters: when iterating
  *  over all shared parameters, the corresponding index of the first variable
  *  changes fastest (in the inner loop), and the corresponding index of the

@@ -62,9 +62,7 @@ SprinklerNetwork = dai.FactorGraph(SprinklerFactors)
 
 # Write factorgraph to a file
 SprinklerNetwork.WriteToFile('sprinkler.fg')
-
-# Reread the factorgraph from the file
-SprinklerNetwork.ReadFromFile('sprinkler.fg')
+print 'Sprinkler network written to sprinkler.fg'
 
 # Output some information about the factorgraph
 print SprinklerNetwork.nrVars(), 'variables'

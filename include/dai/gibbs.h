@@ -121,10 +121,15 @@ class Gibbs : public DAIAlgFG {
 /// Runs Gibbs sampling for \a iters iterations (of which \a burnin for burn-in) on FactorGraph \a fg, and returns the resulting state
 /** \relates Gibbs
  */
-std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t iters, size_t burnin=0 );
+std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t iters );
 
 
 } // end of namespace dai
+
+
+/** \example example_sprinkler_gibbs.cpp
+ *  This example shows how to use the Gibbs class.
+ */
 
 
 #endif

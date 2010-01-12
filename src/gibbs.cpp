@@ -232,10 +232,10 @@ Factor Gibbs::belief( const VarSet &ns ) const {
 }
 
 
-std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t iters, size_t burnin ) {
+std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t iters ) {
     PropertySet gibbsProps;
     gibbsProps.Set("iters", iters);
-    gibbsProps.Set("burnin", burnin);
+    gibbsProps.Set("burnin", size_t(0));
     gibbsProps.Set("verbose", size_t(0));
     Gibbs gibbs( fg, gibbsProps );
     gibbs.run();

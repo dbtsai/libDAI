@@ -13,7 +13,7 @@ include Makefile.conf
 
 # Set version and date
 DAI_VERSION="git HEAD"
-DAI_DATE="January 11, 2010 - or later"
+DAI_DATE="January 12, 2010 - or later"
 
 # Directories of libDAI sources
 # Location libDAI headers
@@ -111,7 +111,7 @@ MEX:=$(MEX) $(CCLIB) $(CCINC) $(MEXFLAGS)
 
 all : $(TARGETS)
 
-examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE)
+examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE)
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
@@ -222,6 +222,12 @@ examples/example_permute$(EE) : examples/example_permute.cpp $(HEADERS) $(LIB)/l
 examples/example_sprinkler$(EE) : examples/example_sprinkler.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)examples/example_sprinkler$(EE) examples/example_sprinkler.cpp $(LIBS)
 
+examples/example_sprinkler_gibbs$(EE) : examples/example_sprinkler_gibbs.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_gibbs.cpp $(LIBS)
+
+examples/example_sprinkler_em$(EE) : examples/example_sprinkler_em.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)examples/example_sprinkler_em$(EE) examples/example_sprinkler_em.cpp $(LIBS)
+
 
 # TESTS
 ########
@@ -321,7 +327,7 @@ ifneq ($(OS),WINDOWS)
 clean :
 	-rm *$(OE)
 	-rm matlab/*$(ME)
-	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE)
+	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE)
 	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc

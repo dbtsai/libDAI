@@ -4,12 +4,13 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2008-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2008-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  */
 
 
 #include <dai/factorgraph.h>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 using namespace dai;
@@ -64,9 +65,7 @@ int main() {
 
     // Write factorgraph to a file
     SprinklerNetwork.WriteToFile( "sprinkler.fg" );
-
-    // Reread the factorgraph from the file
-    SprinklerNetwork.ReadFromFile( "sprinkler.fg" );
+    cout << "Sprinkler network written to sprinkler.fg" << endl;
 
     // Output some information about the factorgraph
     cout << SprinklerNetwork.nrVars() << " variables" << endl;

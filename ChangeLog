@@ -1,3 +1,4 @@
+* Added examples example_sprinkler_gibbs and example_sprinkler_em
 * Optimized BipartiteGraph::isConnected() by using Boost Graph Library implementation
 * Strengthened convergence criteria of various algorithms
 * Implemented FBP::logZ()
