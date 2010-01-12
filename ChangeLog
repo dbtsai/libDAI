@@ -1,3 +1,10 @@
+* Renamed some functions of BipartiteGraph:
+    add1() -> addNode1()
+    erase1() -> eraseNode1()
+    nr1() -> nrNodes1()
+    add2() -> addNode2()
+    erase2() -> eraseNode2()
+    nr2() -> nrNodes2()
 * Added examples example_sprinkler_gibbs and example_sprinkler_em
 * Optimized BipartiteGraph::isConnected() by using Boost Graph Library implementation
 * Strengthened convergence criteria of various algorithms

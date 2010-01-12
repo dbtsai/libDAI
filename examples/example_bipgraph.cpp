@@ -28,10 +28,10 @@ int main() {
     BipartiteGraph G( 3, 2, edges.begin(), edges.end() );
 
     // Display some information about G
-    cout << "G has " << G.nr1() << " nodes of type 1, " << G.nr2() << " nodes of type 2 and " << G.nrEdges() << " edges." << endl << endl;
+    cout << "G has " << G.nrNodes1() << " nodes of type 1, " << G.nrNodes2() << " nodes of type 2 and " << G.nrEdges() << " edges." << endl << endl;
 
     // Iterate over all nodes n1 of type 1
-    for( size_t n1 = 0; n1 < G.nr1(); n1++ ) {
+    for( size_t n1 = 0; n1 < G.nrNodes1(); n1++ ) {
         cout << "Node " << n1 << " of type 1 has " << G.nb1(n1).size() << " neighbors:" << endl;
         // Iterate over all neighbors n2 of n1
         foreach( const BipartiteGraph::Neighbor &n2, G.nb1(n1) ) {

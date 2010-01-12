@@ -63,7 +63,7 @@ namespace dai {
 
             /// Returns number of clusters
             size_t size() const {
-                return G.nr2();
+                return G.nrNodes2();
             }
 
             /// Returns the index of variable \a n
@@ -97,7 +97,7 @@ namespace dai {
 
             /// Returns \c true if cluster \a I is not contained in a larger cluster
             bool isMaximal( size_t I ) const {
-                DAI_DEBASSERT( I < G.nr2() );
+                DAI_DEBASSERT( I < G.nrNodes2() );
                 const VarSet & clI = clusters[I];
                 bool maximal = true;
                 // The following may not be optimal, since it may repeatedly test the same cluster *J
@@ -126,20 +126,20 @@ namespace dai {
                         size_t iter = find( vars.begin(), vars.end(), *n ) - vars.begin();
                         nbs.push_back( iter );
                         if( iter == vars.size() ) {
-                            G.add1();
+                            G.addNode1();
                             vars.push_back( *n );
                         }
                     }
-                    G.add2( nbs.begin(), nbs.end(), nbs.size() );
+                    G.addNode2( nbs.begin(), nbs.end(), nbs.size() );
                 }
             }
 
             /// Erases all clusters that are not maximal
             ClusterGraph& eraseNonMaximal() {
-                for( size_t I = 0; I < G.nr2(); ) {
+                for( size_t I = 0; I < G.nrNodes2(); ) {
                     if( !isMaximal(I) ) {
                         clusters.erase( clusters.begin() + I );
-                        G.erase2(I);
+                        G.eraseNode2(I);
                     } else
                         I++;
                 }
@@ -150,7 +150,7 @@ namespace dai {
             ClusterGraph& eraseSubsuming( size_t i ) {
                 while( G.nb1(i).size() ) {
                     clusters.erase( clusters.begin() + G.nb1(i)[0] );
-                    G.erase2( G.nb1(i)[0] );
+                    G.eraseNode2( G.nb1(i)[0] );
                 }
                 return *this;
             }
