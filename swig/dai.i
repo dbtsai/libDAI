@@ -36,6 +36,9 @@
 %ignore dai::TProb::operator[];
 %ignore dai::TFactor::operator[];
 
+%ignore dai::Var::label() const;
+%ignore dai::Var::states() const;
+
 %include "../include/dai/util.h"
 %include "../include/dai/var.h"
 %include "../include/dai/smallset.h"
@@ -57,8 +60,8 @@
 %extend dai::TFactor<dai::Real> {
         inline dai::Real __getitem__(int i) const {return (*self)[i];} /* for python */
         inline void __setitem__(int i,dai::Real d) {(*self)[i] = d;}   /* for python */
-        inline dai::Real __paren(int i) const {return (*self)[i];}     /* for octave */
-        inline void __paren_asgn(int i,dai::Real d) {(*self)[i] = d;}  /* for octave */
+        inline dai::Real __paren__(int i) const {return (*self)[i];}     /* for octave */
+        inline void __paren_asgn__(int i,dai::Real d) {(*self)[i] = d;}  /* for octave */
 };
 
 %template(Factor) dai::TFactor<dai::Real>;

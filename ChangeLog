@@ -1,3 +1,4 @@
+* Added BETHE method for GBP/HAK cluster choice
 * Renamed some functions of BipartiteGraph:
     add1() -> addNode1()
     erase1() -> eraseNode1()

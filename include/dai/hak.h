@@ -11,7 +11,6 @@
 
 /// \file
 /// \brief Defines class HAK, which implements a variant of Generalized Belief Propagation.
-/// \todo Implement Bethe approximation as a standard region graph choice in HAK.
 /// \idea Implement more general region graphs and corresponding Generalized Belief Propagation updates as described in [\ref YFW05].
 
 
@@ -53,8 +52,9 @@ class HAK : public DAIAlgRG {
              *   - MIN minimal clusters, i.e., one outer region for each maximal factor
              *   - DELTA one outer region for each variable and its Markov blanket
              *   - LOOP one cluster for each loop of length at most \a Properties::loopdepth, and in addition one cluster for each maximal factor
+             *   - BETHE Bethe approximation (one outer region for each maximal factor, inner regions are single variables)
              */
-            DAI_ENUM(ClustersType,MIN,DELTA,LOOP);
+            DAI_ENUM(ClustersType,MIN,BETHE,DELTA,LOOP);
 
             /// Enumeration of possible message initializations
             DAI_ENUM(InitType,UNIFORM,RANDOM);

@@ -48,7 +48,6 @@ namespace dai {
  *    \f[ b_I(x_I) \propto f_I(x_I)^{1/c_I} \prod_{j \in N_I} m_{I\to j}^{1-1/c_I} \prod_{J\in N_j\setminus\{I\}} m_{J\to j} \f]
  *
  *  \todo Add nice way to set scale parameters
- *
  *  \author Frederik Eaton
  */
 class FBP : public BP {

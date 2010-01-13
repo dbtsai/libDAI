@@ -155,9 +155,12 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
     vector<VarSet> cl;
     if( props.clusters == Properties::ClustersType::MIN ) {
         cl = fg.Cliques();
+        constructCVM( fg, cl );
     } else if( props.clusters == Properties::ClustersType::DELTA ) {
+        cl.reserve( fg.nrVars() );
         for( size_t i = 0; i < fg.nrVars(); i++ )
-            cl.push_back(fg.Delta(i));
+            cl.push_back( fg.Delta(i) );
+        constructCVM( fg, cl );
     } else if( props.clusters == Properties::ClustersType::LOOP ) {
         cl = fg.Cliques();
         set<VarSet> scl;
@@ -173,11 +176,36 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
             for( vector<VarSet>::const_iterator cli = cl.begin(); cli != cl.end(); cli++ )
                 cerr << *cli << endl;
         }
+        constructCVM( fg, cl );
+    } else if( props.clusters == Properties::ClustersType::BETHE ) {
+        // build outer regions (the cliques)
+        cl = fg.Cliques();
+        size_t nrEdges = 0;
+        for( size_t c = 0; c < cl.size(); c++ )
+            nrEdges += cl[c].size();
+
+        // build inner regions (single variables)
+        vector<Region> irs;
+        irs.reserve( fg.nrVars() );
+        for( size_t i = 0; i < fg.nrVars(); i++ )
+            irs.push_back( Region( fg.var(i), 1.0 ) );
+
+        // build edges (an outer and inner region are connected if the outer region contains the inner one)
+        // and calculate counting number for inner regions
+        vector<std::pair<size_t, size_t> > edges;
+        edges.reserve( nrEdges );
+        for( size_t c = 0; c < cl.size(); c++ )
+            for( size_t i = 0; i < irs.size(); i++ )
+                if( cl[c] >> irs[i] ) {
+                    edges.push_back( make_pair( c, i ) );
+                    irs[i].c() -= 1.0;
+                }
+
+        // build region graph
+        RegionGraph::construct( fg, cl, irs, edges );
     } else
         DAI_THROW(UNKNOWN_ENUM_VALUE);
 
-    RegionGraph rg(fg,cl);
-    RegionGraph::operator=(rg);
     construct();
 
     if( props.verbose >= 3 )

@@ -42,6 +42,7 @@ namespace dai {
  *  Thus, each node has an associated variable of type BipartiteGraph::Neighbors, which is a vector of
  *  Neighbor structures, describing its neighboring nodes of the other type.
  *  \idea Cache second-order neighborhoods in BipartiteGraph.
+ *  \todo Check whether BGL isConnected improves performance.
  */
 class BipartiteGraph {
     public:

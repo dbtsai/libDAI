@@ -53,7 +53,6 @@ RootedTree::RootedTree( const Graph &T, size_t Root ) {
                 } else
                     e++;
             }
-
     }
 }
 
