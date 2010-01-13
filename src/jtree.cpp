@@ -78,9 +78,9 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
             cerr << "Maximal clusters: " << _cg << endl;
 
         // Use MinFill heuristic to guess optimal elimination sequence
-        vector<VarSet> ElimVec = _cg.VarElim_MinFill().eraseNonMaximal().toVector();
+        vector<VarSet> ElimVec = _cg.VarElim( eliminationChoice_MinFill ).eraseNonMaximal().toVector();
         if( props.verbose >= 3 )
-            cerr << "VarElim_MinFill result: " << ElimVec << endl;
+            cerr << "VarElim result: " << ElimVec << endl;
 
         // Generate the junction tree corresponding to the elimination sequence
         GenerateJT( ElimVec );
@@ -511,7 +511,7 @@ std::pair<size_t,size_t> boundTreewidth( const FactorGraph & fg ) {
     _cg.eraseNonMaximal();
 
     // Obtain elimination sequence
-    vector<VarSet> ElimVec = _cg.VarElim_MinFill().eraseNonMaximal().toVector();
+    vector<VarSet> ElimVec = _cg.VarElim( eliminationChoice_MinFill ).eraseNonMaximal().toVector();
 
     // Calculate treewidth
     size_t treewidth = 0;

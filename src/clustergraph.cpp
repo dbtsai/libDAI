@@ -45,45 +45,8 @@ ClusterGraph::ClusterGraph( const std::vector<VarSet> & cls ) : G(), vars(), clu
 }
 
 
-ClusterGraph ClusterGraph::VarElim_MinFill() const {
-    // Make a copy
-    ClusterGraph cl(*this);
-    cl.eraseNonMaximal();
 
-    ClusterGraph result;
-
-    // Construct set of variable indices
-    set<size_t> varindices;
-    for( size_t i = 0; i < vars.size(); ++i )
-        varindices.insert( i );
-
-    // Do variable elimination
-    while( !varindices.empty() ) {
-        set<size_t>::const_iterator lowest = varindices.end();
-        size_t lowest_cost = -1UL;
-        for( set<size_t>::const_iterator i = varindices.begin(); i != varindices.end(); i++ ) {
-            size_t cost = cl.eliminationCost( *i );
-            if( lowest == varindices.end() || lowest_cost > cost ) {
-                lowest = i;
-                lowest_cost = cost;
-            }
-        }
-        size_t i = *lowest;
-
-        result.insert( cl.Delta( i ) );
-
-        cl.insert( cl.delta( i ) );
-        cl.eraseSubsuming( i );
-        cl.eraseNonMaximal();
-        varindices.erase( i );
-    }
-
-    return result;
-}
-
-
-
-ClusterGraph ClusterGraph::VarElim( const std::vector<Var> & ElimSeq ) const {
+ClusterGraph ClusterGraph::VarElim( const std::vector<Var> &ElimSeq ) const {
     // Make a copy
     ClusterGraph cl(*this);
     cl.eraseNonMaximal();
@@ -104,6 +67,37 @@ ClusterGraph ClusterGraph::VarElim( const std::vector<Var> & ElimSeq ) const {
 
     return result;
 }
+
+
+size_t eliminationCost_MinFill( const ClusterGraph &cl, size_t i ) {
+    std::vector<size_t> id_n = cl.G.delta1( i );
+
+    size_t cost = 0;
+
+    // for each unordered pair {i1,i2} adjacent to n
+    for( size_t _i1 = 0; _i1 < id_n.size(); _i1++ )
+        for( size_t _i2 = _i1 + 1; _i2 < id_n.size(); _i2++ ) {
+            // if i1 and i2 are not adjacent, eliminating n would make them adjacent
+            if( !cl.adj(id_n[_i1], id_n[_i2]) )
+                cost++;
+        }
+
+    return cost;
+}
+
+
+size_t eliminationChoice_MinFill( const ClusterGraph &cl, const std::set<size_t> &remainingVars ) {
+    set<size_t>::const_iterator lowest = remainingVars.end();
+    size_t lowest_cost = -1UL;
+    for( set<size_t>::const_iterator i = remainingVars.begin(); i != remainingVars.end(); i++ ) {
+        size_t cost = eliminationCost_MinFill( cl, *i );
+        if( lowest == remainingVars.end() || lowest_cost > cost ) {
+            lowest = i;
+            lowest_cost = cost;
+        }
+    }
+    return *lowest;
+}    
 
 
 } // end of namespace dai
