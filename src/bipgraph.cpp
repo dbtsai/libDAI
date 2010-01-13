@@ -10,8 +10,6 @@
 
 
 #include <dai/bipgraph.h>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/connected_components.hpp>
 
 
 namespace dai {
@@ -158,6 +156,8 @@ bool BipartiteGraph::isConnected() const {
     if( nrNodes1() == 0 ) {
         return true;
     } else {
+        /*
+        // The BGL implementation is significantly slower...
         using namespace boost;
         typedef adjacency_list< vecS, vecS, undirectedS, property<vertex_distance_t, int> > boostGraph;
         typedef pair<size_t, size_t> E;
@@ -176,7 +176,8 @@ bool BipartiteGraph::isConnected() const {
         int num_comp = connected_components( g, make_iterator_property_map(component.begin(), get(vertex_index, g)) );
 
         return (num_comp == 1);
-        /*
+        */
+
         std::vector<bool> incomponent1( nrNodes1(), false );
         std::vector<bool> incomponent2( nrNodes2(), false );
 
@@ -219,7 +220,7 @@ bool BipartiteGraph::isConnected() const {
             if( !incomponent2[n2] )
                 all_connected = false;
 
-        return all_connected;*/
+        return all_connected;
     }
 }
 

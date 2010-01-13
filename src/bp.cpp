@@ -251,10 +251,9 @@ Real BP::run() {
                 calcNewMessage( i, I.iter );
     } else {
         update_seq.reserve( nredges );
-        /// \todo Investigate whether performance increases by switching the order of the following two loops:
-        for( size_t i = 0; i < nrVars(); ++i )
-            foreach( const Neighbor &I, nbV(i) )
-                update_seq.push_back( Edge( i, I.iter ) );
+        for( size_t I = 0; I < nrFactors(); I++ )
+            foreach( const Neighbor &i, nbF(I) )
+                update_seq.push_back( Edge( i, i.dual ) );
     }
 
     // do several passes over the network until maximum number of iterations has
