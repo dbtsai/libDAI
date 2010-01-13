@@ -33,6 +33,7 @@ namespace dai {
 
 /// Approximate inference algorithm by Montanari and Rizzo [\ref MoR05]
 /** \author Bastian Wemmenhove wrote the original implementation before it was merged into libDAI
+ *  \todo Clean up code (use a BipartiteGraph-like implementation for the graph structure)
  */
 class MR : public DAIAlgFG {
     private:

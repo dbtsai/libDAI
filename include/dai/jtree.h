@@ -128,12 +128,20 @@ class JTree : public DAIAlgRG {
         /** First, constructs a weighted graph, where the nodes are the elements of \a cl, and 
          *  each edge is weighted with the cardinality of the intersection of the state spaces of the nodes. 
          *  Then, a maximal spanning tree for this weighted graph is calculated.
-         *  Finally, a corresponding region graph is built:
+         *  Subsequently, a corresponding region graph is built:
          *    - the outer regions correspond with the cliques and have counting number 1;
          *    - the inner regions correspond with the seperators, i.e., the intersections of two 
          *      cliques that are neighbors in the spanning tree, and have counting number -1;
          *    - inner and outer regions are connected by an edge if the inner region is a
          *      seperator for the outer region.
+         *  Finally, Beliefs are constructed.
+         *  If \a verify == \c true, checks whether each factor is subsumed by a clique.
+         */
+        void construct( const std::vector<VarSet> &cl, bool verify=false );
+
+        /// Constructs a junction tree based on the cliques \a cl (corresponding to some elimination sequence).
+        /** Invokes construct() and then constructs messages.
+         *  \see construct()
          */
         void GenerateJT( const std::vector<VarSet> &cl );
 
