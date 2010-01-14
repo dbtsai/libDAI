@@ -46,7 +46,7 @@ class JTree : public DAIAlgRG {
         /// Stores the messages
         std::vector<std::vector<Factor> >  _mes;
 
-        /// Stores the logarithm of the partition sum
+        /// Stores the logarithm of the partition sum (not used - why not?)
         Real _logZ;
 
     public:
@@ -150,8 +150,8 @@ class JTree : public DAIAlgRG {
         /// Returns reference to the message from outer region \a alpha to its \a _beta 'th neighboring inner region
         Factor & message( size_t alpha, size_t _beta ) { return _mes[alpha][_beta]; }
 
-        /// Runs junction tree algorithm using HUGIN updates
-        /** \note The initial messages may be arbitrary.
+        /// Runs junction tree algorithm using HUGIN (message-free) updates
+        /** \note The initial messages may be arbitrary; actually they are not used at all.
          */
         void runHUGIN();
 

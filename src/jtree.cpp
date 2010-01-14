@@ -333,14 +333,16 @@ Real JTree::run() {
 
 
 Real JTree::logZ() const {
-    Real s = 0.0;
+/*    Real s = 0.0;
     for( size_t beta = 0; beta < nrIRs(); beta++ )
         s += IR(beta).c() * Qb[beta].entropy();
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
         s += OR(alpha).c() * Qa[alpha].entropy();
         s += (OR(alpha).log(true) * Qa[alpha]).sum();
     }
-    return s;
+    DAI_ASSERT( abs( _logZ - s ) < 1e-8 );
+    return s;*/
+    return _logZ;
 }
 
 

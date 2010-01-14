@@ -36,6 +36,11 @@ void TreeEP::setProperties( const PropertySet &opts ) {
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.type = opts.getStringAs<Properties::TypeType>("type");
+
+    if( opts.hasKey("optimize") )
+        props.optimize = opts.getStringAs<bool>("optimize");
+    else
+        props.optimize = false;
 }
 
 
@@ -45,6 +50,7 @@ PropertySet TreeEP::getProperties() const {
     opts.Set( "maxiter", props.maxiter );
     opts.Set( "verbose", props.verbose );
     opts.Set( "type", props.type );
+    opts.Set( "optimize", props.optimize );
     return opts;
 }
 
@@ -55,7 +61,8 @@ string TreeEP::printProperties() const {
     s << "tol=" << props.tol << ",";
     s << "maxiter=" << props.maxiter << ",";
     s << "verbose=" << props.verbose << ",";
-    s << "type=" << props.type << "]";
+    s << "type=" << props.type << ",";
+    s << "optimize=" << props.optimize << "]";
     return s.str();
 }
 
@@ -134,10 +141,12 @@ void TreeEP::construct( const RootedTree &tree ) {
             if( offtree(I) ) {
                 // find efficient subtree
                 RootedTree subTree;
-                /*size_t subTreeSize =*/ findEfficientTree( factor(I).vars(), subTree, PreviousRoot );
+                size_t subTreeSize = findEfficientTree( factor(I).vars(), subTree, PreviousRoot );
                 PreviousRoot = subTree[0].n1;
-                //subTree.resize( subTreeSize );  // FIXME
-                //cerr << "subtree " << I << " has size " << subTreeSize << endl;
+                if( props.optimize ) {
+                    subTree.resize( subTreeSize );  // FIXME
+                    cerr << "subtree " << I << " has size " << subTreeSize << endl;
+                }
                 _Q[I] = TreeEPSubTree( subTree, RTree, Qa, Qb, &factor(I) );
                 if( repeats == 1 )
                     break;

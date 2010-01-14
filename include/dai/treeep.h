@@ -11,7 +11,8 @@
 
 /// \file
 /// \brief Defines class TreeEP, which implements Tree Expectation Propagation
-/// \todo Clean up the TreeEP code
+/// \todo Clean up the TreeEP code (by making JTree more powerful, e.g., by
+/// adding Pearl's cutset algorithm and propagation with an arbitrary root)
 
 
 #ifndef __defined_libdai_treeep_h
@@ -65,6 +66,9 @@ class TreeEP : public JTree {
 
             /// How to choose the tree
             TypeType type;
+
+            /// Optimize within-loop propagation? (currently buggy, so disabled by default)
+            bool optimize;
         } props;
 
         /// Name of this inference method
@@ -72,24 +76,37 @@ class TreeEP : public JTree {
 
     private:
         /// Stores the data structures needed to efficiently update the approximation of an off-tree factor
-        /// \todo Write documentation
         class TreeEPSubTree {
             private:
+                /// Outer region pseudomarginals (corresponding with the \f$\tilde f_i(x_j,x_k)\f$ in [\ref MiQ04])
                 std::vector<Factor>  _Qa;
+                /// Inner region pseudomarginals (corresponding with the \f$\tilde f_i(x_s)\f$ in [\ref MiQ04])
                 std::vector<Factor>  _Qb;
+                /// The junction tree (stored as a rooted tree)
                 RootedTree           _RTree;
-                std::vector<size_t>  _a;        // _Qa[alpha]  <->  superTree.Qa[_a[alpha]]
-                std::vector<size_t>  _b;        // _Qb[beta]   <->  superTree.Qb[_b[beta]]
-                                                // _Qb[beta]   <->  _RTree[beta]
+                /// Index conversion table for outer region indices (_Qa[alpha] corresponds with Qa[_a[alpha]] of the supertree)
+                std::vector<size_t>  _a;        
+                /// Index conversion table for inner region indices (_Qb[beta] corresponds with Qb[_b[beta]] of the supertree)
+                std::vector<size_t>  _b;
+                /// Pointer to off-tree factor
                 const Factor *       _I;
+                /// Variables in off-tree factor
                 VarSet               _ns;
+                /// Variables in off-tree factor which are not in the root of this subtree
                 VarSet               _nsrem;
+                /// Used for calculating the free energy
                 Real                 _logZ;
 
-
             public:
+            /// \name Constructors/destructors
+            //@{
+                /// Default constructor
                 TreeEPSubTree() : _Qa(), _Qb(), _RTree(), _a(), _b(), _I(NULL), _ns(), _nsrem(), _logZ(0.0) {}
-                TreeEPSubTree( const TreeEPSubTree &x) : _Qa(x._Qa), _Qb(x._Qb), _RTree(x._RTree), _a(x._a), _b(x._b), _I(x._I), _ns(x._ns), _nsrem(x._nsrem), _logZ(x._logZ) {}
+
+                /// Copy constructor
+                TreeEPSubTree( const TreeEPSubTree &x ) : _Qa(x._Qa), _Qb(x._Qb), _RTree(x._RTree), _a(x._a), _b(x._b), _I(x._I), _ns(x._ns), _nsrem(x._nsrem), _logZ(x._logZ) {}
+
+                /// Assignment operator
                 TreeEPSubTree & operator=( const TreeEPSubTree& x ) {
                     if( this != &x ) {
                         _Qa         = x._Qa;
@@ -105,11 +122,23 @@ class TreeEP : public JTree {
                     return *this;
                 }
 
+                /// Construct from super tree
                 TreeEPSubTree( const RootedTree &subRTree, const RootedTree &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I );
+            //@}
+
+                /// Initializes beliefs of this subtree
                 void init();
+
+                /// Inverts this approximation and multiplies it by the (super) junction tree marginals \a Qa and \a Qb
                 void InvertAndMultiply( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb );
+
+                /// Runs junction tree algorithm (including off-tree factor I) storing the results in the (super) junction tree \a Qa and \a Qb
                 void HUGIN_with_I( std::vector<Factor> &Qa, std::vector<Factor> &Qb );
+
+                /// Returns energy (?) of this subtree
                 Real logZ( const std::vector<Factor> &Qa, const std::vector<Factor> &Qb ) const;
+
+                /// Returns constant reference to the pointer to the off-tree factor
                 const Factor *& I() { return _I; }
         };
 

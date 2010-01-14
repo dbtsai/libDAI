@@ -457,13 +457,15 @@ void MR::solveM() {
 }
 
 
-void MR::init_cor() {
+Real MR::init_cor() {
+    Real md = 0.0;
     for( size_t i = 0; i < nrVars(); i++ ) {
         vector<Factor> pairq;
         if( props.inits == Properties::InitType::CLAMPING ) {
             BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", (Real)1.0e-9)("maxiter", (size_t)10000)("verbose", (size_t)0)("logdomain", false));
             bpcav.makeCavity( i );
             pairq = calcPairBeliefs( bpcav, delta(i), false, true );
+            md = std::max( md, bpcav.maxDiff() );
         } else if( props.inits == Properties::InitType::EXACT ) {
             JTree jtcav(*this, PropertySet()("updates", string("HUGIN"))("verbose", (size_t)0) );
             jtcav.makeCavity( i );
@@ -482,6 +484,7 @@ void MR::init_cor() {
                 }
         }
     }
+    return md;
 }
 
 
@@ -516,10 +519,16 @@ Real MR::run() {
             Real md = init_cor_resp();
             if( md > _maxdiff )
                 _maxdiff = md;
-        } else if( props.inits == Properties::InitType::EXACT )
-            init_cor(); // FIXME no MaxDiff() calculation
-        else if( props.inits == Properties::InitType::CLAMPING )
-            init_cor(); // FIXME no MaxDiff() calculation
+        } else if( props.inits == Properties::InitType::EXACT ) {
+            Real md = init_cor();
+            if( md > _maxdiff )
+                _maxdiff = md;
+        }
+        else if( props.inits == Properties::InitType::CLAMPING ) {
+            Real md = init_cor();
+            if( md > _maxdiff )
+                _maxdiff = md;
+        }
 
         solvemcav();
 
@@ -529,7 +538,7 @@ Real MR::run() {
         if( props.verbose >= 1 )
             cerr << Name << " needed " << toc() - tic << " seconds." << endl;
 
-        return 0.0;
+        return _maxdiff;
     } else
         return 1.0;
 }

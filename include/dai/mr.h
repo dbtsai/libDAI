@@ -142,7 +142,7 @@ class MR : public DAIAlgFG {
         void makekindex();
         
         /// Initialize cors
-        void init_cor();
+        Real init_cor();
         
         /// Calculate cors using response propagation
         Real init_cor_resp();

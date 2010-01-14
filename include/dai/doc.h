@@ -22,9 +22,9 @@
  *
  *  \todo Add FAQ
  *
- *  \todo Adapt (part of the) guidelines in http://www.boost.org/development/requirements.html#Design_and_Programming
+ *  \idea Adapt (part of the) guidelines in http://www.boost.org/development/requirements.html#Design_and_Programming
  *
- *  \todo Use "gcc -MM" to generate dependencies for targets: http://make.paulandlesley.org/autodep.html
+ *  \idea Use "gcc -MM" to generate dependencies for targets: http://make.paulandlesley.org/autodep.html
  *
  *  \todo Replace VarSets by SmallSet<size_t> where appropriate, in order to minimize the use of FactorGraph::findVar().
  *

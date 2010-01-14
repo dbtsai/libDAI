@@ -9,7 +9,8 @@
 
 
 /// \file
-/// \brief  Defines class BBP, which implements Back-Belief-Propagation
+/// \brief Defines class BBP, which implements Back-Belief-Propagation
+/// \todo Clean up code
 
 
 #ifndef ___defined_libdai_bbp_h
