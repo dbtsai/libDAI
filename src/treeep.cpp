@@ -36,11 +36,6 @@ void TreeEP::setProperties( const PropertySet &opts ) {
     props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.verbose = opts.getStringAs<size_t>("verbose");
     props.type = opts.getStringAs<Properties::TypeType>("type");
-
-    if( opts.hasKey("optimize") )
-        props.optimize = opts.getStringAs<bool>("optimize");
-    else
-        props.optimize = false;
 }
 
 
@@ -50,7 +45,6 @@ PropertySet TreeEP::getProperties() const {
     opts.Set( "maxiter", props.maxiter );
     opts.Set( "verbose", props.verbose );
     opts.Set( "type", props.type );
-    opts.Set( "optimize", props.optimize );
     return opts;
 }
 
@@ -61,8 +55,7 @@ string TreeEP::printProperties() const {
     s << "tol=" << props.tol << ",";
     s << "maxiter=" << props.maxiter << ",";
     s << "verbose=" << props.verbose << ",";
-    s << "type=" << props.type << ",";
-    s << "optimize=" << props.optimize << "]";
+    s << "type=" << props.type << "]";
     return s.str();
 }
 
@@ -132,6 +125,11 @@ void TreeEP::construct( const RootedTree &tree ) {
     // factor as off-tree.
     JTree::construct( cl, false );
 
+    if( props.verbose >= 1 )
+        cerr << "TreeEP::construct: The tree has size " << JTree::RTree.size() << endl;
+    if( props.verbose >= 3 )
+        cerr << "  it is " << JTree::RTree << " with cliques " << cl << endl;
+
     // Create factor approximations
     _Q.clear();
     size_t PreviousRoot = (size_t)-1;
@@ -143,10 +141,11 @@ void TreeEP::construct( const RootedTree &tree ) {
                 RootedTree subTree;
                 size_t subTreeSize = findEfficientTree( factor(I).vars(), subTree, PreviousRoot );
                 PreviousRoot = subTree[0].n1;
-                if( props.optimize ) {
-                    subTree.resize( subTreeSize );  // FIXME
-                    cerr << "subtree " << I << " has size " << subTreeSize << endl;
-                }
+                subTree.resize( subTreeSize );
+                if( props.verbose >= 1 )
+                    cerr << "Subtree " << I << " has size " << subTreeSize << endl;
+                if( props.verbose >= 3 )
+                    cerr << "  it is " << subTree << endl;
                 _Q[I] = TreeEPSubTree( subTree, RTree, Qa, Qb, &factor(I) );
                 if( repeats == 1 )
                     break;

@@ -66,9 +66,6 @@ class TreeEP : public JTree {
 
             /// How to choose the tree
             TypeType type;
-
-            /// Optimize within-loop propagation? (currently buggy, so disabled by default)
-            bool optimize;
         } props;
 
         /// Name of this inference method

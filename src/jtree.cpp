@@ -361,26 +361,21 @@ size_t JTree::findEfficientTree( const VarSet& vs, RootedTree &Tree, size_t Prev
     RootedTree newTree( Graph( RTree.begin(), RTree.end() ), maxalpha );
 
     // identify subtree that contains all variables of vs which are not in the new root
-    VarSet vsrem = vs / OR(maxalpha).vars();
     set<DEdge> subTree;
-    // for each variable in vs that is not in the root clique
-    for( VarSet::const_iterator n = vsrem.begin(); n != vsrem.end(); n++ ) {
-        // find first occurence of *n in the tree, which is closest to the root
-        size_t e = 0;
-        for( ; e != newTree.size(); e++ ) {
-            if( OR(newTree[e].n2).vars().contains( *n ) )
-                break;
-        }
-        DAI_ASSERT( e != newTree.size() );
-
-        // track-back path to root and add edges to subTree
-        subTree.insert( newTree[e] );
-        size_t pos = newTree[e].n1;
-        for( ; e > 0; e-- )
-            if( newTree[e-1].n2 == pos ) {
-                subTree.insert( newTree[e-1] );
-                pos = newTree[e-1].n1;
+    // for each variable in vs
+    for( VarSet::const_iterator n = vs.begin(); n != vs.end(); n++ ) {
+        for( size_t e = 0; e < newTree.size(); e++ ) {
+            if( OR(newTree[e].n2).vars().contains( *n ) ) {
+                size_t f = e;
+                subTree.insert( newTree[f] );
+                size_t pos = newTree[f].n1;
+                for( ; f > 0; f-- )
+                    if( newTree[f-1].n2 == pos ) {
+                        subTree.insert( newTree[f-1] );
+                        pos = newTree[f-1].n1;
+                    }
             }
+        }
     }
     if( PreviousRoot != (size_t)-1 && PreviousRoot != maxalpha) {
         // find first occurence of PreviousRoot in the tree, which is closest to the new root
