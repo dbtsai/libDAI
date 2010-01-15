@@ -4,15 +4,15 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
  */
 
 
 /// \file
 /// \brief Defines class TreeEP, which implements Tree Expectation Propagation
-/// \todo Clean up the TreeEP code (by making JTree more powerful, e.g., by
-/// adding Pearl's cutset algorithm and propagation with an arbitrary root)
+/// \todo Clean up the TreeEP code (exploiting that a large part of the code
+/// is just a special case of JTree).
 
 
 #ifndef __defined_libdai_treeep_h
@@ -72,7 +72,11 @@ class TreeEP : public JTree {
         static const char *Name;
 
     private:
-        /// Stores the data structures needed to efficiently update the approximation of an off-tree factor
+        /// Stores the data structures needed to efficiently update the approximation of an off-tree factor.
+        /** The TreeEP object stores a TreeEPSubTree object for each off-tree factor.
+         *  It stores the approximation of that off-tree factor, which is represented 
+         *  as a distribution on a subtree of the main tree.
+         */
         class TreeEPSubTree {
             private:
                 /// Outer region pseudomarginals (corresponding with the \f$\tilde f_i(x_j,x_k)\f$ in [\ref MiQ04])
@@ -119,7 +123,7 @@ class TreeEP : public JTree {
                     return *this;
                 }
 
-                /// Construct from super tree
+                /// Construct from \a subRTree, which is a subtree of the main tree \a jt_RTree, with distribution represented by \a jt_Qa and \a jt_Qb, for off-tree factor \a I
                 TreeEPSubTree( const RootedTree &subRTree, const RootedTree &jt_RTree, const std::vector<Factor> &jt_Qa, const std::vector<Factor> &jt_Qb, const Factor *I );
             //@}
 
@@ -190,7 +194,6 @@ class TreeEP : public JTree {
         virtual PropertySet getProperties() const;
         virtual std::string printProperties() const;
     //@}
-
 
     private:
         /// Helper function for constructors

@@ -85,4 +85,75 @@ InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg 
 }
 
 
+std::pair<std::string, PropertySet> parseNameProperties( const std::string &s ) {
+    string::size_type pos = s.find_first_of('[');
+    string name;
+    PropertySet opts;
+    if( pos == string::npos ) {
+        name = s;
+    } else {
+        name = s.substr(0,pos);
+
+        stringstream ss;
+        ss << s.substr(pos,s.length());
+        ss >> opts;
+    }
+    return make_pair(name,opts);
+}
+
+
+std::pair<std::string, PropertySet> parseNameProperties( const std::string &s, const std::map<std::string,std::string> &aliases ) {
+    // break string into method[properties]
+    pair<string,PropertySet> ps = parseNameProperties(s);
+    bool looped = false;
+
+    // as long as 'method' is an alias, update:
+    while( aliases.find(ps.first) != aliases.end() && !looped ) {
+        string astr = aliases.find(ps.first)->second;
+        pair<string,PropertySet> aps = parseNameProperties(astr);
+        if( aps.first == ps.first )
+            looped = true;
+        // override aps properties by ps properties
+        aps.second.Set( ps.second );
+        // replace ps by aps
+        ps = aps;
+        // repeat until method name == alias name ('looped'), or
+        // there is no longer an alias 'method'
+    }
+
+    return ps;
+}
+
+
+std::map<std::string,std::string> readAliasesFile( const std::string &filename ) {
+    // Read aliases
+    map<string,string> result;
+    ifstream infile;
+    infile.open( filename.c_str() );
+    if( infile.is_open() ) {
+        while( true ) {
+            string line;
+            getline( infile,line );
+            if( infile.fail() )
+                break;
+            if( (!line.empty()) && (line[0] != '#') ) {
+                string::size_type pos = line.find(':',0);
+                if( pos == string::npos )
+                    DAI_THROWE(INVALID_ALIAS,"Invalid alias '" + line + "'");
+                else {
+                    string::size_type posl = line.substr(0, pos).find_last_not_of(" \t");
+                    string key = line.substr(0, posl + 1);
+                    string::size_type posr = line.substr(pos + 1, line.length()).find_first_not_of(" \t");
+                    string val = line.substr(pos + 1 + posr, line.length());
+                    result[key] = val;
+                }
+            }
+        }
+        infile.close();
+    } else
+        DAI_THROWE(CANNOT_READ_FILE,"Error opening aliases file " + filename);
+    return result;
+}
+
+
 } // end of namespace dai

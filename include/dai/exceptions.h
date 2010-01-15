@@ -87,6 +87,7 @@ class Exception : public std::runtime_error {
                    UNKNOWN_PROPERTY,
                    MALFORMED_PROPERTY,
                    NOT_ALL_PROPERTIES_SPECIFIED,
+                   INVALID_ALIAS,
                    CANNOT_READ_FILE,
                    CANNOT_WRITE_FILE,
                    INVALID_FACTORGRAPH_FILE,

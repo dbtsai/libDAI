@@ -28,6 +28,7 @@ namespace dai {
         "Unknown Property",
         "Malformed Property",
         "Not all mandatory Properties specified",
+        "Invalid alias",
         "Cannot read file",
         "Cannot write file",
         "Invalid FactorGraph file",

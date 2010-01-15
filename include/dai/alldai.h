@@ -11,6 +11,7 @@
 
 /// \file
 /// \brief Main libDAI header file. It \#includes all other libDAI headers.
+/// \todo Update documentation about aliases (add a section to the fileformats)
 
 
 #ifndef __defined_libdai_alldai_h
@@ -74,9 +75,25 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
  *  \param fg The FactorGraph that the algorithm should be applied to.
  *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
  *  \throw UNKNOWN_DAI_ALGORITHM if the requested name is not known/compiled in.
- *  \todo Support aliases like in testdai.cpp
+ *  \todo Allow alias substitution
  */
 InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg );
+
+
+/// Extracts the name and property set from a string \a s in the format "name[key1=val1,key2=val2,...]" or "name"
+std::pair<std::string, PropertySet> parseNameProperties( const std::string &s );
+
+
+/// Extracts the name and property set from a string \a s in the format "name[key1=val1,key2=val2,...]" or "name", performing alias substitution
+/** Alias substitution is performed as follows: as long as name appears as a key in \a aliases,
+ *  it is substituted by its value. Properties in \a s override those of the alias (in case of
+ *  recursion, the "outer" properties override those of the "inner" aliases).
+ */
+std::pair<std::string, PropertySet> parseNameProperties( const std::string &s, const std::map<std::string,std::string> &aliases );
+
+
+/// Reads aliases from file named \a filename
+std::map<std::string,std::string> readAliasesFile( const std::string &filename );
 
 
 /// Contains the names of all inference algorithms compiled into libDAI.

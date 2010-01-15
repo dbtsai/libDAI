@@ -143,54 +143,6 @@ class TestDAI {
 };
 
 
-pair<string, PropertySet> parseMethodRaw( const string &s ) {
-    string::size_type pos = s.find_first_of('[');
-    string name;
-    PropertySet opts;
-    if( pos == string::npos ) {
-        name = s;
-    } else {
-        name = s.substr(0,pos);
-
-        stringstream ss;
-        ss << s.substr(pos,s.length());
-        ss >> opts;
-    }
-    return make_pair(name,opts);
-}
-
-
-pair<string, PropertySet> parseMethod( const string &_s, const map<string,string> & aliases ) {
-    // break string into method[properties]
-    pair<string,PropertySet> ps = parseMethodRaw(_s);
-    bool looped = false;
-
-    // as long as 'method' is an alias, update:
-    while( aliases.find(ps.first) != aliases.end() && !looped ) {
-        string astr = aliases.find(ps.first)->second;
-        pair<string,PropertySet> aps = parseMethodRaw(astr);
-        if( aps.first == ps.first )
-            looped = true;
-        // override aps properties by ps properties
-        aps.second.Set( ps.second );
-        // replace ps by aps
-        ps = aps;
-        // repeat until method name == alias name ('looped'), or
-        // there is no longer an alias 'method'
-    }
-
-    // check whether name is valid
-    size_t n = 0;
-    for( ; strlen( DAINames[n] ) != 0; n++ )
-        if( ps.first == DAINames[n] )
-            break;
-    if( strlen( DAINames[n] ) == 0 && (ps.first != "LDPC") )
-        DAI_THROWE(UNKNOWN_DAI_ALGORITHM,string("Unknown DAI algorithm \"") + ps.first + string("\" in \"") + _s + string("\""));
-
-    return ps;
-}
-
-
 Real clipReal( Real x, Real minabs ) {
     if( abs(x) < minabs )
         return minabs;
@@ -253,32 +205,8 @@ int main( int argc, char *argv[] ) {
     try {
         // Read aliases
         map<string,string> Aliases;
-        if( !aliases.empty() ) {
-            ifstream infile;
-            infile.open (aliases.c_str());
-            if (infile.is_open()) {
-                while( true ) {
-                    string line;
-                    getline(infile,line);
-                    if( infile.fail() )
-                        break;
-                    if( (!line.empty()) && (line[0] != '#') ) {
-                        string::size_type pos = line.find(':',0);
-                        if( pos == string::npos )
-                            DAI_THROWE(RUNTIME_ERROR,"Invalid alias");
-                        else {
-                            string::size_type posl = line.substr(0, pos).find_last_not_of(" \t");
-                            string key = line.substr(0, posl + 1);
-                            string::size_type posr = line.substr(pos + 1, line.length()).find_first_not_of(" \t");
-                            string val = line.substr(pos + 1 + posr, line.length());
-                            Aliases[key] = val;
-                        }
-                    }
-                }
-                infile.close();
-            } else
-                DAI_THROWE(RUNTIME_ERROR,"Error opening aliases file");
-        }
+        if( !aliases.empty() )
+            Aliases = readAliasesFile( aliases );
 
         FactorGraph fg;
         fg.ReadFromFile( filename.c_str() );
@@ -303,7 +231,16 @@ int main( int argc, char *argv[] ) {
         cout << endl;
 
         for( size_t m = 0; m < methods.size(); m++ ) {
-            pair<string, PropertySet> meth = parseMethod( methods[m], Aliases );
+            // parse method
+            pair<string, PropertySet> meth = parseNameProperties( methods[m], Aliases );
+
+            // check whether name is valid
+            size_t n = 0;
+            for( ; strlen( DAINames[n] ) != 0; n++ )
+                if( meth.first == DAINames[n] )
+                    break;
+            if( strlen( DAINames[n] ) == 0 )
+                DAI_THROWE(UNKNOWN_DAI_ALGORITHM,string("Unknown DAI algorithm \"") + meth.first + string("\" in \"") + methods[m] + string("\""));
 
             if( vm.count("tol") )
                 meth.second.Set("tol",tol);
