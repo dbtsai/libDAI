@@ -11,7 +11,6 @@
 
 /// \file
 /// \brief Main libDAI header file. It \#includes all other libDAI headers.
-/// \todo Update documentation about aliases (add a section to the fileformats)
 
 
 #ifndef __defined_libdai_alldai_h
@@ -75,9 +74,16 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
  *  \param fg The FactorGraph that the algorithm should be applied to.
  *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
  *  \throw UNKNOWN_DAI_ALGORITHM if the requested name is not known/compiled in.
- *  \todo Allow alias substitution
  */
 InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg );
+
+
+/// Constructs a new inference algorithm.
+/** \param aliases Maps names to strings in the format "name[key1=val1,key2=val2,...,keyn=valn]"; if not empty, alias substitution
+ *  will be performed when parsing \a nameOpts by invoking parseNameProperties(const std::string &,const std::map<std::string,std::string> &)
+ *  \see newInfAlgFromString(const std::string &, const FactorGraph &)
+ */
+InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg, const std::map<std::string,std::string> &aliases );
 
 
 /// Extracts the name and property set from a string \a s in the format "name[key1=val1,key2=val2,...]" or "name"
@@ -93,6 +99,10 @@ std::pair<std::string, PropertySet> parseNameProperties( const std::string &s, c
 
 
 /// Reads aliases from file named \a filename
+/** \param filename Name of the alias file
+ *  \return A map that maps aliases to the strings they should be substituted with.
+ *  \see \ref fileformats-aliases
+ */
 std::map<std::string,std::string> readAliasesFile( const std::string &filename );
 
 

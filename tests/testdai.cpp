@@ -208,6 +208,7 @@ int main( int argc, char *argv[] ) {
         if( !aliases.empty() )
             Aliases = readAliasesFile( aliases );
 
+        // Read factor graph
         FactorGraph fg;
         fg.ReadFromFile( filename.c_str() );
 

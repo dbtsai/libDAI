@@ -69,19 +69,14 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
 
 
 InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg ) {
-    string::size_type pos = nameOpts.find_first_of('[');
-    string name;
-    PropertySet opts;
-    if( pos == string::npos ) {
-        name = nameOpts;
-    } else {
-        name = nameOpts.substr(0,pos);
+    pair<string,PropertySet> no = parseNameProperties( nameOpts );
+    return newInfAlg( no.first, fg, no.second );
+}
 
-        stringstream ss;
-        ss << nameOpts.substr(pos,nameOpts.length());
-        ss >> opts;
-    }
-    return newInfAlg(name,fg,opts);
+
+InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg, const std::map<std::string,std::string> &aliases ) {
+    pair<string,PropertySet> no = parseNameProperties( nameOpts, aliases );
+    return newInfAlg( no.first, fg, no.second );
 }
 
 

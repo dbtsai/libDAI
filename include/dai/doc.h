@@ -645,6 +645,25 @@
  *  variables) share parameters in parameter learning using EM. This convention
  *  is similar to the convention used in factor blocks in a factor graph .fg 
  *  file (see \ref fileformats-factorgraph-factor).
+ *
+ *  \section fileformats-aliases Aliases file format
+ *
+ *  An aliases file is basically a list of "macros" and the strings that they
+ *  should be substituted with.
+ *  
+ *  Each line of the aliases file can be either empty, contain a comment 
+ *  (if the first character is a '#') or contain an alias. In the latter case, 
+ *  the line should contain a colon; the part before the colon contains the 
+ *  name of the alias, the part after the colon the string that it should be 
+ *  substituted with. Any whitespace before and after the colon is ignored.
+ *
+ *  For example, the following line would define the alias \c BP_SEQFIX
+ *  as a shorthand for "BP[updates=SEQFIX,tol=1e-9,maxiter=10000,logdomain=0]":
+ *  <pre>
+ *  BP_SEQFIX:  BP[updates=SEQFIX,tol=1e-9,maxiter=10000,logdomain=0]
+ *  </pre>
+ *
+ *  Aliases files can be used to store default options for algorithms.
  */
 
 /** \page bibliography Bibliography
