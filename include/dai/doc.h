@@ -20,7 +20,7 @@
  *
  *  \todo Document tests and utils
  *
- *  \todo Add FAQ
+ *  \todo Implement routines for UAI probabilistic inference evaluation data
  *
  *  \idea Adapt (part of the) guidelines in http://www.boost.org/development/requirements.html#Design_and_Programming
  *
@@ -740,6 +740,11 @@
  *  "Divergence measures and message passing",
  *  <em>MicroSoft Research Technical Report</em> MSR-TR-2005-173,
  *  http://research.microsoft.com/en-us/um/people/minka/papers/message-passing/minka-divergence.pdf
+ *
+ *  \anchor KoF09 \ref KoF09
+ *  D. Koller and N. Friedman (2009):
+ *  <em>Probabilistic Graphical Models - Principles and Techniques</em>,
+ *  The MIT Press, Cambridge, Massachusetts, London, England.
  */
 
 
