@@ -46,7 +46,7 @@ class JTree : public DAIAlgRG {
         /// Stores the messages
         std::vector<std::vector<Factor> >  _mes;
 
-        /// Stores the logarithm of the partition sum (not used - why not?)
+        /// Stores the logarithm of the partition sum
         Real _logZ;
 
     public:
@@ -75,6 +75,18 @@ class JTree : public DAIAlgRG {
              */
             DAI_ENUM(InfType,SUMPROD,MAXPROD);
 
+            /// Enumeration of elimination cost functions used for constructing the junction tree
+            /** The cost of eliminating a variable can be (\see [\ref KoF09], page 314)):
+             *  - MINNEIGHBORS the number of neighbors it has in the current adjacency graph;
+             *  - MINWEIGHT the product of the number of states of all neighbors in the current adjacency graph;
+             *  - MINFILL the number of edges that need to be added to the adjacency graph due to the elimination;
+             *  - WEIGHTEDMINFILL the sum of weights of the edges that need to be added to the adjacency graph
+             *    due to the elimination, where a weight of an edge is the produt of weights of its constituent
+             *    vertices.
+             *  The elimination sequence is chosen greedily in order to minimize the cost.
+             */
+            DAI_ENUM(HeuristicType,MINNEIGHBORS,MINWEIGHT,MINFILL,WEIGHTEDMINFILL);
+
             /// Verbosity (amount of output sent to stderr)
             size_t verbose;
 
@@ -83,6 +95,9 @@ class JTree : public DAIAlgRG {
 
             /// Type of inference
             InfType inference;
+
+            /// Heuristic to use for constructing the junction tree
+            HeuristicType heuristic;
         } props;
 
         /// Name of this inference algorithm
@@ -97,7 +112,7 @@ class JTree : public DAIAlgRG {
         /// Construct from FactorGraph \a fg and PropertySet \a opts
         /** \param fg factor graph (which has to be connected);
          ** \param opts Parameters @see Properties
-         *  \param automatic if \c true, construct the junction tree automatically, using the MinFill heuristic.
+         *  \param automatic if \c true, construct the junction tree automatically, using the heuristic in opts['heuristic'].
          *  \throw FACTORGRAPH_NOT_CONNECTED if \a fg is not connected
          */
         JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic=true );
@@ -183,11 +198,11 @@ class JTree : public DAIAlgRG {
 };
 
 
-/// Calculates upper bound to the treewidth of a FactorGraph, using the MinFill heuristic
+/// Calculates upper bound to the treewidth of a FactorGraph, using the specified heuristic
 /** \relates JTree
  *  \return a pair (number of variables in largest clique, number of states in largest clique)
  */
-std::pair<size_t,size_t> boundTreewidth( const FactorGraph & fg );
+std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn );
 
 
 } // end of namespace dai

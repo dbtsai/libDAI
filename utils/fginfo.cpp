@@ -93,9 +93,15 @@ int main( int argc, char *argv[] ) {
         cout << "Binary variables?      " << fg.isBinary() << endl;
         cout << "Pairwise interactions? " << fg.isPairwise() << endl;
         if( calc_tw ) {
-            std::pair<size_t,size_t> tw = boundTreewidth(fg);
-            cout << "Treewidth:           " << tw.first << endl;
-            cout << "Largest cluster for JTree has " << tw.second << " states " << endl;
+            std::pair<size_t,size_t> tw;
+            tw = boundTreewidth(fg, &eliminationCost_MinNeighbors);
+            cout << "Treewidth (MinNeighbors):     " << tw.first << " (" << tw.second << " states)" << endl;
+            tw = boundTreewidth(fg, &eliminationCost_MinWeight);
+            cout << "Treewidth (MinWeight):        " << tw.first << " (" << tw.second << " states)" << endl;
+            tw = boundTreewidth(fg, &eliminationCost_MinFill);
+            cout << "Treewidth (MinFill):          " << tw.first << " (" << tw.second << " states)" << endl;
+            tw = boundTreewidth(fg, &eliminationCost_WeightedMinFill);
+            cout << "Treewidth (WeightedMinFill):  " << tw.first << " (" << tw.second << " states)" << endl;
         }
         long double stsp = 1.0;
         for( size_t i = 0; i < fg.nrVars(); i++ )

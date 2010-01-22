@@ -133,8 +133,11 @@ class VarSet : public SmallSet<Var> {
          */
         size_t nrStates() const {
             size_t states = 1;
-            for( VarSet::const_iterator n = begin(); n != end(); n++ )
-                states *= n->states();
+            for( VarSet::const_iterator n = begin(); n != end(); n++ ) {
+                size_t newStates = states * n->states();
+                DAI_ASSERT( newStates >= states );
+                states = newStates;
+            }
             return states;
         }
     //@}

@@ -33,6 +33,10 @@ void JTree::setProperties( const PropertySet &opts ) {
         props.inference = opts.getStringAs<Properties::InfType>("inference");
     else
         props.inference = Properties::InfType::SUMPROD;
+    if( opts.hasKey("heuristic") )
+        props.heuristic = opts.getStringAs<Properties::HeuristicType>("heuristic");
+    else
+        props.heuristic = Properties::HeuristicType::MINFILL;
 }
 
 
@@ -41,6 +45,7 @@ PropertySet JTree::getProperties() const {
     opts.Set( "verbose", props.verbose );
     opts.Set( "updates", props.updates );
     opts.Set( "inference", props.inference );
+    opts.Set( "heuristic", props.heuristic );
     return opts;
 }
 
@@ -50,6 +55,7 @@ string JTree::printProperties() const {
     s << "[";
     s << "verbose=" << props.verbose << ",";
     s << "updates=" << props.updates << ",";
+    s << "heuristic=" << props.heuristic << ",";
     s << "inference=" << props.inference << "]";
     return s.str();
 }
@@ -77,8 +83,25 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
         if( props.verbose >= 3 )
             cerr << "Maximal clusters: " << _cg << endl;
 
-        // Use MinFill heuristic to guess optimal elimination sequence
-        vector<VarSet> ElimVec = _cg.VarElim( eliminationChoice_MinFill ).eraseNonMaximal().toVector();
+        // Use heuristic to guess optimal elimination sequence
+        greedyVariableElimination::eliminationCostFunction ec(NULL);
+        switch( (size_t)props.heuristic ) {
+            case Properties::HeuristicType::MINNEIGHBORS:
+                ec = eliminationCost_MinNeighbors;
+                break;
+            case Properties::HeuristicType::MINWEIGHT:
+                ec = eliminationCost_MinWeight;
+                break;
+            case Properties::HeuristicType::MINFILL:
+                ec = eliminationCost_MinFill;
+                break;
+            case Properties::HeuristicType::WEIGHTEDMINFILL:
+                ec = eliminationCost_WeightedMinFill;
+                break;
+            default:
+                DAI_THROW(UNKNOWN_ENUM_VALUE);
+        }
+        vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( ec ) ).eraseNonMaximal().toVector();
         if( props.verbose >= 3 )
             cerr << "VarElim result: " << ElimVec << endl;
 
@@ -497,7 +520,7 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
 }
 
 
-std::pair<size_t,size_t> boundTreewidth( const FactorGraph & fg ) {
+std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn ) {
     ClusterGraph _cg;
 
     // Copy factors
@@ -508,11 +531,11 @@ std::pair<size_t,size_t> boundTreewidth( const FactorGraph & fg ) {
     _cg.eraseNonMaximal();
 
     // Obtain elimination sequence
-    vector<VarSet> ElimVec = _cg.VarElim( eliminationChoice_MinFill ).eraseNonMaximal().toVector();
+    vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( fn ) ).eraseNonMaximal().toVector();
 
     // Calculate treewidth
     size_t treewidth = 0;
-    size_t nrstates = 0;
+    double nrstates = 0.0;
     for( size_t i = 0; i < ElimVec.size(); i++ ) {
         if( ElimVec[i].size() > treewidth )
             treewidth = ElimVec[i].size();
@@ -521,13 +544,7 @@ std::pair<size_t,size_t> boundTreewidth( const FactorGraph & fg ) {
             nrstates = s;
     }
 
-    return pair<size_t,size_t>(treewidth, nrstates);
-}
-
-
-std::pair<size_t,size_t> treewidth( const FactorGraph & fg )
-{
-    return boundTreewidth( fg );
+    return make_pair(treewidth, nrstates);
 }
 
 

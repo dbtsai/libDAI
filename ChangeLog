@@ -1,3 +1,5 @@
+* Implemented various heuristics for choosing a variable elimination sequence 
+  in JTree
 * Added BETHE method for GBP/HAK cluster choice
 * Renamed some functions of BipartiteGraph:
     add1() -> addNode1()
