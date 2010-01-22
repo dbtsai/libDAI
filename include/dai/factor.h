@@ -198,6 +198,8 @@ template <typename T> class TFactor {
         }
 
         /// Returns normalized copy of \c *this, using the specified norm
+        /** \throw NOT_NORMALIZABLE if the norm is zero
+         */
         TFactor<T> normalized( typename TProb<T>::NormType norm=TProb<T>::NORMPROB ) const {
             TFactor<T> x;
             x._vs = _vs;
@@ -215,6 +217,8 @@ template <typename T> class TFactor {
         TFactor<T>& setUniform () { _p.setUniform(); return *this; }
 
         /// Normalizes factor using the specified norm
+        /** \throw NOT_NORMALIZABLE if the norm is zero
+         */
         T normalize( typename TProb<T>::NormType norm=TProb<T>::NORMPROB ) { return _p.normalize( norm ); }
     //@}
 

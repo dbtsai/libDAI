@@ -32,6 +32,10 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
     if( name == FBP::Name )
         return new FBP (fg, opts);
 #endif
+#ifdef DAI_WITH_TRWBP
+    if( name == TRWBP::Name )
+        return new TRWBP (fg, opts);
+#endif
 #ifdef DAI_WITH_MF
     if( name == MF::Name )
         return new MF (fg, opts);

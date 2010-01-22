@@ -73,15 +73,13 @@ void FBP::calcNewMessage( size_t i, size_t _I ) {
                         prod_j += message( j, J.iter );
                     else
                         prod_j *= message( j, J.iter );
+                } else {
+                    // FBP: multiply by m_Ij^(1-1/c_I)
+                    if( props.logdomain )
+                        prod_j += message( j, J.iter )*(1-1/scale);
+                    else
+                        prod_j *= message( j, J.iter )^(1-1/scale);
                 }
-
-
-            size_t _I = j.dual;
-            // FBP: now multiply by m_Ij^(1-1/c_I)
-            if(props.logdomain)
-                prod_j += message( j, _I)*(1-1/scale);
-            else
-                prod_j *= message( j, _I)^(1-1/scale);
 
             // multiply prod with prod_j
             if( !DAI_FBP_FAST ) {
@@ -168,15 +166,13 @@ void FBP::calcBeliefF( size_t I, Prob &p ) const {
                     prod_j += newMessage( j, J.iter );
                 else
                     prod_j *= newMessage( j, J.iter );
+            } else {
+                // FBP: multiply by m_Ij^(1-1/c_I)
+                if( props.logdomain )
+                    prod_j += newMessage( j, J.iter)*(1-1/scale);
+                else
+                    prod_j *= newMessage( j, J.iter)^(1-1/scale);
             }
-
-        size_t _I = j.dual;
-
-        // FBP: now multiply by m_Ij^(1-1/c_I)
-        if( props.logdomain )
-            prod_j += newMessage( j, _I)*(1-1/scale);
-        else
-            prod_j *= newMessage( j, _I)^(1-1/scale);
 
         // multiply prod with prod_j
         if( !DAI_FBP_FAST ) {

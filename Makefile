@@ -60,6 +60,10 @@ ifdef WITH_FBP
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_FBP
   OBJECTS:=$(OBJECTS) fbp$(OE)
 endif
+ifdef WITH_TRWBP
+  CCFLAGS:=$(CCFLAGS) -DDAI_WITH_TRWBP
+  OBJECTS:=$(OBJECTS) trwbp$(OE)
+endif
 ifdef WITH_MF
   CCFLAGS:=$(CCFLAGS) -DDAI_WITH_MF
   OBJECTS:=$(OBJECTS) mf$(OE)
@@ -142,6 +146,9 @@ bp$(OE) : $(SRC)/bp.cpp $(INC)/bp.h $(HEADERS)
 
 fbp$(OE) : $(SRC)/fbp.cpp $(INC)/fbp.h $(HEADERS)
 	$(CC) -c $(SRC)/fbp.cpp
+
+trwbp$(OE) : $(SRC)/trwbp.cpp $(INC)/trwbp.h $(HEADERS)
+	$(CC) -c $(SRC)/trwbp.cpp
 
 bp_dual$(OE) : $(SRC)/bp_dual.cpp $(INC)/bp_dual.h $(HEADERS)
 	$(CC) -c $(SRC)/bp_dual.cpp

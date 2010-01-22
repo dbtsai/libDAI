@@ -648,79 +648,83 @@
  */
 
 /** \page bibliography Bibliography
- *  \anchor KFL01 \ref KFL01
- *  F. R. Kschischang and B. J. Frey and H.-A. Loeliger (2001):
- *  "Factor Graphs and the Sum-Product Algorithm",
- *  <em>IEEE Transactions on Information Theory</em> 47(2):498-519.
- *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=910572
- *
- *  \anchor MiQ04 \ref MiQ04
- *  T. Minka and Y. Qi (2004):
- *  "Tree-structured Approximations by Expectation Propagation",
- *  <em>Advances in Neural Information Processing Systems</em> (NIPS) 16.
- *  http://books.nips.cc/papers/files/nips16/NIPS2003_AA25.pdf
- *
- *  \anchor MoR05 \ref MoR05
- *  A. Montanari and T. Rizzo (2005):
- *  "How to Compute Loop Corrections to the Bethe Approximation",
- *  <em>Journal of Statistical Mechanics: Theory and Experiment</em>
- *  2005(10)-P10011.
- *  http://stacks.iop.org/1742-5468/2005/P10011
- *
- *  \anchor YFW05 \ref YFW05
- *  J. S. Yedidia and W. T. Freeman and Y. Weiss (2005):
- *  "Constructing Free-Energy Approximations and Generalized Belief Propagation Algorithms",
- *  <em>IEEE Transactions on Information Theory</em>
- *  51(7):2282-2312.
- *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=1459044
- *
- *  \anchor HAK03 \ref HAK03
- *  T. Heskes and C. A. Albers and H. J. Kappen (2003):
- *  "Approximate Inference and Constrained Optimization",
- *  <em>Proceedings of the 19th Annual Conference on Uncertainty in Artificial Intelligence (UAI-03)</em> pp. 313-320.
- *  http://www.snn.ru.nl/reports/Heskes.uai2003.ps.gz
- *
- *  \anchor MoK07 \ref MoK07
- *  J. M. Mooij and H. J. Kappen (2007):
- *  "Loop Corrections for Approximate Inference on Factor Graphs",
- *  <em>Journal of Machine Learning Research</em> 8:1113-1143.
- *  http://www.jmlr.org/papers/volume8/mooij07a/mooij07a.pdf
- *
- *  \anchor MoK07b \ref MoK07b
- *  J. M. Mooij and H. J. Kappen (2007):
- *  "Sufficient Conditions for Convergence of the Sum-Product Algorithm",
- *  <em>IEEE Transactions on Information Theory</em> 53(12):4422-4437.
- *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=4385778
- *
  *  \anchor EaG09 \ref EaG09
  *  F. Eaton and Z. Ghahramani (2009):
  *  "Choosing a Variable to Clamp",
- *  <em>Proceedings of the Twelfth International Conference on Artificial Intelligence and Statistics (AISTATS 2009)</em> 5:145-152
+ *  <em>Proceedings of the Twelfth International Conference on Artificial Intelligence and Statistics (AISTATS 2009)</em> 5:145-152,
  *  http://jmlr.csail.mit.edu/proceedings/papers/v5/eaton09a/eaton09a.pdf
- *
- *  \anchor StW99 \ref StW99
- *  A. Steger and N. C. Wormald (1999):
- *  "Generating Random Regular Graphs Quickly",
- *  <em>Combinatorics, Probability and Computing</em> Vol 8, Issue 4, pp. 377-396
- *  http://www.math.uwaterloo.ca/~nwormald/papers/randgen.pdf
  *
  *  \anchor EMK06 \ref EMK06
  *  G. Elidan and I. McGraw and D. Koller (2006):
  *  "Residual Belief Propagation: Informed Scheduling for Asynchronous Message Passing",
- *  <em>Proceedings of the 22nd Annual Conference on Uncertainty in Artificial Intelligence (UAI-06)</em>
+ *  <em>Proceedings of the 22nd Annual Conference on Uncertainty in Artificial Intelligence (UAI-06)</em>,
  *  http://uai.sis.pitt.edu/papers/06/UAI2006_0091.pdf
  *
- *  \anchor WiH03 \ref WiH03
- *  W. Wiegerinck and T. Heskes (2003):
- *  "Fractional Belief Propagation",
- *  <em>Advances in Neural Information Processing Systems</em> (NIPS) 15, pp. 438-445.
- *  http://books.nips.cc/papers/files/nips15/LT16.pdf
+ *  \anchor HAK03 \ref HAK03
+ *  T. Heskes and C. A. Albers and H. J. Kappen (2003):
+ *  "Approximate Inference and Constrained Optimization",
+ *  <em>Proceedings of the 19th Annual Conference on Uncertainty in Artificial Intelligence (UAI-03)</em> pp. 313-320,
+ *  http://www.snn.ru.nl/reports/Heskes.uai2003.ps.gz
+ *
+ *  \anchor KFL01 \ref KFL01
+ *  F. R. Kschischang and B. J. Frey and H.-A. Loeliger (2001):
+ *  "Factor Graphs and the Sum-Product Algorithm",
+ *  <em>IEEE Transactions on Information Theory</em> 47(2):498-519,
+ *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=910572
  *
  *  \anchor Min05 \ref Min05
  *  T. Minka (2005):
  *  "Divergence measures and message passing",
  *  <em>MicroSoft Research Technical Report</em> MSR-TR-2005-173,
  *  http://research.microsoft.com/en-us/um/people/minka/papers/message-passing/minka-divergence.pdf
+ *
+ *  \anchor MiQ04 \ref MiQ04
+ *  T. Minka and Y. Qi (2004):
+ *  "Tree-structured Approximations by Expectation Propagation",
+ *  <em>Advances in Neural Information Processing Systems</em> (NIPS) 16,
+ *  http://books.nips.cc/papers/files/nips16/NIPS2003_AA25.pdf
+ *
+ *  \anchor MoK07 \ref MoK07
+ *  J. M. Mooij and H. J. Kappen (2007):
+ *  "Loop Corrections for Approximate Inference on Factor Graphs",
+ *  <em>Journal of Machine Learning Research</em> 8:1113-1143,
+ *  http://www.jmlr.org/papers/volume8/mooij07a/mooij07a.pdf
+ *
+ *  \anchor MoK07b \ref MoK07b
+ *  J. M. Mooij and H. J. Kappen (2007):
+ *  "Sufficient Conditions for Convergence of the Sum-Product Algorithm",
+ *  <em>IEEE Transactions on Information Theory</em> 53(12):4422-4437,
+ *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=4385778
+ *
+ *  \anchor MoR05 \ref MoR05
+ *  A. Montanari and T. Rizzo (2005):
+ *  "How to Compute Loop Corrections to the Bethe Approximation",
+ *  <em>Journal of Statistical Mechanics: Theory and Experiment</em> 2005(10)-P10011,
+ *  http://stacks.iop.org/1742-5468/2005/P10011
+ *
+ *  \anchor StW99 \ref StW99
+ *  A. Steger and N. C. Wormald (1999):
+ *  "Generating Random Regular Graphs Quickly",
+ *  <em>Combinatorics, Probability and Computing</em> Vol 8, Issue 4, pp. 377-396,
+ *  http://www.math.uwaterloo.ca/~nwormald/papers/randgen.pdf
+ *
+ *  \anchor WiH03 \ref WiH03
+ *  W. Wiegerinck and T. Heskes (2003):
+ *  "Fractional Belief Propagation",
+ *  <em>Advances in Neural Information Processing Systems</em> (NIPS) 15, pp. 438-445,
+ *  http://books.nips.cc/papers/files/nips15/LT16.pdf
+ *
+ *  \anchor WJW03 \ref WJW03
+ *  M. J. Wainwright, T. S. Jaakkola and A. S. Willsky (2003):
+ *  "Tree-reweighted belief propagation algorithms and approximate ML estimation by pseudo-moment matching",
+ *  <em>9th Workshop on Artificial Intelligence and Statistics</em>,
+ *  http://www.eecs.berkeley.edu/~wainwrig/Papers/WJW_AIStat03.pdf
+ *
+ *  \anchor YFW05 \ref YFW05
+ *  J. S. Yedidia and W. T. Freeman and Y. Weiss (2005):
+ *  "Constructing Free-Energy Approximations and Generalized Belief Propagation Algorithms",
+ *  <em>IEEE Transactions on Information Theory</em> 51(7):2282-2312,
+ *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=1459044
  */
 
 

@@ -30,6 +30,9 @@
 #ifdef DAI_WITH_FBP
     #include <dai/fbp.h>
 #endif
+#ifdef DAI_WITH_TRWBP
+    #include <dai/trwbp.h>
+#endif
 #ifdef DAI_WITH_MF
     #include <dai/mf.h>
 #endif
@@ -104,6 +107,9 @@ static const char* DAINames[] = {
 #endif
 #ifdef DAI_WITH_FBP
     FBP::Name,
+#endif
+#ifdef DAI_WITH_TRWBP
+    TRWBP::Name,
 #endif
 #ifdef DAI_WITH_MF
     MF::Name,

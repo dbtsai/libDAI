@@ -239,7 +239,7 @@ class BP : public DAIAlgFG {
         /// Finds the edge which has the maximum residual (difference between new and old message)
         void findMaxResidual( size_t &i, size_t &_I );
         /// Calculates unnormalized belief of variable \a i
-        void calcBeliefV( size_t i, Prob &p ) const;
+        virtual void calcBeliefV( size_t i, Prob &p ) const;
         /// Calculates unnormalized belief of factor \a I
         virtual void calcBeliefF( size_t I, Prob &p ) const;
 

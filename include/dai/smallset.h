@@ -196,6 +196,11 @@ class SmallSet {
         reverse_iterator rend() { return _elements.rend(); }
         /// Returns constant reverse iterator that points beyond the first element
         const_reverse_iterator rend() const { return _elements.rend(); }
+
+        /// Returns reference to first element
+        T& front() { return _elements.at(0); }
+        /// Returns constant reference to first element
+        const T& front() const { return _elements.at(0); }
     //@}
 
     /// \name Comparison operators
