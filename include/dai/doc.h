@@ -22,6 +22,8 @@
  *
  *  \todo Implement routines for UAI probabilistic inference evaluation data
  *
+ *  \todo Improve SWIG interfaces
+ *
  *  \idea Adapt (part of the) guidelines in http://www.boost.org/development/requirements.html#Design_and_Programming
  *
  *  \idea Use "gcc -MM" to generate dependencies for targets: http://make.paulandlesley.org/autodep.html
@@ -86,6 +88,7 @@
  *  - Mean Field;
  *  - Loopy Belief Propagation [\ref KFL01];
  *  - Fractional Belief Propagation [\ref WiH03];
+ *  - Tree-Reweighted Belief Propagation [\ref WJW03];
  *  - Tree Expectation Propagation [\ref MiQ04];
  *  - Generalized Belief Propagation [\ref YFW05];
  *  - Double-loop GBP [\ref HAK03];
@@ -437,6 +440,8 @@
  *  Approximate inference:
  *  - Mean Field: dai::MF
  *  - (Loopy) Belief Propagation: dai::BP [\ref KFL01]
+ *  - Fractional Belief Propagation: dai::FBP [\ref WiH03]
+ *  - Tree-Reweighted Belief Propagation: dai::TRWBP [\ref WJW03]
  *  - Tree Expectation Propagation: dai::TreeEP [\ref MiQ04]
  *  - Generalized Belief Propagation: dai::HAK [\ref YFW05]
  *  - Double-loop GBP: dai::HAK [\ref HAK03]

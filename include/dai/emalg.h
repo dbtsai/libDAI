@@ -25,6 +25,7 @@
 
 /// \file
 /// \brief Defines classes related to Expectation Maximization (EMAlg, ParameterEstimation, CondProbEstimation and SharedParameters)
+/// \todo Implement parameter estimation for undirected models / factor graphs.
 
 
 namespace dai {

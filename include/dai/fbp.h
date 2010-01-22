@@ -29,13 +29,13 @@ namespace dai {
 
 /// Approximate inference algorithm "Fractional Belief Propagation" [\ref WiH03]
 /** The Fractional Belief Propagation algorithm is like Belief
- *  Propagation, but associates each factor with a scale parameter
+ *  Propagation, but associates each factor with a weight (scale parameter)
  *  which controls the divergence measure being minimized. Standard
- *  Belief Propagation corresponds to the case of FBP where each scale
- *  parameter is 1. When cast as an EP algorithm, BP (and EP) minimize
+ *  Belief Propagation corresponds to the case of FBP where each weight
+ *  is 1. When cast as an EP algorithm, BP (and EP) minimize
  *  the inclusive KL-divergence, i.e. \f$\min_q KL(p||q)\f$ (note that the
  *  Bethe free energy is typically derived from \f$ KL(q||p) \f$). If each
- *  factor \a I has scale parameter \f$ c_I \f$, then FBP minimizes the
+ *  factor \a I has weight \f$ c_I \f$, then FBP minimizes the
  *  alpha-divergence with \f$ \alpha=1/c_I \f$ for that factor, which also
  *  corresponds to Power EP [\ref Min05].
  *
@@ -46,14 +46,19 @@ namespace dai {
  *    \f[ b_i(x_i) \propto \prod_{I\in N_i} m_{I\to i} \f]
  *  and the factor beliefs are calculated by:
  *    \f[ b_I(x_I) \propto f_I(x_I)^{1/c_I} \prod_{j \in N_I} m_{I\to j}^{1-1/c_I} \prod_{J\in N_j\setminus\{I\}} m_{J\to j} \f]
+ *  The logarithm of the partition sum is approximated by:
+ *    \f[ \log Z = \sum_{I} \sum_{x_I} b_I(x_I) \big( \log f_I(x_I) - c_I \log b_I(x_I) \big) + \sum_{i} (c_i - 1) \sum_{x_i} b_i(x_i) \log b_i(x_i) \f]
+ *  where the variable weights are defined as
+ *    \f[ c_i := \sum_{I \in N_i} c_I \f]
  *
- *  \todo Add nice way to set scale parameters
+ *  \todo Add nice way to set weights
+ *  \todo Merge duplicate code in calcNewMessage() and calcBeliefF()
  *  \author Frederik Eaton
  */
 class FBP : public BP {
     protected:
-        /// Factor scale parameters (indexed by factor ID)
-        std::vector<Real> _scale_factor;
+        /// Factor weights (indexed by factor ID)
+        std::vector<Real> _weight;
 
     public:
         /// Name of this inference algorithm
@@ -63,12 +68,12 @@ class FBP : public BP {
     /// \name Constructors/destructors
     //@{
         /// Default constructor
-        FBP() : BP(), _scale_factor() {}
+        FBP() : BP(), _weight() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
         /** \param opts Parameters @see BP::Properties
          */
-        FBP( const FactorGraph &fg, const PropertySet &opts ) : BP(fg, opts), _scale_factor() {
+        FBP( const FactorGraph &fg, const PropertySet &opts ) : BP(fg, opts), _weight() {
             setProperties( opts );
             construct();
         }
@@ -81,21 +86,21 @@ class FBP : public BP {
         virtual Real logZ() const;
     //@}
 
-    /// \name FBP accessors/mutators for scale parameters
+    /// \name FBP accessors/mutators for weights
     //@{
-        /// Returns scale parameter of the \a I 'th factor
-        Real scaleF( size_t I ) const { return _scale_factor[I]; }
+        /// Returns weight of the \a I 'th factor
+        Real Weight( size_t I ) const { return _weight[I]; }
 
-        /// Returns constant reference to vector of all factor scale parameters
-        const std::vector<Real>& scaleFs() const { return _scale_factor; }
+        /// Returns constant reference to vector of all factor weights
+        const std::vector<Real>& Weights() const { return _weight; }
 
-        /// Sets the scale parameter of the \a I 'th factor to \a c
-        void setScaleF( size_t I, Real c ) { _scale_factor[I] = c; }
+        /// Sets the weight of the \a I 'th factor to \a c
+        void setWeight( size_t I, Real c ) { _weight[I] = c; }
 
-        /// Sets the scale parameters of all factors simultaenously
-        /** \note Faster than calling setScaleF(size_t,Real) for each factor
+        /// Sets the weights of all factors simultaenously
+        /** \note Faster than calling setWeight(size_t,Real) for each factor
          */
-        void setScaleFs( const std::vector<Real> &c ) { _scale_factor = c; }
+        void setWeights( const std::vector<Real> &c ) { _weight = c; }
 
     protected:
         // Calculate the updated message from the \a _I 'th neighbor of variable \a i to variable \a i

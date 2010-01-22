@@ -57,6 +57,8 @@ namespace dai {
  *  \note There are two implementations, an optimized one (the default) which caches IndexFor objects,
  *  and a slower, less complicated one which is easier to maintain/understand. The slower one can be 
  *  enabled by defining DAI_BP_FAST as false in the source file.
+ *
+ *  \todo Merge duplicate code in calcNewMessage() and calcBeliefF()
  */
 class BP : public DAIAlgFG {
     protected:

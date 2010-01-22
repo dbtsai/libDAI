@@ -39,13 +39,25 @@ namespace dai {
  *    \f[ b_i(x_i) \propto \prod_{I\in N_i} m_{I\to i}^{c_I} \f]
  *  and the factor beliefs are calculated by:
  *    \f[ b_I(x_I) \propto f_I(x_I)^{1/c_I} \prod_{j \in N_I} m_{I\to j}^{c_I-1} \prod_{J\in N_j\setminus\{I\}} m_{J\to j}^{c_J} \f]
+ *  The logarithm of the partition sum is approximated by:
+ *    \f[ \log Z = \sum_{I} \sum_{x_I} b_I(x_I) \big( \log f_I(x_I) - c_I \log b_I(x_I) \big) + \sum_{i} (c_i - 1) \sum_{x_i} b_i(x_i) \log b_i(x_i) \f]
+ *  where the variable weights are defined as
+ *    \f[ c_i := \sum_{I \in N_i} c_I \f]
  *
- *  \todo Fix documentation
+ *  \note TRWBP is actually equivalent to FBP
+ *  \todo Merge duplicate code in calcNewMessage() and calcBeliefF()
+ *  \todo Add nice way to set weights
+ *  \todo Merge code of FBP and TRWBP
  */
 class TRWBP : public BP {
     protected:
-        /// Factor scale parameters (indexed by factor ID)
-        std::vector<Real> _edge_weight;
+        /// "Edge weights" (indexed by factor ID)
+        /** In [\ref WJW03], only unary or pairwise factors are considered.
+         *  Here we are more general by having a weight for each factor in the
+         *  factor graph. If unary factors have weight 1, and higher-order factors
+         *  are absent, then we have the special case considered in [\ref WJW03].
+         */
+        std::vector<Real> _weight;
 
     public:
         /// Name of this inference algorithm
@@ -55,12 +67,12 @@ class TRWBP : public BP {
     /// \name Constructors/destructors
     //@{
         /// Default constructor
-        TRWBP() : BP(), _edge_weight() {}
+        TRWBP() : BP(), _weight() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
         /** \param opts Parameters @see BP::Properties
          */
-        TRWBP( const FactorGraph &fg, const PropertySet &opts ) : BP(fg, opts), _edge_weight() {
+        TRWBP( const FactorGraph &fg, const PropertySet &opts ) : BP(fg, opts), _weight() {
             setProperties( opts );
             construct();
         }
@@ -75,19 +87,19 @@ class TRWBP : public BP {
 
     /// \name TRWBP accessors/mutators for scale parameters
     //@{
-        /// Returns scale parameter of edge corresponding to the \a I 'th factor
-        Real edgeWeight( size_t I ) const { return _edge_weight[I]; }
+        /// Returns weight corresponding to the \a I 'th factor
+        Real Weight( size_t I ) const { return _weight[I]; }
 
-        /// Returns constant reference to vector of all factor scale parameters
-        const std::vector<Real>& edgeWeights() const { return _edge_weight; }
+        /// Returns constant reference to vector of all weights
+        const std::vector<Real>& Weights() const { return _weight; }
 
-        /// Sets the scale parameter of the \a I 'th factor to \a c
-        void setEdgeWeight( size_t I, Real c ) { _edge_weight[I] = c; }
+        /// Sets the weight of the \a I 'th factor to \a c
+        void setWeight( size_t I, Real c ) { _weight[I] = c; }
 
-        /// Sets the scale parameters of all factors simultaenously
-        /** \note Faster than calling setScaleF(size_t,Real) for each factor
+        /// Sets the weights of all factors simultaenously
+        /** \note Faster than calling setWeight(size_t,Real) for each factor
          */
-        void setEdgeWeights( const std::vector<Real> &c ) { _edge_weight = c; }
+        void setWeights( const std::vector<Real> &c ) { _weight = c; }
 
     protected:
         // Calculate the updated message from the \a _I 'th neighbor of variable \a i to variable \a i
