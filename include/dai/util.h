@@ -28,7 +28,7 @@
 
 
 #if defined(WINDOWS)
-    #include <map> // an alternative would be to use boost/tr1/unordered_map.hpp
+    #include <boost/tr1/unordered_map.hpp> // only present in boost 1.37 and higher
 #elif defined(CYGWIN)
     #include <boost/tr1/unordered_map.hpp> // only present in boost 1.37 and higher
 #elif defined(MACOSX)
@@ -100,19 +100,11 @@ inline Real exp( Real x ) {
 Real max( const std::vector<Real> &v );
 
 
-#ifdef WINDOWS
-    /// hash_map is an alias for \c std::map.
-    /** Since there is no TR1 unordered_map implementation available yet, we fall back on std::map.
-     */
-    template <typename T, typename U, typename H = boost::hash<T> >
-        class hash_map : public std::map<T,U> {};
-#else
-    /// hash_map is an alias for \c std::tr1::unordered_map.
-    /** We use the (experimental) TR1 unordered_map implementation included in modern GCC distributions or in boost versions 1.37 and higher.
-     */
-    template <typename T, typename U, typename H = boost::hash<T> >
-        class hash_map : public std::tr1::unordered_map<T,U,H> {};
-#endif
+/// hash_map is an alias for \c std::tr1::unordered_map.
+/** We use the (experimental) TR1 unordered_map implementation included in modern GCC distributions or in boost versions 1.37 and higher.
+ */
+template <typename T, typename U, typename H = boost::hash<T> >
+    class hash_map : public std::tr1::unordered_map<T,U,H> {};
 
 
 /// Returns wall clock time in seconds

@@ -212,7 +212,8 @@
  *    - GNU make
  *    - doxygen
  *    - graphviz
- *    - recent boost C++ libraries (at least version 1.34, or 1.37 for cygwin;
+ *    - recent boost C++ libraries (at least version 1.34 if you have
+ *      a recent version of GCC, otherwise at least version 1.37; however,
  *      version 1.37 shipped with Ubuntu 9.04 is known not to work)
  * 
  *  On Debian/Ubuntu, you can easily install all these packages with a single command:
@@ -251,8 +252,8 @@
  *  \section build-windows Building libDAI under Windows
  *
  *  You need:
- *  - A recent version of MicroSoft Visual Studio (2008 works)
- *  - recent boost C++ libraries (version 1.34 or higher)
+ *  - A recent version of MicroSoft Visual Studio (2008 is known to work)
+ *  - recent boost C++ libraries (version 1.37 or higher)
  *  - GNU make (can be obtained from http://gnuwin32.sourceforge.net)
  *
  *  For the regression test, you need:
