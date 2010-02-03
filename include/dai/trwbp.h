@@ -45,7 +45,6 @@ namespace dai {
  *    \f[ c_i := \sum_{I \in N_i} c_I \f]
  *
  *  \note TRWBP is actually equivalent to FBP
- *  \todo Merge duplicate code in calcNewMessage() and calcBeliefF()
  *  \todo Add nice way to set weights
  *  \todo Merge code of FBP and TRWBP
  */
@@ -102,14 +101,19 @@ class TRWBP : public BP {
         void setWeights( const std::vector<Real> &c ) { _weight = c; }
 
     protected:
-        // Calculate the updated message from the \a _I 'th neighbor of variable \a i to variable \a i
-        virtual void calcNewMessage( size_t i, size_t _I );
+        /// Calculate the product of factor \a I and the incoming messages
+        /** If \a without_i == \c true, the message coming from variable \a i is omitted from the product
+         *  \note This function is used by calcNewMessage() and calcBeliefF()
+         */
+        virtual Prob calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) const;
 
         /// Calculates unnormalized belief of variable \a i
         virtual void calcBeliefV( size_t i, Prob &p ) const;
 
         // Calculates unnormalized belief of factor \a I
-        virtual void calcBeliefF( size_t I, Prob &p ) const;
+        virtual void calcBeliefF( size_t I, Prob &p ) const {
+            p = calcIncomingMessageProduct( I, false, 0 );
+        }
 
         // Helper function for constructors
         virtual void construct();

@@ -52,7 +52,6 @@ namespace dai {
  *    \f[ c_i := \sum_{I \in N_i} c_I \f]
  *
  *  \todo Add nice way to set weights
- *  \todo Merge duplicate code in calcNewMessage() and calcBeliefF()
  *  \author Frederik Eaton
  */
 class FBP : public BP {
@@ -103,11 +102,19 @@ class FBP : public BP {
         void setWeights( const std::vector<Real> &c ) { _weight = c; }
 
     protected:
+        /// Calculate the product of factor \a I and the incoming messages
+        /** If \a without_i == \c true, the message coming from variable \a i is omitted from the product
+         *  \note This function is used by calcNewMessage() and calcBeliefF()
+         */
+        virtual Prob calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) const;
+
         // Calculate the updated message from the \a _I 'th neighbor of variable \a i to variable \a i
         virtual void calcNewMessage( size_t i, size_t _I );
 
         // Calculates unnormalized belief of factor \a I
-        virtual void calcBeliefF( size_t I, Prob &p ) const;
+        virtual void calcBeliefF( size_t I, Prob &p ) const {
+            p = calcIncomingMessageProduct( I, false, 0 );
+        }
 
         // Helper function for constructors
         virtual void construct();

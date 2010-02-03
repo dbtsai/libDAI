@@ -57,8 +57,6 @@ namespace dai {
  *  \note There are two implementations, an optimized one (the default) which caches IndexFor objects,
  *  and a slower, less complicated one which is easier to maintain/understand. The slower one can be 
  *  enabled by defining DAI_BP_FAST as false in the source file.
- *
- *  \todo Merge duplicate code in calcNewMessage() and calcBeliefF()
  */
 class BP : public DAIAlgFG {
     protected:
@@ -232,6 +230,11 @@ class BP : public DAIAlgFG {
         /// Returns reference to residual for the edge between variable \a i and its \a _I 'th neighbor
         Real & residual(size_t i, size_t _I) { return _edges[i][_I].residual; }
 
+        /// Calculate the product of factor \a I and the incoming messages
+        /** If \a without_i == \c true, the message coming from variable \a i is omitted from the product
+         *  \note This function is used by calcNewMessage() and calcBeliefF()
+         */
+        virtual Prob calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) const;
         /// Calculate the updated message from the \a _I 'th neighbor of variable \a i to variable \a i
         virtual void calcNewMessage( size_t i, size_t _I );
         /// Replace the "old" message from the \a _I 'th neighbor of variable \a i to variable \a i by the "new" (updated) message
@@ -243,7 +246,9 @@ class BP : public DAIAlgFG {
         /// Calculates unnormalized belief of variable \a i
         virtual void calcBeliefV( size_t i, Prob &p ) const;
         /// Calculates unnormalized belief of factor \a I
-        virtual void calcBeliefF( size_t I, Prob &p ) const;
+        virtual void calcBeliefF( size_t I, Prob &p ) const {
+            p = calcIncomingMessageProduct( I, false, 0 );
+        }
 
         /// Helper function for constructors
         virtual void construct();

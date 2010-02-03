@@ -141,6 +141,49 @@ void BP::findMaxResidual( size_t &i, size_t &_I ) {
 }
 
 
+Prob BP::calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) const {
+    Factor Fprod( factor(I) );
+    Prob &prod = Fprod.p();
+    if( props.logdomain )
+        prod.takeLog();
+
+    // Calculate product of incoming messages and factor I
+    foreach( const Neighbor &j, nbF(I) )
+        if( !(without_i && (j == i)) ) {
+            // prod_j will be the product of messages coming into j
+            Prob prod_j( var(j).states(), props.logdomain ? 0.0 : 1.0 );
+            foreach( const Neighbor &J, nbV(j) )
+                if( J != I ) { // for all J in nb(j) \ I
+                    if( props.logdomain )
+                        prod_j += message( j, J.iter );
+                    else
+                        prod_j *= message( j, J.iter );
+                }
+
+            // multiply prod with prod_j
+            if( !DAI_BP_FAST ) {
+                // UNOPTIMIZED (SIMPLE TO READ, BUT SLOW) VERSION
+                if( props.logdomain )
+                    Fprod += Factor( var(j), prod_j );
+                else
+                    Fprod *= Factor( var(j), prod_j );
+            } else {
+                // OPTIMIZED VERSION
+                size_t _I = j.dual;
+                // ind is the precalculated IndexFor(j,I) i.e. to x_I == k corresponds x_j == ind[k]
+                const ind_t &ind = index(j, _I);
+
+                for( size_t r = 0; r < prod.size(); ++r )
+                    if( props.logdomain )
+                        prod[r] += prod_j[ind[r]];
+                    else
+                        prod[r] *= prod_j[ind[r]];
+            }
+    }
+    return prod;
+}
+
+
 void BP::calcNewMessage( size_t i, size_t _I ) {
     // calculate updated message I->i
     size_t I = nbV(i,_I);
@@ -151,41 +194,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
     else {
         Factor Fprod( factor(I) );
         Prob &prod = Fprod.p();
-        if( props.logdomain )
-            prod.takeLog();
-
-        // Calculate product of incoming messages and factor I
-        foreach( const Neighbor &j, nbF(I) )
-            if( j != i ) { // for all j in I \ i
-                // prod_j will be the product of messages coming into j
-                Prob prod_j( var(j).states(), props.logdomain ? 0.0 : 1.0 );
-                foreach( const Neighbor &J, nbV(j) )
-                    if( J != I ) { // for all J in nb(j) \ I
-                        if( props.logdomain )
-                            prod_j += message( j, J.iter );
-                        else
-                            prod_j *= message( j, J.iter );
-                    }
-
-                // multiply prod with prod_j
-                if( !DAI_BP_FAST ) {
-                    /* UNOPTIMIZED (SIMPLE TO READ, BUT SLOW) VERSION */
-                    if( props.logdomain )
-                        Fprod += Factor( var(j), prod_j );
-                    else
-                        Fprod *= Factor( var(j), prod_j );
-                } else {
-                    /* OPTIMIZED VERSION */
-                    size_t _I = j.dual;
-                    // ind is the precalculated IndexFor(j,I) i.e. to x_I == k corresponds x_j == ind[k]
-                    const ind_t &ind = index(j, _I);
-                    for( size_t r = 0; r < prod.size(); ++r )
-                        if( props.logdomain )
-                            prod[r] += prod_j[ind[r]];
-                        else
-                            prod[r] *= prod_j[ind[r]];
-                }
-            }
+        prod = calcIncomingMessageProduct( I, true, i );
 
         if( props.logdomain ) {
             prod -= prod.max();
@@ -346,50 +355,6 @@ void BP::calcBeliefV( size_t i, Prob &p ) const {
             p += newMessage( i, I.iter );
         else
             p *= newMessage( i, I.iter );
-}
-
-
-void BP::calcBeliefF( size_t I, Prob &p ) const {
-    Factor Fprod( factor( I ) );
-    Prob &prod = Fprod.p();
-
-    if( props.logdomain )
-        prod.takeLog();
-
-    foreach( const Neighbor &j, nbF(I) ) {
-        // prod_j will be the product of messages coming into j
-        Prob prod_j( var(j).states(), props.logdomain ? 0.0 : 1.0 );
-        foreach( const Neighbor &J, nbV(j) )
-            if( J != I ) { // for all J in nb(j) \ I
-                if( props.logdomain )
-                    prod_j += newMessage( j, J.iter );
-                else
-                    prod_j *= newMessage( j, J.iter );
-            }
-
-        // multiply prod with prod_j
-        if( !DAI_BP_FAST ) {
-            /* UNOPTIMIZED (SIMPLE TO READ, BUT SLOW) VERSION */
-            if( props.logdomain )
-                Fprod += Factor( var(j), prod_j );
-            else
-                Fprod *= Factor( var(j), prod_j );
-        } else {
-            /* OPTIMIZED VERSION */
-            size_t _I = j.dual;
-            // ind is the precalculated IndexFor(j,I) i.e. to x_I == k corresponds x_j == ind[k]
-            const ind_t & ind = index(j, _I);
-
-            for( size_t r = 0; r < prod.size(); ++r ) {
-                if( props.logdomain )
-                    prod[r] += prod_j[ind[r]];
-                else
-                    prod[r] *= prod_j[ind[r]];
-            }
-        }
-    }
-
-    p = prod;
 }
 
 
