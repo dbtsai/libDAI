@@ -5,7 +5,7 @@
  *  warranty. See the file COPYING for more details.
  *
  *  Copyright (C) 2007       Bastian Wemmenhove
- *  Copyright (C) 2007-2009  Joris Mooij         [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2007-2009  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2007       Radboud University Nijmegen, The Netherlands
  */
 

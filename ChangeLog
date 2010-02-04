@@ -1,3 +1,5 @@
+* Documented tests/testdai
+* Moved platform independent build options into Makefile.ALL
 * Windows platform now needs boost 1.37 or higher
 * Implemented Tree-Reweighted BP
 * Implemented various heuristics for choosing a variable elimination sequence 

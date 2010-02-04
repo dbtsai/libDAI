@@ -4,38 +4,15 @@
 # 2, or (at your option) any later version. libDAI is distributed without any
 # warranty. See the file COPYING for more details.
 #
-# Copyright (C) 2009  Joris Mooij  [joris dot mooij at libdai dot org]
+# Copyright (C) 2009-2010  Joris Mooij  [joris dot mooij at libdai dot org]
 
 
-# This template contains configurations for compiling libDAI under GNU/Linux and other UNIX variants
+# This template contains configurations for compiling libDAI under GNU/Linux
+# and other UNIX variants
 #
 # To use it, simply copy this file to 'Makefile.conf' and adapt 'Makefile.conf'
 # to your local setup
-#
-# A boolean variable VAR can be set to true ("VAR=true") or to false ("VAR=")
 
-
-# COMPILATION AND BUILD FLAGS
-# Enable/disable various approximate inference methods
-WITH_BP=true
-WITH_FBP=true
-WITH_TRWBP=true
-WITH_MF=true
-WITH_HAK=true
-WITH_LC=true
-WITH_TREEEP=true
-WITH_JTREE=true
-WITH_MR=true
-WITH_GIBBS=true
-WITH_CBP=true
-# Build doxygen documentation?
-WITH_DOC=true
-# Build with debug info?
-DEBUG=true
-# Build matlab interface?
-WITH_MATLAB=
-# MatLab version 7.3 (R2006b) or newer?
-NEW_MATLAB=true
 
 # OPERATING SYSTEM
 # Choose OS from {LINUX, WINDOWS, CYGWIN, MACOSX}

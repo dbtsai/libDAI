@@ -4,16 +4,19 @@
 # 2, or (at your option) any later version. libDAI is distributed without any
 # warranty. See the file COPYING for more details.
 #
-# Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+# Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
 # Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
 
+
+# Load the platform independent build configuration file
+include Makefile.ALL
 
 # Load the local configuration from Makefile.conf
 include Makefile.conf
 
 # Set version and date
 DAI_VERSION="git HEAD"
-DAI_DATE="January 12, 2010 - or later"
+DAI_DATE="February 4, 2010 - or later"
 
 # Directories of libDAI sources
 # Location libDAI headers
