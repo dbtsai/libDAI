@@ -183,13 +183,14 @@ http://www.boost.org/ and compile/install it with:
 To build the libDAI source, first copy a template Makefile.* to Makefile.conf
 (for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). Then,
 edit the Makefile.conf template to adapt it to your local setup. Especially
-directories may differ from system to system. Finally, run
+directories may differ from system to system. Platform independent build
+options can be set in Makefile.ALL. Finally, run
 
   make
 
 The build includes a regression test, which may take a while to complete.
 
-If the build was successful, you can test the example program:
+If the build is successful, you can test the example program:
 
   examples/example tests/alarm.fg
 
@@ -212,14 +213,14 @@ For the regression test, you need:
   * GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
 
 To build the source, copy Makefile.WINDOWS to Makefile.conf. Then, edit
-Makefile.conf to adapt it to your local setup. Finally, run (from the command
-line)
+Makefile.conf to adapt it to your local setup. Platform independent build
+options can be set in Makefile.ALL. Finally, run (from the command line)
 
   make
 
 The build includes a regression test, which may take a while to complete.
 
-If the build was successful, you can test the example program:
+If the build is successful, you can test the example program:
 
   examples\example tests\alarm.fg
 
@@ -238,7 +239,7 @@ You need:
 
 First, you need to build the libDAI source as described above for your
 platform. By default, the MatLab interface is disabled, so before compiling the
-source, you have to enable it in the Makefile.conf by setting
+source, you have to enable it in Makefile.ALL by setting
 
   WITH_MATLAB=true
 

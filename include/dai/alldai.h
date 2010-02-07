@@ -9,8 +9,15 @@
  */
 
 
-/// \file
-/// \brief Main libDAI header file. It \#includes all other libDAI headers.
+/** \file
+ *  \brief Main libDAI header file. It \#includes all other libDAI headers.
+ * 
+ *  \todo Replace VarSets by SmallSet<size_t> where appropriate, in order to minimize the use of FactorGraph::findVar().
+ *
+ *  \todo Implement routines for UAI probabilistic inference evaluation data
+ *
+ *  \todo Improve SWIG interfaces and merge their build process with the main build process
+ */
 
 
 #ifndef __defined_libdai_alldai_h

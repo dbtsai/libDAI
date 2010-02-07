@@ -11,24 +11,11 @@
 /** \file
  *  \brief Contains additional doxygen documentation
  *
- *  \todo Write a concept/notations page for the documentation,
- *  explaining the concepts of "state" (index into a 
- *  multi-dimensional array, e.g., one corresponding
- *  to the Cartesian product of statespaces of variables)
- *  and "linear index". This should make it easier to
- *  document index.h and varset.h
- *
- *  \todo Document tests and utils
- *
- *  \todo Implement routines for UAI probabilistic inference evaluation data
- *
- *  \todo Improve SWIG interfaces
+ *  \todo Document utils/createfg (and clean up the code a bit)
  *
  *  \idea Adapt (part of the) guidelines in http://www.boost.org/development/requirements.html#Design_and_Programming
  *
  *  \idea Use "gcc -MM" to generate dependencies for targets: http://make.paulandlesley.org/autodep.html
- *
- *  \todo Replace VarSets by SmallSet<size_t> where appropriate, in order to minimize the use of FactorGraph::findVar().
  *
  *  \idea Disentangle structures. In particular, ensure that graphical properties are not
  *  entangled with probabilistic properties. For example, a FactorGraph contains several components:
@@ -57,7 +44,7 @@
 /** \mainpage Reference manual for libDAI - A free/open source C++ library for Discrete Approximate Inference methods
  *  \author Joris Mooij
  *  \version git HEAD
- *  \date January 12, 2010 - or later
+ *  \date February 4, 2010 - or later
  *
  *  <hr size="1">
  *  \section about About libDAI
@@ -238,11 +225,12 @@
  *  To build the libDAI source, first copy a template Makefile.* to Makefile.conf
  *  (for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). 
  *  Then, edit the Makefile.conf template to adapt it to your local setup.
- *  Especially directories may differ from system to system. Finally, run
+ *  Especially directories may differ from system to system. Platform independent
+ *  build options can be set in Makefile.ALL. Finally, run
  *  <pre>  make</pre>
  *  The build includes a regression test, which may take a while to complete.
  *
- *  If the build was successful, you can test the example program:
+ *  If the build is successful, you can test the example program:
  *  <pre>  examples/example tests/alarm.fg</pre>
  *  or the more elaborate test program:
  *  <pre>  tests/testdai --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX</pre>
@@ -260,11 +248,12 @@
  *  - GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
  *
  *  To build the source, copy Makefile.WINDOWS to Makefile.conf. Then, edit 
- *  Makefile.conf to adapt it to your local setup. Finally, run (from the command line)
+ *  Makefile.conf to adapt it to your local setup. Platform independent 
+ *  build options can be set in Makefile.ALL. Finally, run (from the command line)
  *  <pre>  make</pre>
  *  The build includes a regression test, which may take a while to complete.
  *
- *  If the build was successful, you can test the example program:
+ *  If the build is successful, you can test the example program:
  *  <pre>  examples\\example tests\\alarm.fg</pre>
  *  or the more elaborate test program:
  *  <pre>  tests\\testdai --aliases tests\\aliases.conf --filename tests\\alarm.fg --methods JTREE_HUGIN BP_SEQMAX</pre>
@@ -279,7 +268,7 @@
  *
  *  First, you need to build the libDAI source as described above for your
  *  platform. By default, the MatLab interface is disabled, so before compiling the
- *  source, you have to enable it in the Makefile.conf by setting
+ *  source, you have to enable it in Makefile.ALL by setting
  *  <pre>  WITH_MATLAB=true</pre>
  *  Also, you have to configure the MatLab-specific parts of
  *  Makefile.conf to match your system (in particular, the Makefile variables ME,
@@ -322,9 +311,9 @@
  */
 
 
-/** \page inference Graphical models and approximate inference
+/** \page terminology Terminology and conventions
  *
- *  \section inference-graphicalmodels Graphical models
+ *  \section terminology-graphicalmodels Graphical models
  *
  *  Commonly used graphical models are Bayesian networks and Markov random fields.
  *  In libDAI, both types of graphical models are represented by a slightly more 
@@ -416,7 +405,7 @@
  *  This is why libDAI uses a factor graph as representation of a 
  *  graphical model, implemented in the dai::FactorGraph class.
  *
- *  \section inference-inference Inference tasks
+ *  \section terminology-inference Inference tasks
  *
  *  Given a factor graph, specified by the variable nodes \f$\{x_i\}_{i\in\mathcal{V}}\f$
  *  the factor nodes \f$ \mathcal{F} \f$, the graph structure, and the factors
@@ -454,12 +443,71 @@
  *  is only possible with dai::JTree and dai::BP, calculating partition sums is
  *  not possible with dai::MR, dai::LC and dai::Gibbs.
  *
- *  \section inference-learning Parameter learning
+ *  \section terminology-learning Parameter learning
  *
  *  In addition, libDAI supports parameter learning of conditional probability
  *  tables by Expectation Maximization (or Maximum Likelihood, if there is no
  *  missing data). This is implemented in dai::EMAlg.
  *  
+ *  \section terminology-variables-states Variables and states
+ *
+ *  Linear states are a concept that is used often in libDAI, for example for storing
+ *  and accessing factors, which are functions mapping from states of a set of variables
+ *  to the real numbers. Internally, a factor is stored as an array, and the array index
+ *  of an entry corresponds with the linear state of the set of variables. Below we will
+ *  define variables, states and linear states of (sets of) variables.
+ *
+ *  \subsection terminology-variables Variables
+ *
+ *  Each (random) \a variable has a unique identifier, its \a label (which has
+ *  a non-negative integer value). If two variables have the same
+ *  label, they are considered as identical. A variable can take on a finite
+ *  number of different values or \a states.
+ *  
+ *  We use the following notational conventions. The discrete
+ *  random variable with label \f$l\f$ is denoted as \f$x_l\f$, and the number
+ *  of possible values of this variable as \f$S_{x_l}\f$ or simply \f$S_l\f$. 
+ *  The set of possible values of variable \f$x_l\f$ is denoted 
+ *  \f$X_l := \{0,1,\dots,S_l-1\}\f$ and called its \a state \a space.
+ *
+ *  \subsection terminology-variable-sets Sets of variables and the canonical ordering
+ *  
+ *  Let \f$A := \{x_{l_1},x_{l_2},\dots,x_{l_n}\}\f$ be a set of variables. 
+ *
+ *  The \a canonical \a ordering of the variables in \a A is induced by their labels.
+ *  That is: if \f$l_1 < l_2\f$, then \f$x_{l_1}\f$ occurs before \f$x_{l_2}\f$ in the
+ *  canonical ordering. Below, we will assume that \f$(l_i)_{i=1}^n\f$ is
+ *  ordered according to the canonical ordering, i.e., \f$l_1 < l_2 < \dots < l_n\f$.
+ *
+ *  \subsection terminology-variable-states States and linear states of sets of variables
+ *
+ *  A \a state of the variables in \a A refers to a joint assignment of the 
+ *  variables, or in other words, to an element of the Cartesian product 
+ *  \f$ \prod_{i=1}^n X_{l_i}\f$ of the state spaces of the variables in \a A.
+ *  Note that a state can also be interpreted as a mapping from variables (or
+ *  variable labels) to the natural numbers, which assigns to a variable (or its
+ *  label) the corresponding state of the variable.
+ *
+ *  A state of \a n variables can be represented as an n-tuple of 
+ *  non-negative integers: \f$(s_1,s_2,\dots,s_n)\f$ corresponds to the
+ *  joint assignment \f$x_{l_1} = s_1, \dots, x_{l_n} = s_n\f$.
+ *  Alternatively, a state can be represented compactly as one non-negative integer;
+ *  this representation is called a \a linear \a state. The linear state
+ *  \a s corresponding to the state \f$(s_1,s_2,\dots,s_n)\f$ would be:
+ *  \f[
+ *    s := \sum_{i=1}^n s_i \prod_{j=1}^{i-1} S_{l_j} 
+ *       = s_1 + s_2 S_{l_1} + s_3 S_{l_1} S_{l_2} + \dots + s_n S_{l_1} \cdots S_{l_{n-1}}.
+ *  \f]
+ *
+ *  Vice versa, given a linear state \a s for the variables \a A, the
+ *  corresponding state \f$s_i\f$ of the \a i 'th variable \f$x_{l_i}\f$ (according to
+ *  the canonical ordering of the variables in \a A) is given by
+ *  \f[
+ *    s_i = \left\lfloor\frac{s \mbox { mod } \prod_{j=1}^i S_{l_j}}{\prod_{j=1}^{i-1} S_{l_j}}\right\rfloor.
+ *  \f]
+ *
+ *  Finally, the \a number \a of \a states of the set of variables \a A is simply the 
+ *  number of different joint assignments of the variables, that is, \f$\prod_{i=1}^n S_{l_i}\f$.
  */
 
 
