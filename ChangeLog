@@ -1,3 +1,5 @@
+* Added some functionality to create various standard factors to factor.cpp
+* Renamed "Clamped BP" into "Conditioned BP"
 * Improved documentation
 * Documented tests/testdai
 * Moved platform independent build options into Makefile.ALL

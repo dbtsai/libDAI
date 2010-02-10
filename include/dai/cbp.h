@@ -9,7 +9,7 @@
 
 
 /// \file
-/// \brief Defines class CBP, which implements Clamped Belief Propagation
+/// \brief Defines class CBP, which implements Conditioned Belief Propagation
 
 
 #ifndef __defined_libdai_cbp_h
@@ -26,7 +26,7 @@
 namespace dai {
 
 
-/// Class for CBP (Clamped Belief Propagation) [\ref EaG09]
+/// Class for CBP (Conditioned Belief Propagation) [\ref EaG09]
 /** This approximate inference algorithm uses configurable heuristics to choose a variable
  *  \f$ x_i \f$ and a state \f$ x_i^* \f$. Inference is done with \f$ x_i \f$ "clamped" to \f$ x_i^* \f$
  *  (i.e., conditional on \f$ x_i = x_i^* \f$), and also with the negation of this condition. 

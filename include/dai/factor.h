@@ -591,6 +591,45 @@ template<typename T> T MutualInfo(const TFactor<T> &f) {
 typedef TFactor<Real> Factor;
 
 
+/// Returns a binary single-variable factor \f$ \exp(hx) \f$ where \f$ x = \pm 1 \f$
+/** \param x Variable (should be binary)
+ *  \param h Field strength
+ */
+Factor BinaryFactor( const Var &x, Real h );
+
+
+/// Returns a binary pairwise factor \f$ \exp(J x_1 x_2) \f$ where \f$ x_1, x_2 = \pm 1 \f$
+/** \param x1 First variable (should be binary)
+ *  \param x2 Second variable (should be binary)
+ *  \param J Coupling strength
+ */
+Factor BinaryFactor( const Var &x1, const Var &x2, Real J );
+
+
+/// Returns a random factor on the variables \a vs with strength \a beta
+/** Each entry are set by drawing a normally distributed random with mean
+ *  0 and standard-deviation \a beta, and taking its exponent.
+ *  \param vs Variables
+ *  \param beta Factor strength (inverse temperature)
+ */
+Factor RandomFactor( const VarSet &vs, Real beta );
+
+
+/// Returns a pairwise Potts factor \f$ \exp( J \delta_{x_1, x_2} ) \f$
+/** \param x1 First variable
+ *  \param x2 Second variable (should have the same number of states as \a x1)
+ *  \param J  Factor strength
+ */
+Factor PottsFactor( const Var &x1, const Var &x2, Real J );
+
+
+/// Returns a Kronecker delta point mass
+/** \param v Variable
+ *  \param state The state of \a v that should get value 1
+ */
+Factor DeltaFactor( const Var &v, size_t state );
+
+
 } // end of namespace dai
 
 

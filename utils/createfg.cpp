@@ -30,70 +30,6 @@ typedef matrix::value_array_type::const_iterator matrix_vcit;
 typedef matrix::index_array_type::const_iterator matrix_icit;
 
 
-Factor BinaryFactor( const Var &n, Real field ) {
-    DAI_ASSERT( n.states() == 2 );
-    Real buf[2];
-    buf[0] = std::exp(-field);
-    buf[1] = std::exp(field);
-    return Factor(n, &buf[0]);
-}
-
-
-Factor BinaryFactor( const Var &n1, const Var &n2, Real coupling ) {
-    DAI_ASSERT( n1.states() == 2 );
-    DAI_ASSERT( n2.states() == 2 );
-    DAI_ASSERT( n1 != n2 );
-    Real buf[4];
-    buf[0] = (buf[3] = std::exp(coupling));
-    buf[1] = (buf[2] = std::exp(-coupling));
-    return Factor( VarSet(n1, n2), &buf[0] );
-}
-
-
-Factor RandomFactor( const VarSet &ns, Real beta ) {
-    Factor fac( ns );
-    for( size_t t = 0; t < fac.states(); t++ )
-        fac[t] = std::exp(rnd_stdnormal() * beta);
-    return fac;
-}
-
-
-Factor PottsFactor( const Var &n1, const Var &n2, Real beta ) {
-    Factor fac( VarSet( n1, n2 ), 1.0 );
-    DAI_ASSERT( n1.states() == n2.states() );
-    for( size_t s = 0; s < n1.states(); s++ )
-        fac[ s * (n1.states() + 1) ] = std::exp(beta);
-    return fac;
-}
-
-
-void MakeHOIFG( size_t N, size_t M, size_t k, Real sigma, FactorGraph &fg ) {
-    vector<Var> vars;
-    vector<Factor> factors;
-
-    vars.reserve(N);
-    for( size_t i = 0; i < N; i++ )
-        vars.push_back(Var(i,2));
-
-    for( size_t I = 0; I < M; I++ ) {
-        VarSet vars;
-        while( vars.size() < k ) {
-            do {
-                size_t newind = (size_t)(N * rnd_uniform());
-                Var newvar = Var(newind, 2);
-                if( !vars.contains( newvar ) ) {
-                    vars |= newvar;
-                    break;
-                }
-            } while( 1 );
-        }
-        factors.push_back( RandomFactor( vars, sigma ) );
-    }
-
-    fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
-}
-
-
 // w should be upper triangular or lower triangular
 void WTh2FG( const matrix &w, const vector<Real> &th, FactorGraph &fg ) {
     vector<Var>    vars;
@@ -121,6 +57,33 @@ void WTh2FG( const matrix &w, const vector<Real> &th, FactorGraph &fg ) {
     }
     for( size_t i = 0; i < N; i++ )
         factors.push_back( BinaryFactor( vars[i], th[i] ) );
+
+    fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
+}
+
+
+void MakeHOIFG( size_t N, size_t M, size_t k, Real sigma, FactorGraph &fg ) {
+    vector<Var> vars;
+    vector<Factor> factors;
+
+    vars.reserve(N);
+    for( size_t i = 0; i < N; i++ )
+        vars.push_back(Var(i,2));
+
+    for( size_t I = 0; I < M; I++ ) {
+        VarSet vars;
+        while( vars.size() < k ) {
+            do {
+                size_t newind = (size_t)(N * rnd_uniform());
+                Var newvar = Var(newind, 2);
+                if( !vars.contains( newvar ) ) {
+                    vars |= newvar;
+                    break;
+                }
+            } while( 1 );
+        }
+        factors.push_back( RandomFactor( vars, sigma ) );
+    }
 
     fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
 }
