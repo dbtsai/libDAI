@@ -381,7 +381,7 @@ size_t JTree::findEfficientTree( const VarSet& vs, RootedTree &Tree, size_t Prev
     }
 
     // reorder the tree edges such that maxalpha becomes the new root
-    RootedTree newTree( Graph( RTree.begin(), RTree.end() ), maxalpha );
+    RootedTree newTree( GraphEL( RTree.begin(), RTree.end() ), maxalpha );
 
     // identify subtree that contains all variables of vs which are not in the new root
     set<DEdge> subTree;

@@ -71,9 +71,15 @@ class DEdge {
 class UEdge {
     public:
         /// First node index
-        size_t  n1;
+        union {
+            size_t n1;
+            size_t first;   /// alias
+        };
         /// Second node index
-        size_t  n2;
+        union {
+            size_t n2;
+            size_t second;  /// alias
+        };
 
         /// Default constructor
         UEdge() {}
@@ -112,17 +118,21 @@ class UEdge {
 
 
 /// Represents an undirected graph, implemented as a std::set of undirected edges
-class Graph : public std::set<UEdge> {
+class GraphEL : public std::set<UEdge> {
     public:
         /// Default constructor
-        Graph() {}
+        GraphEL() {}
 
         /// Construct from range of objects that can be cast to DEdge
         template <class InputIterator>
-        Graph( InputIterator begin, InputIterator end ) {
+        GraphEL( InputIterator begin, InputIterator end ) {
             insert( begin, end );
         }
 };
+
+
+/// \deprecated Please use GraphEL instead.
+typedef GraphEL Graph;
 
 
 /// Represents an undirected weighted graph, with weights of type \a T, implemented as a std::map mapping undirected edges to weights
@@ -142,7 +152,7 @@ class RootedTree : public std::vector<DEdge> {
         /// Constructs a rooted tree from a tree and a root
         /** \pre T has no cycles and contains node \a Root
          */
-        RootedTree( const Graph &T, size_t Root );
+        RootedTree( const GraphEL &T, size_t Root );
 };
 
 
@@ -174,7 +184,7 @@ template<typename T> RootedTree MinSpanningTreePrims( const WeightedGraph<T> &G 
         prim_minimum_spanning_tree( g, &(p[0]) );
 
         // Store tree edges in result
-        Graph tree;
+        GraphEL tree;
         size_t root = 0;
         for( size_t i = 0; i != p.size(); i++ )
             if( p[i] != i )
@@ -217,7 +227,7 @@ template<typename T> RootedTree MaxSpanningTreePrims( const WeightedGraph<T> &G 
  *  (which becomes uniform in the limit that \a d is small and \a N goes
  *  to infinity).
  */
-Graph RandomDRegularGraph( size_t N, size_t d );
+GraphEL RandomDRegularGraph( size_t N, size_t d );
 
 
 } // end of namespace dai

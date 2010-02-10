@@ -101,7 +101,7 @@ ifdef WITH_CBP
 endif
 
 # Define standard libDAI header dependencies
-HEADERS=$(INC)/bipgraph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h $(INC)/util.h
+HEADERS=$(INC)/bipgraph.h $(INC)/graph.h $(INC)/index.h $(INC)/var.h $(INC)/factor.h $(INC)/varset.h $(INC)/smallset.h $(INC)/prob.h $(INC)/daialg.h $(INC)/properties.h $(INC)/alldai.h $(INC)/enum.h $(INC)/exceptions.h $(INC)/util.h
 
 # Setup final command for C++ compiler and MEX
 ifneq ($(OS),WINDOWS)
@@ -134,6 +134,9 @@ lib: $(LIB)/libdai$(LE)
 
 bipgraph$(OE) : $(SRC)/bipgraph.cpp $(HEADERS)
 	$(CC) -c $(SRC)/bipgraph.cpp
+
+graph$(OE) : $(SRC)/graph.cpp $(HEADERS)
+	$(CC) -c $(SRC)/graph.cpp
 
 varset$(OE) : $(SRC/varset.cpp $(HEADERS)
 	$(CC) -c $(SRC)/varset.cpp
@@ -289,7 +292,7 @@ utils/fginfo$(EE) : utils/fginfo.cpp $(HEADERS) $(LIB)/libdai$(LE)
 # LIBRARY
 ##########
 
-OBJECTS:=bipgraph$(OE) varset$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factor$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS) 
+OBJECTS:=bipgraph$(OE) graph$(OE) varset$(OE) daialg$(OE) alldai$(OE) clustergraph$(OE) factor$(OE) factorgraph$(OE) properties$(OE) regiongraph$(OE) util$(OE) weightedgraph$(OE) exceptions$(OE) $(OBJECTS) 
 
 ifneq ($(OS),WINDOWS)
 $(LIB)/libdai$(LE) : $(OBJECTS)

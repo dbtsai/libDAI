@@ -11,8 +11,6 @@
 /** \file
  *  \brief Contains additional doxygen documentation
  *
- *  \todo Document utils/createfg (and clean up the code a bit)
- *
  *  \idea Adapt (part of the) guidelines in http://www.boost.org/development/requirements.html#Design_and_Programming
  *
  *  \idea Use "gcc -MM" to generate dependencies for targets: http://make.paulandlesley.org/autodep.html

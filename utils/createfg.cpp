@@ -4,7 +4,7 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
  */
 
@@ -15,54 +15,92 @@
 #include <iterator>
 #include <algorithm>
 #include <boost/program_options.hpp>
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/io.hpp>
 #include <dai/factorgraph.h>
 #include <dai/weightedgraph.h>
 #include <dai/util.h>
+#include <dai/graph.h>
+#include <dai/enum.h>
+#include <dai/properties.h>
 
 
 using namespace std;
 using namespace dai;
 namespace po = boost::program_options;
-typedef boost::numeric::ublas::compressed_matrix<Real> matrix;
-typedef matrix::value_array_type::const_iterator matrix_vcit;
-typedef matrix::index_array_type::const_iterator matrix_icit;
 
 
-// w should be upper triangular or lower triangular
-void WTh2FG( const matrix &w, const vector<Real> &th, FactorGraph &fg ) {
-    vector<Var>    vars;
-    vector<Factor> factors;
+/// Possible factor types
+DAI_ENUM(FactorType,ISING,EXPGAUSS,POTTS);
 
-    size_t N = th.size();
-    DAI_ASSERT( (w.size1() == N) && (w.size2() == N) );
 
-    vars.reserve(N);
-    for( size_t i = 0; i < N; i++ )
-        vars.push_back(Var(i,2));
+/// Creates a factor graph from a pairwise interactions graph
+/** \param G  Graph describing interactions between variables
+ *  \param ft Type of factors to use for interactions
+ *  \param states Number of states of the variables
+ *  \param props Additional properties for generating the interactions
+ */
+FactorGraph createFG( const GraphAL &G, FactorType ft, size_t states, const PropertySet &props ) {
+    size_t N = G.nrNodes();
 
-    factors.reserve( w.nnz() + N );
-    // walk through the sparse array structure
-    // this is similar to matlab sparse arrays
-    // index2 gives the column index (similar to ir in matlab)
-    // index1 gives the starting indices for each row (similar to jc in matlab)
-    size_t i = 0;
-    for( size_t pos = 0; pos < w.nnz(); pos++ ) {
-        while( pos == w.index1_data()[i+1] )
-            i++;
-        size_t j = w.index2_data()[pos];
-        Real w_ij = w.value_data()[pos];
-        factors.push_back( BinaryFactor( vars[i], vars[j], w_ij ) );
+    if( states > 2 )
+        DAI_ASSERT( ft != FactorType::ISING );
+
+    // Get inverse temperature
+    Real beta = 1.0;
+    if( ft != FactorType::ISING ) 
+        beta = props.GetAs<Real>("beta");
+
+    // Get properties for Ising factors
+    Real mean_h = 0.0;
+    Real sigma_h = 0.0;
+    Real mean_J = 0.0;
+    Real sigma_J = 0.0;
+    if( ft == FactorType::ISING ) {
+        mean_h = props.GetAs<Real>("mean_th");
+        sigma_h = props.GetAs<Real>("sigma_th");
+        mean_J = props.GetAs<Real>("mean_w");
+        sigma_J = props.GetAs<Real>("sigma_w");
     }
+    
+    // Create variables
+    vector<Var> vars;
+    vars.reserve( N );
     for( size_t i = 0; i < N; i++ )
-        factors.push_back( BinaryFactor( vars[i], th[i] ) );
+        vars.push_back( Var( i, states ) );
 
-    fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
+    // Create factors
+    vector<Factor> factors;
+    factors.reserve( G.nrEdges() + N );
+    // Pairwise factors
+    for( size_t i = 0; i < N; i++ )
+        foreach( const GraphAL::Neighbor &j, G.nb(i) )
+            if( i < j ) {
+                if( ft == FactorType::POTTS )
+                    factors.push_back( createFactorPotts( vars[i], vars[j], beta ) );
+                else if( ft == FactorType::EXPGAUSS )
+                    factors.push_back( createFactorExpGauss( VarSet( vars[i], vars[j] ), beta ) );
+                else if( ft == FactorType::ISING ) {
+                    Real J = rnd_stdnormal() * sigma_J + mean_J;
+                    factors.push_back( createFactorIsing( vars[i], vars[j], J ) );
+                }
+            }
+    // Unary factors
+    if( ft == FactorType::ISING )
+        for( size_t i = 0; i < N; i++ ) {
+            Real h = rnd_stdnormal() * sigma_h + mean_h;
+            factors.push_back( createFactorIsing( vars[i], h ) );
+        }
+
+    return FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
 }
 
 
-void MakeHOIFG( size_t N, size_t M, size_t k, Real sigma, FactorGraph &fg ) {
+/// Return a random factor graph with higher-order interactions
+/** \param N number of variables
+ *  \param M number of factors
+ *  \param k number of variables that each factor depends on
+ *  \param beta standard-deviation of Gaussian log-factor entries
+ */
+FactorGraph createHOIFG( size_t N, size_t M, size_t k, Real beta ) {
     vector<Var> vars;
     vector<Factor> factors;
 
@@ -82,172 +120,36 @@ void MakeHOIFG( size_t N, size_t M, size_t k, Real sigma, FactorGraph &fg ) {
                 }
             } while( 1 );
         }
-        factors.push_back( RandomFactor( vars, sigma ) );
+        factors.push_back( createFactorExpGauss( vars, beta ) );
     }
 
-    fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
+    return FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
 }
 
 
-void MakeFullFG( size_t N, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
-    matrix w(N,N,N*(N-1)/2);
-    vector<Real> th(N,0.0);
-
-    for( size_t i = 0; i < N; i++ ) {
-        for( size_t j = i+1; j < N; j++ )
-            w(i,j) = rnd_stdnormal() * sigma_w + mean_w;
-        th[i] = rnd_stdnormal() * sigma_th + mean_th;
-    }
-
-    WTh2FG( w, th, fg );
-}
-
-
-void Make3DPotts( size_t n1, size_t n2, size_t n3, size_t states, Real beta, FactorGraph &fg ) {
-    vector<Var> vars;
-    vector<Factor> factors;
-
-    for( size_t i1 = 0; i1 < n1; i1++ )
-        for( size_t i2 = 0; i2 < n2; i2++ )
-            for( size_t i3 = 0; i3 < n3; i3++ ) {
-                vars.push_back( Var( i1*n2*n3 + i2*n3 + i3, states ) );
-                if( i1 )
-                    factors.push_back( PottsFactor( vars.back(), vars[ (i1-1)*n2*n3 + i2*n3 + i3 ], beta ) );
-                if( i2 )
-                    factors.push_back( PottsFactor( vars.back(), vars[ i1*n2*n3 + (i2-1)*n3 + i3 ], beta ) );
-                if( i3 )
-                    factors.push_back( PottsFactor( vars.back(), vars[ i1*n2*n3 + i2*n3 + (i3-1) ], beta ) );
-            }
-
-    fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
-}
-
-
-void MakeGridFG( long periodic, size_t n, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
-    size_t N = n*n;
-
-    matrix w(N,N,2*N);
-    vector<Real> th(N,0.0);
-
-    for( size_t i = 0; i < n; i++ )
-        for( size_t j = 0; j < n; j++ ) {
-            if( i+1 < n || periodic )
-                w(i*n+j, ((i+1)%n)*n+j) = rnd_stdnormal() * sigma_w + mean_w;
-            if( j+1 < n || periodic )
-                w(i*n+j, i*n+((j+1)%n)) = rnd_stdnormal() * sigma_w + mean_w;
-            th[i*n+j] = rnd_stdnormal() * sigma_th + mean_th;
-        }
-
-    WTh2FG( w, th, fg );
-}
-
-
-void MakeGridNonbinaryFG( bool periodic, size_t n, size_t states, Real beta, FactorGraph &fg ) {
-    size_t N = n*n;
-
-    vector<Var>    vars;
-    vector<Factor> factors;
-
-    vars.reserve(N);
-    for( size_t i = 0; i < N; i++ )
-        vars.push_back(Var(i, states));
-
-    factors.reserve( 2 * N );
-    for( size_t i = 0; i < n; i++ ) {
-        for( size_t j = 0; j < n; j++ ) {
-            if( i+1 < n || periodic )
-                factors.push_back( RandomFactor( VarSet( vars[i*n+j], vars[((i+1)%n)*n+j] ), beta ) );
-            if( j+1 < n || periodic )
-                factors.push_back( RandomFactor( VarSet( vars[i*n+j], vars[i*n+((j+1)%n)] ), beta ) );
-        }
-    }
-
-    fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
-}
-
-
-void MakeLoopFG( size_t N, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
-    matrix w(N,N,N);
-    vector<Real> th(N,0.0);
-
-    for( size_t i = 0; i < N; i++ ) {
-        w(i, (i+1)%N) = rnd_stdnormal() * sigma_w + mean_w;
-        th[i] = rnd_stdnormal() * sigma_th + mean_th;
-    }
-
-    WTh2FG( w, th, fg );
-}
-
-
-void MakeLoopNonbinaryFG( size_t N, size_t states, Real beta, FactorGraph &fg ) {
-    vector<Var>    vars;
-    vector<Factor> factors;
-
-    vars.reserve(N);
-    for( size_t i = 0; i < N; i++ )
-        vars.push_back(Var(i, states));
-
-    factors.reserve( N );
-    for( size_t i = 0; i < N; i++ ) {
-        factors.push_back( RandomFactor( VarSet( vars[i], vars[(i+1)%N] ), beta ) );
-    }
-
-    fg = FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
-}
-
-
-void MakeTreeFG( size_t N, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
-    matrix w(N,N,N-1);
-    vector<Real> th(N,0.0);
-
-    for( size_t i = 0; i < N; i++ ) {
-        th[i] = rnd_stdnormal() * sigma_th + mean_th;
-        if( i > 0 ) {
-            size_t j = rnd_int( 0, i-1 );
-            w(i,j) = rnd_stdnormal() * sigma_w + mean_w;
-        }
-    }
-
-    WTh2FG( w, th, fg );
-}
-
-
-void MakeDRegFG( size_t N, size_t d, Real mean_w, Real mean_th, Real sigma_w, Real sigma_th, FactorGraph &fg ) {
-    matrix w(N,N,(d*N)/2);
-    vector<Real> th(N,0.0);
-
-    Graph g = RandomDRegularGraph( N, d );
-    foreach( const UEdge &e, g )
-        w(e.n1, e.n2) = rnd_stdnormal() * sigma_w + mean_w;
-
-    for( size_t i = 0; i < N; i++ )
-        th[i] = rnd_stdnormal() * sigma_th + mean_th;
-
-    WTh2FG( w, th, fg );
-}
-
-
-// N = number of variables
-// n = size of variable neighborhoods
-// K = number of factors
-// k = size of factor neighborhoods
-// asserts: N * n == K * k
-BipartiteGraph CreateRandomBipartiteGraph( size_t N, size_t K, size_t n, size_t k ) {
+/// Creates a regular random bipartite graph
+/** \param N1 = number of nodes of type 1
+ *  \param d1 = size of neighborhoods of nodes of type 1
+ *  \param N2 = number of nodes of type 2
+ *  \param d2 = size of neighborhoods of nodes of type 2
+ *  \note asserts that N1 * d1 == N2 * d2
+ */
+BipartiteGraph createRandomBipartiteGraph( size_t N1, size_t N2, size_t d1, size_t d2 ) {
     BipartiteGraph G;
 
-    DAI_ASSERT( N * n == K * k );
+    DAI_ASSERT( N1 * d1 == N2 * d2 );
 
     // build lists of degree-repeated vertex numbers
-    std::vector<size_t> stubs1(N*n,0);
-    for( size_t i = 0; i < N; i++ )
-        for( size_t t = 0; t < n; t++ )
-            stubs1[i*n + t] = i;
+    std::vector<size_t> stubs1( N1*d1, 0 );
+    for( size_t n1 = 0; n1 < N1; n1++ )
+        for( size_t t = 0; t < d1; t++ )
+            stubs1[n1*d1 + t] = n1;
 
     // build lists of degree-repeated vertex numbers
-    std::vector<size_t> stubs2(K*k,0);
-    for( size_t I = 0; I < K; I++ )
-        for( size_t t = 0; t < k; t++ )
-            stubs2[I*k + t] = I;
+    std::vector<size_t> stubs2( N2*d2, 0 );
+    for( size_t n2 = 0; n2 < N2; n2++ )
+        for( size_t t = 0; t < d2; t++ )
+            stubs2[n2*d2 + t] = n2;
 
     // shuffle lists
     random_shuffle( stubs1.begin(), stubs1.end() );
@@ -255,18 +157,18 @@ BipartiteGraph CreateRandomBipartiteGraph( size_t N, size_t K, size_t n, size_t 
 
     // add edges
     vector<BipartiteGraph::Edge> edges;
-    edges.reserve( N*n );
-    for( size_t e = 0; e < N*n; e++ )
+    edges.reserve( N1*d1 );
+    for( size_t e = 0; e < N1*d1; e++ )
         edges.push_back( BipartiteGraph::Edge(stubs1[e], stubs2[e]) );
 
     // finish construction
-    G.construct( N, K, edges.begin(), edges.end() );
+    G.construct( N1, N2, edges.begin(), edges.end() );
 
     return G;
 }
 
 
-// Returns x**n % p, assuming p is prime
+/// Returns x**n % p, assuming p is prime
 int powmod (int x, int n, int p) {
     int y = 1;
     for( int m = 0; m < n; m++ )
@@ -275,7 +177,7 @@ int powmod (int x, int n, int p) {
 }
 
 
-// Returns order of x in GF(p) with p prime
+/// Returns order of x in GF(p) with p prime
 size_t order (int x, int p) {
     x = x % p;
     DAI_ASSERT( x != 0 );
@@ -289,7 +191,7 @@ size_t order (int x, int p) {
 }
 
 
-// Returns whether n is a prime number
+/// Returns whether n is a prime number
 bool isPrime (size_t n) {
     bool result = true;
     for( size_t k = 2; (k < n) && result; k++ )
@@ -299,8 +201,8 @@ bool isPrime (size_t n) {
 }
 
 
-// Make a regular LDPC graph with N=6, j=2, K=4, k=3
-BipartiteGraph CreateSmallLDPCGraph() {
+/// Constructs a regular LDPC graph with N=6, j=2, K=4, k=3
+BipartiteGraph createSmallLDPCGraph() {
     BipartiteGraph G;
     size_t N=4, j=3, K=4; // k=3;
 
@@ -319,13 +221,19 @@ BipartiteGraph CreateSmallLDPCGraph() {
 }
 
 
-// Use construction described in "A Class of Group-Structured LDPC Codes"
-// by R. M. Tanner, D. Sridhara and T. Fuja
-// Proceedings of ICSTA, 2001
-//
-// Example parameters: (p,j,k) = (31,3,5)
-// j and k must be divisors of p-1
-BipartiteGraph CreateGroupStructuredLDPCGraph( size_t p, size_t j, size_t k ) {
+/// Creates group-structured LDPC code
+/** Use construction described in "A Class of Group-Structured LDPC Codes"
+ *  by R. M. Tanner, D. Sridhara and T. Fuja
+ *  Proceedings of ICSTA, 2001
+ *
+ *  Example parameters: (p,j,k) = (31,3,5)
+ *                      (p,j,k) = (37,3,4)
+ *                      (p,j,k) = (7,2,4)
+ *                      (p,j,k) = (29,2,4)
+ *
+ *  j and k must be divisors of p-1
+ */
+BipartiteGraph createGroupStructuredLDPCGraph( size_t p, size_t j, size_t k ) {
     BipartiteGraph G;
 
     size_t n = j;
@@ -341,8 +249,8 @@ BipartiteGraph CreateGroupStructuredLDPCGraph( size_t p, size_t j, size_t k ) {
         if( order(b,p) == j )
             break;
     DAI_ASSERT( b != p );
-//    cout << "# order(a=" << a << ") = " << order(a,p) << endl;
-//    cout << "# order(b=" << b << ") = " << order(b,p) << endl;
+    // cout << "# order(a=" << a << ") = " << order(a,p) << endl;
+    // cout << "# order(b=" << b << ") = " << order(b,p) << endl;
 
     DAI_ASSERT( N * n == K * k );
 
@@ -364,8 +272,8 @@ BipartiteGraph CreateGroupStructuredLDPCGraph( size_t p, size_t j, size_t k ) {
 }
 
 
-// Make parity check table
-void MakeParityCheck( Real *result, size_t n, Real eps ) {
+// Constructs a parity check table
+void createParityCheck( Real *result, size_t n, Real eps ) {
     size_t N = 1 << n;
     for( size_t i = 0; i < N; i++ ) {
         size_t c = 0;
@@ -381,116 +289,143 @@ void MakeParityCheck( Real *result, size_t n, Real eps ) {
 }
 
 
-const char *FULL_TYPE = "full";
-const char *GRID_TYPE = "grid";
-const char *GRID_TORUS_TYPE = "grid_torus";
-const char *DREG_TYPE = "dreg";
-const char *HOI_TYPE = "hoi";
-const char *LDPC_RANDOM_TYPE = "ldpc_random";
-const char *LDPC_GROUP_TYPE = "ldpc_group";
-const char *LDPC_SMALL_TYPE = "ldpc_small";
-const char *LOOP_TYPE = "loop";
-const char *TREE_TYPE = "tree";
-const char *POTTS3D_TYPE = "potts3d";
+/// Predefined names of various factor graph types
+const char *FULL_TYPE        = "FULL";
+const char *DREG_TYPE        = "DREG";
+const char *LOOP_TYPE        = "LOOP";
+const char *TREE_TYPE        = "TREE";
+const char *GRID_TYPE        = "GRID";
+const char *GRID3D_TYPE      = "GRID3D";
+const char *HOI_TYPE         = "HOI";
+const char *LDPC_TYPE        = "LDPC";
 
 
+/// Possible LDPC structures
+DAI_ENUM(LDPCType,SMALL,GROUP,RANDOM);
+
+
+/// Main function
 int main( int argc, char *argv[] ) {
     try {
-        size_t N, K, k, d, j, n1, n2, n3;
-        size_t prime;
+        // Variables for storing command line arguments
         size_t seed;
-        Real beta, sigma_w, sigma_th, noise, mean_w, mean_th;
-        string type;
         size_t states = 2;
+        string type;
+        size_t d, N, K, k, j, n1, n2, n3, prime;
+        bool periodic = false;
+        FactorType ft;
+        LDPCType ldpc;
+        Real beta, sigma_w, sigma_th, mean_w, mean_th, noise;
 
         // Declare the supported options.
-        po::options_description desc("Allowed options");
-        desc.add_options()
+        po::options_description opts("General command line options");
+        opts.add_options()
             ("help",     "produce help message")
-            ("type",     po::value<string>(&type),     "factor graph type:\n\t'full', 'grid', 'grid_torus', 'dreg', 'loop', 'tree', 'hoi', 'ldpc_random', 'ldpc_group', 'ldpc_small', 'potts3d'")
-            ("seed",     po::value<size_t>(&seed),     "random number seed (tries to read from /dev/urandom if not specified)")
-            ("N",        po::value<size_t>(&N),        "number of variables (not for type=='ldpc_small')")
-            ("n1",       po::value<size_t>(&n1),       "width of 3D grid (only for type=='potts3d')")
-            ("n2",       po::value<size_t>(&n2),       "height of 3D grid (only for type=='potts3d')")
-            ("n3",       po::value<size_t>(&n3),       "length of 3D grid (only for type=='potts3d')")
-            ("K",        po::value<size_t>(&K),        "number of factors\n\t(only for type=='hoi' and 'type=='ldpc_{random,group}')")
-            ("k",        po::value<size_t>(&k),        "number of variables per factor\n\t(only for type=='hoi' and type=='ldpc_{random,group}')")
-            ("d",        po::value<size_t>(&d),        "variable connectivity\n\t(only for type=='dreg')")
-            ("j",        po::value<size_t>(&j),        "number of parity checks per bit\n\t(only for type=='ldpc_{random,group}')")
-            ("prime",    po::value<size_t>(&prime),    "prime number for construction of LDPC code\n\t(only for type=='ldpc_group')")
-            ("beta",     po::value<Real>(&beta),       "stddev of log-factor entries\n\t(only for type=='hoi', 'potts3d', 'grid' if states>2)")
-            ("mean_w",   po::value<Real>(&mean_w),     "mean of pairwise interactions w_{ij}\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
-            ("mean_th",  po::value<Real>(&mean_th),    "mean of singleton interactions th_i\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
-            ("sigma_w",  po::value<Real>(&sigma_w),    "stddev of pairwise interactions w_{ij}\n\t(not for type=='hoi', 'ldpc_*', 'potts3d')")
-            ("sigma_th", po::value<Real>(&sigma_th),   "stddev of singleton interactions th_i\n\t(not for type=='hoi', 'ldpc_*', 'potts3d'")
-            ("noise",    po::value<Real>(&noise),      "bitflip probability for binary symmetric channel (only for type=='ldpc')")
-            ("states",   po::value<size_t>(&states),   "number of states of each variable (should be 2 for all but type=='grid', 'grid_torus', 'loop', 'potts3d')")
+            ("seed",     po::value<size_t>(&seed),   "random number seed (tries to read from /dev/urandom if not specified)")
+            ("states",   po::value<size_t>(&states), "number of states of each variable (default=2 for binary variables)")
         ;
 
+        // Graph structure options
+        po::options_description opts_graph("Options for specifying graph structure");
+        opts_graph.add_options()
+            ("type",     po::value<string>(&type),   "factor graph type (one of 'FULL', 'DREG', 'LOOP', 'TREE', 'GRID', 'GRID3D', 'HOI', 'LDPC')")
+            ("d",        po::value<size_t>(&d),      "variable connectivity (only for type=='DREG');\n\t<d><N> should be even")
+            ("N",        po::value<size_t>(&N),      "number of variables (not for type=='GRID','GRID3D')")
+            ("n1",       po::value<size_t>(&n1),     "width of grid (only for type=='GRID','GRID3D')")
+            ("n2",       po::value<size_t>(&n2),     "height of grid (only for type=='GRID','GRID3D')")
+            ("n3",       po::value<size_t>(&n3),     "length of grid (only for type=='GRID3D')")
+            ("periodic", po::value<bool>(&periodic), "periodic grid? (only for type=='GRID','GRID3D'; default=0)")
+            ("K",        po::value<size_t>(&K),      "number of factors (only for type=='HOI','LDPC')")
+            ("k",        po::value<size_t>(&k),      "number of variables per factor (only for type=='HOI','LDPC')")
+        ;
+
+        // Factor options
+        po::options_description opts_factors("Options for specifying factors");
+        opts_factors.add_options()
+            ("factors",  po::value<FactorType>(&ft), "factor type (one of 'EXPGAUSS','POTTS','ISING')")
+            ("beta",     po::value<Real>(&beta),     "inverse temperature (ignored for factors=='ISING')")
+            ("mean_w",   po::value<Real>(&mean_w),   "mean of pairwise interactions w_{ij} (only for factors=='ISING')")
+            ("mean_th",  po::value<Real>(&mean_th),  "mean of unary interactions th_i (only for factors=='ISING')")
+            ("sigma_w",  po::value<Real>(&sigma_w),  "stddev of pairwise interactions w_{ij} (only for factors=='ISING')")
+            ("sigma_th", po::value<Real>(&sigma_th), "stddev of unary interactions th_i (only for factors=='ISING'")
+        ;
+
+        // LDPC options
+        po::options_description opts_ldpc("Options for specifying LDPC code factor graphs");
+        opts_ldpc.add_options()
+            ("ldpc",     po::value<LDPCType>(&ldpc), "type of LDPC code (one of 'SMALL','GROUP','RANDOM')")
+            ("j",        po::value<size_t>(&j),      "number of parity checks per bit (only for type=='LDPC')")
+            ("noise",    po::value<Real>(&noise),    "bitflip probability for binary symmetric channel (only for type=='LDPC')")
+            ("prime",    po::value<size_t>(&prime),  "prime number for construction of LDPC code (only for type=='LDPC' with ldpc='GROUP'))")
+        ;
+
+        // All options
+        opts.add(opts_graph).add(opts_factors).add(opts_ldpc);
+
+        // Parse command line arguments
         po::variables_map vm;
-        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::store(po::parse_command_line(argc, argv, opts), vm);
         po::notify(vm);
 
+        // Display help message if necessary
         if( vm.count("help") || !vm.count("type") ) {
-            if( vm.count("type") ) {
-                if( type == FULL_TYPE ) {
-                    cout << "Creates fully connected pairwise graphical model of <N> binary variables;" << endl;
-                } else if( type == GRID_TYPE ) {
-                    cout << "Creates (non-periodic) 2D Ising grid of (approx.) <N> variables (which need not be binary);" << endl;
-                } else if( type == GRID_TORUS_TYPE ) {
-                    cout << "Creates periodic 2D Ising grid of (approx.) <N> variables (which need not be binary);" << endl;
-                } else if( type == DREG_TYPE ) {
-                    cout << "Creates random d-regular graph of <N> binary variables with uniform degree <d>" << endl;
-                    cout << "(where <d><N> should be even);" << endl;
-                } else if( type == LOOP_TYPE ) {
-                    cout << "Creates a pairwise graphical model consisting of a single loop of" << endl;
-                    cout << "<N> variables (which need not be binary);" << endl;
-                } else if( type == TREE_TYPE ) {
-                    cout << "Creates a pairwise, connected graphical model without cycles (i.e., a tree)" << endl;
-                    cout << "of <N> binary variables;" << endl;
-                } else if( type == HOI_TYPE ) {
-                    cout << "Creates a random factor graph of <N> binary variables and" << endl;
-                    cout << "<K> factors, each factor being an interaction of <k> variables." << endl;
-                    cout << "The entries of the factors are exponentials of i.i.d. Gaussian" << endl;
-                    cout << "variables with mean 0 and standard deviation <beta>." << endl;
-                } else if( type == LDPC_RANDOM_TYPE ) {
-                    cout << "Simulates LDPC decoding problem, using a LDPC code of <N> bits and <K> parity" << endl;
-                    cout << "checks, with <k> bits per check and <j> checks per bit, transmitted on a binary" << endl;
-                    cout << "symmetric channel with probability <noise> of flipping a bit. The transmitted" << endl;
-                    cout << "codeword has all bits set to zero. The LDPC code is randomly generated." << endl;
-                } else if( type == LDPC_GROUP_TYPE ) {
-                    cout << "Simulates LDPC decoding problem, using a LDPC code of <N> bits and <K> parity" << endl;
-                    cout << "checks, with <k> bits per check and <j> checks per bit, transmitted on a binary" << endl;
-                    cout << "symmetric channel with probability <noise> of flipping a bit. The transmitted" << endl;
-                    cout << "codeword has all bits set to zero. The LDPC code is constructed (using group" << endl;
-                    cout << "theory) using a parameter <prime>; <j> and <k> should both be divisors of <prime>-1." << endl;
-                } else if( type == LDPC_SMALL_TYPE ) {
-                    cout << "Simulates LDPC decoding problem, using a LDPC code of 4 bits and 4 parity" << endl;
-                    cout << "checks, with 3 bits per check and 3 checks per bit, transmitted on a binary" << endl;
-                    cout << "symmetric channel with probability <noise> of flipping a bit. The transmitted" << endl;
-                    cout << "codeword has all bits set to zero. The LDPC code is fixed." << endl;
-                } else if( type == POTTS3D_TYPE ) {
-                    cout << "Builds 3D Potts model of size <n1>x<n2>x<n3> with nearest-neighbour Potts" << endl;
-                    cout << "interactions with <states> states and inverse temperature <beta>." << endl;
-                } else
-                    cerr << "Unknown type (should be one of 'full', 'grid', 'grid_torus', 'dreg', 'loop', 'tree', 'hoi', 'ldpc_random', 'ldpc_group', 'ldpc_small', 'potts3d')" << endl;
+            cout << "This program is part of libDAI - http://www.libdai.org/" << endl << endl;
+            cout << "Usage: ./createfg [options]" << endl << endl;
+            cout << "Creates a factor graph according to the specified options." << endl << endl;
+            
+            cout << endl << opts << endl;
+            
+            cout << "The following factor graph types with pairwise interactions can be created:" << endl;
+            cout << "\t'FULL':   fully connected graph of <N> variables" << endl;
+            cout << "\t'DREG':   random regular graph of <N> variables where each variable is connected with <d> others" << endl;
+            cout << "\t'LOOP':   a single loop of <N> variables" << endl;
+            cout << "\t'TREE':   random tree-structured (acyclic, connected) graph of <N> variables" << endl;
+            cout << "\t'GRID':   2D grid of <n1>x<n2> variables" << endl;
+            cout << "\t'GRID3D': 3D grid of <n1>x<n2>x<n3> variables" << endl;
+            cout << "The following higher-order interactions factor graphs can be created:" << endl;
+            cout << "\t'HOI':    random factor graph consisting of <N> variables and <K> factors," << endl;
+            cout << "\t          each factor being an interaction of <k> variables." << endl;
+            cout << "The following LDPC code factor graphs can be created:" << endl;
+            cout << "\t'LDPC':   simulates LDPC decoding problem, using an LDPC code of <N> bits and <K>" << endl;
+            cout << "\t          parity checks, with <k> bits per check and <j> checks per bit, transmitted" << endl;
+            cout << "\t          on a binary symmetric channel with probability <noise> of flipping a bit." << endl;
+            cout << "\t          The transmitted codeword has all bits set to zero. The argument 'ldpc'" << endl;
+            cout << "\t          determines how the LDPC code is constructed: either using a group structure," << endl;
+            cout << "\t          or randomly, or a fixed small code with (N,K,k,j) = (4,4,3,3)." << endl << endl;
 
-                if( type == FULL_TYPE || type == GRID_TYPE || type == GRID_TORUS_TYPE || type == DREG_TYPE || type == LOOP_TYPE || type == TREE_TYPE ) {
-                    if( type == GRID_TYPE || type == GRID_TORUS_TYPE || type == LOOP_TYPE ) {
-                        cout << "if <states> > 2: factor entries are exponents of Gaussians with mean 0 and standard deviation beta; otherwise," << endl;
-                    }
-                    cout << "singleton interactions are Gaussian with mean <mean_th> and standard" << endl;
-                    cout << "deviation <sigma_th>; pairwise interactions are Gaussian with mean" << endl;
-                    cout << "<mean_w> and standard deviation <sigma_w>." << endl;
-                }
-            }
-            cout << endl << desc << endl;
+            cout << "For all types except type=='LDPC', the factors have to be specified as well." << endl << endl;
+
+            cout << "EXPGAUSS factors (the default) are created by drawing all log-factor entries" << endl;
+            cout << "independently from a Gaussian with mean 0 and standard deviation <beta>." << endl << endl;
+            
+            cout << "In case of pairwise interactions, one can also choose POTTS factors, for which" << endl;
+            cout << "the log-factors are simply delta functions multiplied by the strength <beta>." << endl << endl;
+
+            cout << "For pairwise interactions and binary variables, one can also use ISING factors." << endl;
+            cout << "Here variables x1...xN are assumed to be +1/-1--valued, and unary interactions" << endl;
+            cout << "are of the form exp(th*xi) with th drawn from a Gaussian distribution with mean" << endl;
+            cout << "<mean_th> and standard deviation <sigma_th>, and pairwise interactions are of the" << endl;
+            cout << "form exp(w*xi*xj) with w drawn from a Gaussian distribution with mean <mean_w>" << endl;
+            cout << "and standard deviation <sigma_w>." << endl;
             return 1;
         }
 
+        // Set default number of states
         if( !vm.count("states") )
             states = 2;
 
+        // Set default factor type
+        if( !vm.count("factors") )
+            ft = FactorType::EXPGAUSS;
+        // Check validness of factor type
+        if( ft == FactorType::POTTS )
+            if( type == HOI_TYPE )
+                throw "For factors=='POTTS', interactions should be pairwise (type!='HOI')";
+        if( ft == FactorType::ISING )
+            if( ((states != 2) || (type == HOI_TYPE)) )
+                throw "For factors=='ISING', variables should be binary (states==2) and interactions should be pairwise (type!='HOI')";
+
+        // Read random seed
         if( !vm.count("seed") ) {
             ifstream infile;
             bool success;
@@ -506,128 +441,126 @@ int main( int argc, char *argv[] ) {
         }
         rnd_seed( seed );
 
-        FactorGraph fg;
+        // Set default periodicity
+        if( !vm.count("periodic") )
+            periodic = false;
 
+        // Store some options in a PropertySet object
+        PropertySet options;
+        if( vm.count("mean_th") )
+            options.Set("mean_th", mean_th);
+        if( vm.count("sigma_th") )
+            options.Set("sigma_th", sigma_th);
+        if( vm.count("mean_w") )
+            options.Set("mean_w", mean_w);
+        if( vm.count("sigma_w") )
+            options.Set("sigma_w", sigma_w);
+        if( vm.count("beta") )
+            options.Set("beta", beta);
+
+        // Output some comments
         cout << "# Factor graph made by " << argv[0] << endl;
         cout << "# type = " << type << endl;
+        cout << "# states = " << states << endl;
 
-        if( type == FULL_TYPE ) {
-            if( !vm.count("N") || !vm.count("mean_w") || !vm.count("mean_th") || !vm.count("sigma_w") || !vm.count("sigma_th") )
-                throw "Please specify all required arguments";
-            MakeFullFG( N, mean_w, mean_th, sigma_w, sigma_th, fg );
+        // The factor graph to be constructed
+        FactorGraph fg;
 
-            cout << "# N = " << N << endl;
-            cout << "# mean_w = " << mean_w << endl;
-            cout << "# mean_th = " << mean_th << endl;
-            cout << "# sigma_w = " << sigma_w << endl;
-            cout << "# sigma_th = " << sigma_th << endl;
-        } else if( type == GRID_TYPE || type == GRID_TORUS_TYPE ) {
 #define NEED_ARG(name, desc) do { if(!vm.count(name)) throw "Please specify " desc " with --" name; } while(0);
-            if( states > 2 ) {
-                NEED_ARG("N", "number of nodes");
+
+        if( type == FULL_TYPE || type == DREG_TYPE || type == LOOP_TYPE || type == TREE_TYPE || type == GRID_TYPE || type == GRID3D_TYPE ) {
+            // Pairwise interactions
+
+            // Check command line options
+            if( type == GRID_TYPE ) {
+                NEED_ARG("n1", "width of grid");
+                NEED_ARG("n2", "height of grid");
+                N = n1 * n2;
+            } else if( type == GRID3D_TYPE ) {
+                NEED_ARG("n1", "width of grid");
+                NEED_ARG("n2", "height of grid");
+                NEED_ARG("n3", "depth of grid");
+                N = n1 * n2 * n3;
+            } else
+                NEED_ARG("N", "number of variables");
+
+            if( states > 2 || ft == FactorType::POTTS ) {
                 NEED_ARG("beta", "stddev of log-factor entries");
             } else {
-                NEED_ARG("N", "number of nodes");
                 NEED_ARG("mean_w", "mean of pairwise interactions");
-                NEED_ARG("mean_th", "mean of singleton interactions");
+                NEED_ARG("mean_th", "mean of unary interactions");
                 NEED_ARG("sigma_w", "stddev of pairwise interactions");
-                NEED_ARG("sigma_th", "stddev of singleton interactions");
+                NEED_ARG("sigma_th", "stddev of unary interactions");
             }
 
-            size_t n = (size_t)sqrt((long double)N);
-            N = n * n;
+            if( type == DREG_TYPE )
+                NEED_ARG("d", "connectivity (number of neighboring variables of each variable)");
 
-            bool periodic = false;
-            if( type == GRID_TYPE )
-                periodic = false;
-            else
-                periodic = true;
+            // Build pairwise interaction graph
+            GraphAL G;
+            if( type == FULL_TYPE )
+                G = createGraphFull( N );
+            else if( type == DREG_TYPE )
+                G = createGraphRegular( N, d );
+            else if( type == LOOP_TYPE )
+                G = createGraphLoop( N );
+            else if( type == TREE_TYPE )
+                G = createGraphTree( N );
+            else if( type == GRID_TYPE )
+                G = createGraphGrid( n1, n2, periodic );
+            else if( type == GRID3D_TYPE )
+                G = createGraphGrid3D( n1, n2, n3, periodic );
 
-            if( states > 2 )
-                MakeGridNonbinaryFG( periodic, n, states, beta, fg );
-            else
-                MakeGridFG( periodic, n, mean_w, mean_th, sigma_w, sigma_th, fg );
+            // Construct factor graph from pairwise interaction graph
+            fg = createFG( G, ft, states, options );
 
-            cout << "# n = " << n << endl;
-            cout << "# N = " << N << endl;
-
-            if( states > 2 )
-                cout << "# beta = " << beta << endl;
-            else {
-                cout << "# mean_w = " << mean_w << endl;
-                cout << "# mean_th = " << mean_th << endl;
-                cout << "# sigma_w = " << sigma_w << endl;
-                cout << "# sigma_th = " << sigma_th << endl;
+            // Output some additional comments
+            if( type == GRID_TYPE || type == GRID3D_TYPE ) {
+                cout << "# n1 = " << n1 << endl;
+                cout << "# n2 = " << n2 << endl;
+                if( type == GRID3D_TYPE )
+                    cout << "# n3 = " << n3 << endl;
             }
-        } else if( type == DREG_TYPE ) {
-            if( !vm.count("N") || !vm.count("mean_w") || !vm.count("mean_th") || !vm.count("sigma_w") || !vm.count("sigma_th") || !vm.count("d") )
-                throw "Please specify all required arguments";
-
-            MakeDRegFG( N, d, mean_w, mean_th, sigma_w, sigma_th, fg );
-
-            cout << "# N = " << N << endl;
-            cout << "# d = " << d << endl;
-            cout << "# mean_w = " << mean_w << endl;
-            cout << "# mean_th = " << mean_th << endl;
-            cout << "# sigma_w = " << sigma_w << endl;
-            cout << "# sigma_th = " << sigma_th << endl;
-        } else if( type == LOOP_TYPE ) {
-            if( states > 2 ) {
-                if( !vm.count("N") || !vm.count("beta") )
-                    throw "Please specify all required arguments";
-            } else {
-                if( !vm.count("N") || !vm.count("mean_w") || !vm.count("mean_th") || !vm.count("sigma_w") || !vm.count("sigma_th") )
-                    throw "Please specify all required arguments";
-            }
-            if( states > 2 )
-                MakeLoopNonbinaryFG( N, states, beta, fg );
-            else
-                MakeLoopFG( N, mean_w, mean_th, sigma_w, sigma_th, fg );
-
-            cout << "# N = " << N << endl;
-
-            if( states > 2 )
-                cout << "# beta = " << beta << endl;
-            else {
-                cout << "# mean_w = " << mean_w << endl;
-                cout << "# mean_th = " << mean_th << endl;
-                cout << "# sigma_w = " << sigma_w << endl;
-                cout << "# sigma_th = " << sigma_th << endl;
-            }
-        } else if( type == TREE_TYPE ) {
-            if( !vm.count("N") || !vm.count("mean_w") || !vm.count("mean_th") || !vm.count("sigma_w") || !vm.count("sigma_th") )
-                throw "Please specify all required arguments";
-            MakeTreeFG( N, mean_w, mean_th, sigma_w, sigma_th, fg );
-
-            cout << "# N = " << N << endl;
-            cout << "# mean_w = " << mean_w << endl;
-            cout << "# mean_th = " << mean_th << endl;
-            cout << "# sigma_w = " << sigma_w << endl;
-            cout << "# sigma_th = " << sigma_th << endl;
+            if( type == DREG_TYPE )
+                cout << "# d = " << d << endl;
+            cout << "# options = " << options << endl;
         } else if( type == HOI_TYPE ) {
-            if( !vm.count("N") || !vm.count("K") || !vm.count("k") || !vm.count("beta") )
-                throw "Please specify all required arguments";
+            // Higher order interactions
+
+            // Check command line arguments
+            NEED_ARG("N", "number of variables");
+            NEED_ARG("K", "number of factors");
+            NEED_ARG("k", "number of variables per factor");
+            NEED_ARG("beta", "stddev of log-factor entries");
+
+            // Create higher-order interactions factor graph
             do {
-                MakeHOIFG( N, K, k, beta, fg );
+                fg = createHOIFG( N, K, k, beta );
             } while( !fg.isConnected() );
 
-            cout << "# N = " << N << endl;
+            // Output some additional comments
             cout << "# K = " << K << endl;
             cout << "# k = " << k << endl;
             cout << "# beta = " << beta << endl;
-        } else if( type == LDPC_RANDOM_TYPE || type == LDPC_GROUP_TYPE || type == LDPC_SMALL_TYPE ) {
-            if( !vm.count("noise") )
-                throw "Please specify all required arguments";
+        } else if( type == LDPC_TYPE ) {
+            // LDPC codes
 
-            if( type == LDPC_RANDOM_TYPE ) {
-                if( !vm.count("N") || !vm.count("K") || !vm.count("j") || !vm.count("k") )
-                    throw "Please specify all required arguments";
+            // Check command line arguments
+            NEED_ARG("ldpc", "type of LDPC code");
+            NEED_ARG("noise", "bitflip probability for binary symmetric channel");
 
+            // Check more command line arguments (seperately for each LDPC type)
+            if( ldpc == LDPCType::RANDOM ) {
+                NEED_ARG("N", "number of variables");
+                NEED_ARG("K", "number of factors");
+                NEED_ARG("k", "number of variables per factor");
+                NEED_ARG("j", "number of parity checks per bit");
                 if( N * j != K * k )
                     throw "Parameters should satisfy N * j == K * k";
-            } else if( type == LDPC_GROUP_TYPE ) {
-                if( !vm.count("prime") || !vm.count("j") || !vm.count("k") )
-                    throw "Please specify all required arguments";
+            } else if( ldpc == LDPCType::GROUP ) {
+                NEED_ARG("prime", "prime number");
+                NEED_ARG("k", "number of variables per factor");
+                NEED_ARG("j", "number of parity checks per bit");
 
                 if( !isPrime(prime) )
                     throw "Parameter <prime> should be prime";
@@ -638,41 +571,37 @@ int main( int argc, char *argv[] ) {
 
                 N = prime * k;
                 K = prime * j;
-            } else if( type == LDPC_SMALL_TYPE ) {
+            } else if( ldpc == LDPCType::SMALL ) {
                 N = 4;
                 K = 4;
                 j = 3;
                 k = 3;
             }
 
+            // Output some additional comments
             cout << "# N = " << N << endl;
             cout << "# K = " << K << endl;
             cout << "# j = " << j << endl;
             cout << "# k = " << k << endl;
-            if( type == LDPC_GROUP_TYPE )
+            if( ldpc == LDPCType::GROUP )
                 cout << "# prime = " << prime << endl;
             cout << "# noise = " << noise << endl;
-
-            // p = 31, j = 3, k = 5
-            // p = 37, j = 3, k = 4
-            // p = 7 , j = 2, k = 3
-            // p = 29, j = 2, k = 4
 
             // Construct likelihood and paritycheck factors
             Real likelihood[4] = {1.0 - noise, noise, noise, 1.0 - noise};
             Real *paritycheck = new Real[1 << k];
-            MakeParityCheck(paritycheck, k, 0.0);
+            createParityCheck(paritycheck, k, 0.0);
 
             // Create LDPC structure
             BipartiteGraph ldpcG;
             bool regular;
             do {
-                if( type == LDPC_GROUP_TYPE )
-                    ldpcG = CreateGroupStructuredLDPCGraph( prime, j, k );
-                else if( type == LDPC_RANDOM_TYPE )
-                    ldpcG = CreateRandomBipartiteGraph( N, K, j, k );
-                else if( type == LDPC_SMALL_TYPE )
-                    ldpcG = CreateSmallLDPCGraph();
+                if( ldpc == LDPCType::GROUP )
+                    ldpcG = createGroupStructuredLDPCGraph( prime, j, k );
+                else if( ldpc == LDPCType::RANDOM )
+                    ldpcG = createRandomBipartiteGraph( N, K, j, k );
+                else if( ldpc == LDPCType::SMALL )
+                    ldpcG = createSmallLDPCGraph();
 
                 regular = true;
                 for( size_t i = 0; i < N; i++ )
@@ -718,24 +647,17 @@ int main( int argc, char *argv[] ) {
 
             // Construct Factor Graph
             fg = FactorGraph( factors );
-        } else if( type == POTTS3D_TYPE ) {
-            if( !vm.count("n1") || !vm.count("n2") || !vm.count("n3") || !vm.count("beta") || !vm.count("states") )
-                throw "Please specify all required arguments";
-            Make3DPotts( n1, n2, n3, states, beta, fg );
-
-            cout << "# N = " << n1*n2*n3 << endl;
-            cout << "# n1 = " << n1 << endl;
-            cout << "# n2 = " << n2 << endl;
-            cout << "# n3 = " << n3 << endl;
-            cout << "# beta = " << beta << endl;
-            cout << "# states = " << states << endl;
-        } else {
+        } else
             throw "Invalid type";
-        }
 
+        // Output additional comments
+        cout << "# N = " << fg.nrVars() << endl;
         cout << "# seed = " << seed << endl;
+
+        // Output factor graph
         cout << fg;
     } catch( const char *e ) {
+        /// Display error message
         cerr << "Error: " << e << endl;
         return 1;
     }

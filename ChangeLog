@@ -1,4 +1,9 @@
-* Added some functionality to create various standard factors to factor.cpp
+* Documented and cleaned up utils/createfg
+* Added GraphAL, an adjacency list implementation for graphs,
+  similar to (but simpler than) BipartiteGraph
+* Renamed Graph into GraphEL (for Graph, implemented as Edge List)
+* Added some functionality to create various standard factors
+  (the functions whose names start with "createFactor")
 * Renamed "Clamped BP" into "Conditioned BP"
 * Improved documentation
 * Documented tests/testdai

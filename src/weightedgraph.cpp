@@ -21,10 +21,10 @@ namespace dai {
 using namespace std;
 
 
-RootedTree::RootedTree( const Graph &T, size_t Root ) {
+RootedTree::RootedTree( const GraphEL &T, size_t Root ) {
     if( T.size() != 0 ) {
         // Make a copy
-        Graph Gr = T;
+        GraphEL Gr = T;
 
         // Nodes in the tree
         set<size_t> nodes;
@@ -34,7 +34,7 @@ RootedTree::RootedTree( const Graph &T, size_t Root ) {
 
         // Keep adding edges until done
         while( !(Gr.empty()) )
-            for( Graph::iterator e = Gr.begin(); e != Gr.end(); ) {
+            for( GraphEL::iterator e = Gr.begin(); e != Gr.end(); ) {
                 bool e1_in_nodes = nodes.count( e->n1 );
                 bool e2_in_nodes = nodes.count( e->n2 );
                 DAI_ASSERT( !(e1_in_nodes && e2_in_nodes) );
@@ -57,7 +57,7 @@ RootedTree::RootedTree( const Graph &T, size_t Root ) {
 }
 
 
-Graph RandomDRegularGraph( size_t N, size_t d ) {
+GraphEL RandomDRegularGraph( size_t N, size_t d ) {
     DAI_ASSERT( (N * d) % 2 == 0 );
 
     bool ready = false;
@@ -117,7 +117,7 @@ Graph RandomDRegularGraph( size_t N, size_t d ) {
             ready = false;
     }
 
-    return Graph( G.begin(), G.end() );
+    return GraphEL( G.begin(), G.end() );
 }
 
 
