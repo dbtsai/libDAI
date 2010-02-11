@@ -120,12 +120,6 @@ class RegionGraph : public FactorGraph {
 #endif
         }
 
-        /// Constructs a region graph from a factor graph, a vector of outer regions, a vector of inner regions and a vector of edges
-        /** \note The counting numbers for the outer regions need to be 1.
-         *  \deprecated Please use dai::RegionGraph::RegionGraph( const FactorGraph &, const std::vector<VarSet> &, const std::vector<Region> &, const std::vector<std::pair<size_t,size_t> > & ) instead.
-         */
-        RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors, const std::vector<Region> &irs, const std::vector<std::pair<size_t,size_t> > &edges );
-
         /// Constructs a region graph from a factor graph and a vector of outer clusters (CVM style)
         /** The region graph is constructed as in the Cluster Variation Method. 
          *

@@ -45,21 +45,6 @@ ClusterGraph::ClusterGraph( const std::vector<VarSet> & cls ) : G(), vars(), clu
 }
 
 
-size_t ClusterGraph::eliminationCost( size_t i ) const {
-    return eliminationCost_MinFill( *this, i );
-}
-
-
-ClusterGraph ClusterGraph::VarElim( const std::vector<Var> &ElimSeq ) const {
-    return VarElim( sequentialVariableElimination( ElimSeq ) );
-}
-
-
-ClusterGraph ClusterGraph::VarElim_MinFill() const {
-    return VarElim( greedyVariableElimination( &eliminationCost_MinFill ) );
-}
-
-
 size_t sequentialVariableElimination::operator()( const ClusterGraph &cl, const std::set<size_t> &/*remainingVars*/ ) {
     return cl.findVar( seq.at(i++) );
 }

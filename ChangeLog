@@ -1,3 +1,10 @@
+git HEAD
+--------
+
+* Removed deprecated functionality
+* Updated ChangeLog for libDAI-0.2.4 (forgot a few entries)
+
+
 libDAI-0.2.4 (2010-02-11)
 -------------------------
 
@@ -24,6 +31,7 @@ Miscellaneous improvements:
 * Implemented various heuristics for choosing a variable elimination sequence 
   in JTree
 * Added BETHE method for GBP/HAK cluster choice
+* Made alias support official part of the library
 
 Build system:
 * Moved platform independent build options into Makefile.ALL
@@ -31,6 +39,7 @@ Build system:
 
 Code cleanup:
 * Cleaned up utils/createfg and tests/testdai
+* Cleanup of some duplicate code in BP, FBP, TRWBP
 
 Interface changes (the old interface is marked obsolete and will be removed in the next release):
 * Removed obsolete/deprecated stuff
@@ -57,6 +66,7 @@ Bug fixes:
   and using log-domain updates
 * Fixed bug in HAK for trivial region graphs (with only one outer region
   and no inner regions), reported by Alejandro Lage.
+* Fixed long-standing bug in TreeEP (now, within-loop propagation optimization works)
 
 
 libDAI-0.2.3 (2009-11-16)

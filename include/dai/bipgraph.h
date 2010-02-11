@@ -228,16 +228,6 @@ class BipartiteGraph {
         size_t addNode2() { _nb2.push_back( Neighbors() ); return _nb2.size() - 1; }
 
 
-        /// Adds a node of type 1 without neighbors and returns the index of the added node.
-        /** \deprecated Please use dai::BipartiteGraph::addNode1() instead.
-         */
-        size_t add1() { return addNode1(); }
-
-        /// Adds a node of type 2 without neighbors and returns the index of the added node.
-        /** \deprecated Please use dai::BipartiteGraph::addNode2() instead.
-         */
-        size_t add2() { return addNode2(); }
-
         /// Adds a node of type 1, with neighbors specified by a range of nodes of type 2.
         /** \tparam NodeInputIterator Iterator that iterates over instances of \c size_t.
          *  \param begin Points to the first index of the nodes of type 2 that should become neighbors of the added node.
@@ -284,22 +274,6 @@ class BipartiteGraph {
             return _nb2.size() - 1;
         }
 
-        /// Adds a node of type 1, with neighbors specified by a range of nodes of type 2.
-        /** \deprecated Please use dai::BipartiteGraph::addNode1( NodeInputIterator, NodeInputIterator, size_t) instead.
-         */
-        template <typename NodeInputIterator>
-        size_t add1( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
-            return addNode1( begin, end, sizeHint );
-        }
-
-        /// Adds a node of type 2, with neighbors specified by a range of nodes of type 1.
-        /** \deprecated Please use dai::BipartiteGraph::addNode2( NodeInputIterator, NodeInputIterator, size_t) instead.
-         */
-        template <typename NodeInputIterator>
-        size_t add2( NodeInputIterator begin, NodeInputIterator end, size_t sizeHint = 0 ) {
-            return addNode2( begin, end, sizeHint );
-        }
-        
         /// Adds an edge between node \a n1 of type 1 and node \a n2 of type 2.
         /** If \a check == \c true, only adds the edge if it does not exist already.
          */
@@ -314,16 +288,6 @@ class BipartiteGraph {
         /// Removes node \a n2 of type 2 and all incident edges; indices of other nodes are changed accordingly.
         void eraseNode2( size_t n2 );
 
-        /// Removes node \a n1 of type 1 and all incident edges; indices of other nodes are changed accordingly.
-        /** \deprecated Please use dai::BipartiteGraph::eraseNode1(size_t) instead.
-         */
-        void erase1( size_t n1 ) { eraseNode1( n1 ); }
-
-        /// Removes node \a n2 of type 2 and all incident edges; indices of other nodes are changed accordingly.
-        /** \deprecated Please use dai::BipartiteGraph::eraseNode2(size_t) instead.
-         */
-        void erase2( size_t n2 ) { eraseNode2( n2 ); }
-
         /// Removes edge between node \a n1 of type 1 and node \a n2 of type 2.
         void eraseEdge( size_t n1, size_t n2 );
     //@}
@@ -334,16 +298,6 @@ class BipartiteGraph {
         size_t nrNodes1() const { return _nb1.size(); }
         /// Returns number of nodes of type 2
         size_t nrNodes2() const { return _nb2.size(); }
-
-        /// Returns number of nodes of type 1
-        /** \deprecated Please use dai::BipartiteGraph::nrNodes1() instead.
-         */
-        size_t nr1() const { return nrNodes1(); }
-
-        /// Returns number of nodes of type 2
-        /** \deprecated Please use dai::BipartiteGraph::nrNodes2() instead.
-         */
-        size_t nr2() const { return nrNodes2(); }
 
         /// Calculates the number of edges, time complexity: O(nrNodes1())
         size_t nrEdges() const {

@@ -131,10 +131,6 @@ class GraphEL : public std::set<UEdge> {
 };
 
 
-/// \deprecated Please use dai::GraphEL instead.
-typedef GraphEL Graph;
-
-
 /// Represents an undirected weighted graph, with weights of type \a T, implemented as a std::map mapping undirected edges to weights
 template<class T> class WeightedGraph : public std::map<UEdge, T> {};
 

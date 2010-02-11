@@ -104,22 +104,6 @@ void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet>
 }
 
 
-RegionGraph::RegionGraph( const FactorGraph &fg, const std::vector<Region> &ors, const std::vector<Region> &irs, const std::vector<std::pair<size_t,size_t> > &edges ) {
-    vector<VarSet> ors_alt;
-    ors_alt.reserve( ors.size() );
-    for( size_t alpha = 0; alpha < ors.size(); alpha++ ) {
-        ors_alt.push_back( ors[alpha] );
-        DAI_ASSERT( ors[alpha].c() == 1.0 );
-    }
-    construct( fg, ors_alt, irs, edges );
-
-    // Check counting numbers
-#ifdef DAI_DEBUG
-    checkCountingNumbers();
-#endif
-}
-
-
 void RegionGraph::calcCountingNumbers() {
     // Calculates counting numbers of inner regions based upon counting numbers of outer regions
 

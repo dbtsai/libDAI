@@ -2,8 +2,8 @@ libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
 -------------------------------------------------------------------------------
 
-Version:  0.2.4
-Date:     February 11, 2010
+Version:  git HEAD
+Date:     February 11, 2010 - or later
 See also: http://www.libdai.org
 
 -------------------------------------------------------------------------------

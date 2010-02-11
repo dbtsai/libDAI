@@ -198,29 +198,6 @@ namespace dai {
 
                 return result;
             }
-
-            /// Calculates cost of eliminating the \a i 'th variable.
-            /** The cost is measured as "number of added edges in the adjacency graph",
-             *  where the adjacency graph has the variables as its nodes and connects
-             *  nodes \a i1 and \a i2 iff \a i1 and \a i2 occur together in some common cluster.
-             *  \deprecated Please use dai::eliminationCost_MinFill() instead.
-             */
-            size_t eliminationCost( size_t i ) const;
-
-            /// Performs Variable Elimination, only keeping track of the interactions that are created along the way.
-            /** \param ElimSeq The sequence in which to eliminate the variables
-             *  \return A set of elimination "cliques"
-             *  \deprecated Please use dai::ClusterGraph::VarElim( sequentialVariableElimination( ElimSeq ) ) instead.
-             */
-            ClusterGraph VarElim( const std::vector<Var> &ElimSeq ) const;
-
-            /// Performs Variable Elimination using the "MinFill" heuristic
-            /** The "MinFill" heuristic greedily minimizes the cost of eliminating a variable,
-             *  measured with eliminationCost().
-             *  \return A set of elimination "cliques".
-             *  \deprecated Please use dai::ClusterGraph::VarElim( greedyVariableElimination( eliminationCost_MinFill ) ) instead.
-             */
-            ClusterGraph VarElim_MinFill() const;
         //@}
     };
 

@@ -41,8 +41,8 @@
 
 /** \mainpage Reference manual for libDAI - A free/open source C++ library for Discrete Approximate Inference methods
  *  \author Joris Mooij, Frederik Eaton
- *  \version 0.2.4
- *  \date February 11, 2010
+ *  \version git HEAD
+ *  \date February 11, 2010 - or later
  *
  *  <hr size="1">
  *  \section about About libDAI
