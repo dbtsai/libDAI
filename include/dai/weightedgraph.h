@@ -131,7 +131,7 @@ class GraphEL : public std::set<UEdge> {
 };
 
 
-/// \deprecated Please use GraphEL instead.
+/// \deprecated Please use dai::GraphEL instead.
 typedef GraphEL Graph;
 
 

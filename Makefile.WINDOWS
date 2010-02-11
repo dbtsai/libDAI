@@ -40,13 +40,13 @@ CCDEBUGFLAGS=/Ox /Zi -DDAI_DEBUG
 # Flags to add in non-debugging mode (if DEBUG=false)
 CCNODEBUGFLAGS=/Ox
 # Standard include directories
-CCINC=/Iinclude /IC:\boost_1_36_0
+CCINC=/Iinclude /IE:\boost_1_42_0
 
 # LINKER
 # Standard libraries to include
 LIBS=/link $(LIB)/libdai$(LE)
 # For linking with the BOOST Program Options library
-BOOSTLIBS=/LIBPATH:C:\boost_1_36_0\stage\lib
+BOOSTLIBS=/LIBPATH:E:\boost_1_42_0\stage\lib
 # Additional library search paths for linker
 # (For some reason, we have to add the VC library path, although it is in the environment)
 CCLIB=/LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\ATLMFC\LIB" /LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\LIB" /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v6.0A\lib"
@@ -65,4 +65,4 @@ SWIG=swig
 # Location of Python header files
 INCLUDE_PYTHON=C:\python2.5
 # Location of Boost C++ library header files
-INCLUDE_BOOST=C:\boost_1_36_0
+INCLUDE_BOOST=E:\boost_1_42_0

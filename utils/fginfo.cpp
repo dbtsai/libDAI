@@ -4,7 +4,7 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
  */
 
@@ -73,8 +73,10 @@ bool hasNegatives( const std::vector<Factor> &P ) {
 
 int main( int argc, char *argv[] ) {
     if( argc != 3 ) {
-        cout << "Usage: " << argv[0] << " <in.fg> <tw>" << endl << endl;
-        cout << "Reports some characteristics of the .fg network." << endl;
+        // Display help message if number of command line arguments is incorrect
+        cout << "This program is part of libDAI - http://www.libdai.org/" << endl << endl;
+        cout << "Usage: ./fginfo <in.fg> <tw>" << endl << endl;
+        cout << "Reports some detailed information about the factor graph <in.fg>." << endl;
         cout << "Also calculates treewidth (which may take some time) unless <tw> == 0." << endl;
         return 1;
     } else {
@@ -84,6 +86,7 @@ int main( int argc, char *argv[] ) {
         int calc_tw = atoi(argv[2]);
         fg.ReadFromFile( infile );
 
+        // Output various statistics
         cout << "Number of variables:   " << fg.nrVars() << endl;
         cout << "Number of factors:     " << fg.nrFactors() << endl;
         cout << "Connected:             " << fg.isConnected() << endl;
@@ -92,6 +95,7 @@ int main( int argc, char *argv[] ) {
         cout << "Has negatives:         " << hasNegatives(fg.factors()) << endl;
         cout << "Binary variables?      " << fg.isBinary() << endl;
         cout << "Pairwise interactions? " << fg.isPairwise() << endl;
+        // Calculate treewidth using various heuristics, if requested
         if( calc_tw ) {
             std::pair<size_t,size_t> tw;
             tw = boundTreewidth(fg, &eliminationCost_MinNeighbors);
@@ -103,11 +107,15 @@ int main( int argc, char *argv[] ) {
             tw = boundTreewidth(fg, &eliminationCost_WeightedMinFill);
             cout << "Treewidth (WeightedMinFill):  " << tw.first << " (" << tw.second << " states)" << endl;
         }
+        // Calculate total state space
         long double stsp = 1.0;
         for( size_t i = 0; i < fg.nrVars(); i++ )
             stsp *= fg.var(i).states();
         cout << "Total state space:   " << stsp << endl;
+        // Output type of factor graph
+        cout << "Type: " << (fg.isPairwise() ? "pairwise" : "higher order") << " interactions, " << (fg.isBinary() ? "binary" : "nonbinary") << " variables" << endl;
 
+        // Calculate complexity for LCBP
         long double cavsum_lcbp = 0.0;
         long double cavsum_lcbp2 = 0.0;
         size_t max_Delta_size = 0;
@@ -133,8 +141,7 @@ int main( int argc, char *argv[] ) {
             cout << it->first << "(" << it->second << ") ";
         cout << endl;
 
-        cout << "Type: " << (fg.isPairwise() ? "pairwise" : "higher order") << " interactions, " << (fg.isBinary() ? "binary" : "nonbinary") << " variables" << endl;
-
+        // Calculate girth and length of loops
         if( fg.isPairwise() ) {
             bool girth_reached = false;
             size_t loopdepth;
@@ -150,6 +157,7 @@ int main( int argc, char *argv[] ) {
                 cout << "Girth: infinity" << endl;
         }
 
+        // Output factor state spaces
         map<size_t,size_t> facsizes;
         for( size_t I = 0; I < fg.nrFactors(); I++ ) {
             size_t Isize = fg.factor(I).vars().size();

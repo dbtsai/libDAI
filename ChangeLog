@@ -1,18 +1,40 @@
-* Documented and cleaned up utils/createfg
+libDAI-0.2.4 (2010-02-11)
+-------------------------
+
+New features:
+* Implemented Tree-Reweighted BP
+* [Frederik Eaton] Implemented Fractional Belief Propagation
+
+Miscellaneous improvements:
+* Improved documentation
+* [Frederik Eaton] Added constructors for BBPCostFunction
+* [Frederik Eaton] Added accessor/mutator for the elements of a SmallSet<>
+* [Frederik Eaton] Added unary minus to TProb<>
+* [Frederik Eaton] Added Hellinger distance to TProb<>::DistType
+* [Frederik Eaton] Two small patches for src/jtree.cpp and utils/createfg.cpp
+* tests/testdai option "marginals" now has three possible values: NONE
+  outputs no marginals, VAR only variable marginals, and ALL outputs all
+  marginals calculated by the algorithm.
+* Strengthened convergence criteria of various algorithms
 * Added GraphAL, an adjacency list implementation for graphs,
   similar to (but simpler than) BipartiteGraph
-* Renamed Graph into GraphEL (for Graph, implemented as Edge List)
 * Added some functionality to create various standard factors
   (the functions whose names start with "createFactor")
-* Renamed "Clamped BP" into "Conditioned BP"
-* Improved documentation
-* Documented tests/testdai
-* Moved platform independent build options into Makefile.ALL
-* Windows platform now needs boost 1.37 or higher
-* Implemented Tree-Reweighted BP
+* Added examples example_sprinkler_gibbs and example_sprinkler_em
 * Implemented various heuristics for choosing a variable elimination sequence 
   in JTree
 * Added BETHE method for GBP/HAK cluster choice
+
+Build system:
+* Moved platform independent build options into Makefile.ALL
+* Windows platform now needs Boost 1.37 or higher
+
+Code cleanup:
+* Cleaned up utils/createfg and tests/testdai
+
+Interface changes (the old interface is marked obsolete and will be removed in the next release):
+* Removed obsolete/deprecated stuff
+* Renamed Graph into GraphEL (for Graph, implemented as Edge List)
 * Renamed some functions of BipartiteGraph:
     add1() -> addNode1()
     erase1() -> eraseNode1()
@@ -20,27 +42,21 @@
     add2() -> addNode2()
     erase2() -> eraseNode2()
     nr2() -> nrNodes2()
-* Added examples example_sprinkler_gibbs and example_sprinkler_em
-* Strengthened convergence criteria of various algorithms
-* Implemented FBP::logZ()
-* Fixed bug in HAK for trivial region graphs (with only one outer region
-  and no inner regions), reported by Alejandro Lage.
-* tests/testdai option "marginals" now has three possible values: NONE
-  outputs no marginals, VAR only variable marginals, and ALL outputs all
-  marginals calculated by the algorithm.
-* [Frederik Eaton] Added Fractional Belief Propagation
-* [Alexander Gerhard Schwing] Fixed error in BP that occured with damping
-  and using log-domain updates
-* Fixed FTBFS errors on MACOSX (thanks to Sebastian Riedel for reporting this bug)
-* [Frederik Eaton] Two small patches for src/jtree.cpp and utils/createfg.cpp
+* Renamed some functions in ClusterGraph:
+    ClusterGraph::eliminationCost() -> ::eliminationCost_MinFill() 
+    ClusterGraph::VarElim() -> ClusterGraph::VarElim( sequentialVariableElimination( ElimSeq ) ) 
+    ClusterGraph::VarElim_MinFill() -> ClusterGraph::VarElim( greedyVariableElimination( eliminationCost_MinFill ) )
+* Changed interface of one RegionGraph constructor
+* Renamed "Clamped BP" into "Conditioned BP"
+
+Bug fixes:
 * Fixed regression in scripts/regenerate-properties (now all errors are 
   gathered before throwing the exception, as used to be the case)
-* [Frederik Eaton] Added constructors for BBPCostFunction
-* [Frederik Eaton] Added accessor/mutator for the elements of a SmallSet<>
-* [Frederik Eaton] Added unary minus to TProb<>
-* [Frederik Eaton] Added Hellinger distance to TProb<>::DistType
-* Some small modifications to AUTHORS and main page of documentation
-* Removed obsolete/deprecated stuff
+* Fixed FTBFS errors on MACOSX (thanks to Sebastian Riedel for reporting this bug)
+* [Alexander Schwing] Fixed error in BP that occured with damping
+  and using log-domain updates
+* Fixed bug in HAK for trivial region graphs (with only one outer region
+  and no inner regions), reported by Alejandro Lage.
 
 
 libDAI-0.2.3 (2009-11-16)

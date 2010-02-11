@@ -5,6 +5,7 @@
  *  warranty. See the file COPYING for more details.
  *
  *  Copyright (C) 2008  Frederik Eaton  [frederik at ofb dot net]
+ *  Copyright (C) 2008-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  */
 
 

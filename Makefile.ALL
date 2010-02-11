@@ -33,7 +33,7 @@ WITH_GIBBS=true
 WITH_CBP=true
 
 # Build doxygen documentation?
-WITH_DOC=true
+WITH_DOC=
 
 # Build with debug info?
 DEBUG=true

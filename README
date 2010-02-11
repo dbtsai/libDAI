@@ -2,8 +2,8 @@ libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
 -------------------------------------------------------------------------------
 
-Version:  git HEAD
-Date:     February 4, 2010 - or later
+Version:  0.2.4
+Date:     February 11, 2010
 See also: http://www.libdai.org
 
 -------------------------------------------------------------------------------
@@ -34,12 +34,22 @@ of this program, please:
   * mention this software in the Acknowledgements section.
 
 An appropriate citation would be:
-J. M. Mooij (2009) "libDAI 0.2.3: A free/open source C++ library for Discrete
-Approximate Inference", http://www.libdai.org
+
+Joris M. Mooij et al. (2010) "libDAI 0.2.4: A free/open source C++ library for
+Discrete Approximate Inference", http://www.libdai.org
+
+or in BiBTeX format:
+
+  @misc{mooij2010libdai,
+    author = "Joris M. Mooij et al.",
+    title = "lib{DAI} 0.2.4: A free/open source {C}++ library for {D}iscrete {A}pproximate {I}nference",
+    howpublished = "http://www.libdai.org/",
+    year = 2010
+  }
+
 
 Moreover, as a personal note, I would appreciate it if you would email
-(citations of) papers referencing this work to joris dot mooij at libdai dot
-org.
+(citations of) papers referencing this work to joris dot mooij at libdai dot org.
 
 -------------------------------------------------------------------------------
 
@@ -141,10 +151,11 @@ Mailing list
 
 The Google group "libDAI" (http://groups.google.com/group/libdai) can be used
 for getting support and discussing development issues.
-
 -------------------------------------------------------------------------------
 
 Building libDAI under UNIX variants (Linux / Cygwin / Mac OS X)
+
+Preparations
 
 You need:
 
@@ -180,6 +191,8 @@ http://www.boost.org/ and compile/install it with:
   make install
 
 
+Building libDAI
+
 To build the libDAI source, first copy a template Makefile.* to Makefile.conf
 (for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). Then,
 edit the Makefile.conf template to adapt it to your local setup. Especially
@@ -194,13 +207,15 @@ If the build is successful, you can test the example program:
 
   examples/example tests/alarm.fg
 
-or the more elaborate test program:
+or the more extensive test program:
 
   tests/testdai --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX
 
 -------------------------------------------------------------------------------
 
 Building libDAI under Windows
+
+Preparations
 
 You need:
 
@@ -211,6 +226,8 @@ You need:
 For the regression test, you need:
 
   * GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
+
+Building libDAI
 
 To build the source, copy Makefile.WINDOWS to Makefile.conf. Then, edit
 Makefile.conf to adapt it to your local setup. Platform independent build
@@ -224,7 +241,7 @@ If the build is successful, you can test the example program:
 
   examples\example tests\alarm.fg
 
-or the more elaborate test program:
+or the more extensive test program:
 
   tests\testdai --aliases tests\aliases.conf --filename tests\alarm.fg --methods JTREE_HUGIN BP_SEQMAX
 
@@ -282,4 +299,3 @@ Install doxygen, graphviz and a TeX distribution and use
 to build the documentation. If the documentation is not clear enough, feel free
 to send me an email (or even better, to improve the documentation and send a
 patch!). The documentation can also be browsed online at http://www.libdai.org.
-

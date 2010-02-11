@@ -40,9 +40,9 @@
 
 
 /** \mainpage Reference manual for libDAI - A free/open source C++ library for Discrete Approximate Inference methods
- *  \author Joris Mooij
- *  \version git HEAD
- *  \date February 4, 2010 - or later
+ *  \author Joris Mooij, Frederik Eaton
+ *  \version 0.2.4
+ *  \date February 11, 2010
  *
  *  <hr size="1">
  *  \section about About libDAI
@@ -173,8 +173,20 @@
  *    - mention this software in the Acknowledgements section. 
  *
  *  An appropriate citation would be:\n
- *  J. M. Mooij (2009) "libDAI 0.2.3: A free/open source C++ library for Discrete 
+ *
+ *  Joris M. Mooij et al. (2010) "libDAI 0.2.4: A free/open source C++ library for Discrete 
  *  Approximate Inference", http://www.libdai.org
+ *
+ *  or in BiBTeX format:
+ *  
+ *  <pre>
+ *  \@misc{mooij2010libdai,
+ *    author = "Joris M. Mooij et al.",
+ *    title = "lib{DAI} 0.2.4: A free/open source {C}++ library for {D}iscrete {A}pproximate {I}nference",
+ *    howpublished = "http://www.libdai.org/",
+ *    year = 2010
+ *  }
+ *  </pre>
  *
  *  Moreover, as a personal note, I would appreciate it if you would email
  *  (citations of) papers referencing this work to joris dot mooij at libdai dot org.
@@ -191,6 +203,8 @@
 /** \page build Building libDAI
  *  <hr size="1">
  *  \section build-unix Building libDAI under UNIX variants (Linux / Cygwin / Mac OS X)
+ *
+ *  \subsection build-unix-preparations Preparations
  *
  *  You need:
  *    - a recent version of gcc (at least version 3.4)
@@ -220,6 +234,8 @@
  *  make install
  *  </pre>
  *
+ *  \subsection build-unix-libdai Building libDAI
+ *
  *  To build the libDAI source, first copy a template Makefile.* to Makefile.conf
  *  (for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). 
  *  Then, edit the Makefile.conf template to adapt it to your local setup.
@@ -230,12 +246,14 @@
  *
  *  If the build is successful, you can test the example program:
  *  <pre>  examples/example tests/alarm.fg</pre>
- *  or the more elaborate test program:
+ *  or the more extensive test program:
  *  <pre>  tests/testdai --aliases tests/aliases.conf --filename tests/alarm.fg --methods JTREE_HUGIN BP_SEQMAX</pre>
  *
  *
  *  <hr size="1">
  *  \section build-windows Building libDAI under Windows
+ *
+ *  \subsection build-windows-preparations Preparations
  *
  *  You need:
  *  - A recent version of MicroSoft Visual Studio (2008 is known to work)
@@ -245,6 +263,8 @@
  *  For the regression test, you need:
  *  - GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
  *
+ *  \subsection build-windows-libdai Building libDAI
+ *
  *  To build the source, copy Makefile.WINDOWS to Makefile.conf. Then, edit 
  *  Makefile.conf to adapt it to your local setup. Platform independent 
  *  build options can be set in Makefile.ALL. Finally, run (from the command line)
@@ -253,7 +273,7 @@
  *
  *  If the build is successful, you can test the example program:
  *  <pre>  examples\\example tests\\alarm.fg</pre>
- *  or the more elaborate test program:
+ *  or the more extensive test program:
  *  <pre>  tests\\testdai --aliases tests\\aliases.conf --filename tests\\alarm.fg --methods JTREE_HUGIN BP_SEQMAX</pre>
  *
  *
