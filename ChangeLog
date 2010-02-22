@@ -1,6 +1,7 @@
 git HEAD
 --------
 
+* [Stefano Pellegrini] Fixed bug in BP[logdomain=1,inference=MAXPROD]
 * Removed deprecated functionality
 * Updated ChangeLog for libDAI-0.2.4 (forgot a few entries)
 

@@ -512,7 +512,7 @@ std::vector<size_t> BP::findMaximum() const {
 
             // The allowed configuration is restrained according to the variables assigned so far:
             // pick the argmax amongst the allowed states
-            Real maxProb = numeric_limits<Real>::min();
+            Real maxProb = -numeric_limits<Real>::max();
             State maxState( factor(I).vars() );
             for( State s( factor(I).vars() ); s.valid(); ++s ){
                 // First, calculate whether this state is consistent with variables that
