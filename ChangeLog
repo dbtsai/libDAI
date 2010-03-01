@@ -1,6 +1,8 @@
 git HEAD
 --------
 
+* Fixed bug in BBPCostFunction::operator=() which prevented the desired 
+  assignment from happening
 * [Stefano Pellegrini] Fixed bug in BP[logdomain=1,inference=MAXPROD]
 * Removed deprecated functionality
 * Updated ChangeLog for libDAI-0.2.4 (forgot a few entries)

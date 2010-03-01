@@ -54,9 +54,7 @@ class BBPCostFunction : public BBPCostFunctionBase {
 
         /// Assignment operator
         BBPCostFunction& operator=( const BBPCostFunctionBase &x ) {
-            if( this != &x ) {
-                (BBPCostFunctionBase)*this = x;
-            }
+            BBPCostFunctionBase::operator=( x );
             return *this;
         }
 };
