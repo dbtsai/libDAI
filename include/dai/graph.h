@@ -235,6 +235,18 @@ class GraphAL {
             return sum;
         }
 
+        /// Returns the index of a given node \a n2 amongst the neighbors of \a n1
+        /** \note The time complexity is linear in the number of neighbors of \a n1
+         *  \throw OBJECT_NOT_FOUND if \a n2 is not a neighbor of \a n1
+         */
+        size_t findNb( size_t n1, size_t n2 ) {
+            for( size_t _n2 = 0; _n2 < nb(n1).size(); _n2++ )
+                if( nb( n1, _n2 ) == n2 )
+                    return _n2;
+            DAI_THROW(OBJECT_NOT_FOUND);
+            return nb(n1).size();
+        }
+
         /// Returns true if the graph is connected
         bool isConnected() const;
 

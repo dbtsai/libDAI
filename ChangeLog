@@ -1,7 +1,10 @@
 git HEAD
 --------
 
-* Rewrote implementation of response propagation in MR
+* Cleaned up MR code:
+  - rewrote response propagation implementation with help of BBP
+  - now uses GraphAL to represent the Markov graph
+  - miscellaneous smaller cleanups
 * Fixed bug in BBPCostFunction::operator=() which prevented the desired 
   assignment from happening
 * [Stefano Pellegrini] Fixed bug in BP[logdomain=1,inference=MAXPROD]
