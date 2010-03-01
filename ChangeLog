@@ -1,6 +1,7 @@
 git HEAD
 --------
 
+* Rewrote implementation of response propagation in MR
 * Fixed bug in BBPCostFunction::operator=() which prevented the desired 
   assignment from happening
 * [Stefano Pellegrini] Fixed bug in BP[logdomain=1,inference=MAXPROD]

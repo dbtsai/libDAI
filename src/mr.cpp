@@ -18,6 +18,7 @@
 #include <dai/bp.h>
 #include <dai/jtree.h>
 #include <dai/util.h>
+#include <dai/bbp.h>
 
 
 namespace dai {
@@ -89,53 +90,34 @@ void MR::init(size_t Nin, Real *_w, Real *_th) {
 }
 
 
-Real MR::init_cor_resp() {
-    size_t j,k,l, runx,i2;
-    Real variab1, variab2;
+Real MR::init_cor_resp_old() {
     Real md, maxdev;
-    Real thbJsite[kmax];
-    Real xinter;
-    Real rinter;
-    Real res[kmax];
-    size_t s2;
-    size_t flag;
-    size_t concav;
-    size_t runs = 3000;
-    Real eps = 0.2;
-    size_t cavity;
+
+    size_t maxIters = 3000;
+    Real damping = 0.1;
 
     vector<vector<Real> > tJ_org;
     vector<vector<size_t> > nb_org;
     vector<size_t> con_org;
-    vector<Real> theta_org;
-
-    vector<Real> xfield(N*kmax,0.0);
-    vector<Real> rfield(N*kmax,0.0);
-    vector<Real> Hfield(N,0.0);
-    vector<Real> devs(N*kmax,0.0);
-    vector<Real> devs2(N*kmax,0.0);
-    vector<Real> dev(N,0.0);
-    vector<Real> avmag(N,0.0);
 
     // save original tJ, nb
     nb_org = nb;
     tJ_org = tJ;
     con_org = con;
-    theta_org = theta;
 
     maxdev = 0.0;
-    for(cavity=0; cavity<N; cavity++){    // for each spin to be removed
+    for( size_t cavity = 0; cavity < N; cavity++ ) {    // for each spin to be removed
         con = con_org;
-        concav=con[cavity];
+        size_t concav = con[cavity];
 
         nb = nb_org;
         tJ = tJ_org;
 
-        //  Adapt the graph variables nb[], tJ[] and con[]
+        // Adapt the graph variables nb[], tJ[] and con[]
         for(size_t i=0; i<con[cavity]; i++) {
             size_t ij = nb[cavity][i];
-            flag=0;
-            j=0;
+            size_t flag=0;
+            size_t j=0;
             do{
                 if(nb[ij][j]==cavity){
                     while(j<(con[ij]-1)){
@@ -152,97 +134,139 @@ Real MR::init_cor_resp() {
             con[nb[cavity][i]]--;
         con[cavity] = 0;
 
-
         // Do everything starting from the new graph********
 
         makekindex();
-        theta = theta_org;
 
-        for(size_t i=0; i<kmax*N; i++)
-            xfield[i] = 3.0*(2*rnd_uniform()-1.);
+        vector<Real> xfield(N*kmax,0.0);
+        vector<Real> rfield(N*kmax,0.0);
 
-        for(i2=0; i2<concav; i2++){ // Subsequently apply a field to each cavity spin ****************
+        for( size_t i = 0; i < kmax*N; i++ )
+            xfield[i] = 3.0 * (2.0 * rnd_uniform() - 1.);
 
-            s2 = nb[cavity][i2];    // identify the index of the cavity spin
-            for(size_t i=0; i<con[s2]; i++)
-                rfield[kmax*s2+i] = 1.;
+        for( size_t _i2 = 0; _i2 < concav; _i2++ ) { // Subsequently apply a field to each cavity spin ****************
+            size_t i2 = nb[cavity][_i2];
 
-            runx=0;
-            do {      // From here start the response and belief propagation
-                runx++;
-                md=0.0;
-                for(k=0; k<N; k++){
-                    if(k!=cavity) {
-                        for(size_t i=0; i<con[k]; i++)
-                            thbJsite[i] = tJ[k][i];
-                        for(l=0; l<con[k]; l++){
-                            xinter = 1.;
-                            rinter = 0.;
-                            if(k==s2) rinter += 1.;
-                            for(j=0; j<con[k]; j++)
-                                if(j!=l){
-                                    variab2 = tanh(xfield[kmax*nb[k][j]+kindex[k][j]]);
-                                    variab1 = thbJsite[j]*variab2;
-                                    xinter *= (1.+variab1)/(1.-variab1);
+            for( size_t _i = 0; _i < con[i2]; _i++ )
+                rfield[kmax*i2 + _i] = 1.0;
 
-                                    rinter += thbJsite[j]*rfield[kmax*nb[k][j]+kindex[k][j]]*(1-variab2*variab2)/(1-variab1*variab1);
+            size_t iters = 0;
+            do { // From here start the response and belief propagation
+                iters++;
+                md = 0.0;
+                for( size_t k = 0; k < N; k++ ){
+                    if( k != cavity ) {
+                        for( size_t _l = 0; _l < con[k]; _l++ ){
+                            Real xinter = theta[k];
+                            Real rinter = 0.;
+                            if( k == i2 ) 
+                                rinter += 1.;
+                            for( size_t _j = 0; _j < con[k]; _j++ )
+                                if( _j != _l ) {
+                                    size_t ind = kmax*nb[k][_j] + kindex[k][_j];  // index of cavity field "j \ k"
+                                    Real variab2 = tanh( xfield[ind] );
+                                    Real variab1 = tJ[k][_j] * variab2;
+                                    xinter += atanh( variab1 );
+                                    rinter += tJ[k][_j] * rfield[ind] * (1.0 - variab2*variab2) / (1.0 - variab1*variab1);
                                 }
 
-                            variab1 = 0.5*log(xinter);
-                            xinter = variab1 + theta[k];
-                            devs[kmax*k+l] = xinter-xfield[kmax*k+l];
-                            xfield[kmax*k+l] = xfield[kmax*k+l]+devs[kmax*k+l]*eps;
-                            if( fabs(devs[kmax*k+l]) > md )
-                                md = fabs(devs[kmax*k+l]);
+                            size_t ind = kmax * k + _l;  // index of cavity field "k \ l"
 
-                            devs2[kmax*k+l] = rinter-rfield[kmax*k+l];
-                            rfield[kmax*k+l] = rfield[kmax*k+l]+devs2[kmax*k+l]*eps;
-                            if( fabs(devs2[kmax*k+l]) > md )
-                                md = fabs(devs2[kmax*k+l]);
+                            // update xfield
+                            Real devs = xinter - xfield[ind];
+                            xfield[ind] += devs * damping;
+                            if( fabs(devs) > md )
+                                md = fabs( devs );
+
+                            // update rfield
+                            Real devs2 = rinter - rfield[ind];
+                            rfield[ind] += devs2 * damping;
+                            if( fabs(devs2) > md )
+                                md = fabs(devs2);
                         }
                     }
                 }
-            } while((md > props.tol)&&(runx<runs)); // Precision condition reached -> BP and RP finished
-            if(runx==runs)
+            } while( (md > props.tol) && (iters < maxIters) ); // Precision condition reached -> BP and RP finished
+            if( iters == maxIters )
                 if( props.verbose >= 2 )
-                    cerr << "init_cor_resp: Convergence not reached (md=" << md << ")..." << endl;
-            if(md > maxdev)
+                    cerr << "init_cor_resp_old: Convergence not reached (md=" << md << ")..." << endl;
+
+            if( md > maxdev )
                 maxdev = md;
 
             // compute the observables (i.e. magnetizations and responses)******
 
-            for(size_t i=0; i<concav; i++){
-                rinter = 0.;
-                xinter = 1.;
-                if(i!=i2)
-                    for(j=0; j<con[nb[cavity][i]]; j++){
-                        variab2 = tanh(xfield[kmax*nb[nb[cavity][i]][j]+kindex[nb[cavity][i]][j]]);
-                        variab1 = tJ[nb[cavity][i]][j]*variab2;
-                        rinter +=  tJ[nb[cavity][i]][j]*rfield[kmax*nb[nb[cavity][i]][j]+kindex[nb[cavity][i]][j]]*(1-variab2*variab2)/(1-variab1*variab1);
-                        xinter *= (1.+variab1)/(1.-variab1);
+            for( size_t _k = 0; _k < concav; _k++ ) {
+                size_t k = nb[cavity][_k];
+                Real rinter = 0.;
+                Real xinter = theta[k];
+                if( _k != _i2 )
+                    for( size_t _j = 0; _j < con[k]; _j++ ) {
+                        size_t ind = kmax*nb[k][_j] + kindex[k][_j];  // index of cavity field "j \ k"
+                        Real variab2 = tanh( xfield[ind] );
+                        Real variab1 = tJ[k][_j] * variab2;
+                        xinter += atanh( variab1 );
+                        rinter += tJ[k][_j] * rfield[ind] * (1.0 - variab2*variab2) / (1.0 - variab1*variab1);
                     }
-                xinter = tanh(0.5*log(xinter)+theta[nb[cavity][i]]);
-                res[i] = rinter*(1-xinter*xinter);
-            }
 
-            // *******************
-
-            for(size_t i=0; i<concav; i++)
-                if(nb[cavity][i]!=s2)
-            //      if(i!=i2)
-                    cors[cavity][i2][i] = res[i];
+                if( k != i2 )
+                    cors[cavity][_i2][_k] = rinter * (1.0 - tanh(xinter) * tanh(xinter));
                 else
-                    cors[cavity][i2][i] = 0;
-        } // close for i2 = 0...concav
+                    cors[cavity][_i2][_k] = 0;
+            }
+        } // close for _i2 = 0...concav
     }
 
     // restore nb, tJ, con
     tJ = tJ_org;
     nb = nb_org;
     con = con_org;
-    theta = theta_org;
 
     return maxdev;
+}
+
+
+Real MR::init_cor_resp() {
+    for( size_t i = 0; i < nrVars(); i++ ) {
+        vector<Factor> pairq;
+        BP bpcav(*this, PropertySet()("updates", string("SEQMAX"))("tol", (Real)1.0e-9)("maxiter", (size_t)10000)("verbose", (size_t)0)("logdomain", false));
+        bpcav.makeCavity( i );
+        bpcav.init();
+        bpcav.run();
+
+        BBP bbp( &bpcav, PropertySet()("verbose",(size_t)0)("tol",(Real)1.0e-9)("maxiter",(size_t)10000)("damping",(Real)0.0)("updates",string("SEQ_MAX")) );
+        for( size_t _j = 0; _j < con[i]; _j++ ) {
+            size_t j = nb[i][_j];
+
+            // Create weights for magnetization of some spin
+            Prob p( 2, 0.0 );
+            p[0] = -1.0;
+            p[1] = 1.0;
+
+            // BBP cost function would be the magnetization of spin j
+            vector<Prob> b1_adj;
+            b1_adj.reserve( nrVars() );
+            for( size_t l = 0; l < nrVars(); l++ )
+                if( l == j )
+                    b1_adj.push_back( p );
+                else
+                    b1_adj.push_back( Prob( 2, 0.0 ) );
+            bbp.init_V( b1_adj );
+
+            // run BBP to estimate adjoints
+            bbp.run();
+
+            for( size_t _k = 0; _k < con[i]; _k++ ) {
+                size_t k = nb[i][_k];
+                if( k != j )
+                    cors[i][_j][_k] = (bbp.adj_psi_V(k)[1] - bbp.adj_psi_V(k)[0]);
+                else
+                    cors[i][_j][_k] = 0.0;
+            }
+        }
+    }
+
+    return 0.0;
 }
 
 
@@ -517,6 +541,10 @@ Real MR::run() {
 
         if( props.inits == Properties::InitType::RESPPROP ) {
             Real md = init_cor_resp();
+            if( md > _maxdiff )
+                _maxdiff = md;
+        } else if( props.inits == Properties::InitType::RESPPROPOLD ) {
+            Real md = init_cor_resp_old();
             if( md > _maxdiff )
                 _maxdiff = md;
         } else if( props.inits == Properties::InitType::EXACT ) {

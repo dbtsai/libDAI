@@ -81,8 +81,9 @@ class MR : public DAIAlgFG {
              *  - RESPPROP using response propagation ("linear response")
              *  - CLAMPING using clamping and BP
              *  - EXACT using JunctionTree
+             *  - RESPPROPOLD using response propagation ("linear response"), old implementation
              */
-            DAI_ENUM(InitType,RESPPROP,CLAMPING,EXACT);
+            DAI_ENUM(InitType,RESPPROP,CLAMPING,EXACT,RESPPROPOLD);
 
             /// Verbosity (amount of output sent to stderr)
             size_t verbose;
@@ -147,6 +148,11 @@ class MR : public DAIAlgFG {
         /// Calculate cors using response propagation
         Real init_cor_resp();
         
+        /// Calculate cors using response propagation (old implementation)
+        /** \deprecated Should be removed soon
+         */
+        Real init_cor_resp_old();
+
         /// Iterate update equations for cavity fields
         void solvemcav();
         
