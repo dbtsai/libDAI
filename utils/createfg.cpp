@@ -484,7 +484,7 @@ int main( int argc, char *argv[] ) {
             } else
                 NEED_ARG("N", "number of variables");
 
-            if( states > 2 || ft == FactorType::POTTS ) {
+            if( ft != FactorType::ISING ) {
                 NEED_ARG("beta", "stddev of log-factor entries");
             } else {
                 NEED_ARG("mean_w", "mean of pairwise interactions");

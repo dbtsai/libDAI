@@ -45,7 +45,6 @@ namespace dai {
  *    \f[ c_i := \sum_{I \in N_i} c_I \f]
  *
  *  \note TRWBP is actually equivalent to FBP
- *  \todo Add nice way to set weights
  *  \todo Merge code of FBP and TRWBP
  */
 class TRWBP : public BP {
@@ -59,6 +58,13 @@ class TRWBP : public BP {
         std::vector<Real> _weight;
 
     public:
+        /// Size of sample of trees used to set the weights
+        /** \todo See if there is a way to wrap TRWBP::nrtrees in a props struct
+         *  together with the other properties currently in TRWBP::props
+         *  (without copying al lot of BP code literally)
+         */
+        size_t nrtrees;
+
         /// Name of this inference algorithm
         static const char *Name;
 
@@ -68,8 +74,10 @@ class TRWBP : public BP {
         /// Default constructor
         TRWBP() : BP(), _weight() {}
 
-        /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \param opts Parameters @see BP::Properties
+        /// Construct from FactorGraph \a fg and PropertySet \a opts.
+        /** There is an additional property "nrtrees" which allows to specify the
+         *  number of random spanning trees used to set the scale parameters.
+         *  \param opts Parameters @see BP::Properties. 
          */
         TRWBP( const FactorGraph &fg, const PropertySet &opts ) : BP(fg, opts), _weight() {
             setProperties( opts );
@@ -82,6 +90,9 @@ class TRWBP : public BP {
         virtual TRWBP* clone() const { return new TRWBP(*this); }
         virtual std::string identify() const;
         virtual Real logZ() const;
+        virtual void setProperties( const PropertySet &opts );
+        virtual PropertySet getProperties() const;
+        virtual std::string printProperties() const;
     //@}
 
     /// \name TRWBP accessors/mutators for scale parameters
@@ -99,6 +110,12 @@ class TRWBP : public BP {
         /** \note Faster than calling setWeight(size_t,Real) for each factor
          */
         void setWeights( const std::vector<Real> &c ) { _weight = c; }
+
+        /// Increases weights corresponding to pairwise factors in \a tree with 1
+        void addTreeToWeights( const RootedTree &tree );
+
+        /// Samples weights from a sample of \a nrTrees random spanning trees
+        void sampleWeights( size_t nrTrees );
 
     protected:
         /// Calculate the product of factor \a I and the incoming messages

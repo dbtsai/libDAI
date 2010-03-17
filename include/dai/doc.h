@@ -11,6 +11,8 @@
 /** \file
  *  \brief Contains additional doxygen documentation
  *
+ *  \todo Replace all Name members by virtual functions (or add virtual functions returning the Name)
+ *
  *  \idea Adapt (part of the) guidelines in http://www.boost.org/development/requirements.html#Design_and_Programming
  *
  *  \idea Use "gcc -MM" to generate dependencies for targets: http://make.paulandlesley.org/autodep.html

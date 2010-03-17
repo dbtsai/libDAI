@@ -23,6 +23,33 @@ using namespace std;
 const char *TRWBP::Name = "TRWBP";
 
 
+void TRWBP::setProperties( const PropertySet &opts ) {
+    BP::setProperties( opts );
+
+    if( opts.hasKey("nrtrees") )
+        nrtrees = opts.getStringAs<size_t>("nrtrees");
+    else
+        nrtrees = 0;
+}
+
+
+PropertySet TRWBP::getProperties() const {
+    PropertySet opts = BP::getProperties();
+    opts.Set( "nrtrees", nrtrees );
+    return opts;
+}
+
+
+string TRWBP::printProperties() const {
+    stringstream s( stringstream::out );
+    string sbp = BP::printProperties();
+    s << sbp.substr( 0, sbp.size() - 1 );
+    s << ",";
+    s << "nrtrees=" << nrtrees << "]";
+    return s.str();
+}
+
+
 string TRWBP::identify() const {
     return string(Name) + printProperties();
 }
@@ -121,6 +148,60 @@ void TRWBP::calcBeliefV( size_t i, Prob &p ) const {
 void TRWBP::construct() {
     BP::construct();
     _weight.resize( nrFactors(), 1.0 );
+    sampleWeights( nrtrees );
+    if( props.verbose >= 2 )
+        cerr << "Weights: " << _weight << endl;
+}
+
+
+void TRWBP::addTreeToWeights( const RootedTree &tree ) {
+    for( RootedTree::const_iterator e = tree.begin(); e != tree.end(); e++ ) {
+        VarSet ij( var(e->n1), var(e->n2) );
+        size_t I = findFactor( ij );
+        _weight[I] += 1.0;
+    }
+}
+
+
+void TRWBP::sampleWeights( size_t nrTrees ) {
+    if( !nrTrees )
+        return;
+
+    // initialize weights to zero
+    fill( _weight.begin(), _weight.end(), 0.0 );
+
+    // construct Markov adjacency graph, with edges weighted with
+    // random weights drawn from the uniform distribution on the interval [0,1]
+    WeightedGraph<Real> wg;
+    for( size_t i = 0; i < nrVars(); ++i ) {
+        const Var &v_i = var(i);
+        VarSet di = delta(i);
+        for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
+            if( v_i < *j )
+                wg[UEdge(i,findVar(*j))] = rnd_uniform();
+    }
+
+    // now repeatedly change the random weights, find the minimal spanning tree, and add it to the weights
+    for( size_t nr = 0; nr < nrTrees; nr++ ) {
+        // find minimal spanning tree
+        RootedTree randTree = MinSpanningTreePrims( wg );
+        // add it to the weights
+        addTreeToWeights( randTree );
+        // resample weights of the graph
+        for( WeightedGraph<Real>::iterator e = wg.begin(); e != wg.end(); e++ )
+            e->second = rnd_uniform();
+    }
+
+    // normalize the weights and set the single-variable weights to 1.0
+    for( size_t I = 0; I < nrFactors(); I++ ) {
+        size_t sizeI = factor(I).vars().size();
+        if( sizeI == 1 )
+            _weight[I] = 1.0;
+        else if( sizeI == 2 )
+            _weight[I] /= nrTrees;
+        else
+            DAI_THROW(NOT_IMPLEMENTED);
+    }
 }
 
 
