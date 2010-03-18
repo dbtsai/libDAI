@@ -1,6 +1,7 @@
 git HEAD
 --------
 
+* Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:
   - rewrote response propagation implementation with help of BBP

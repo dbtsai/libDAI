@@ -45,8 +45,9 @@ CCINC=/Iinclude /IE:\boost_1_42_0
 # LINKER
 # Standard libraries to include
 LIBS=/link $(LIB)/libdai$(LE)
-# For linking with the BOOST Program Options library
-BOOSTLIBS=/LIBPATH:E:\boost_1_42_0\stage\lib
+# For linking with BOOST libraries
+BOOSTLIBS_PO=/LIBPATH:E:\boost_1_42_0\stage\lib
+BOOSTLIBS_UTF=/LIBPATH:E:\boost_1_42_0\stage\lib
 # Additional library search paths for linker
 # (For some reason, we have to add the VC library path, although it is in the environment)
 CCLIB=/LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\ATLMFC\LIB" /LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\LIB" /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v6.0A\lib"

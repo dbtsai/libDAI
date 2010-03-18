@@ -34,7 +34,7 @@ else
 endif
 
 # Define build targets
-TARGETS=tests utils lib examples testregression testem
+TARGETS=tests utils lib examples unittests testregression testem
 ifdef WITH_DOC
   TARGETS:=$(TARGETS) doc
 endif
@@ -122,7 +122,11 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
+unittests : tests/unit/var$(EE)
+	echo Running unit tests...
+	tests/unit/var
+
+tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE) $(unittests)
 
 utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
 
@@ -245,13 +249,20 @@ examples/example_sprinkler_em$(EE) : examples/example_sprinkler_em.cpp $(HEADERS
 	$(CC) $(CCO)examples/example_sprinkler_em$(EE) examples/example_sprinkler_em.cpp $(LIBS)
 
 
+# UNIT TESTS
+#############
+
+tests/unit/var$(EE) : tests/unit/var.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)tests/unit/var$(EE) tests/unit/var.cpp $(LIBS) $(BOOSTLIBS_UTF)
+
+
 # TESTS
 ########
 
 tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCO)tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS)
+	$(CC) $(CCO)tests/testdai$(EE) tests/testdai.cpp $(LIBS) $(BOOSTLIBS_PO)
 tests/testem/testem$(EE) : tests/testem/testem.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS)
+	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_PO)
 
 tests/testbbp$(EE) : tests/testbbp.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)tests/testbbp$(EE) tests/testbbp.cpp $(LIBS)
@@ -280,7 +291,7 @@ matlab$(OE) : $(SRC)/matlab/matlab.cpp $(INC)/matlab/matlab.h $(HEADERS)
 ########
 
 utils/createfg$(EE) : utils/createfg.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCO)utils/createfg$(EE) utils/createfg.cpp $(LIBS) $(BOOSTLIBS)
+	$(CC) $(CCO)utils/createfg$(EE) utils/createfg.cpp $(LIBS) $(BOOSTLIBS_PO)
 
 utils/fg2dot$(EE) : utils/fg2dot.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)utils/fg2dot$(EE) utils/fg2dot.cpp $(LIBS)

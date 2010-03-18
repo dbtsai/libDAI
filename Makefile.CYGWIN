@@ -45,8 +45,9 @@ CCINC=-Iinclude -I/usr/local/include/boost-1_37
 # LINKER
 # Standard libraries to include
 LIBS=-ldai
-# For linking with the BOOST Program Options library
-BOOSTLIBS=-lboost_program_options-gcc34-mt
+# For linking with BOOST libraries
+BOOSTLIBS_PO=-lboost_program_options-gcc34-mt
+BOOSTLIBS_UTF=-lboost_unit_test_framework-gcc34-mt
 # Additional library search paths for linker
 CCLIB=-Llib
 
