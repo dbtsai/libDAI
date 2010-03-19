@@ -1,6 +1,7 @@
 git HEAD
 --------
 
+* Added unit tests for Var
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

@@ -26,7 +26,7 @@ namespace dai {
 
 
 /// Represents a discrete random variable.
-/** A Var stores the \a label of the variable (a nonnegative integer-valued
+/** A Var stores the \a label of the variable (an unsigned integer-valued
  *  unique ID) and the number of possible values (\a states) of that variable. 
  *  Two Var objects with the same label are assumed to be identical (i.e., it
  *  is assumed that they have the same number of possible states).
@@ -46,8 +46,8 @@ class Var {
         size_t  _states;
 
     public:
-        /// Default constructor (creates a variable with label -1 and 0 states)
-        Var() : _label(-1), _states(0) {}
+        /// Default constructor (creates a variable with label 0 and 0 states)
+        Var() : _label(0), _states(0) {}
         /// Constructs a variable with a given label and number of states
         Var( size_t label, size_t states ) : _label(label), _states(states) {}
 
@@ -62,9 +62,23 @@ class Var {
         size_t& states () { return _states; }
 
         /// Smaller-than operator (only compares labels)
-        bool operator < ( const Var& n ) const { return( _label <  n._label ); }
+        bool operator < ( const Var& n ) const { 
+#ifdef DAI_DEBUG
+            if( _label == n._label )
+                DAI_ASSERT( _states == n._states );
+#endif
+            return( _label <  n._label );
+        }
+
         /// Larger-than operator (only compares labels)
-        bool operator > ( const Var& n ) const { return( _label >  n._label ); }
+        bool operator > ( const Var& n ) const { 
+#ifdef DAI_DEBUG
+            if( _label == n._label )
+                DAI_ASSERT( _states == n._states );
+#endif
+            return( _label >  n._label ); 
+        }
+
         /// Smaller-than-or-equal-to operator (only compares labels)
         bool operator <= ( const Var& n ) const {
 #ifdef DAI_DEBUG
@@ -73,6 +87,7 @@ class Var {
 #endif
             return( _label <= n._label );
         }
+
         /// Larger-than-or-equal-to operator (only compares labels)
         bool operator >= ( const Var& n ) const {
 #ifdef DAI_DEBUG
@@ -81,6 +96,7 @@ class Var {
 #endif
             return( _label >= n._label );
         }
+
         /// Not-equal-to operator (only compares labels)
         bool operator != ( const Var& n ) const {
 #ifdef DAI_DEBUG
@@ -89,6 +105,7 @@ class Var {
 #endif
             return( _label != n._label );
         }
+
         /// Equal-to operator (only compares labels)
         bool operator == ( const Var& n ) const {
 #ifdef DAI_DEBUG
