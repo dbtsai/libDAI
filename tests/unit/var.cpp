@@ -25,7 +25,7 @@ using namespace dai;
 
 
 BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
-    // check constructors and states and labels accessors
+    // check constructors
     Var x;
     BOOST_CHECK_EQUAL( x.label(), 0 );
     BOOST_CHECK_EQUAL( x.states(), 0 );
