@@ -809,7 +809,7 @@ BOOST_AUTO_TEST_CASE( StreamTest ) {
     std::stringstream ss;
     ss << x << std::endl;
     std::string s;
-    getline( ss, s );
+    std::getline( ss, s );
     BOOST_CHECK_EQUAL( s, "{x1, x2}" );
 }
 

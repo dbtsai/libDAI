@@ -1,8 +1,17 @@
 git HEAD
 --------
 
+* Improved GraphAL code:
+  - Fixed bug in GraphAL::nrEdges()
+  - Fixed bug in GraphAL::addEdge()
+  - Fixed bug in GraphAL::isTree()
+  - Fixed bug in GraphAL::printDot()
+  - Fixed bug in createGraphGrid3D()
+  - Fixed bug in createGraphRegular()
+  - Added GraphAL::hasEdge(size_t,size_t)
+* Removed RandomDRegularGraph()
 * Compressed Makefile
-* Added unit tests for Var, SmallSet, VarSet
+* Added unit tests for Var, SmallSet, VarSet, Graph
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

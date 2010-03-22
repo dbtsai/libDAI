@@ -226,7 +226,6 @@ bool BipartiteGraph::isConnected() const {
 
 
 bool BipartiteGraph::isTree() const {
-    using namespace std;
     vector<levelType> levels;
 
     bool foundCycle = false;
@@ -294,7 +293,6 @@ bool BipartiteGraph::isTree() const {
 
 
 void BipartiteGraph::printDot( std::ostream& os ) const {
-    using namespace std;
     os << "graph G {" << endl;
     os << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
     for( size_t n1 = 0; n1 < nrNodes1(); n1++ )

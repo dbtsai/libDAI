@@ -4,7 +4,7 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
  */
 
@@ -214,16 +214,6 @@ template<typename T> RootedTree MaxSpanningTreePrims( const WeightedGraph<T> &G 
         return MinSpanningTreePrims( gr );
     }
 }
-
-
-/// Constructs a random undirected graph of \a N nodes, where each node has connectivity \a d
-/** Algorithm 1 in [\ref StW99].
- *  Draws a random graph of size \a N and uniform degree \a d
- *  from an almost uniform probability distribution over these graphs
- *  (which becomes uniform in the limit that \a d is small and \a N goes
- *  to infinity).
- */
-GraphEL RandomDRegularGraph( size_t N, size_t d );
 
 
 } // end of namespace dai
