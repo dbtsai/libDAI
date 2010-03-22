@@ -4,7 +4,7 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
  */
 
@@ -323,7 +323,7 @@ class BipartiteGraph {
         /// Returns true if the graph is a tree, i.e., if it is singly connected and connected.
         bool isTree() const;
 
-        /// Checks internal consistency
+        /// Asserts internal consistency
         void checkConsistency() const;
     //@}
 

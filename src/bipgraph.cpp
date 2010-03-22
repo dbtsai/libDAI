@@ -52,13 +52,13 @@ void BipartiteGraph::eraseNode1( size_t n1 ) {
                 nb2(n2).erase( nb2(n2).begin() + iter );
             } else if( m1.node > n1 ) {
                 // update this entry and the corresponding dual of the neighboring node of type 1
-                m1.iter = iter;
                 m1.node--;
                 nb1( m1.node, m1.dual ).dual = iter;
-                iter++;
+                m1.iter = iter++;
             } else {
-                // skip
-                iter++;
+                // update this entry and the corresponding dual of the neighboring node of type 1
+                nb1( m1.node, m1.dual ).dual = iter;
+                m1.iter = iter++;
             }
         }
     }
@@ -78,13 +78,13 @@ void BipartiteGraph::eraseNode2( size_t n2 ) {
                 nb1(n1).erase( nb1(n1).begin() + iter );
             } else if( m2.node > n2 ) {
                 // update this entry and the corresponding dual of the neighboring node of type 2
-                m2.iter = iter;
                 m2.node--;
                 nb2( m2.node, m2.dual ).dual = iter;
-                iter++;
+                m2.iter = iter++;
             } else {
-                // skip
-                iter++;
+                // update this entry and the corresponding dual of the neighboring node of type 2
+                nb2( m2.node, m2.dual ).dual = iter;
+                m2.iter = iter++;
             }
         }
     }
@@ -232,8 +232,10 @@ bool BipartiteGraph::isTree() const {
     size_t nr_1 = 0;
     size_t nr_2 = 0;
 
-    if( nrNodes1() == 0 || nrNodes2() == 0 )
-        return true;
+    if( nrNodes1() == 0 )
+        return (nrNodes2() < 2 );
+    else if( nrNodes2() == 0 )
+        return (nrNodes1() < 2 );
     else {
         levelType newLevel;
         do {

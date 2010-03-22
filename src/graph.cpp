@@ -55,13 +55,13 @@ void GraphAL::eraseNode( size_t n ) {
                 nb(n2).erase( nb(n2).begin() + iter );
             } else if( m.node > n ) {
                 // update this entry and the corresponding dual of the neighboring node
-                m.iter = iter;
                 m.node--;
                 nb( m.node, m.dual ).dual = iter;
-                iter++;
+                m.iter = iter++;
             } else {
-                // skip
-                iter++;
+                // update this entry and the corresponding dual of the neighboring node
+                nb( m.node, m.dual ).dual = iter;
+                m.iter = iter++;
             }
         }
     }

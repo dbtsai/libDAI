@@ -79,17 +79,177 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
 
 
 BOOST_AUTO_TEST_CASE( NeighborTest ) {
-    // TODO   
+    // check nb() accessor / mutator
+    typedef BipartiteGraph::Edge Edge;
+    std::vector<Edge> edges;
+    edges.push_back( Edge(0, 0) );
+    edges.push_back( Edge(0, 1) );
+    edges.push_back( Edge(1, 1) );
+    edges.push_back( Edge(1, 2) );
+    BipartiteGraph G( 2, 3, edges.begin(), edges.end() );
+    BOOST_CHECK_EQUAL( G.nb1(0).size(), 2 );
+    BOOST_CHECK_EQUAL( G.nb1(1).size(), 2 );
+    BOOST_CHECK_EQUAL( G.nb2(0).size(), 1 );
+    BOOST_CHECK_EQUAL( G.nb2(1).size(), 2 );
+    BOOST_CHECK_EQUAL( G.nb2(2).size(), 1 );
+    BOOST_CHECK_EQUAL( G.nb1(0,0).iter, 0 );
+    BOOST_CHECK_EQUAL( G.nb1(0,0).node, 0 );
+    BOOST_CHECK_EQUAL( G.nb1(0,0).dual, 0 );
+    BOOST_CHECK_EQUAL( G.nb1(0,1).iter, 1 );
+    BOOST_CHECK_EQUAL( G.nb1(0,1).node, 1 );
+    BOOST_CHECK_EQUAL( G.nb1(0,1).dual, 0 );
+    BOOST_CHECK_EQUAL( G.nb1(1,0).iter, 0 );
+    BOOST_CHECK_EQUAL( G.nb1(1,0).node, 1 );
+    BOOST_CHECK_EQUAL( G.nb1(1,0).dual, 1 );
+    BOOST_CHECK_EQUAL( G.nb1(1,1).iter, 1 );
+    BOOST_CHECK_EQUAL( G.nb1(1,1).node, 2 );
+    BOOST_CHECK_EQUAL( G.nb1(1,1).dual, 0 );
+    BOOST_CHECK_EQUAL( G.nb2(0,0).iter, 0 );
+    BOOST_CHECK_EQUAL( G.nb2(0,0).node, 0 );
+    BOOST_CHECK_EQUAL( G.nb2(0,0).dual, 0 );
+    BOOST_CHECK_EQUAL( G.nb2(1,0).iter, 0 );
+    BOOST_CHECK_EQUAL( G.nb2(1,0).node, 0 );
+    BOOST_CHECK_EQUAL( G.nb2(1,0).dual, 1 );
+    BOOST_CHECK_EQUAL( G.nb2(1,1).iter, 1 );
+    BOOST_CHECK_EQUAL( G.nb2(1,1).node, 1 );
+    BOOST_CHECK_EQUAL( G.nb2(1,1).dual, 0 );
+    BOOST_CHECK_EQUAL( G.nb2(2,0).iter, 0 );
+    BOOST_CHECK_EQUAL( G.nb2(2,0).node, 1 );
+    BOOST_CHECK_EQUAL( G.nb2(2,0).dual, 1 );
 }
 
 
 BOOST_AUTO_TEST_CASE( AddEraseTest ) {
-    // TODO   
+    // check addition and erasure of nodes and edges
+    typedef BipartiteGraph::Edge Edge;
+    std::vector<Edge> edges;
+    edges.push_back( Edge( 0, 0 ) );
+    edges.push_back( Edge( 0, 1 ) );
+    edges.push_back( Edge( 1, 1 ) );
+    BipartiteGraph G( 2, 2, edges.begin(), edges.end() );
+    G.checkConsistency();
+    BOOST_CHECK_EQUAL( G.nrNodes1(), 2 );
+    BOOST_CHECK_EQUAL( G.nrNodes2(), 2 );
+    BOOST_CHECK_EQUAL( G.nrEdges(), 3 );
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    BOOST_CHECK_EQUAL( G.addNode1(), 2 );
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    BOOST_CHECK_EQUAL( G.addNode2(), 2 );
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    BOOST_CHECK_EQUAL( G.addNode1(), 3 );
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    G.checkConsistency();
+    std::vector<size_t> nbs;
+    nbs.push_back( 2 );
+    nbs.push_back( 0 );
+    BOOST_CHECK_EQUAL( G.addNode1( nbs.begin(), nbs.end() ), 4 );
+    G.checkConsistency();
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    BOOST_CHECK_EQUAL( G.addNode2( nbs.begin(), nbs.end() ), 3 );
+    G.checkConsistency();
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    G.addEdge( 3, 3 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    G.addEdge( 1, 3 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    BOOST_CHECK_EQUAL( G.nrNodes1(), 5 );
+    BOOST_CHECK_EQUAL( G.nrNodes2(), 4 );
+    BOOST_CHECK_EQUAL( G.nrEdges(), 9 );
+    G.eraseEdge( 0, 3 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    G.eraseEdge( 4, 2 );
+    G.checkConsistency();
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    G.eraseNode2( 2 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    G.eraseNode1( 0 );
+    G.checkConsistency();
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    G.addEdge( 1, 0 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    G.eraseNode1( 2 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    G.eraseNode2( 2 );
+    G.checkConsistency();
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    G.addEdge( 1, 1 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    G.eraseNode2( 1 );
+    G.checkConsistency();
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    G.eraseNode1( 1 );
+    G.checkConsistency();
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    G.addEdge( 0, 0 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    G.eraseNode2( 0 );
+    G.checkConsistency();
+    BOOST_CHECK( !G.isConnected() );
+    BOOST_CHECK( !G.isTree() );
+    G.eraseNode1( 0 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    G.eraseNode1( 0 );
+    G.checkConsistency();
+    BOOST_CHECK( G.isConnected() );
+    BOOST_CHECK( G.isTree() );
+    BOOST_CHECK_EQUAL( G.nrNodes1(), 0 );
+    BOOST_CHECK_EQUAL( G.nrNodes2(), 0 );
+    BOOST_CHECK_EQUAL( G.nrEdges(), 0 );
 }
 
 
 BOOST_AUTO_TEST_CASE( QueriesTest ) {
-    // TODO   
+    // check queries which have not been tested in another test case
+    typedef BipartiteGraph::Edge Edge;
+    std::vector<Edge> edges;
+    edges.push_back( Edge( 0, 0 ) );
+    edges.push_back( Edge( 0, 1 ) );
+    edges.push_back( Edge( 1, 1 ) );
+    BipartiteGraph G( 3, 2, edges.begin(), edges.end() );
+    G.checkConsistency();
+    std::vector<size_t> v;
+    std::vector<size_t> v0; v0.push_back(0);
+    std::vector<size_t> v1; v1.push_back(1);
+    std::vector<size_t> v01; v01.push_back(0); v01.push_back(1);
+    BOOST_CHECK( G.delta1( 0, true ) == v01 );
+    BOOST_CHECK( G.delta1( 1, true ) == v01 );
+    BOOST_CHECK( G.delta1( 2, true ) == v );
+    BOOST_CHECK( G.delta2( 0, true ) == v01 );
+    BOOST_CHECK( G.delta2( 1, true ) == v01 );
+    BOOST_CHECK( G.delta1( 0, false ) == v1 );
+    BOOST_CHECK( G.delta1( 1, false ) == v0 );
+    BOOST_CHECK( G.delta1( 2, false ) == v );
+    BOOST_CHECK( G.delta2( 0, false ) == v1 );
+    BOOST_CHECK( G.delta2( 1, false ) == v0 );
 }
 
 
