@@ -122,12 +122,13 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE)
+unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE)
 	echo Running unit tests...
 	tests/unit/var
 	tests/unit/smallset
 	tests/unit/varset
 	tests/unit/graph
+	tests/unit/bipgraph
 
 tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE) $(unittests)
 
@@ -196,6 +197,8 @@ tests/unit/smallset$(EE) : tests/unit/smallset.cpp $(HEADERS) $(LIB)/libdai$(LE)
 tests/unit/varset$(EE) : tests/unit/varset.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
 tests/unit/graph$(EE) : tests/unit/graph.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
+tests/unit/bipgraph$(EE) : tests/unit/bipgraph.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
 
 
@@ -303,7 +306,7 @@ clean :
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE)
 	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
-	-rm tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE)
+	-rm tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib
@@ -334,6 +337,7 @@ clean :
 	-del tests\unit\smallset$(EE)
 	-del tests\unit\varset$(EE)
 	-del tests\unit\graph$(EE)
+	-del tests\unit\bipgraph$(EE)
 	-del $(LIB)\libdai$(LE)
 	-rmdir lib
 endif
