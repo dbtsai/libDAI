@@ -5,6 +5,11 @@ git HEAD
   - Fixed bug in BipartiteGraph::eraseNode1()
   - Fixed bug in BipartiteGraph::eraseNode2()
   - Fixed bug in BipartiteGraph::isTree()
+  - Added BipartiteGraph::hasEdge()
+  - Added BipartiteGraph::findNb1()
+  - Added BipartiteGraph::findNb2()
+  - BipartiteGraph::delta1() and BipartiteGraph::delta2() now 
+    return a SmallSet<size_t> instead of a vector<size_t>
 * Improved GraphAL code:
   - Fixed bug in GraphAL::nrEdges()
   - Fixed bug in GraphAL::addEdge()
@@ -14,6 +19,12 @@ git HEAD
   - Fixed bug in createGraphGrid3D()
   - Fixed bug in createGraphRegular()
   - Added GraphAL::hasEdge(size_t,size_t)
+* Improved SmallSet code:
+  - The sizeHint argument of the iterator constructor
+     SmallSet::SmallSet( TIterator begin, TIterator end, size_t sizeHint=0 )
+    no longer has a default value in order to avoid confusion with the
+     SmallSet::SmallSet( const T &t1, const T &t2 )
+    constructor.
 * Removed RandomDRegularGraph()
 * Compressed Makefile
 * Added unit tests for Var, SmallSet, VarSet, Graph, BipartiteGraph

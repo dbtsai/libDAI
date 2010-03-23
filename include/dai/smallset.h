@@ -67,7 +67,7 @@ class SmallSet {
          *  \param sizeHint For efficiency, the number of elements can be speficied by \a sizeHint.
          */
         template <typename TIterator>
-        SmallSet( TIterator begin, TIterator end, size_t sizeHint=0 ) {
+        SmallSet( TIterator begin, TIterator end, size_t sizeHint ) {
             _elements.reserve( sizeHint );
             _elements.insert( _elements.begin(), begin, end );
             std::sort( _elements.begin(), _elements.end() );

@@ -227,29 +227,124 @@ BOOST_AUTO_TEST_CASE( AddEraseTest ) {
 }
 
 
+BOOST_AUTO_TEST_CASE( RandomAddEraseTest ) {
+    // check adding and erasing nodes and edges randomly
+    BipartiteGraph G;
+    for( size_t maxN1 = 2; maxN1 < 10; maxN1++ )
+        for( size_t maxN2 = 2; maxN2 < 10; maxN2++ )
+            for( size_t repeats = 0; repeats < 100000; repeats++ ) {
+                size_t action = rnd( 5 );
+                size_t N1 = G.nrNodes1();
+                size_t N2 = G.nrNodes2();
+                size_t M = G.nrEdges();
+                size_t maxM = N1 * N2;
+                if( action == 0 ) {
+                    // add node
+                    if( rnd( 2 ) == 0 ) {
+                        // add node of type 1
+                        if( N1 < maxN1 )
+                            G.addNode1();
+                    } else {
+                        // add node of type 2
+                        if( N2 < maxN2 )
+                            G.addNode2();
+                    }
+                } else if( action == 1 ) {
+                    // erase node
+                    if( rnd( 2 ) == 0 ) {
+                        // erase node of type 1
+                        if( N1 > 0 )
+                            G.eraseNode1( rnd( N1 ) );
+                    } else {
+                        // erase node of type 2
+                        if( N2 > 0 )
+                            G.eraseNode2( rnd( N2 ) );
+                    }
+                } else if( action == 2 || action == 3 ) {
+                    // add edge
+                    if( N1 >= 1 && N2 >= 1 && M < maxM ) {
+                        size_t n1 = 0;
+                        size_t n2 = 0;
+                        if( rnd( 2 ) == 0 ) {
+                            do {
+                                n1 = rnd( N1 );
+                            } while( G.nb1(n1).size() >= N2 );
+                            do {
+                                n2 = rnd( N2 );
+                            } while( G.hasEdge( n1, n2 ) );
+                        } else {
+                            do {
+                                n2 = rnd( N2 );
+                            } while( G.nb2(n2).size() >= N1 );
+                            do {
+                                n1 = rnd( N1 );
+                            } while( G.hasEdge( n1, n2 ) );
+                        }
+                        G.addEdge( n1, n2 );
+                    }
+                } else if( action == 4 ) {
+                    // erase edge
+                    if( M > 0 ) {
+                        size_t n1 = 0;
+                        size_t n2 = 0;
+                        if( rnd( 2 ) == 0 ) {
+                            do {
+                                n1 = rnd( N1 );
+                            } while( G.nb1(n1).size() == 0 );
+                            do {
+                                n2 = rnd( N2 );
+                            } while( !G.hasEdge( n1, n2 ) );
+                        } else {
+                            do {
+                                n2 = rnd( N2 );
+                            } while( G.nb2(n2).size() == 0 );
+                            do {
+                                n1 = rnd( N1 );
+                            } while( !G.hasEdge( n1, n2 ) );
+                        }
+                        G.eraseEdge( n1, n2 );
+                    }
+                }
+                G.checkConsistency();
+            }
+}
+
+
 BOOST_AUTO_TEST_CASE( QueriesTest ) {
     // check queries which have not been tested in another test case
     typedef BipartiteGraph::Edge Edge;
     std::vector<Edge> edges;
-    edges.push_back( Edge( 0, 0 ) );
     edges.push_back( Edge( 0, 1 ) );
     edges.push_back( Edge( 1, 1 ) );
+    edges.push_back( Edge( 0, 0 ) );
     BipartiteGraph G( 3, 2, edges.begin(), edges.end() );
     G.checkConsistency();
-    std::vector<size_t> v;
-    std::vector<size_t> v0; v0.push_back(0);
-    std::vector<size_t> v1; v1.push_back(1);
-    std::vector<size_t> v01; v01.push_back(0); v01.push_back(1);
-    BOOST_CHECK( G.delta1( 0, true ) == v01 );
-    BOOST_CHECK( G.delta1( 1, true ) == v01 );
-    BOOST_CHECK( G.delta1( 2, true ) == v );
-    BOOST_CHECK( G.delta2( 0, true ) == v01 );
-    BOOST_CHECK( G.delta2( 1, true ) == v01 );
-    BOOST_CHECK( G.delta1( 0, false ) == v1 );
-    BOOST_CHECK( G.delta1( 1, false ) == v0 );
-    BOOST_CHECK( G.delta1( 2, false ) == v );
-    BOOST_CHECK( G.delta2( 0, false ) == v1 );
-    BOOST_CHECK( G.delta2( 1, false ) == v0 );
+    SmallSet<size_t> v;
+    SmallSet<size_t> v0( 0 );
+    SmallSet<size_t> v1( 1 );
+    SmallSet<size_t> v01( 0, 1 );
+    BOOST_CHECK_EQUAL( G.delta1( 0, true ), v01 );
+    BOOST_CHECK_EQUAL( G.delta1( 1, true ), v01 );
+    BOOST_CHECK_EQUAL( G.delta1( 2, true ), v );
+    BOOST_CHECK_EQUAL( G.delta2( 0, true ), v01 );
+    BOOST_CHECK_EQUAL( G.delta2( 1, true ), v01 );
+    BOOST_CHECK_EQUAL( G.delta1( 0, false ), v1 );
+    BOOST_CHECK_EQUAL( G.delta1( 1, false ), v0 );
+    BOOST_CHECK_EQUAL( G.delta1( 2, false ), v );
+    BOOST_CHECK_EQUAL( G.delta2( 0, false ), v1 );
+    BOOST_CHECK_EQUAL( G.delta2( 1, false ), v0 );
+    BOOST_CHECK( G.hasEdge( 0, 0 ) );
+    BOOST_CHECK( G.hasEdge( 0, 1 ) );
+    BOOST_CHECK( G.hasEdge( 1, 1 ) );
+    BOOST_CHECK( !G.hasEdge( 1, 0 ) );
+    BOOST_CHECK( !G.hasEdge( 2, 0 ) );
+    BOOST_CHECK( !G.hasEdge( 2, 1 ) );
+    BOOST_CHECK_EQUAL( G.findNb1( 0, 0 ), 1 );
+    BOOST_CHECK_EQUAL( G.findNb1( 0, 1 ), 0 );
+    BOOST_CHECK_EQUAL( G.findNb1( 1, 1 ), 0 );
+    BOOST_CHECK_EQUAL( G.findNb2( 0, 0 ), 0 );
+    BOOST_CHECK_EQUAL( G.findNb2( 0, 1 ), 0 );
+    BOOST_CHECK_EQUAL( G.findNb2( 1, 1 ), 1 );
 }
 
 

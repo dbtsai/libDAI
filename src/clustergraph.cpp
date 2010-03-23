@@ -65,49 +65,50 @@ size_t greedyVariableElimination::operator()( const ClusterGraph &cl, const std:
 
 
 size_t eliminationCost_MinNeighbors( const ClusterGraph &cl, size_t i ) {
-    std::vector<size_t> id_n = cl.G.delta1( i );
-    return id_n.size();
+    return cl.G.delta1( i ).size();
 }
 
 
 size_t eliminationCost_MinWeight( const ClusterGraph &cl, size_t i ) {
-    std::vector<size_t> id_n = cl.G.delta1( i );
+    SmallSet<size_t> id_n = cl.G.delta1( i );
     
     size_t cost = 1;
-    for( size_t _i = 0; _i < id_n.size(); _i++ )
-        cost *= cl.vars[id_n[_i]].states();
+    for( SmallSet<size_t>::const_iterator it = id_n.begin(); it != id_n.end(); it++ )
+        cost *= cl.vars[*it].states();
 
     return cost;
 }
 
 
 size_t eliminationCost_MinFill( const ClusterGraph &cl, size_t i ) {
-    std::vector<size_t> id_n = cl.G.delta1( i );
+    SmallSet<size_t> id_n = cl.G.delta1( i );
 
     size_t cost = 0;
     // for each unordered pair {i1,i2} adjacent to n
-    for( size_t _i1 = 0; _i1 < id_n.size(); _i1++ )
-        for( size_t _i2 = _i1 + 1; _i2 < id_n.size(); _i2++ ) {
-            // if i1 and i2 are not adjacent, eliminating n would make them adjacent
-            if( !cl.adj(id_n[_i1], id_n[_i2]) )
-                cost++;
-        }
+    for( SmallSet<size_t>::const_iterator it1 = id_n.begin(); it1 != id_n.end(); it1++ )
+        for( SmallSet<size_t>::const_iterator it2 = it1; it2 != id_n.end(); it2++ )
+            if( it1 != it2 ) {
+                // if i1 and i2 are not adjacent, eliminating n would make them adjacent
+                if( !cl.adj(*it1, *it2) )
+                    cost++;
+            }
 
     return cost;
 }
 
 
 size_t eliminationCost_WeightedMinFill( const ClusterGraph &cl, size_t i ) {
-    std::vector<size_t> id_n = cl.G.delta1( i );
+    SmallSet<size_t> id_n = cl.G.delta1( i );
 
     size_t cost = 0;
     // for each unordered pair {i1,i2} adjacent to n
-    for( size_t _i1 = 0; _i1 < id_n.size(); _i1++ )
-        for( size_t _i2 = _i1 + 1; _i2 < id_n.size(); _i2++ ) {
-            // if i1 and i2 are not adjacent, eliminating n would make them adjacent
-            if( !cl.adj(id_n[_i1], id_n[_i2]) )
-                cost += cl.vars[id_n[_i1]].states() * cl.vars[id_n[_i2]].states();
-        }
+    for( SmallSet<size_t>::const_iterator it1 = id_n.begin(); it1 != id_n.end(); it1++ )
+        for( SmallSet<size_t>::const_iterator it2 = it1; it2 != id_n.end(); it2++ )
+            if( it1 != it2 ) {
+                // if i1 and i2 are not adjacent, eliminating n would make them adjacent
+                if( !cl.adj(*it1, *it2) )
+                    cost += cl.vars[*it1].states() * cl.vars[*it2].states();
+            }
 
     return cost;
 }

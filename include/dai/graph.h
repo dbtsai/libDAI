@@ -233,12 +233,18 @@ class GraphAL {
         }
 
         /// Returns true if the graph contains an edge between nodes \a n1 and \a n2
-        /** \note The time complexity is linear in the number of neighbors of \a n1
+        /** \note The time complexity is linear in the number of neighbors of \a n1 or \a n2
          */
         bool hasEdge( size_t n1, size_t n2 ) {
-            for( size_t _n2 = 0; _n2 < nb(n1).size(); _n2++ )
-                if( nb( n1, _n2 ) == n2 )
-                    return true;
+            if( nb(n1).size() < nb(n2).size() ) {
+                for( size_t _n2 = 0; _n2 < nb(n1).size(); _n2++ )
+                    if( nb( n1, _n2 ) == n2 )
+                        return true;
+            } else {
+                for( size_t _n1 = 0; _n1 < nb(n2).size(); _n1++ )
+                    if( nb( n2, _n1 ) == n1 )
+                        return true;
+            }
             return false;
         }
 

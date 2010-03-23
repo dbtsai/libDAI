@@ -21,6 +21,7 @@
 #include <vector>
 #include <algorithm>
 #include <dai/util.h>
+#include <dai/smallset.h>
 #include <dai/exceptions.h>
 
 
@@ -307,15 +308,55 @@ class BipartiteGraph {
             return sum;
         }
 
+        /// Returns true if the graph contains an edge between node \a n1 of type 1 and node \a n2 of type 2.
+        /** \note The time complexity is linear in the number of neighbors of \a n1 or \a n2
+         */
+        bool hasEdge( size_t n1, size_t n2 ) {
+            if( nb1(n1).size() < nb2(n2).size() ) {
+                for( size_t _n2 = 0; _n2 < nb1(n1).size(); _n2++ )
+                    if( nb1( n1, _n2 ) == n2 )
+                        return true;
+            } else {
+                for( size_t _n1 = 0; _n1 < nb2(n2).size(); _n1++ )
+                    if( nb2( n2, _n1 ) == n1 )
+                        return true;
+            }
+            return false;
+        }
+
+        /// Returns the index of a given node \a n2 of type 2 amongst the neighbors of node \a n1 of type 1
+        /** \note The time complexity is linear in the number of neighbors of \a n1
+         *  \throw OBJECT_NOT_FOUND if \a n2 is not a neighbor of \a n1
+         */
+        size_t findNb1( size_t n1, size_t n2 ) {
+            for( size_t _n2 = 0; _n2 < nb1(n1).size(); _n2++ )
+                if( nb1( n1, _n2 ) == n2 )
+                    return _n2;
+            DAI_THROW(OBJECT_NOT_FOUND);
+            return nb1(n1).size();
+        }
+
+        /// Returns the index of a given node \a n1 of type 1 amongst the neighbors of node \a n2 of type 2
+        /** \note The time complexity is linear in the number of neighbors of \a n2
+         *  \throw OBJECT_NOT_FOUND if \a n1 is not a neighbor of \a n2
+         */
+        size_t findNb2( size_t n1, size_t n2 ) {
+            for( size_t _n1 = 0; _n1 < nb2(n2).size(); _n1++ )
+                if( nb2( n2, _n1 ) == n1 )
+                    return _n1;
+            DAI_THROW(OBJECT_NOT_FOUND);
+            return nb2(n2).size();
+        }
+
         /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node \a n1 of type 1.
         /** If \a include == \c true, includes \a n1 itself, otherwise excludes \a n1.
          */
-        std::vector<size_t> delta1( size_t n1, bool include = false ) const;
+        SmallSet<size_t> delta1( size_t n1, bool include = false ) const;
 
         /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node \a n2 of type 2.
         /** If \a include == \c true, includes \a n2 itself, otherwise excludes \a n2.
          */
-        std::vector<size_t> delta2( size_t n2, bool include = false ) const;
+        SmallSet<size_t> delta2( size_t n2, bool include = false ) const;
 
         /// Returns true if the graph is connected
         bool isConnected() const;

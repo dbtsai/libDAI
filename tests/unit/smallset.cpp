@@ -37,6 +37,13 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK( !y.contains( 5 ) );
     BOOST_CHECK( y.contains( 1 ) );
 
+    SmallSet<size_t> u( 0, 1 );
+    BOOST_CHECK( !u.empty() );
+    BOOST_CHECK_EQUAL( u.size(), 2 );
+    BOOST_CHECK( !u.contains( 2 ) );
+    BOOST_CHECK( u.contains( 1 ) );
+    BOOST_CHECK( u.contains( 0 ) );
+
     SmallSet<double> z( 1.0, 2.0 );
     BOOST_CHECK_EQUAL( z.size(), 2 );
     BOOST_CHECK( !z.contains( 5.0 ) );
@@ -54,7 +61,7 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     a.push_back( 4 );
     a.push_back( 3 );
     a.push_back( 2 );
-    SmallSet<double> w( a.begin(), a.end() );
+    SmallSet<double> w( a.begin(), a.end(), a.size() );
     BOOST_CHECK_EQUAL( w.size(), 4 );
     BOOST_CHECK( w.contains( 1 ) );
     BOOST_CHECK( w.contains( 2 ) );

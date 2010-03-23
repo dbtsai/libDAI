@@ -124,30 +124,24 @@ void BipartiteGraph::eraseEdge( size_t n1, size_t n2 ) {
 }
 
 
-std::vector<size_t> BipartiteGraph::delta1( size_t n1, bool include ) const {
+SmallSet<size_t> BipartiteGraph::delta1( size_t n1, bool include ) const {
     // get all second-order neighbors
-    std::vector<size_t> result;
+    SmallSet<size_t> result;
     foreach( const Neighbor &n2, nb1(n1) )
         foreach( const Neighbor &m1, nb2(n2) )
             if( include || (m1 != n1) )
-                result.push_back( m1 );
-    // remove duplicates
-    std::vector<size_t>::iterator it = std::unique( result.begin(), result.end() );
-    result.erase( it, result.end() );
+                result |= m1;
     return result;
 }
 
 
-std::vector<size_t> BipartiteGraph::delta2( size_t n2, bool include ) const {
+SmallSet<size_t> BipartiteGraph::delta2( size_t n2, bool include ) const {
     // store all second-order neighbors
-    std::vector<size_t> result;
+    SmallSet<size_t> result;
     foreach( const Neighbor &n1, nb2(n2) )
         foreach( const Neighbor &m2, nb1(n1) )
             if( include || (m2 != n2) )
-                result.push_back( m2 );
-    // remove duplicates
-    std::vector<size_t>::iterator it = std::unique( result.begin(), result.end() );
-    result.erase( it, result.end() );
+                result |= m2;
     return result;
 }
 

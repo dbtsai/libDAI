@@ -159,6 +159,55 @@ BOOST_AUTO_TEST_CASE( AddEraseTest ) {
 }
 
 
+BOOST_AUTO_TEST_CASE( RandomAddEraseTest ) {
+    // check adding and erasing nodes and edges randomly
+    GraphAL G;
+    for( size_t maxN = 2; maxN < 50; maxN++ )
+        for( size_t repeats = 0; repeats < 10000; repeats++ ) {
+            size_t action = rnd( 5 );
+            size_t N = G.nrNodes();
+            size_t M = G.nrEdges();
+            size_t maxM = N * (N - 1) / 2;
+            if( action == 0 ) {
+                // add node
+                if( N < maxN )
+                    G.addNode();
+            } else if( action == 1 ) {
+                // erase node
+                if( N > 0 )
+                    G.eraseNode( rnd( N ) );
+            } else if( action == 2 || action == 3 ) {
+                // add edge
+                if( N >= 2 && M < maxM ) {
+                    size_t n1 = 0;
+                    do {
+                        n1 = rnd( N );
+                    } while( G.nb(n1).size() >= N - 1 );
+                    size_t n2 = 0;
+                    do {
+                        n2 = rnd( N );
+                    } while( G.hasEdge( n1, n2 ) );
+                    G.addEdge( n1, n2 );
+                }
+            } else if( action == 4 ) {
+                // erase edge
+                if( M > 0 ) {
+                    size_t n1 = 0;
+                    do {
+                        n1 = rnd( N );
+                    } while( G.nb(n1).size() == 0 );
+                    size_t n2 = 0;
+                    do {
+                        n2 = rnd( N );
+                    } while( !G.hasEdge( n1, n2 ) );
+                    G.eraseEdge( n1, n2 );
+                }
+            }
+            G.checkConsistency();
+        }
+}
+
+
 BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
     // check queries and createGraph* functions
 
