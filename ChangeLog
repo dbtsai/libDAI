@@ -1,13 +1,16 @@
 git HEAD
 --------
 
-* Improved WeightedGraph code:
+* Improved util.h/cpp:
+  - Fixed a bug in rnd_seed()
+  - Removed Real max( const std::vector<Real> &v )
+* Improved weightedgraph.h/cpp:
   - Renamed MaxSpanningTreePrims into MaxSpanningTree
   - Renamed MinSpanningTreePrims into MinSpanningTree
   - Added option to MaxSpanningTree and MinSpanningTree for
     choosing between Prim's algorithm and Kruskal's algorithm
   - More error checking in RootedTree constructor
-* Improved BipartiteGraph code:
+* Improved bipgraph.h/cpp:
   - Fixed bug in BipartiteGraph::eraseNode1()
   - Fixed bug in BipartiteGraph::eraseNode2()
   - Fixed bug in BipartiteGraph::isTree()
@@ -16,7 +19,7 @@ git HEAD
   - Added BipartiteGraph::findNb2()
   - BipartiteGraph::delta1() and BipartiteGraph::delta2() now 
     return a SmallSet<size_t> instead of a vector<size_t>
-* Improved GraphAL code:
+* Improved graph.h/cpp:
   - Fixed bug in GraphAL::nrEdges()
   - Fixed bug in GraphAL::addEdge()
   - Fixed bug in GraphAL::isTree()
@@ -25,7 +28,7 @@ git HEAD
   - Fixed bug in createGraphGrid3D()
   - Fixed bug in createGraphRegular()
   - Added GraphAL::hasEdge(size_t,size_t)
-* Improved SmallSet code:
+* Improved smallset.h/cpp:
   - The sizeHint argument of the iterator constructor
      SmallSet::SmallSet( TIterator begin, TIterator end, size_t sizeHint=0 )
     no longer has a default value in order to avoid confusion with the
@@ -33,8 +36,8 @@ git HEAD
     constructor.
 * Removed RandomDRegularGraph()
 * Compressed Makefile
-* Added unit tests for Var, SmallSet, VarSet, Graph, BipartiteGraph,
-  WeightedGraph, Enum
+* Added unit tests for var, smallset, varset, graph, bipgraph,
+  weightedgraph, enum, util
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

@@ -122,7 +122,7 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE)
+unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/enum$(EE) tests/unit/util$(EE)
 	echo Running unit tests...
 	tests/unit/var
 	tests/unit/smallset
@@ -131,6 +131,7 @@ unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) 
 	tests/unit/bipgraph
 	tests/unit/weightedgraph
 	tests/unit/enum
+	tests/unit/util
 
 tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE) $(unittests)
 
@@ -205,6 +206,8 @@ tests/unit/bipgraph$(EE) : tests/unit/bipgraph.cpp $(HEADERS) $(LIB)/libdai$(LE)
 tests/unit/weightedgraph$(EE) : tests/unit/weightedgraph.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
 tests/unit/enum$(EE) : tests/unit/enum.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
+tests/unit/util$(EE) : tests/unit/util.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
 
 
@@ -312,7 +315,7 @@ clean :
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE)
 	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
-	-rm tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE)
+	-rm tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/util$(EE)
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib
@@ -346,6 +349,7 @@ clean :
 	-del tests\unit\bipgraph$(EE)
 	-del tests\unit\weightedgraph$(EE)
 	-del tests\unit\enum$(EE)
+	-del tests\unit\util$(EE)
 	-del $(LIB)\libdai$(LE)
 	-rmdir lib
 endif

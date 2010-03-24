@@ -96,9 +96,6 @@ inline Real exp( Real x ) {
     return std::exp(x);
 }
 
-/// Returns maximum value of a std::vector<Real>
-Real max( const std::vector<Real> &v );
-
 
 /// hash_map is an alias for \c std::tr1::unordered_map.
 /** We use the (experimental) TR1 unordered_map implementation included in modern GCC distributions or in boost versions 1.37 and higher.
