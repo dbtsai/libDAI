@@ -1,6 +1,12 @@
 git HEAD
 --------
 
+* Improved WeightedGraph code:
+  - Renamed MaxSpanningTreePrims into MaxSpanningTree
+  - Renamed MinSpanningTreePrims into MinSpanningTree
+  - Added option to MaxSpanningTree and MinSpanningTree for
+    choosing between Prim's algorithm and Kruskal's algorithm
+  - More error checking in RootedTree constructor
 * Improved BipartiteGraph code:
   - Fixed bug in BipartiteGraph::eraseNode1()
   - Fixed bug in BipartiteGraph::eraseNode2()
@@ -27,7 +33,8 @@ git HEAD
     constructor.
 * Removed RandomDRegularGraph()
 * Compressed Makefile
-* Added unit tests for Var, SmallSet, VarSet, Graph, BipartiteGraph
+* Added unit tests for Var, SmallSet, VarSet, Graph, BipartiteGraph,
+  WeightedGraph
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

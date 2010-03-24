@@ -1,0 +1,255 @@
+/*  This file is part of libDAI - http://www.libdai.org/
+ *
+ *  libDAI is licensed under the terms of the GNU General Public License version
+ *  2, or (at your option) any later version. libDAI is distributed without any
+ *  warranty. See the file COPYING for more details.
+ *
+ *  Copyright (C) 2010  Joris Mooij      [joris dot mooij at libdai dot org]
+ */
+
+
+#define BOOST_TEST_DYN_LINK
+
+
+#include <dai/weightedgraph.h>
+#include <dai/exceptions.h>
+#include <strstream>
+#include <vector>
+
+
+using namespace dai;
+
+
+#define BOOST_TEST_MODULE WeighedGraphTest
+
+
+#include <boost/test/unit_test.hpp>
+
+
+BOOST_AUTO_TEST_CASE( DEdgeTest ) {
+    DEdge a;
+    BOOST_CHECK_EQUAL( a.n1, 0 );
+    BOOST_CHECK_EQUAL( a.n2, 0 );
+    DEdge b( 3, 5 );
+    BOOST_CHECK_EQUAL( b.n1, 3 );
+    BOOST_CHECK_EQUAL( b.n2, 5 );
+    DEdge c( 5, 3 );
+    BOOST_CHECK_EQUAL( c.n1, 5 );
+    BOOST_CHECK_EQUAL( c.n2, 3 );
+    DEdge d( c );
+    DEdge e = c;
+    DEdge f( 5, 4 );
+    DEdge g( 3, 6 );
+
+    BOOST_CHECK( !(a == b) );
+    BOOST_CHECK( !(a == c) );
+    BOOST_CHECK( !(b == c) );
+    BOOST_CHECK( d == c );
+    BOOST_CHECK( c == d );
+    BOOST_CHECK( e == c );
+    BOOST_CHECK( c == e );
+    BOOST_CHECK( d == e );
+    BOOST_CHECK( e == d );
+
+    BOOST_CHECK( a < b );
+    BOOST_CHECK( a < c );
+    BOOST_CHECK( b < c );
+    BOOST_CHECK( !(c < d) );
+    BOOST_CHECK( !(b < a) );
+    BOOST_CHECK( !(c < a) );
+    BOOST_CHECK( !(c < b) );
+    BOOST_CHECK( !(d < c) );
+    BOOST_CHECK( a < f );
+    BOOST_CHECK( b < f );
+    BOOST_CHECK( c < f );
+    BOOST_CHECK( g < f );
+    BOOST_CHECK( !(f < a) );
+    BOOST_CHECK( !(f < b) );
+    BOOST_CHECK( !(f < c) );
+    BOOST_CHECK( !(f < g) );
+    BOOST_CHECK( a < g );
+    BOOST_CHECK( b < g );
+    BOOST_CHECK( !(c < g) );
+    BOOST_CHECK( !(g < a) );
+    BOOST_CHECK( !(g < b) );
+    BOOST_CHECK( g < c );
+
+    std::stringstream ss;
+    ss << c;
+    std::string s;
+    ss >> s;
+    BOOST_CHECK_EQUAL( s, "(5->3)" );
+}
+
+
+BOOST_AUTO_TEST_CASE( UEdgeTest ) {
+    UEdge a;
+    BOOST_CHECK_EQUAL( a.n1, 0 );
+    BOOST_CHECK_EQUAL( a.n2, 0 );
+    UEdge b( 3, 5 );
+    BOOST_CHECK_EQUAL( b.n1, 3 );
+    BOOST_CHECK_EQUAL( b.n2, 5 );
+    UEdge c( 5, 3 );
+    BOOST_CHECK_EQUAL( c.n1, 5 );
+    BOOST_CHECK_EQUAL( c.n2, 3 );
+    UEdge d( c );
+    UEdge e = c;
+    UEdge f( 5, 4 );
+    UEdge g( 3, 6 );
+
+    UEdge h( DEdge( 5, 3 ) );
+    BOOST_CHECK_EQUAL( h.n1, 5 );
+    BOOST_CHECK_EQUAL( h.n2, 3 );
+
+    BOOST_CHECK( !(a == b) );
+    BOOST_CHECK( !(a == c) );
+    BOOST_CHECK( b == c );
+    BOOST_CHECK( d == c );
+    BOOST_CHECK( c == d );
+    BOOST_CHECK( e == c );
+    BOOST_CHECK( c == e );
+    BOOST_CHECK( d == e );
+    BOOST_CHECK( e == d );
+
+    BOOST_CHECK( a < b );
+    BOOST_CHECK( a < c );
+    BOOST_CHECK( !(b < c) );
+    BOOST_CHECK( !(c < d) );
+    BOOST_CHECK( !(b < a) );
+    BOOST_CHECK( !(c < a) );
+    BOOST_CHECK( !(c < b) );
+    BOOST_CHECK( !(d < c) );
+    BOOST_CHECK( a < f );
+    BOOST_CHECK( b < f );
+    BOOST_CHECK( c < f );
+    BOOST_CHECK( g < f );
+    BOOST_CHECK( !(f < a) );
+    BOOST_CHECK( !(f < b) );
+    BOOST_CHECK( !(f < c) );
+    BOOST_CHECK( !(f < g) );
+    BOOST_CHECK( a < g );
+    BOOST_CHECK( b < g );
+    BOOST_CHECK( c < g );
+    BOOST_CHECK( !(g < a) );
+    BOOST_CHECK( !(g < b) );
+    BOOST_CHECK( !(g < c) );
+
+    std::stringstream ss;
+    std::string s;
+    ss << c;
+    ss >> s;
+    BOOST_CHECK_EQUAL( s, "{3--5}" );
+    ss << b;
+    ss >> s;
+    BOOST_CHECK_EQUAL( s, "{3--5}" );
+}
+
+
+BOOST_AUTO_TEST_CASE( RootedTreeTest ) {
+    typedef UEdge E;
+    std::vector<E> edges;
+    edges.push_back( E( 1, 2 ) );
+    edges.push_back( E( 2, 3 ) );
+    edges.push_back( E( 3, 1 ) );
+    GraphEL G( edges.begin(), edges.end() );
+    
+    bool thrown = false;
+    try {
+        RootedTree T( G, 0 );
+    } catch( Exception &e ) {
+        if( e.code() == Exception::RUNTIME_ERROR )
+            thrown = true;
+        else
+            throw;
+    }
+    BOOST_CHECK( thrown );
+
+    thrown = false;
+    try {
+        RootedTree T( G, 1 );
+    } catch( Exception &e ) {
+        if( e.code() == Exception::RUNTIME_ERROR )
+            thrown = true;
+        else
+            throw;
+    }
+    BOOST_CHECK( thrown );
+
+    edges.back().n2 = 4;
+    G = GraphEL( edges.begin(), edges.end() );
+    thrown = false;
+    RootedTree T;
+    try {
+        T = RootedTree( G, 1 );
+    } catch( Exception &e ) {
+        if( e.code() == Exception::RUNTIME_ERROR )
+            thrown = true;
+        else
+            throw;
+    }
+    BOOST_CHECK( !thrown );
+    BOOST_CHECK_EQUAL( T.size(), 3 );
+    BOOST_CHECK_EQUAL( T[0], DEdge( 1, 2 ) );
+    BOOST_CHECK_EQUAL( T[1], DEdge( 2, 3 ) );
+    BOOST_CHECK_EQUAL( T[2], DEdge( 3, 4 ) );
+
+    edges.push_back( E(5, 6) );
+    G = GraphEL( edges.begin(), edges.end() );
+    thrown = false;
+    try {
+        RootedTree T( G, 1 );
+    } catch( Exception &e ) {
+        if( e.code() == Exception::RUNTIME_ERROR )
+            thrown = true;
+        else
+            throw;
+    }
+    BOOST_CHECK( thrown );
+}
+
+
+BOOST_AUTO_TEST_CASE( SpanningTreeTest ) {
+    RootedTree T;
+    WeightedGraph<int> G;
+    G[UEdge(0,1)] = 1;
+    G[UEdge(0,2)] = 2;
+    G[UEdge(1,2)] = 3;
+    G[UEdge(1,3)] = 4;
+    G[UEdge(2,3)] = 5;
+   
+    RootedTree TMin;
+    TMin.push_back( DEdge( 0,1 ) );
+    TMin.push_back( DEdge( 0,2 ) );
+    TMin.push_back( DEdge( 1,3 ) );
+    RootedTree TMax;
+    TMax.push_back( DEdge( 0,2 ) );
+    TMax.push_back( DEdge( 2,3 ) );
+    TMax.push_back( DEdge( 3,1 ) );
+
+    T = MinSpanningTree( G, true );
+    BOOST_CHECK_EQUAL( T, TMin );
+    T = MinSpanningTree( G, false );
+    BOOST_CHECK_EQUAL( T, TMin );
+
+    T = MaxSpanningTree( G, true );
+    BOOST_CHECK_EQUAL( T, TMax );
+    T = MaxSpanningTree( G, false );
+    BOOST_CHECK_EQUAL( T, TMax );
+
+    WeightedGraph<double> H;
+    H[UEdge(1,2)] = 1;
+    H[UEdge(1,3)] = 2;
+    H[UEdge(2,3)] = 3;
+    H[UEdge(2,4)] = 4;
+    H[UEdge(3,4)] = 5;
+    bool thrown = false;
+    try {
+        T = MinSpanningTree( H, true );
+    } catch( Exception &e ) {
+        if( e.code() == Exception::RUNTIME_ERROR )
+            thrown = true;
+        else
+            throw;
+    }
+    BOOST_CHECK( thrown );
+}

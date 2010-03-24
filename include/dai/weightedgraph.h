@@ -25,9 +25,12 @@
 #include <set>
 #include <limits>
 #include <climits>   // Work-around for bug in boost graph library
+#include <dai/util.h>
+#include <dai/exceptions.h>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
 
 
 namespace dai {
@@ -37,22 +40,25 @@ namespace dai {
 class DEdge {
     public:
         /// First node index (source of edge)
-        size_t n1;
+        union {
+            size_t n1;
+            size_t first;   /// alias
+        };
 
-        /// Second node index (sink of edge)
-        size_t n2;
+        /// Second node index (target of edge)
+        union {
+            size_t n2;
+            size_t second;   /// alias
+        };
 
         /// Default constructor
-        DEdge() {}
+        DEdge() : n1(0), n2(0) {}
 
         /// Constructs a directed edge pointing from \a m1 to \a m2
         DEdge( size_t m1, size_t m2 ) : n1(m1), n2(m2) {}
 
         /// Tests for equality
         bool operator==( const DEdge &x ) const { return ((n1 == x.n1) && (n2 == x.n2)); }
-
-        /// Tests for inequality
-        bool operator!=( const DEdge &x ) const { return !(*this == x); }
 
         /// Smaller-than operator (performs lexicographical comparison)
         bool operator<( const DEdge &x ) const {
@@ -61,7 +67,7 @@ class DEdge {
 
         /// Writes a directed edge to an output stream
         friend std::ostream & operator << (std::ostream & os, const DEdge & e) {
-            os << "(" << e.n1 << "," << e.n2 << ")";
+            os << "(" << e.n1 << "->" << e.n2 << ")";
             return os;
         }
 };
@@ -82,7 +88,7 @@ class UEdge {
         };
 
         /// Default constructor
-        UEdge() {}
+        UEdge() : n1(0), n2(0) {}
 
         /// Constructs an undirected edge between \a m1 and \a m2
         UEdge( size_t m1, size_t m2 ) : n1(m1), n2(m2) {}
@@ -109,9 +115,9 @@ class UEdge {
         /// Writes an undirected edge to an output stream
         friend std::ostream & operator << (std::ostream & os, const UEdge & e) {
             if( e.n1 < e.n2 )
-                os << "{" << e.n1 << "," << e.n2 << "}";
+                os << "{" << e.n1 << "--" << e.n2 << "}";
             else
-                os << "{" << e.n2 << "," << e.n1 << "}";
+                os << "{" << e.n2 << "--" << e.n1 << "}";
             return os;
         }
 };
@@ -123,7 +129,7 @@ class GraphEL : public std::set<UEdge> {
         /// Default constructor
         GraphEL() {}
 
-        /// Construct from range of objects that can be cast to DEdge
+        /// Construct from range of objects that can be cast to UEdge
         template <class InputIterator>
         GraphEL( InputIterator begin, InputIterator end ) {
             insert( begin, end );
@@ -152,52 +158,75 @@ class RootedTree : public std::vector<DEdge> {
 };
 
 
-/// Uses Prim's algorithm to construct a minimal spanning tree from the (positively) weighted graph \a G.
-/** Uses implementation in Boost Graph Library.
+/// Constructs a minimum spanning tree from the (non-negatively) weighted graph \a G.
+/** \param usePrim If true, use Prim's algorithm (complexity O(E log(V))), otherwise, use Kruskal's algorithm (complexity O(E log(E)))
+ *  \note Uses implementation from Boost Graph Library.
+ *  \note The vertices of \a G must be in the range [0,N) where N is the number of vertices of \a G.
  */
-template<typename T> RootedTree MinSpanningTreePrims( const WeightedGraph<T> &G ) {
+template<typename T> RootedTree MinSpanningTree( const WeightedGraph<T> &G, bool usePrim ) {
     RootedTree result;
     if( G.size() > 0 ) {
         using namespace boost;
         using namespace std;
-        typedef adjacency_list< vecS, vecS, undirectedS, property<vertex_distance_t, int>, property<edge_weight_t, double> > boostGraph;
-        typedef pair<size_t, size_t> E;
+        typedef adjacency_list< listS, vecS, undirectedS, no_property, property<edge_weight_t, double> > boostGraph;
 
         set<size_t> nodes;
-        vector<E> edges;
+        vector<UEdge> edges;
         vector<double> weights;
         edges.reserve( G.size() );
         weights.reserve( G.size() );
         for( typename WeightedGraph<T>::const_iterator e = G.begin(); e != G.end(); e++ ) {
             weights.push_back( e->second );
-            edges.push_back( E( e->first.n1, e->first.n2 ) );
+            edges.push_back( e->first );
             nodes.insert( e->first.n1 );
             nodes.insert( e->first.n2 );
         }
 
-        boostGraph g( edges.begin(), edges.end(), weights.begin(), nodes.size() );
-        vector< graph_traits< boostGraph >::vertex_descriptor > p( num_vertices(g) );
-        prim_minimum_spanning_tree( g, &(p[0]) );
+        size_t N = nodes.size();
+        for( set<size_t>::const_iterator it = nodes.begin(); it != nodes.end(); it++ )
+            if( *it >= N )
+                DAI_THROWE(RUNTIME_ERROR,"Vertices must be in range [0..N) where N is the number of vertices.");
 
-        // Store tree edges in result
+        boostGraph g( edges.begin(), edges.end(), weights.begin(), nodes.size() );
+        size_t root = *(nodes.begin());
         GraphEL tree;
-        size_t root = 0;
-        for( size_t i = 0; i != p.size(); i++ )
-            if( p[i] != i )
-                tree.insert( UEdge( p[i], i ) );
-            else
-                root = i;
-        // Order them to obtain a rooted tree
+        if( usePrim ) {
+            // Prim's algorithm
+            vector< graph_traits< boostGraph >::vertex_descriptor > p( num_vertices(g) );
+            prim_minimum_spanning_tree( g, &(p[0]) );
+
+            // Store tree edges in result
+            for( size_t i = 0; i != p.size(); i++ ) {
+                if( p[i] != i )
+                    tree.insert( UEdge( p[i], i ) );
+            }
+        } else {
+            // Kruskal's algorithm
+            vector< graph_traits< boostGraph >::edge_descriptor > p( num_vertices(g) );
+            kruskal_minimum_spanning_tree( g, &(p[0]) );
+
+            // Store tree edges in result
+            for( size_t i = 0; i != p.size(); i++ ) {
+                size_t v1 = source( p[i], g );
+                size_t v2 = target( p[i], g );
+                if( v1 != v2 )
+                    tree.insert( UEdge( v1, v2 ) );
+            }
+        }
+
+        // Direct edges in order to obtain a rooted tree
         result = RootedTree( tree, root );
     }
     return result;
 }
 
 
-/// Use Prim's algorithm to construct a maximal spanning tree from the (positively) weighted graph \a G.
-/** Uses implementation in Boost Graph Library.
+/// Constructs a minimum spanning tree from the (non-negatively) weighted graph \a G.
+/** \param usePrim If true, use Prim's algorithm (complexity O(E log(V))), otherwise, use Kruskal's algorithm (complexity O(E log(E)))
+ *  \note Uses implementation from Boost Graph Library.
+ *  \note The vertices of \a G must be in the range [0,N) where N is the number of vertices of \a G.
  */
-template<typename T> RootedTree MaxSpanningTreePrims( const WeightedGraph<T> &G ) {
+template<typename T> RootedTree MaxSpanningTree( const WeightedGraph<T> &G, bool usePrim ) {
     if( G.size() == 0 )
         return RootedTree();
     else {
@@ -207,11 +236,11 @@ template<typename T> RootedTree MaxSpanningTreePrims( const WeightedGraph<T> &G 
                 maxweight = it->second;
         // make a copy of the graph
         WeightedGraph<T> gr( G );
-        // invoke MinSpanningTreePrims with negative weights
+        // invoke MinSpanningTree with negative weights
         // (which have to be shifted to satisfy positivity criterion)
         for( typename WeightedGraph<T>::iterator it = gr.begin(); it != gr.end(); it++ )
             it->second = maxweight - it->second;
-        return MinSpanningTreePrims( gr );
+        return MinSpanningTree( gr, usePrim );
     }
 }
 

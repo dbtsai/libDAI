@@ -109,7 +109,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
             }
 
             // find maximal spanning tree
-            construct( MaxSpanningTreePrims( wg ) );
+            construct( MaxSpanningTree( wg, true ) );
         } else
             DAI_THROW(UNKNOWN_ENUM_VALUE);
     }

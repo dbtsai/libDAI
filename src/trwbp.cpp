@@ -184,7 +184,7 @@ void TRWBP::sampleWeights( size_t nrTrees ) {
     // now repeatedly change the random weights, find the minimal spanning tree, and add it to the weights
     for( size_t nr = 0; nr < nrTrees; nr++ ) {
         // find minimal spanning tree
-        RootedTree randTree = MinSpanningTreePrims( wg );
+        RootedTree randTree = MinSpanningTree( wg, true );
         // add it to the weights
         addTreeToWeights( randTree );
         // resample weights of the graph

@@ -123,7 +123,7 @@ void JTree::construct( const std::vector<VarSet> &cl, bool verify ) {
         }
 
     // Construct maximal spanning tree using Prim's algorithm
-    RTree = MaxSpanningTreePrims( JuncGraph );
+    RTree = MaxSpanningTree( JuncGraph, true );
 
     // Construct corresponding region graph
 
