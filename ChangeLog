@@ -10,6 +10,8 @@ git HEAD
   - Added option to MaxSpanningTree and MinSpanningTree for
     choosing between Prim's algorithm and Kruskal's algorithm
   - More error checking in RootedTree constructor
+  - The vertices in DEdge and UEdge are now named "first" and "second"
+    for compatibility with a std::pair<size_t,size_t>
 * Improved bipgraph.h/cpp:
   - Fixed bug in BipartiteGraph::eraseNode1()
   - Fixed bug in BipartiteGraph::eraseNode2()

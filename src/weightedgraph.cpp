@@ -32,7 +32,7 @@ RootedTree::RootedTree( const GraphEL &T, size_t Root ) {
         // Check whether the root is in the tree
         bool valid = false;
         for( GraphEL::iterator e = Gr.begin(); e != Gr.end() && !valid; e++ )
-            if( e->n1 == Root || e->n2 == Root )
+            if( e->first == Root || e->second == Root )
                 valid = true;
         if( !valid )
             DAI_THROWE(RUNTIME_ERROR,"Graph does not contain specified root.");
@@ -45,21 +45,21 @@ RootedTree::RootedTree( const GraphEL &T, size_t Root ) {
         while( !done ) {
             bool changed = false;
             for( GraphEL::iterator e = Gr.begin(); e != Gr.end(); ) {
-                bool e1_in_nodes = nodes.count( e->n1 );
-                bool e2_in_nodes = nodes.count( e->n2 );
+                bool e1_in_nodes = nodes.count( e->first );
+                bool e2_in_nodes = nodes.count( e->second );
                 if( e1_in_nodes && e2_in_nodes )
                     DAI_THROWE(RUNTIME_ERROR,"Graph is not acyclic.");
                 if( e1_in_nodes ) {
                     // Add directed edge, pointing away from the root
-                    push_back( DEdge( e->n1, e->n2 ) );
-                    nodes.insert( e->n2 );
+                    push_back( DEdge( e->first, e->second ) );
+                    nodes.insert( e->second );
                     // Erase the edge
                     Gr.erase( e++ );
                     changed = true;
                 } else if( e2_in_nodes ) {
                     // Add directed edge, pointing away from the root
-                    push_back( DEdge( e->n2, e->n1 ) );
-                    nodes.insert( e->n1 );
+                    push_back( DEdge( e->second, e->first ) );
+                    nodes.insert( e->first );
                     // Erase the edge
                     Gr.erase( e++ );
                     changed = true;

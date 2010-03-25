@@ -40,34 +40,28 @@ namespace dai {
 class DEdge {
     public:
         /// First node index (source of edge)
-        union {
-            size_t n1;
-            size_t first;   /// alias
-        };
+        size_t first;
 
         /// Second node index (target of edge)
-        union {
-            size_t n2;
-            size_t second;   /// alias
-        };
+        size_t second;
 
         /// Default constructor
-        DEdge() : n1(0), n2(0) {}
+        DEdge() : first(0), second(0) {}
 
         /// Constructs a directed edge pointing from \a m1 to \a m2
-        DEdge( size_t m1, size_t m2 ) : n1(m1), n2(m2) {}
+        DEdge( size_t m1, size_t m2 ) : first(m1), second(m2) {}
 
         /// Tests for equality
-        bool operator==( const DEdge &x ) const { return ((n1 == x.n1) && (n2 == x.n2)); }
+        bool operator==( const DEdge &x ) const { return ((first == x.first) && (second == x.second)); }
 
         /// Smaller-than operator (performs lexicographical comparison)
         bool operator<( const DEdge &x ) const {
-            return( (n1 < x.n1) || ((n1 == x.n1) && (n2 < x.n2)) );
+            return( (first < x.first) || ((first == x.first) && (second < x.second)) );
         }
 
         /// Writes a directed edge to an output stream
         friend std::ostream & operator << (std::ostream & os, const DEdge & e) {
-            os << "(" << e.n1 << "->" << e.n2 << ")";
+            os << "(" << e.first << "->" << e.second << ")";
             return os;
         }
 };
@@ -77,47 +71,40 @@ class DEdge {
 class UEdge {
     public:
         /// First node index
-        union {
-            size_t n1;
-            size_t first;   /// alias
-        };
+        size_t first;
+
         /// Second node index
-        union {
-            size_t n2;
-            size_t second;  /// alias
-        };
+        size_t second;
 
         /// Default constructor
-        UEdge() : n1(0), n2(0) {}
+        UEdge() : first(0), second(0) {}
 
         /// Constructs an undirected edge between \a m1 and \a m2
-        UEdge( size_t m1, size_t m2 ) : n1(m1), n2(m2) {}
+        UEdge( size_t m1, size_t m2 ) : first(m1), second(m2) {}
 
         /// Construct from DEdge
-        UEdge( const DEdge &e ) : n1(e.n1), n2(e.n2) {}
+        UEdge( const DEdge &e ) : first(e.first), second(e.second) {}
 
         /// Tests for inequality (disregarding the ordering of the nodes)
         bool operator==( const UEdge &x ) {
-            return ((n1 == x.n1) && (n2 == x.n2)) || ((n1 == x.n2) && (n2 == x.n1));
+            return ((first == x.first) && (second == x.second)) || ((first == x.second) && (second == x.first));
         }
 
         /// Smaller-than operator
         bool operator<( const UEdge &x ) const {
-            size_t s = n1, l = n2;
-            if( s > l )
-                std::swap( s, l );
-            size_t xs = x.n1, xl = x.n2;
-            if( xs > xl )
-                std::swap( xs, xl );
+            size_t s = std::min( first, second );
+            size_t l = std::max( first, second );
+            size_t xs = std::min( x.first, x.second );
+            size_t xl = std::max( x.first, x.second );
             return( (s < xs) || ((s == xs) && (l < xl)) );
         }
 
         /// Writes an undirected edge to an output stream
         friend std::ostream & operator << (std::ostream & os, const UEdge & e) {
-            if( e.n1 < e.n2 )
-                os << "{" << e.n1 << "--" << e.n2 << "}";
+            if( e.first < e.second )
+                os << "{" << e.first << "--" << e.second << "}";
             else
-                os << "{" << e.n2 << "--" << e.n1 << "}";
+                os << "{" << e.second << "--" << e.first << "}";
             return os;
         }
 };
@@ -168,7 +155,7 @@ template<typename T> RootedTree MinSpanningTree( const WeightedGraph<T> &G, bool
     if( G.size() > 0 ) {
         using namespace boost;
         using namespace std;
-        typedef adjacency_list< listS, vecS, undirectedS, no_property, property<edge_weight_t, double> > boostGraph;
+        typedef adjacency_list< vecS, vecS, undirectedS, no_property, property<edge_weight_t, double> > boostGraph;
 
         set<size_t> nodes;
         vector<UEdge> edges;
@@ -178,8 +165,8 @@ template<typename T> RootedTree MinSpanningTree( const WeightedGraph<T> &G, bool
         for( typename WeightedGraph<T>::const_iterator e = G.begin(); e != G.end(); e++ ) {
             weights.push_back( e->second );
             edges.push_back( e->first );
-            nodes.insert( e->first.n1 );
-            nodes.insert( e->first.n2 );
+            nodes.insert( e->first.first );
+            nodes.insert( e->first.second );
         }
 
         size_t N = nodes.size();
@@ -192,7 +179,7 @@ template<typename T> RootedTree MinSpanningTree( const WeightedGraph<T> &G, bool
         GraphEL tree;
         if( usePrim ) {
             // Prim's algorithm
-            vector< graph_traits< boostGraph >::vertex_descriptor > p( num_vertices(g) );
+            vector< graph_traits< boostGraph >::vertex_descriptor > p(N);
             prim_minimum_spanning_tree( g, &(p[0]) );
 
             // Store tree edges in result
@@ -202,13 +189,14 @@ template<typename T> RootedTree MinSpanningTree( const WeightedGraph<T> &G, bool
             }
         } else {
             // Kruskal's algorithm
-            vector< graph_traits< boostGraph >::edge_descriptor > p( num_vertices(g) );
-            kruskal_minimum_spanning_tree( g, &(p[0]) );
+            vector< graph_traits< boostGraph >::edge_descriptor > t;
+            t.reserve(  N - 1 );
+            kruskal_minimum_spanning_tree( g, std::back_inserter(t) );
 
             // Store tree edges in result
-            for( size_t i = 0; i != p.size(); i++ ) {
-                size_t v1 = source( p[i], g );
-                size_t v2 = target( p[i], g );
+            for( size_t i = 0; i != t.size(); i++ ) {
+                size_t v1 = source( t[i], g );
+                size_t v2 = target( t[i], g );
                 if( v1 != v2 )
                     tree.insert( UEdge( v1, v2 ) );
             }

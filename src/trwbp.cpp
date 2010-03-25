@@ -156,7 +156,7 @@ void TRWBP::construct() {
 
 void TRWBP::addTreeToWeights( const RootedTree &tree ) {
     for( RootedTree::const_iterator e = tree.begin(); e != tree.end(); e++ ) {
-        VarSet ij( var(e->n1), var(e->n2) );
+        VarSet ij( var(e->first), var(e->second) );
         size_t I = findFactor( ij );
         _weight[I] += 1.0;
     }

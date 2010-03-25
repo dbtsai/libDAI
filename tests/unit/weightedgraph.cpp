@@ -28,14 +28,14 @@ using namespace dai;
 
 BOOST_AUTO_TEST_CASE( DEdgeTest ) {
     DEdge a;
-    BOOST_CHECK_EQUAL( a.n1, 0 );
-    BOOST_CHECK_EQUAL( a.n2, 0 );
+    BOOST_CHECK_EQUAL( a.first, 0 );
+    BOOST_CHECK_EQUAL( a.second, 0 );
     DEdge b( 3, 5 );
-    BOOST_CHECK_EQUAL( b.n1, 3 );
-    BOOST_CHECK_EQUAL( b.n2, 5 );
+    BOOST_CHECK_EQUAL( b.first, 3 );
+    BOOST_CHECK_EQUAL( b.second, 5 );
     DEdge c( 5, 3 );
-    BOOST_CHECK_EQUAL( c.n1, 5 );
-    BOOST_CHECK_EQUAL( c.n2, 3 );
+    BOOST_CHECK_EQUAL( c.first, 5 );
+    BOOST_CHECK_EQUAL( c.second, 3 );
     DEdge d( c );
     DEdge e = c;
     DEdge f( 5, 4 );
@@ -84,22 +84,22 @@ BOOST_AUTO_TEST_CASE( DEdgeTest ) {
 
 BOOST_AUTO_TEST_CASE( UEdgeTest ) {
     UEdge a;
-    BOOST_CHECK_EQUAL( a.n1, 0 );
-    BOOST_CHECK_EQUAL( a.n2, 0 );
+    BOOST_CHECK_EQUAL( a.first, 0 );
+    BOOST_CHECK_EQUAL( a.second, 0 );
     UEdge b( 3, 5 );
-    BOOST_CHECK_EQUAL( b.n1, 3 );
-    BOOST_CHECK_EQUAL( b.n2, 5 );
+    BOOST_CHECK_EQUAL( b.first, 3 );
+    BOOST_CHECK_EQUAL( b.second, 5 );
     UEdge c( 5, 3 );
-    BOOST_CHECK_EQUAL( c.n1, 5 );
-    BOOST_CHECK_EQUAL( c.n2, 3 );
+    BOOST_CHECK_EQUAL( c.first, 5 );
+    BOOST_CHECK_EQUAL( c.second, 3 );
     UEdge d( c );
     UEdge e = c;
     UEdge f( 5, 4 );
     UEdge g( 3, 6 );
 
     UEdge h( DEdge( 5, 3 ) );
-    BOOST_CHECK_EQUAL( h.n1, 5 );
-    BOOST_CHECK_EQUAL( h.n2, 3 );
+    BOOST_CHECK_EQUAL( h.first, 5 );
+    BOOST_CHECK_EQUAL( h.second, 3 );
 
     BOOST_CHECK( !(a == b) );
     BOOST_CHECK( !(a == c) );
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE( RootedTreeTest ) {
     }
     BOOST_CHECK( thrown );
 
-    edges.back().n2 = 4;
+    edges.back().second = 4;
     G = GraphEL( edges.begin(), edges.end() );
     thrown = false;
     RootedTree T;
