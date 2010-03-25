@@ -45,16 +45,7 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( static_cast<size_t>(e), 2 );
     BOOST_CHECK_EQUAL( strcmp( static_cast<char const *>(e), "BLUE" ), 0 );
 
-    bool thrown = false;
-    try {
-        colors f("BLUEISH");
-    } catch( Exception &e ) {
-        if( e.code() == Exception::UNKNOWN_ENUM_VALUE )
-            thrown = true;
-        else
-            throw;
-    }
-    BOOST_CHECK( thrown );
+    BOOST_CHECK_THROW( colors f("BLUEISH"), Exception );
 
     colors f = e;
     colors g(f);
@@ -93,15 +84,6 @@ BOOST_AUTO_TEST_CASE( StreamTest ) {
     ss6 >> c;
     BOOST_CHECK_EQUAL( c, colors::BLUE );
 
-    bool thrown = false;
-    try {
-        ss7 << "BLUEISH";
-        ss7 >> c;
-    } catch( Exception &e ) {
-        if( e.code() == Exception::UNKNOWN_ENUM_VALUE )
-            thrown = true;
-        else
-            throw;
-    }
-    BOOST_CHECK( thrown );
+    ss7 << "BLUEISH";
+    BOOST_CHECK_THROW( ss7 >> c, Exception );
 }

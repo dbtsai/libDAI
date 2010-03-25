@@ -153,41 +153,13 @@ BOOST_AUTO_TEST_CASE( RootedTreeTest ) {
     edges.push_back( E( 3, 1 ) );
     GraphEL G( edges.begin(), edges.end() );
     
-    bool thrown = false;
-    try {
-        RootedTree T( G, 0 );
-    } catch( Exception &e ) {
-        if( e.code() == Exception::RUNTIME_ERROR )
-            thrown = true;
-        else
-            throw;
-    }
-    BOOST_CHECK( thrown );
-
-    thrown = false;
-    try {
-        RootedTree T( G, 1 );
-    } catch( Exception &e ) {
-        if( e.code() == Exception::RUNTIME_ERROR )
-            thrown = true;
-        else
-            throw;
-    }
-    BOOST_CHECK( thrown );
+    BOOST_CHECK_THROW( RootedTree T( G, 0 ), Exception );
+    BOOST_CHECK_THROW( RootedTree T( G, 1 ), Exception );
 
     edges.back().second = 4;
     G = GraphEL( edges.begin(), edges.end() );
-    thrown = false;
     RootedTree T;
-    try {
-        T = RootedTree( G, 1 );
-    } catch( Exception &e ) {
-        if( e.code() == Exception::RUNTIME_ERROR )
-            thrown = true;
-        else
-            throw;
-    }
-    BOOST_CHECK( !thrown );
+    T = RootedTree( G, 1 );
     BOOST_CHECK_EQUAL( T.size(), 3 );
     BOOST_CHECK_EQUAL( T[0], DEdge( 1, 2 ) );
     BOOST_CHECK_EQUAL( T[1], DEdge( 2, 3 ) );
@@ -195,16 +167,7 @@ BOOST_AUTO_TEST_CASE( RootedTreeTest ) {
 
     edges.push_back( E(5, 6) );
     G = GraphEL( edges.begin(), edges.end() );
-    thrown = false;
-    try {
-        RootedTree T( G, 1 );
-    } catch( Exception &e ) {
-        if( e.code() == Exception::RUNTIME_ERROR )
-            thrown = true;
-        else
-            throw;
-    }
-    BOOST_CHECK( thrown );
+    BOOST_CHECK_THROW( RootedTree T( G, 1 ), Exception );
 }
 
 
@@ -242,14 +205,5 @@ BOOST_AUTO_TEST_CASE( SpanningTreeTest ) {
     H[UEdge(2,3)] = 3;
     H[UEdge(2,4)] = 4;
     H[UEdge(3,4)] = 5;
-    bool thrown = false;
-    try {
-        T = MinSpanningTree( H, true );
-    } catch( Exception &e ) {
-        if( e.code() == Exception::RUNTIME_ERROR )
-            thrown = true;
-        else
-            throw;
-    }
-    BOOST_CHECK( thrown );
+    BOOST_CHECK_THROW( T = MinSpanningTree( H, true ), Exception );
 }
