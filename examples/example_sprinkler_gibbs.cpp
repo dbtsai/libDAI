@@ -37,9 +37,9 @@ int main() {
 
     // Prepare a Gibbs sampler
     PropertySet gibbsProps;
-    gibbsProps.Set("iters", size_t(100));   // number of Gibbs sampler iterations
-    gibbsProps.Set("burnin", size_t(0));
-    gibbsProps.Set("verbose", size_t(0));
+    gibbsProps.set("iters", size_t(100));   // number of Gibbs sampler iterations
+    gibbsProps.set("burnin", size_t(0));
+    gibbsProps.set("verbose", size_t(0));
     Gibbs gibbsSampler( SprinklerNetwork, gibbsProps );
 
     // Open a .tab file for writing

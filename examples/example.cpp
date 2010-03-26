@@ -35,9 +35,9 @@ int main( int argc, char *argv[] ) {
 
         // Store the constants in a PropertySet object
         PropertySet opts;
-        opts.Set("maxiter",maxiter);  // Maximum number of iterations
-        opts.Set("tol",tol);          // Tolerance for convergence
-        opts.Set("verbose",verb);     // Verbosity (amount of output generated)
+        opts.set("maxiter",maxiter);  // Maximum number of iterations
+        opts.set("tol",tol);          // Tolerance for convergence
+        opts.set("verbose",verb);     // Verbosity (amount of output generated)
 
         // Construct a JTree (junction tree) object from the FactorGraph fg
         // using the parameters specified by opts and an additional property

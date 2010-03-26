@@ -42,10 +42,10 @@ void JTree::setProperties( const PropertySet &opts ) {
 
 PropertySet JTree::getProperties() const {
     PropertySet opts;
-    opts.Set( "verbose", props.verbose );
-    opts.Set( "updates", props.updates );
-    opts.Set( "inference", props.inference );
-    opts.Set( "heuristic", props.heuristic );
+    opts.set( "verbose", props.verbose );
+    opts.set( "updates", props.updates );
+    opts.set( "inference", props.inference );
+    opts.set( "heuristic", props.heuristic );
     return opts;
 }
 

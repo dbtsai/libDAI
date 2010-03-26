@@ -47,7 +47,7 @@ FactorGraph createFG( const GraphAL &G, FactorType ft, size_t states, const Prop
     // Get inverse temperature
     Real beta = 1.0;
     if( ft != FactorType::ISING ) 
-        beta = props.GetAs<Real>("beta");
+        beta = props.getAs<Real>("beta");
 
     // Get properties for Ising factors
     Real mean_h = 0.0;
@@ -55,10 +55,10 @@ FactorGraph createFG( const GraphAL &G, FactorType ft, size_t states, const Prop
     Real mean_J = 0.0;
     Real sigma_J = 0.0;
     if( ft == FactorType::ISING ) {
-        mean_h = props.GetAs<Real>("mean_th");
-        sigma_h = props.GetAs<Real>("sigma_th");
-        mean_J = props.GetAs<Real>("mean_w");
-        sigma_J = props.GetAs<Real>("sigma_w");
+        mean_h = props.getAs<Real>("mean_th");
+        sigma_h = props.getAs<Real>("sigma_th");
+        mean_J = props.getAs<Real>("mean_w");
+        sigma_J = props.getAs<Real>("sigma_w");
     }
     
     // Create variables
@@ -448,15 +448,15 @@ int main( int argc, char *argv[] ) {
         // Store some options in a PropertySet object
         PropertySet options;
         if( vm.count("mean_th") )
-            options.Set("mean_th", mean_th);
+            options.set("mean_th", mean_th);
         if( vm.count("sigma_th") )
-            options.Set("sigma_th", sigma_th);
+            options.set("sigma_th", sigma_th);
         if( vm.count("mean_w") )
-            options.Set("mean_w", mean_w);
+            options.set("mean_w", mean_w);
         if( vm.count("sigma_w") )
-            options.Set("sigma_w", sigma_w);
+            options.set("sigma_w", sigma_w);
         if( vm.count("beta") )
-            options.Set("beta", beta);
+            options.set("beta", beta);
 
         // Output some comments
         cout << "# Factor graph made by " << argv[0] << endl;

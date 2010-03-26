@@ -113,7 +113,7 @@ std::pair<std::string, PropertySet> parseNameProperties( const std::string &s, c
         if( aps.first == ps.first )
             looped = true;
         // override aps properties by ps properties
-        aps.second.Set( ps.second );
+        aps.second.set( ps.second );
         // replace ps by aps
         ps = aps;
         // repeat until method name == alias name ('looped'), or

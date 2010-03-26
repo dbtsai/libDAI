@@ -262,7 +262,7 @@ EOF
     my ($type,$name,$default,$cmt) = @$v;
 #     $text .= qq{opts.set("$name", $name);};
     $stext .= <<EOF;
-    opts.Set("$name", $name);
+    opts.set("$name", $name);
 EOF
 
   }

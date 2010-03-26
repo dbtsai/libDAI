@@ -21,6 +21,8 @@ std::ostream& operator<< (std::ostream & os, const Property & p) {
     os << p.first << "=";
     if( p.second.type() == typeid(size_t) )
         os << boost::any_cast<size_t>(p.second);
+    else if( p.second.type() == typeid(int) )
+        os << boost::any_cast<int>(p.second);
     else if( p.second.type() == typeid(std::string) )
         os << boost::any_cast<std::string>(p.second);
     else if( p.second.type() == typeid(double) )
@@ -91,7 +93,7 @@ std::istream& operator>> (std::istream& is, PropertySet & ps) {
         std::string value = s.substr(token_start, token_end - token_start);
 
         // store the key,value pair
-        ps.Set(key,value);
+        ps.set(key,value);
 
         // go on with the next one
         token_start = token_end + 1;

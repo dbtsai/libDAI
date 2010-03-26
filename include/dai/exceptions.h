@@ -103,7 +103,7 @@ class Exception : public std::runtime_error {
         /// Constructor
         Exception( Code _code, const std::string& msg="", const std::string& detailedMsg="" ) : std::runtime_error(ErrorStrings[_code] + " [" +  msg + "]"), errorcode(_code) {
             if( !detailedMsg.empty() )
-                std::cerr << "ERROR: " << detailedMsg << std::endl;
+                std::cerr << "EXCEPTION: " << detailedMsg << std::endl;
         }
 
         /// Returns error code of this exception

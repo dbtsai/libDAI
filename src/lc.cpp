@@ -54,15 +54,15 @@ void LC::setProperties( const PropertySet &opts ) {
 
 PropertySet LC::getProperties() const {
     PropertySet opts;
-    opts.Set( "tol", props.tol );
-    opts.Set( "maxiter", props.maxiter );
-    opts.Set( "verbose", props.verbose );
-    opts.Set( "cavity", props.cavity );
-    opts.Set( "updates", props.updates );
-    opts.Set( "cavainame", props.cavainame );
-    opts.Set( "cavaiopts", props.cavaiopts );
-    opts.Set( "reinit", props.reinit );
-    opts.Set( "damping", props.damping );
+    opts.set( "tol", props.tol );
+    opts.set( "maxiter", props.maxiter );
+    opts.set( "verbose", props.verbose );
+    opts.set( "cavity", props.cavity );
+    opts.set( "updates", props.updates );
+    opts.set( "cavainame", props.cavainame );
+    opts.set( "cavaiopts", props.cavaiopts );
+    opts.set( "reinit", props.reinit );
+    opts.set( "damping", props.damping );
     return opts;
 }
 

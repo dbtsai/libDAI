@@ -4,7 +4,7 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
  */
 
@@ -42,6 +42,10 @@ typedef std::pair<PropertyKey, PropertyValue> Property;
 
 
 /// Writes a Property object (key-value pair) to an output stream
+/** \note Not all value types are automatically supported; if a type is unknown, an 
+ *  UNKNOWN_PROPERTY_TYPE exception is thrown. Adding support for a new type can 
+ *  be done by changing this function body.
+ */
 std::ostream& operator<< ( std::ostream & os, const Property &p );
 
 
@@ -89,16 +93,16 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
     /// \name Setting property keys/values
     //@{
         /// Sets a property (a key \a key with a corresponding value \a val)
-        PropertySet& Set( const PropertyKey& key, const PropertyValue& val ) { 
+        PropertySet& set( const PropertyKey& key, const PropertyValue& val ) { 
             this->operator[](key) = val; 
             return *this; 
         }
 
         /// Set properties according to \a newProps, overriding properties that already exist with new values
-        PropertySet& Set( const PropertySet& newProps ) {
+        PropertySet& set( const PropertySet& newProps ) {
             const std::map<PropertyKey, PropertyValue> *m = &newProps;
             foreach(value_type i, *m)
-                Set( i.first, i.second );
+                set( i.first, i.second );
             return *this;
         }
 
@@ -110,7 +114,7 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
          */
         PropertySet operator()( const PropertyKey& key, const PropertyValue& val ) const { 
             PropertySet copy = *this; 
-            return copy.Set(key,val); 
+            return copy.set(key,val); 
         }
 
         /// Sets a property (a key \a key with a corresponding value \a val, which is first converted from \a ValueType to string)
@@ -119,9 +123,9 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
          *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
          */
         template<typename ValueType>
-        PropertySet& setAsString( const PropertyKey& key, ValueType& val ) {
+        PropertySet& setAsString( const PropertyKey& key, const ValueType& val ) {
             try {
-                return Set( key, boost::lexical_cast<std::string>(val) );
+                return set( key, boost::lexical_cast<std::string>(val) );
             } catch( boost::bad_lexical_cast & ) {
                 DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to string.");
             }
@@ -133,12 +137,12 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
          *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
          */
         template<typename ValueType>
-        void ConvertTo( const PropertyKey& key ) { 
-            PropertyValue val = Get(key);
+        void convertTo( const PropertyKey& key ) { 
+            PropertyValue val = get(key);
             if( val.type() != typeid(ValueType) ) {
                 DAI_ASSERT( val.type() == typeid(std::string) );
                 try {
-                    Set(key, boost::lexical_cast<ValueType>(GetAs<std::string>(key)));
+                    set(key, boost::lexical_cast<ValueType>(getAs<std::string>(key)));
                 } catch(boost::bad_lexical_cast &) {
                     DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' from string to desired type.");
                 }
@@ -150,6 +154,21 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
 
     /// \name Queries
     //@{
+        /// Return number of key-value pairs
+        size_t size() const {
+            return std::map<PropertyKey, PropertyValue>::size();
+        }
+
+        /// Removes all key-value pairs
+        void clear() {
+            std::map<PropertyKey, PropertyValue>::clear();
+        }
+
+        /// Removes key-value pair with given \a key
+        size_t erase( const PropertyKey &key ) {
+            return std::map<PropertyKey, PropertyValue>::erase( key );
+        }
+
         /// Check if a property with the given \a key is defined
         bool hasKey( const PropertyKey& key ) const { 
             PropertySet::const_iterator x = find(key); 
@@ -168,10 +187,10 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
         /// Gets the value corresponding to \a key
         /** \throw OBJECT_NOT_FOUND if the key cannot be found in \c *this
          */
-        const PropertyValue& Get( const PropertyKey& key ) const {
+        const PropertyValue& get( const PropertyKey& key ) const {
             PropertySet::const_iterator x = find(key);
             if( x == this->end() )
-                DAI_THROWE(OBJECT_NOT_FOUND,"PropertySet::Get cannot find property '" + key + "'");
+                DAI_THROWE(OBJECT_NOT_FOUND,"PropertySet::get cannot find property '" + key + "'");
             return x->second;
         }
 
@@ -181,9 +200,9 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
          *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
          */
         template<typename ValueType>
-        ValueType GetAs( const PropertyKey& key ) const {
+        ValueType getAs( const PropertyKey& key ) const {
             try {
-                return boost::any_cast<ValueType>(Get(key));
+                return boost::any_cast<ValueType>(get(key));
             } catch( const boost::bad_any_cast & ) {
                 DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to desired type.");
                 return ValueType();
@@ -200,12 +219,12 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
          */
         template<typename ValueType>
         ValueType getStringAs( const PropertyKey& key ) const { 
-            PropertyValue val = Get(key);
+            PropertyValue val = get(key);
             if( val.type() == typeid(ValueType) ) {
                 return boost::any_cast<ValueType>(val);
             } else if( val.type() == typeid(std::string) ) {
                 try {
-                    return boost::lexical_cast<ValueType>(GetAs<std::string>(key));
+                    return boost::lexical_cast<ValueType>(getAs<std::string>(key));
                 } catch(boost::bad_lexical_cast &) {
                     DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' from string to desired type.");
                 }

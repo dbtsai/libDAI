@@ -45,10 +45,10 @@ void MR::setProperties( const PropertySet &opts ) {
 
 PropertySet MR::getProperties() const {
     PropertySet opts;
-    opts.Set( "tol", props.tol );
-    opts.Set( "verbose", props.verbose );
-    opts.Set( "updates", props.updates );
-    opts.Set( "inits", props.inits );
+    opts.set( "tol", props.tol );
+    opts.set( "verbose", props.verbose );
+    opts.set( "updates", props.updates );
+    opts.set( "inits", props.inits );
     return opts;
 }
 

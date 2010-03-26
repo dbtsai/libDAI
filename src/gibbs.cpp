@@ -46,9 +46,9 @@ void Gibbs::setProperties( const PropertySet &opts ) {
 
 PropertySet Gibbs::getProperties() const {
     PropertySet opts;
-    opts.Set( "iters", props.iters );
-    opts.Set( "burnin", props.burnin );
-    opts.Set( "verbose", props.verbose );
+    opts.set( "iters", props.iters );
+    opts.set( "burnin", props.burnin );
+    opts.set( "verbose", props.verbose );
     return opts;
 }
 
@@ -235,9 +235,9 @@ Factor Gibbs::belief( const VarSet &ns ) const {
 
 std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t iters ) {
     PropertySet gibbsProps;
-    gibbsProps.Set("iters", iters);
-    gibbsProps.Set("burnin", size_t(0));
-    gibbsProps.Set("verbose", size_t(0));
+    gibbsProps.set("iters", iters);
+    gibbsProps.set("burnin", size_t(0));
+    gibbsProps.set("verbose", size_t(0));
     Gibbs gibbs( fg, gibbsProps );
     gibbs.run();
     return gibbs.state();

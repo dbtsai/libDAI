@@ -1,6 +1,15 @@
 git HEAD
 --------
 
+* Improved properties.h/cpp:
+  - Renamed PropertySet::Set() -> PropertySet::set()
+  - Renamed PropertySet::Get() -> PropertySet::get()
+  - Renamed PropertySet::GetAs<T>() -> PropertySet::getAs<T>()
+  - Renamed PropertySet::ConvertTo<T>() -> PropertySet::convertTo<T>()
+  - Added PropertySet::size()
+  - Added PropertySet::clear()
+  - Added PropertySet::erase()
+  - Fixed bug in PropertySet::setAsString<T>()
 * Improved util.h/cpp:
   - Fixed a bug in rnd_seed()
   - Removed Real max( const std::vector<Real> &v )
@@ -39,7 +48,7 @@ git HEAD
 * Removed RandomDRegularGraph()
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,
-  weightedgraph, enum, util
+  weightedgraph, enum, util, properties
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

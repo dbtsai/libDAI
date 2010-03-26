@@ -45,10 +45,10 @@ void MF::setProperties( const PropertySet &opts ) {
 
 PropertySet MF::getProperties() const {
     PropertySet opts;
-    opts.Set( "tol", props.tol );
-    opts.Set( "maxiter", props.maxiter );
-    opts.Set( "verbose", props.verbose );
-    opts.Set( "damping", props.damping );
+    opts.set( "tol", props.tol );
+    opts.set( "maxiter", props.maxiter );
+    opts.set( "verbose", props.verbose );
+    opts.set( "damping", props.damping );
     return opts;
 }
 

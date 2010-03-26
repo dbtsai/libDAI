@@ -35,7 +35,7 @@ void TRWBP::setProperties( const PropertySet &opts ) {
 
 PropertySet TRWBP::getProperties() const {
     PropertySet opts = BP::getProperties();
-    opts.Set( "nrtrees", nrtrees );
+    opts.set( "nrtrees", nrtrees );
     return opts;
 }
 

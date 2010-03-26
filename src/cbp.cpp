@@ -152,12 +152,12 @@ Real CBP::run() {
 
 InfAlg* CBP::getInfAlg() {
     PropertySet bpProps;
-    bpProps.Set("updates", props.updates);
-    bpProps.Set("tol", props.tol);
-    bpProps.Set("maxiter", props.maxiter);
-    bpProps.Set("verbose", props.verbose);
-    bpProps.Set("logdomain", false);
-    bpProps.Set("damping", (Real)0.0);
+    bpProps.set("updates", props.updates);
+    bpProps.set("tol", props.tol);
+    bpProps.set("maxiter", props.maxiter);
+    bpProps.set("verbose", props.verbose);
+    bpProps.set("logdomain", false);
+    bpProps.set("damping", (Real)0.0);
     BP *bp = new BP( *this, bpProps );
     bp->recordSentMessages = true;
     bp->init();
@@ -597,20 +597,20 @@ void CBP::Properties::set(const PropertySet &opts)
 }
 PropertySet CBP::Properties::get() const {
     PropertySet opts;
-    opts.Set("verbose", verbose);
-    opts.Set("tol", tol);
-    opts.Set("updates", updates);
-    opts.Set("maxiter", maxiter);
-    opts.Set("rec_tol", rec_tol);
-    opts.Set("max_levels", max_levels);
-    opts.Set("min_max_adj", min_max_adj);
-    opts.Set("choose", choose);
-    opts.Set("recursion", recursion);
-    opts.Set("clamp", clamp);
-    opts.Set("bbp_props", bbp_props);
-    opts.Set("bbp_cfn", bbp_cfn);
-    opts.Set("rand_seed", rand_seed);
-    opts.Set("clamp_outfile", clamp_outfile);
+    opts.set("verbose", verbose);
+    opts.set("tol", tol);
+    opts.set("updates", updates);
+    opts.set("maxiter", maxiter);
+    opts.set("rec_tol", rec_tol);
+    opts.set("max_levels", max_levels);
+    opts.set("min_max_adj", min_max_adj);
+    opts.set("choose", choose);
+    opts.set("recursion", recursion);
+    opts.set("clamp", clamp);
+    opts.set("bbp_props", bbp_props);
+    opts.set("bbp_cfn", bbp_cfn);
+    opts.set("rand_seed", rand_seed);
+    opts.set("clamp_outfile", clamp_outfile);
     return opts;
 }
 string CBP::Properties::toString() const {

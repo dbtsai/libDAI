@@ -60,13 +60,13 @@ void BP::setProperties( const PropertySet &opts ) {
 
 PropertySet BP::getProperties() const {
     PropertySet opts;
-    opts.Set( "tol", props.tol );
-    opts.Set( "maxiter", props.maxiter );
-    opts.Set( "verbose", props.verbose );
-    opts.Set( "logdomain", props.logdomain );
-    opts.Set( "updates", props.updates );
-    opts.Set( "damping", props.damping );
-    opts.Set( "inference", props.inference );
+    opts.set( "tol", props.tol );
+    opts.set( "maxiter", props.maxiter );
+    opts.set( "verbose", props.verbose );
+    opts.set( "logdomain", props.logdomain );
+    opts.set( "updates", props.updates );
+    opts.set( "damping", props.damping );
+    opts.set( "inference", props.inference );
     return opts;
 }
 

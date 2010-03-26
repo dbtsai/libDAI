@@ -31,7 +31,7 @@ void ExactInf::setProperties( const PropertySet &opts ) {
 
 PropertySet ExactInf::getProperties() const {
     PropertySet opts;
-    opts.Set( "verbose", props.verbose );
+    opts.set( "verbose", props.verbose );
     return opts;
 }
 

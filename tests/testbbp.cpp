@@ -37,10 +37,10 @@ int main( int argc, char *argv[] ) {
 
         // Store the constants in a PropertySet object
         PropertySet opts;
-        opts.Set("verbose",verbose);  // Verbosity (amount of output generated)
-        opts.Set("tol",tol);          // Tolerance for convergence
-        opts.Set("maxiter",maxiter);  // Maximum number of iterations
-        opts.Set("damping",damping);  // Amount of damping applied
+        opts.set("verbose",verbose);  // Verbosity (amount of output generated)
+        opts.set("tol",tol);          // Tolerance for convergence
+        opts.set("maxiter",maxiter);  // Maximum number of iterations
+        opts.set("damping",damping);  // Amount of damping applied
 
         // Construct a BP (belief propagation) object from the FactorGraph fg
         BP bp(fg, opts("updates",string("SEQFIX"))("logdomain",false));

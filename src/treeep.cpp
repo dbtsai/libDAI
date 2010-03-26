@@ -41,10 +41,10 @@ void TreeEP::setProperties( const PropertySet &opts ) {
 
 PropertySet TreeEP::getProperties() const {
     PropertySet opts;
-    opts.Set( "tol", props.tol );
-    opts.Set( "maxiter", props.maxiter );
-    opts.Set( "verbose", props.verbose );
-    opts.Set( "type", props.type );
+    opts.set( "tol", props.tol );
+    opts.set( "maxiter", props.maxiter );
+    opts.set( "verbose", props.verbose );
+    opts.set( "type", props.type );
     return opts;
 }
 
@@ -67,7 +67,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
        DAI_THROW(FACTORGRAPH_NOT_CONNECTED);
 
     if( opts.hasKey("tree") ) {
-        construct( opts.GetAs<RootedTree>("tree") );
+        construct( opts.getAs<RootedTree>("tree") );
     } else {
         if( props.type == Properties::TypeType::ORG || props.type == Properties::TypeType::ALT ) {
             // ORG: construct weighted graph with as weights a crude estimate of the

@@ -73,14 +73,14 @@ void HAK::setProperties( const PropertySet &opts ) {
 
 PropertySet HAK::getProperties() const {
     PropertySet opts;
-    opts.Set( "tol", props.tol );
-    opts.Set( "maxiter", props.maxiter );
-    opts.Set( "verbose", props.verbose );
-    opts.Set( "doubleloop", props.doubleloop );
-    opts.Set( "clusters", props.clusters );
-    opts.Set( "init", props.init );
-    opts.Set( "loopdepth", props.loopdepth );
-    opts.Set( "damping", props.damping );
+    opts.set( "tol", props.tol );
+    opts.set( "maxiter", props.maxiter );
+    opts.set( "verbose", props.verbose );
+    opts.set( "doubleloop", props.doubleloop );
+    opts.set( "clusters", props.clusters );
+    opts.set( "init", props.init );
+    opts.set( "loopdepth", props.loopdepth );
+    opts.set( "damping", props.damping );
     return opts;
 }
 

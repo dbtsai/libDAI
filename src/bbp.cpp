@@ -1172,11 +1172,11 @@ void BBP::Properties::set(const PropertySet &opts)
 }
 PropertySet BBP::Properties::get() const {
     PropertySet opts;
-    opts.Set("verbose", verbose);
-    opts.Set("maxiter", maxiter);
-    opts.Set("tol", tol);
-    opts.Set("damping", damping);
-    opts.Set("updates", updates);
+    opts.set("verbose", verbose);
+    opts.set("maxiter", maxiter);
+    opts.set("tol", tol);
+    opts.set("damping", damping);
+    opts.set("updates", updates);
     return opts;
 }
 string BBP::Properties::toString() const {

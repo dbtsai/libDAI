@@ -38,8 +38,8 @@ int main( int argc, char** argv ) {
     fg.ReadFromFile( argv[1] );
 
     PropertySet infprops;
-    infprops.Set( "verbose", (size_t)1 );
-    infprops.Set( "updates", string("HUGIN") );
+    infprops.set( "verbose", (size_t)1 );
+    infprops.set( "updates", string("HUGIN") );
     InfAlg* inf = newInfAlg( "JTREE", fg, infprops );
     inf->init();
 
