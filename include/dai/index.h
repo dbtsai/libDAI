@@ -5,7 +5,7 @@
  *  warranty. See the file COPYING for more details.
  *
  *  Copyright (C) 2002       Martijn Leisink  [martijn@mbfys.kun.nl]
- *  Copyright (C) 2006-2009  Joris Mooij      [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2010  Joris Mooij      [joris dot mooij at libdai dot org]
  *  Copyright (C) 2002-2007  Radboud University Nijmegen, The Netherlands
  */
 
@@ -37,11 +37,11 @@ namespace dai {
  *      size_t iter = 0;
  *      for( ; i.valid(); i++, iter++ ) {
  *          cout << "State of forVars: " << calcState( forVars, iter ) << "; ";
- *          cout << "state of indexVars: " << calcState( indexVars, long(i) ) << endl;
+ *          cout << "state of indexVars: " << calcState( indexVars, size_t(i) ) << endl;
  *      }
  *  \endcode
  *  loops over all joint states of the variables in \a forVars,
- *  and <tt>(long)i</tt> equals the linear index of the corresponding
+ *  and <tt>(size_t)i</tt> equals the linear index of the corresponding
  *  state of \a indexVars, where the variables in \a indexVars that are
  *  not in \a forVars assume their zero'th value.
  *  \idea Optimize all indices as follows: keep a cache of all (or only
@@ -279,6 +279,13 @@ class multifor {
         /// Increments the current indices (postfix)
         void operator++( int ) {
             operator++();
+        }
+
+        /// Resets the state
+        multifor& reset() {
+            fill( _indices.begin(), _indices.end(), 0 );
+            _linear_index = 0;
+            return( *this );
         }
 
         /// Returns \c true if the current indices are valid

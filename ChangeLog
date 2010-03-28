@@ -1,6 +1,8 @@
 git HEAD
 --------
 
+* Improved index.h/cpp:
+  - Added multifor::reset()
 * Improved properties.h/cpp:
   - Renamed PropertySet::Set() -> PropertySet::set()
   - Renamed PropertySet::Get() -> PropertySet::get()
