@@ -179,7 +179,6 @@ BOOST_AUTO_TEST_CASE( SetTest ) {
     BOOST_CHECK_EQUAL( x.getAs<size_t>( "key1" ), 5 );
     x.setAsString( "key1", -5 );
     BOOST_CHECK_EQUAL( x.getAs<std::string>( "key1" ), std::string("-5") );
-    BOOST_CHECK_THROW( x.convertTo<size_t>( "key1" ), Exception );
     x.convertTo<int>( "key1" );
     BOOST_CHECK_EQUAL( x.getAs<int>( "key1" ), -5 );
     x.setAsString( "key1", 1.234 );
