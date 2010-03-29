@@ -305,8 +305,16 @@ template <typename T> class TProb {
         size_t size() const { return _p.size(); }
 
         /// Accumulate over all values, similar to std::accumulate
+        /** The following calculation is done:
+         *  \code
+         *  T t = op2(init);
+         *  for( const_iterator it = begin(); it != end(); it++ )
+         *      t = op1( t, op2(*it) );
+         *  return t;
+         *  \endcode
+         */
         template<typename binOp, typename unOp> T accumulate( T init, binOp op1, unOp op2 ) const {
-            T t = init;
+            T t = op2(init);
             for( const_iterator it = begin(); it != end(); it++ )
                 t = op1( t, op2(*it) );
             return t;
@@ -374,7 +382,7 @@ template <typename T> class TProb {
         /// Lexicographical comparison
         /** \pre <tt>this->size() == q.size()</tt>
          */
-        bool operator<=( const TProb<T>& q ) const {
+        bool operator<( const TProb<T>& q ) const {
             DAI_DEBASSERT( size() == q.size() );
             return lexicographical_compare( begin(), end(), q.begin(), q.end() );
         }
@@ -528,11 +536,10 @@ template <typename T> class TProb {
                 return *this;
         }
 
-        /// Divides each entry by scalar \a x
+        /// Divides each entry by scalar \a x, where division by 0 yields 0
         TProb<T>& operator/= (T x) {
-            DAI_DEBASSERT( x != 0 );
             if( x != 1 )
-                return pwUnaryOp( std::bind2nd( std::divides<T>(), x ) );
+                return pwUnaryOp( std::bind2nd( fo_divides0<T>(), x ) );
             else
                 return *this;
         }
@@ -695,9 +702,10 @@ template<typename T> T dist( const TProb<T> &p, const TProb<T> &q, typename TPro
 /** \relates TProb
  */
 template<typename T> std::ostream& operator<< (std::ostream& os, const TProb<T>& p) {
-    os << "[";
-    std::copy( p.p().begin(), p.p().end(), std::ostream_iterator<T>(os, " ") );
-    os << "]";
+    os << "(";
+    for( typename std::vector<T>::const_iterator it = p.begin(); it != p.end(); it++ )
+        os << (it != p.begin() ? ", " : "") << *it;
+    os << ")";
     return os;
 }
 

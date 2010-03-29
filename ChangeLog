@@ -2,7 +2,11 @@ git HEAD
 --------
 
 * Improved prob.h/cpp:
-  - Added operator==( const TProb<T> &q )
+  - Added TProb<T>::operator==( const TProb<T> &q )
+  - TProb<T>::accumulate() now also applies op2 to init
+  - Fixed bug by renaming TProb<T>::operator<=() to TProb<T>::operator<()
+  - TProb<T>& operator/= (T x) now yields 0 when dividing by 0
+  - Changed format of TProb<T> when streamed to an ostream
 * Improved index.h/cpp:
   - Added multifor::reset()
 * Improved properties.h/cpp:
