@@ -146,7 +146,8 @@ class RootedTree : public std::vector<DEdge> {
 
 
 /// Constructs a minimum spanning tree from the (non-negatively) weighted graph \a G.
-/** \param usePrim If true, use Prim's algorithm (complexity O(E log(V))), otherwise, use Kruskal's algorithm (complexity O(E log(E)))
+/** \param G Weighted graph that should have non-negative weights.
+ *  \param usePrim If true, use Prim's algorithm (complexity O(E log(V))), otherwise, use Kruskal's algorithm (complexity O(E log(E))).
  *  \note Uses implementation from Boost Graph Library.
  *  \note The vertices of \a G must be in the range [0,N) where N is the number of vertices of \a G.
  */
@@ -210,7 +211,8 @@ template<typename T> RootedTree MinSpanningTree( const WeightedGraph<T> &G, bool
 
 
 /// Constructs a minimum spanning tree from the (non-negatively) weighted graph \a G.
-/** \param usePrim If true, use Prim's algorithm (complexity O(E log(V))), otherwise, use Kruskal's algorithm (complexity O(E log(E)))
+/** \param G Weighted graph that should have non-negative weights.
+ *  \param usePrim If true, use Prim's algorithm (complexity O(E log(V))), otherwise, use Kruskal's algorithm (complexity O(E log(E))).
  *  \note Uses implementation from Boost Graph Library.
  *  \note The vertices of \a G must be in the range [0,N) where N is the number of vertices of \a G.
  */

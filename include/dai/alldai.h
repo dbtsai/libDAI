@@ -89,7 +89,9 @@ InfAlg *newInfAlgFromString( const std::string &nameOpts, const FactorGraph &fg 
 
 
 /// Constructs a new inference algorithm.
-/** \param aliases Maps names to strings in the format "name[key1=val1,key2=val2,...,keyn=valn]"; if not empty, alias substitution
+/** \param nameOpts The name and options of the inference algorithm (should be in the format "name[key1=val1,key2=val2,...,keyn=valn]").
+ *  \param fg The FactorGraph that the algorithm should be applied to.
+ *  \param aliases Maps names to strings in the format "name[key1=val1,key2=val2,...,keyn=valn]"; if not empty, alias substitution
  *  will be performed when parsing \a nameOpts by invoking parseNameProperties(const std::string &,const std::map<std::string,std::string> &)
  *  \see newInfAlgFromString(const std::string &, const FactorGraph &)
  */

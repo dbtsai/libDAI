@@ -71,7 +71,8 @@ class FBP : public BP {
         FBP() : BP(), _weight() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \param opts Parameters @see BP::Properties
+        /** \param fg Factor graph.
+         *  \param opts Parameters @see BP::Properties
          */
         FBP( const FactorGraph &fg, const PropertySet &opts ) : BP(fg, opts), _weight() {
             setProperties( opts );

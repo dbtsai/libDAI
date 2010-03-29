@@ -1,6 +1,8 @@
 git HEAD
 --------
 
+* Improved prob.h/cpp:
+  - Added operator==( const TProb<T> &q )
 * Improved index.h/cpp:
   - Added multifor::reset()
 * Improved properties.h/cpp:
@@ -50,7 +52,7 @@ git HEAD
 * Removed RandomDRegularGraph()
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,
-  weightedgraph, enum, util, properties
+  weightedgraph, enum, util, properties, index, prob
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:
@@ -742,4 +744,4 @@ description in the help).
 
 0.1.0   (2006-02-28)
 --------------------
-First version worthy a version number.
+First version worthy of a version number.

@@ -313,7 +313,7 @@ class multifor {
  *  \note The same functionality could be achieved by simply iterating over the linear state and using dai::calcState(),
  *  but the State class offers a more efficient implementation.
  *
- *  \note A State is very similar to a \link multifor \endlink, but tailored for Var 's and VarSet 's.
+ *  \note A State is very similar to a dai::multifor, but tailored for Var 's and VarSet 's.
  *
  *  \see dai::calcLinearState(), dai::calcState()
  *

@@ -94,7 +94,8 @@ class HAK : public DAIAlgRG {
         HAK() : DAIAlgRG(), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \param opts Parameters @see Properties
+        /** \param fg Factor graph.
+         *  \param opts Parameters @see Properties
          */
         HAK( const FactorGraph &fg, const PropertySet &opts );
 

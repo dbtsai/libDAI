@@ -77,6 +77,7 @@ class TRWBP : public BP {
         /// Construct from FactorGraph \a fg and PropertySet \a opts.
         /** There is an additional property "nrtrees" which allows to specify the
          *  number of random spanning trees used to set the scale parameters.
+         *  \param fg Factor graph.
          *  \param opts Parameters @see BP::Properties. 
          */
         TRWBP( const FactorGraph &fg, const PropertySet &opts ) : BP(fg, opts), _weight() {

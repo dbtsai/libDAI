@@ -61,7 +61,8 @@ class CBP : public DAIAlgFG {
 
     public:
         /// Construct CBP object from FactorGraph \a fg and PropertySet \a opts
-        /** \param opts Parameters @see Properties
+        /** \param fg Factor graph.
+         *  \param opts Parameters @see Properties
          */
         CBP( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg) {
             props.set( opts );

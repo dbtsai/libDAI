@@ -107,7 +107,8 @@ class MR : public DAIAlgFG {
         MR() : DAIAlgFG(), supported(), G(), tJ(), theta(), M(), cors(), Mag(), _maxdiff(), _iters(), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \param opts Parameters @see Properties
+        /** \param fg Factor graph.
+         *  \param opts Parameters @see Properties
          *  \note This implementation only deals with binary variables and pairwise interactions.
          *  \throw NOT_IMPLEMENTED if \a fg has factors depending on three or more variables or has variables with more than two possible states.
          */

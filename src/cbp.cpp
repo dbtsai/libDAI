@@ -451,7 +451,7 @@ void CBP::printDebugInfo() {
 }
 
 
-pair<size_t, size_t> BBPFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, const BBPCostFunction &cfn, Real *maxVarOut ) {
+std::pair<size_t, size_t> BBPFindClampVar( const InfAlg &in_bp, bool clampingVar, const PropertySet &bbp_props, const BBPCostFunction &cfn, Real *maxVarOut ) {
     BBP bbp( &in_bp, bbp_props );
     bbp.initCostFnAdj( cfn, NULL );
     bbp.run();

@@ -374,9 +374,16 @@ template <typename T> class TProb {
         /// Lexicographical comparison
         /** \pre <tt>this->size() == q.size()</tt>
          */
-        bool operator<= (const TProb<T> & q) const {
+        bool operator<=( const TProb<T>& q ) const {
             DAI_DEBASSERT( size() == q.size() );
             return lexicographical_compare( begin(), end(), q.begin(), q.end() );
+        }
+
+        /// Comparison
+        bool operator==( const TProb<T>& q ) const {
+            if( size() != q.size() )
+                return false;
+            return p() == q.p();
         }
     //@}
 

@@ -210,20 +210,4 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& vs, bool reIni
 }
 
 
-std::vector<Factor> calcPairBeliefsNew( const InfAlg& obj, const VarSet& vs, bool reInit ) { 
-    return calcPairBeliefs( obj, vs, reInit, true );
-}
-
-
-Factor calcMarginal2ndO( const InfAlg & obj, const VarSet& vs, bool reInit ) {
-    vector<Factor> pairbeliefs = calcPairBeliefs( obj, vs, reInit );
-
-    Factor Pvs (vs);
-    for( size_t ij = 0; ij < pairbeliefs.size(); ij++ )
-        Pvs *= pairbeliefs[ij];
-
-    return( Pvs.normalized() );
-}
-
-
 } // end of namespace dai
