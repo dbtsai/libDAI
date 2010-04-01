@@ -149,6 +149,9 @@ template <typename T> class TFactor {
 
         /// Returns sum of all values
         T sum() const { return _p.sum(); }
+        
+        /// Returns sum of absolute values
+        T sumAbs() const { return _p.sumAbs(); }
 
         /// Returns maximum absolute value of all values
         T maxAbs() const { return _p.maxAbs(); }
@@ -161,6 +164,11 @@ template <typename T> class TFactor {
 
         /// Returns strength of this factor (between variables \a i and \a j), as defined in eq. (52) of [\ref MoK07b]
         T strength( const Var &i, const Var &j ) const;
+
+        /// Comparison
+        bool operator==( const TFactor<T>& y ) const {
+            return (_vs == y._vs) && (_p == y._p);
+        }
     //@}
 
     /// \name Unary transformations

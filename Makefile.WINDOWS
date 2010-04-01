@@ -26,7 +26,7 @@ OE=.obj
 # Binary executable
 EE=.exe
 # MatLab compiled MEX file
-ME=.mexglx
+ME=.mexw32
 
 # COMPILER
 # Compile using Visual C++ Compiler
@@ -34,13 +34,16 @@ CC=cl
 # Output filename option of the compiler
 CCO=/Fe
 # Flags for the C++ compiler
-CCFLAGS=/EHsc -DWINDOWS -DNOMINMAX
+CCFLAGS=/EHsc /GR /W3 /DWINDOWS /DNOMINMAX
+# For MatLab R2008b, the following flags seem to be necessary: /MD /D_SECURE_SCL=0
+# but the last one generates exceptions in executables... therefore, the MatLab 
+# interface is now built from source completely using mex
 # Flags to add in debugging mode (if DEBUG=true)
-CCDEBUGFLAGS=/Ox /Zi -DDAI_DEBUG
+CCDEBUGFLAGS=/Ox /Zi /DDAI_DEBUG
 # Flags to add in non-debugging mode (if DEBUG=false)
 CCNODEBUGFLAGS=/Ox
 # Standard include directories
-CCINC=/Iinclude /IE:\boost_1_42_0
+CCINC=-Iinclude -IE:\boost_1_42_0
 
 # LINKER
 # Standard libraries to include
@@ -54,11 +57,15 @@ CCLIB=/LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\ATLMFC\LIB" /LIB
 
 # MATLAB
 # Replace the following by the directory where MatLab has been installed
-MATLABDIR=c:\matlab
+MATLABDIR=c:\matlab\R2008b
 # The following should resolve to the MatLab mex compile command
 MEX=$(MATLABDIR)\bin\mex
-# Specify the same C++ compiler and flags to mex
-MEXFLAGS:=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'
+# Flags for MEX
+MEXFLAGS:=-DWINDOWS -DNOMINMAX
+# Standard include directories for MEX
+MEXINC:=$(CCINC)
+# Additional library search paths for MEX
+MEXLIB=
 
 # SWIG PYTHON INTERFACE
 # The following should resolve to the SWIG command

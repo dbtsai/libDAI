@@ -1,9 +1,14 @@
 git HEAD
 --------
 
+TODO:
+* Write unit tests for newly added functions
+
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
 * Improved factor.h/cpp:
+  - Added TFactor<T>::sumAbs() const
+  - Added TFactor<T>::operator=( const TFactor<T> &y )
   - Added get(size_t) and set(size_t,T) operators; get() is 
     equivalent to "operator[](size_t) const" and set() should
     be used instead of the non-const operator[], which has been deprecated
@@ -16,6 +21,7 @@ git HEAD
   - Added get(size_t) and set(size_t,T) operators; get() is 
     equivalent to "operator[](size_t) const" and set() should
     be used instead of the non-const operator[], which has been deprecated
+  - Added TProb<T>::resize(size_t, T)
 * Improved index.h/cpp:
   - Added multifor::reset()
 * Improved properties.h/cpp:

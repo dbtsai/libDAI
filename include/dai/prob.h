@@ -286,6 +286,13 @@ class TProb {
         const_reverse_iterator rend() const { return _p.rend(); }
     //@}
 
+    /// \name Miscellaneous operations
+    //@{
+        void resize( size_t sz, T c = T() ) {
+            _p.resize( sz, c );
+        }
+    //@}
+
     /// \name Queries
     //@{
         /// Gets \a i 'th entry

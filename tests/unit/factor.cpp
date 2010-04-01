@@ -31,146 +31,140 @@ const double tol = 1e-8;
 BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     // check constructors
     Factor x1;
-/*    BOOST_CHECK_EQUAL( x1.states(), 0 );
-    BOOST_CHECK( x1.p() == std::vector<Real>() );
+    BOOST_CHECK_EQUAL( x1.states(), 1 );
+    BOOST_CHECK( x1.p() == Prob( 1, 1.0 ) );
+    BOOST_CHECK( x1.vars() == VarSet() );
 
-    Factor x2( 3 );
-    BOOST_CHECK_EQUAL( x2.states(), 3 );
-    BOOST_CHECK( x2.p() == std::vector<Real>( 3, 1.0 / 3.0 ) );
-    BOOST_CHECK_EQUAL( x2[0], 1.0 / 3.0 );
-    BOOST_CHECK_EQUAL( x2[1], 1.0 / 3.0 );
-    BOOST_CHECK_EQUAL( x2[2], 1.0 / 3.0 );
+    Factor x2( 5.0 );
+    BOOST_CHECK_EQUAL( x2.states(), 1 );
+    BOOST_CHECK( x2.p() == Prob( 1, 5.0 ) );
+    BOOST_CHECK( x2.vars() == VarSet() );
 
-    Factor x3( 4, 1.0 );
-    BOOST_CHECK_EQUAL( x3.states(), 4 );
-    BOOST_CHECK( x3.p() == std::vector<Real>( 4, 1.0 ) );
-    BOOST_CHECK_EQUAL( x3[0], 1.0 );
-    BOOST_CHECK_EQUAL( x3[1], 1.0 );
-    BOOST_CHECK_EQUAL( x3[2], 1.0 );
-    BOOST_CHECK_EQUAL( x3[3], 1.0 );
-    x3.set( 0, 0.5 );
-    x3.set( 1, 1.0 );
-    x3.set( 2, 2.0 );
-    x3.set( 3, 4.0 );
+    Var v1( 0, 3 );
+    Factor x3( v1 );
+    BOOST_CHECK_EQUAL( x3.states(), 3 );
+    BOOST_CHECK( x3.p() == Prob( 3, 1.0 / 3.0 ) );
+    BOOST_CHECK( x3.vars() == VarSet( v1 ) );
+    BOOST_CHECK_EQUAL( x3[0], 1.0 / 3.0 );
+    BOOST_CHECK_EQUAL( x3[1], 1.0 / 3.0 );
+    BOOST_CHECK_EQUAL( x3[2], 1.0 / 3.0 );
 
-    Factor x4( x3.begin(), x3.end() );
-    BOOST_CHECK_EQUAL( x4.states(), 4 );
-    BOOST_CHECK( x4.p() == x3.p() );
-    BOOST_CHECK_EQUAL( x4[0], 0.5 );
-    BOOST_CHECK_EQUAL( x4[1], 1.0 );
-    BOOST_CHECK_EQUAL( x4[2], 2.0 );
-    BOOST_CHECK_EQUAL( x4[3], 4.0 );
+    Var v2( 1, 2 );
+    Factor x4( VarSet( v1, v2 ) );
+    BOOST_CHECK_EQUAL( x4.states(), 6 );
+    BOOST_CHECK( x4.p() == Prob( 6, 1.0 / 6.0 ) );
+    BOOST_CHECK( x4.vars() == VarSet( v1, v2 ) );
+    for( size_t i = 0; i < 6; i++ )
+        BOOST_CHECK_EQUAL( x4[i], 1.0 / 6.0 );
 
-    x3.p() = std::vector<Real>( 4, 2.5 );
-    Factor x5( x3.begin(), x3.end(), x3.states() );
-    BOOST_CHECK_EQUAL( x5.states(), 4 );
-    BOOST_CHECK( x5.p() == x3.p() );
-    BOOST_CHECK_EQUAL( x5[0], 2.5 );
-    BOOST_CHECK_EQUAL( x5[1], 2.5 );
-    BOOST_CHECK_EQUAL( x5[2], 2.5 );
-    BOOST_CHECK_EQUAL( x5[3], 2.5 );
+    Factor x5( VarSet( v1, v2 ), 1.0 );
+    BOOST_CHECK_EQUAL( x5.states(), 6 );
+    BOOST_CHECK( x5.p() == Prob( 6, 1.0 ) );
+    BOOST_CHECK( x5.vars() == VarSet( v1, v2 ) );
+    for( size_t i = 0; i < 6; i++ )
+        BOOST_CHECK_EQUAL( x5[i], 1.0 );
 
-    std::vector<int> y( 3, 2 );
-    Factor x6( y );
-    BOOST_CHECK_EQUAL( x6.states(), 3 );
-    BOOST_CHECK( x6.p() == std::vector<Real>( 3, 2.0 ) );
-    BOOST_CHECK_EQUAL( x6[0], 2.0 );
-    BOOST_CHECK_EQUAL( x6[1], 2.0 );
-    BOOST_CHECK_EQUAL( x6[2], 2.0 );
+    std::vector<Real> x( 6, 1.0 );
+    for( size_t i = 0; i < 6; i++ )
+        x[i] = 10.0 - i;
+    Factor x6( VarSet( v1, v2 ), x );
+    BOOST_CHECK_EQUAL( x6.states(), 6 );
+    BOOST_CHECK( x6.vars() == VarSet( v1, v2 ) );
+    for( size_t i = 0; i < 6; i++ )
+        BOOST_CHECK_EQUAL( x6[i], x[i] );
 
-    Factor x7( x6 );
-    BOOST_CHECK( x7 == x6 );
+    x.resize( 4 );
+    BOOST_CHECK_THROW( Factor x7( VarSet( v1, v2 ), x ), Exception );
+
+    x.resize( 6 );
+    x[4] = 10.0 - 4; x[5] = 10.0 - 5;
+    Factor x8( VarSet( v2, v1 ), &(x[0]) );
+    BOOST_CHECK_EQUAL( x8.states(), 6 );
+    BOOST_CHECK( x8.vars() == VarSet( v1, v2 ) );
+    for( size_t i = 0; i < 6; i++ )
+        BOOST_CHECK_EQUAL( x8[i], x[i] );
+
+    Prob xx( x );
+    Factor x9( VarSet( v2, v1 ), xx );
+    BOOST_CHECK_EQUAL( x9.states(), 6 );
+    BOOST_CHECK( x9.vars() == VarSet( v1, v2 ) );
+    for( size_t i = 0; i < 6; i++ )
+        BOOST_CHECK_EQUAL( x9[i], x[i] );
+
+    xx.resize( 4 );
+    BOOST_CHECK_THROW( Factor x10( VarSet( v2, v1 ), xx ), Exception );
+
+    std::vector<Real> w;
+    w.push_back( 0.1 );
+    w.push_back( 3.5 );
+    w.push_back( 2.8 );
+    w.push_back( 6.3 );
+    w.push_back( 8.4 );
+    w.push_back( 0.0 );
+    w.push_back( 7.4 );
+    w.push_back( 2.4 );
+    w.push_back( 8.9 );
+    w.push_back( 1.3 );
+    w.push_back( 1.6 );
+    w.push_back( 2.6 );
+    Var v4( 4, 3 );
+    Var v8( 8, 2 );
+    Var v7( 7, 2 );
+    std::vector<Var> vars;
+    vars.push_back( v4 );
+    vars.push_back( v8 );
+    vars.push_back( v7 );
+    Factor x11( vars, w );
+    BOOST_CHECK_EQUAL( x11.states(), 12 );
+    BOOST_CHECK( x11.vars() == VarSet( vars.begin(), vars.end() ) );
+    BOOST_CHECK_EQUAL( x11[0], 0.1 );
+    BOOST_CHECK_EQUAL( x11[1], 3.5 );
+    BOOST_CHECK_EQUAL( x11[2], 2.8 );
+    BOOST_CHECK_EQUAL( x11[3], 7.4 );
+    BOOST_CHECK_EQUAL( x11[4], 2.4 );
+    BOOST_CHECK_EQUAL( x11[5], 8.9 );
+    BOOST_CHECK_EQUAL( x11[6], 6.3 );
+    BOOST_CHECK_EQUAL( x11[7], 8.4 );
+    BOOST_CHECK_EQUAL( x11[8], 0.0 );
+    BOOST_CHECK_EQUAL( x11[9], 1.3 );
+    BOOST_CHECK_EQUAL( x11[10], 1.6 );
+    BOOST_CHECK_EQUAL( x11[11], 2.6 );
+
+    Factor x12( x11 );
+    BOOST_CHECK( x12 == x11 );
     
-    Factor x8 = x6;
-    BOOST_CHECK( x8 == x6 );*/
-}
-
-/*
-
-BOOST_AUTO_TEST_CASE( IteratorTest ) {
-    Prob x( 5, 0.0 );
-    size_t i;
-    for( i = 0; i < x.size(); i++ )
-        x.set( i, i );
-
-    i = 0;
-    for( Prob::const_iterator cit = x.begin(); cit != x.end(); cit++, i++ )
-        BOOST_CHECK_EQUAL( *cit, i );
-    
-    i = 0;
-    for( Prob::iterator it = x.begin(); it != x.end(); it++, i++ )
-        *it = 4 - i;
-    
-    i = 0;
-    for( Prob::const_iterator it = x.begin(); it != x.end(); it++, i++ )
-        BOOST_CHECK_EQUAL( *it, 4 - i );
-
-    i = 0;
-    for( Prob::const_reverse_iterator crit = x.rbegin(); crit != x.rend(); crit++, i++ )
-        BOOST_CHECK_EQUAL( *crit, i );
-
-    i = 0;
-    for( Prob::reverse_iterator rit = x.rbegin(); rit != x.rend(); rit++, i++ )
-        *rit = 2 * i;
-    
-    i = 0;
-    for( Prob::const_reverse_iterator crit = x.rbegin(); crit != x.rend(); crit++, i++ )
-        BOOST_CHECK_EQUAL( *crit, 2 * i );
+    Factor x13 = x12;
+    BOOST_CHECK( x13 == x11 );
 }
 
 
 BOOST_AUTO_TEST_CASE( QueriesTest ) {
-    Prob x( 5, 0.0 );
-    for( size_t i = 0; i < x.size(); i++ )
+    Factor x( Var( 5, 5 ), 0.0 );
+    for( size_t i = 0; i < x.states(); i++ )
         x.set( i, 2.0 - i );
 
-    // test accumulate, min, max, sum, sumAbs, maxAbs
+    // test min, max, sum, sumAbs, maxAbs
     BOOST_CHECK_EQUAL( x.sum(), 0.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 0.0, std::plus<Real>(), fo_id<Real>() ), 0.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 1.0, std::plus<Real>(), fo_id<Real>() ), 1.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -1.0, std::plus<Real>(), fo_id<Real>() ), -1.0 );
     BOOST_CHECK_EQUAL( x.max(), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -INFINITY, fo_max<Real>(), fo_id<Real>() ), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 3.0, fo_max<Real>(), fo_id<Real>() ), 3.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -5.0, fo_max<Real>(), fo_id<Real>() ), 2.0 );
     BOOST_CHECK_EQUAL( x.min(), -2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( INFINITY, fo_min<Real>(), fo_id<Real>() ), -2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -3.0, fo_min<Real>(), fo_id<Real>() ), -3.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 5.0, fo_min<Real>(), fo_id<Real>() ), -2.0 );
     BOOST_CHECK_EQUAL( x.sumAbs(), 6.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 0.0, std::plus<Real>(), fo_abs<Real>() ), 6.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 1.0, std::plus<Real>(), fo_abs<Real>() ), 7.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -1.0, std::plus<Real>(), fo_abs<Real>() ), 7.0 );
     BOOST_CHECK_EQUAL( x.maxAbs(), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 0.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 1.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -1.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 3.0, fo_max<Real>(), fo_abs<Real>() ), 3.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -3.0, fo_max<Real>(), fo_abs<Real>() ), 3.0 );
     x.set( 1, 1.0 );
     BOOST_CHECK_EQUAL( x.maxAbs(), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 0.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 1.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -1.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 3.0, fo_max<Real>(), fo_abs<Real>() ), 3.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( -3.0, fo_max<Real>(), fo_abs<Real>() ), 3.0 );
-    for( size_t i = 0; i < x.size(); i++ )
-        x.set( i, i ? (1.0 / i) : 0.0 );
-    BOOST_CHECK_EQUAL( x.accumulate( 0.0, std::plus<Real>(), fo_inv0<Real>() ), 10.0 );
     x /= x.sum();
 
     // test entropy
     BOOST_CHECK( x.entropy() < Prob(5).entropy() );
     for( size_t i = 1; i < 100; i++ )
-        BOOST_CHECK_CLOSE( Prob(i).entropy(), std::log(i), tol );
+        BOOST_CHECK_CLOSE( Factor( Var(0,i) ).entropy(), std::log(i), tol );
 
     // test hasNaNs and hasNegatives
-    BOOST_CHECK( !Prob( 3, 0.0 ).hasNaNs() );
+    BOOST_CHECK( !Factor( 0.0 ).hasNaNs() );
     Real c = 0.0;
-    BOOST_CHECK( Prob( 3, c / c ).hasNaNs() );
-    BOOST_CHECK( !Prob( 3, 0.0 ).hasNegatives() );
-    BOOST_CHECK( !Prob( 3, 1.0 ).hasNegatives() );
-    BOOST_CHECK( Prob( 3, -1.0 ).hasNegatives() );
+    BOOST_CHECK( Factor( c / c ).hasNaNs() );
+    BOOST_CHECK( !Factor( 0.0 ).hasNegatives() );
+    BOOST_CHECK( !Factor( 1.0 ).hasNegatives() );
+    BOOST_CHECK( Factor( -1.0 ).hasNegatives() );
     x.set( 0, 0.0 ); x.set( 1, 0.0 ); x.set( 2, -1.0 ); x.set( 3, 1.0 ); x.set( 4, 100.0 );
     BOOST_CHECK( x.hasNegatives() );
     x.set( 2, -INFINITY );
@@ -179,77 +173,34 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK( !x.hasNegatives() );
     x.set( 2, -1.0 );
 
-    // test argmax
-    BOOST_CHECK( x.argmax() == std::make_pair( (size_t)4, (Real)100.0 ) );
-    x.set( 4, 0.5 );
-    BOOST_CHECK( x.argmax() == std::make_pair( (size_t)3, (Real)1.0 ) );
-    x.set( 3, -2.0 );
-    BOOST_CHECK( x.argmax() == std::make_pair( (size_t)4, (Real)0.5 ) );
-    x.set( 4, -1.0 );
-    BOOST_CHECK( x.argmax() == std::make_pair( (size_t)0, (Real)0.0 ) );
-    x.set( 0, -2.0 );
-    BOOST_CHECK( x.argmax() == std::make_pair( (size_t)1, (Real)0.0 ) );
-    x.set( 1, -3.0 );
-    BOOST_CHECK( x.argmax() == std::make_pair( (size_t)2, (Real)-1.0 ) );
-    x.set( 2, -2.0 );
-    BOOST_CHECK( x.argmax() == std::make_pair( (size_t)4, (Real)-1.0 ) );
+    // test strength
+    Var x0(0,2);
+    Var x1(1,2);
+    BOOST_CHECK_CLOSE( createFactorIsing( x0, x1, 1.0 ).strength( x0, x1 ), std::tanh( 1.0 ), tol );
+    BOOST_CHECK_CLOSE( createFactorIsing( x0, x1, -1.0 ).strength( x0, x1 ), std::tanh( 1.0 ), tol );
+    BOOST_CHECK_CLOSE( createFactorIsing( x0, x1, 0.5 ).strength( x0, x1 ), std::tanh( 0.5 ), tol );
 
-    // test draw
-    for( size_t i = 0; i < x.size(); i++ )
-        x.set( i, i ? (1.0 / i) : 0.0 );
-    for( size_t repeat = 0; repeat < 10000; repeat++ ) {
-        BOOST_CHECK( x.draw() < x.size() );
-        BOOST_CHECK( x.draw() != 0 );
-    }
-    x.set( 2, 0.0 );
-    for( size_t repeat = 0; repeat < 10000; repeat++ ) {
-        BOOST_CHECK( x.draw() < x.size() );
-        BOOST_CHECK( x.draw() != 0 );
-        BOOST_CHECK( x.draw() != 2 );
-    }
-    x.set( 4, 0.0 );
-    for( size_t repeat = 0; repeat < 10000; repeat++ ) {
-        BOOST_CHECK( x.draw() < x.size() );
-        BOOST_CHECK( x.draw() != 0 );
-        BOOST_CHECK( x.draw() != 2 );
-        BOOST_CHECK( x.draw() != 4 );
-    }
-    x.set( 1, 0.0 );
-    for( size_t repeat = 0; repeat < 10000; repeat++ )
-        BOOST_CHECK( x.draw() == 3 );
-
-    // test <, ==
-    Prob a(3, 1.0), b(3, 1.0);
-    BOOST_CHECK( !(a < b) );
-    BOOST_CHECK( !(b < a) );
+    // test ==
+    Factor a(Var(0,3)), b(Var(0,3));
+    Factor d(Var(1,3));
+    BOOST_CHECK( !(a == d) );
+    BOOST_CHECK( !(b == d) );
     BOOST_CHECK( a == b );
     a.set( 0, 0.0 );
-    BOOST_CHECK( a < b );
-    BOOST_CHECK( !(b < a) );
     BOOST_CHECK( !(a == b) );
     b.set( 2, 0.0 );
-    BOOST_CHECK( a < b );
-    BOOST_CHECK( !(b < a) );
     BOOST_CHECK( !(a == b) );
     b.set( 0, 0.0 );
-    BOOST_CHECK( !(a < b) );
-    BOOST_CHECK( b < a );
     BOOST_CHECK( !(a == b) );
     a.set( 1, 0.0 );
-    BOOST_CHECK( a < b );
-    BOOST_CHECK( !(b < a) );
     BOOST_CHECK( !(a == b) );
     b.set( 1, 0.0 );
-    BOOST_CHECK( !(a < b) );
-    BOOST_CHECK( b < a );
     BOOST_CHECK( !(a == b) );
     a.set( 2, 0.0 );
-    BOOST_CHECK( !(a < b) );
-    BOOST_CHECK( !(b < a) );
     BOOST_CHECK( a == b );
 }
 
-
+/*
 BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     Prob x( 3 );
     x.set( 0, -2.0 );

@@ -10,6 +10,7 @@
 
 
 #include <string>
+#include <fstream>
 #include <dai/alldai.h>
 #include <dai/properties.h>
 #include <dai/exceptions.h>
