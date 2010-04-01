@@ -97,7 +97,7 @@ int main( int argc, char *argv[] ) {
         cout << "Pairwise interactions? " << fg.isPairwise() << endl;
         // Calculate treewidth using various heuristics, if requested
         if( calc_tw ) {
-            std::pair<size_t,size_t> tw;
+            std::pair<size_t,double> tw;
             tw = boundTreewidth(fg, &eliminationCost_MinNeighbors);
             cout << "Treewidth (MinNeighbors):     " << tw.first << " (" << tw.second << " states)" << endl;
             tw = boundTreewidth(fg, &eliminationCost_MinWeight);

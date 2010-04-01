@@ -62,8 +62,7 @@ class TestDAI {
 
             if( name == "LDPC" ) {
                 // special case: simulating a Low Density Parity Check code
-                Prob zero(2,0.0);
-                zero[0] = 1.0;
+                Real zero[2] = {1.0, 0.0};
                 for( size_t i = 0; i < fg.nrVars(); i++ )
                     varMarginals.push_back( Factor(fg.var(i), zero) );
                 allMarginals = varMarginals;

@@ -492,7 +492,7 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
                     for( VarSet::const_iterator n = vsrem.begin(); n != vsrem.end(); n++ )
                         if( Qa[T[i].second].vars() >> *n ) {
                             Factor piet( *n, 0.0 );
-                            piet[s(*n)] = 1.0;
+                            piet.set( s(*n), 1.0 );
                             Qa[T[i].second] *= piet;
                         }
 
@@ -504,7 +504,7 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
                 logZ += log(Qa[T[0].first].normalize());
 
                 Factor piet( vsrem, 0.0 );
-                piet[s] = exp(logZ);
+                piet.set( s, exp(logZ) );
                 Pvs += piet * Qa[T[0].first].marginal( vs / vsrem, false );      // OPTIMIZE ME
 
                 // Restore clamped beliefs

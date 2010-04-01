@@ -65,6 +65,7 @@ class SmallSet {
          *  \param begin Points to first element to be added.
          *  \param end Points just beyond last element to be added.
          *  \param sizeHint For efficiency, the number of elements can be speficied by \a sizeHint.
+         *  \note The \a sizeHint parameter used to be optional in libDAI versions 0.2.4 and earlier.
          */
         template <typename TIterator>
         SmallSet( TIterator begin, TIterator end, size_t sizeHint ) {

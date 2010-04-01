@@ -119,12 +119,11 @@ Prob TRWBP::calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) con
                 // ind is the precalculated IndexFor(j,I) i.e. to x_I == k corresponds x_j == ind[k]
                 const ind_t &ind = index(j, _I);
 
-                for( size_t r = 0; r < prod.size(); ++r ) {
+                for( size_t r = 0; r < prod.size(); ++r )
                     if( props.logdomain )
-                        prod[r] += prod_j[ind[r]];
+                        prod.set( r, prod[r] + prod_j[ind[r]] );
                     else
-                        prod[r] *= prod_j[ind[r]];
-                }
+                        prod.set( r, prod[r] * prod_j[ind[r]] );
             }
         }
     

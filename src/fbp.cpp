@@ -94,9 +94,9 @@ Prob FBP::calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) const
 
                 for( size_t r = 0; r < prod.size(); ++r )
                     if( props.logdomain )
-                        prod[r] += prod_j[ind[r]];
+                        prod.set( r, prod[r] + prod_j[ind[r]] );
                     else
-                        prod[r] *= prod_j[ind[r]];
+                        prod.set( r, prod[r] * prod_j[ind[r]] );
             }
     }
     return prod;
@@ -134,11 +134,11 @@ void FBP::calcNewMessage( size_t i, size_t _I ) {
         const ind_t ind = index(i,_I);
         if( props.inference == Properties::InfType::SUMPROD )
             for( size_t r = 0; r < prod.size(); ++r )
-                marg[ind[r]] += prod[r];
+                marg.set( ind[r], marg[ind[r]] + prod[r] );
         else
             for( size_t r = 0; r < prod.size(); ++r )
                 if( prod[r] > marg[ind[r]] )
-                    marg[ind[r]] = prod[r];
+                    marg.set( ind[r], prod[r] );
         marg.normalize();
     }
 

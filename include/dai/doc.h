@@ -308,7 +308,7 @@
  *  at the MatLab prompt), which performs exact inference by the junction tree
  *  algorithm and approximate inference by belief propagation on the ALARM network:
  *  <pre>  cd path_to_libdai/matlab
- *  [psi] = dai_readfg ('../examples/alarm.fg');
+ *  [psi] = dai_readfg ('../tests/alarm.fg');
  *  [logZ,q,md,qv,qf] = dai (psi, 'JTREE', '[updates=HUGIN,verbose=0]')
  *  [logZ,q,md,qv,qf] = dai (psi, 'BP', '[updates=SEQMAX,tol=1e-9,maxiter=10000,logdomain=0]')</pre>
  *  where "path_to_libdai" has to be replaced with the directory in which libDAI

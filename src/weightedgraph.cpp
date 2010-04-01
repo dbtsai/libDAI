@@ -75,4 +75,9 @@ RootedTree::RootedTree( const GraphEL &T, size_t Root ) {
 }
 
 
+GraphEL RandomDRegularGraph( size_t N, size_t d ) {
+    return GraphEL( createGraphRegular( N, d ) );
+}
+
+
 } // end of namespace dai

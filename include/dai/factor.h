@@ -102,7 +102,7 @@ template <typename T> class TFactor {
         TFactor( const std::vector<Var> &vars, const std::vector<T> &p ) : _vs(vars.begin(), vars.end(), vars.size()), _p(p.size()) {
             Permute permindex(vars);
             for( size_t li = 0; li < p.size(); ++li )
-                _p[permindex.convertLinearIndex(li)] = p[li];
+                _p.set( permindex.convertLinearIndex(li), p[li] );
         }
     //@}
 
@@ -118,7 +118,14 @@ template <typename T> class TFactor {
         T operator[] (size_t i) const { return _p[i]; }
 
         /// Returns a reference to the \a i 'th entry of the value vector
+        /// \deprecated Please use dai::TFactor::set() instead
         T& operator[] (size_t i) { return _p[i]; }
+
+        /// Gets \a i 'th entry of the value vector
+        T get( size_t i ) const { return _p[i]; }
+
+        /// Sets \a i 'th entry of the value vector to \a val
+        void set( size_t i, T val ) { _p.set( i, val ); }
 
         /// Returns constant reference to variable set (i.e., the variables on which the factor depends)
         const VarSet& vars() const { return _vs; }
@@ -460,7 +467,7 @@ template<typename T> TFactor<T> TFactor<T>::slice( const VarSet& vars, size_t va
     IndexFor i_varsrem (varsrem, _vs);
     for( size_t i = 0; i < states(); i++, ++i_vars, ++i_varsrem )
         if( (size_t)i_vars == varsState )
-            result._p[i_varsrem] = _p[i];
+            result.set( i_varsrem, _p[i] );
 
     return result;
 }
@@ -473,7 +480,7 @@ template<typename T> TFactor<T> TFactor<T>::marginal(const VarSet &vars, bool no
 
     IndexFor i_res( res_vars, _vs );
     for( size_t i = 0; i < _p.size(); i++, ++i_res )
-        res._p[i_res] += _p[i];
+        res.set( i_res, res[i_res] + _p[i] );
 
     if( normed )
         res.normalize( TProb<T>::NORMPROB );
@@ -490,7 +497,7 @@ template<typename T> TFactor<T> TFactor<T>::maxMarginal(const VarSet &vars, bool
     IndexFor i_res( res_vars, _vs );
     for( size_t i = 0; i < _p.size(); i++, ++i_res )
         if( _p[i] > res._p[i_res] )
-            res._p[i_res] = _p[i];
+            res.set( i_res, _p[i] );
 
     if( normed )
         res.normalize( TProb<T>::NORMPROB );

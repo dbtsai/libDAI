@@ -131,7 +131,7 @@ Prob Gibbs::getVarDist( size_t i ) {
         size_t I_skip = getFactorEntryDiff( I, i );
         size_t I_entry = getFactorEntry(I) - (_state[i] * I_skip);
         for( size_t st_i = 0; st_i < i_states; st_i++ ) {
-            i_given_MB[st_i] *= f_I[I_entry];
+            i_given_MB.set( st_i, i_given_MB[st_i] * f_I[I_entry] );
             I_entry += I_skip;
         }
     }

@@ -319,11 +319,8 @@ void TreeEP::TreeEPSubTree::HUGIN_with_I( std::vector<Factor> &Qa, std::vector<F
         for( size_t i = _RTree.size(); (i--) != 0; ) {
             // clamp variables in nsrem
             for( VarSet::const_iterator n = _nsrem.begin(); n != _nsrem.end(); n++ )
-                if( _Qa[_RTree[i].second].vars() >> *n ) {
-                    Factor delta( *n, 0.0 );
-                    delta[s(*n)] = 1.0;
-                    _Qa[_RTree[i].second] *= delta;
-                }
+                if( _Qa[_RTree[i].second].vars() >> *n )
+                    _Qa[_RTree[i].second] *= createFactorDelta( *n, s(*n) );
             Factor new_Qb = _Qa[_RTree[i].second].marginal( _Qb[i].vars(), false );
             _Qa[_RTree[i].first] *= new_Qb / _Qb[i];
             _Qb[i] = new_Qb;

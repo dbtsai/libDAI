@@ -188,7 +188,7 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
             is >> val;
 
             // store value, but permute indices first according to internal representation
-            facs.back()[permindex.convertLinearIndex( li )] = val;
+            facs.back().set( permindex.convertLinearIndex( li ), val );
         }
     }
 
@@ -292,7 +292,7 @@ vector<VarSet> FactorGraph::Cliques() const {
 void FactorGraph::clamp( size_t i, size_t x, bool backup ) {
     DAI_ASSERT( x <= var(i).states() );
     Factor mask( var(i), (Real)0 );
-    mask[x] = (Real)1;
+    mask.set( x, (Real)1 );
 
     map<size_t, Factor> newFacs;
     foreach( const Neighbor &I, nbV(i) )
@@ -309,7 +309,7 @@ void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
 
     foreach( size_t i, is ) {
         DAI_ASSERT( i <= n.states() );
-        mask_n[i] = (Real)1;
+        mask_n.set( i, (Real)1 );
     }
 
     map<size_t, Factor> newFacs;
@@ -325,7 +325,7 @@ void FactorGraph::clampFactor( size_t I, const vector<size_t> &is, bool backup )
 
     foreach( size_t i, is ) {
         DAI_ASSERT( i <= st );
-        newF[i] = factor(I)[i];
+        newF.set( i, factor(I)[i] );
     }
 
     setFactor( I, newF, backup );

@@ -48,10 +48,10 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( x3[1], 1.0 );
     BOOST_CHECK_EQUAL( x3[2], 1.0 );
     BOOST_CHECK_EQUAL( x3[3], 1.0 );
-    x3[0] = 0.5;
-    x3[1] = 1.0;
-    x3[2] = 2.0;
-    x3[3] = 4.0;
+    x3.set( 0, 0.5 );
+    x3.set( 1, 1.0 );
+    x3.set( 2, 2.0 );
+    x3.set( 3, 4.0 );
 
     Prob x4( x3.begin(), x3.end() );
     BOOST_CHECK_EQUAL( x4.size(), 4 );
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE( IteratorTest ) {
     Prob x( 5, 0.0 );
     size_t i;
     for( i = 0; i < x.size(); i++ )
-        x[i] = i;
+        x.set( i, i );
 
     i = 0;
     for( Prob::const_iterator cit = x.begin(); cit != x.end(); cit++, i++ )
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( IteratorTest ) {
 BOOST_AUTO_TEST_CASE( QueriesTest ) {
     Prob x( 5, 0.0 );
     for( size_t i = 0; i < x.size(); i++ )
-        x[i] = 2.0 - i;
+        x.set( i, 2.0 - i );
 
     // test accumulate, min, max, sum, sumAbs, maxAbs
     BOOST_CHECK_EQUAL( x.sum(), 0.0 );
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK_EQUAL( x.accumulate( -1.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
     BOOST_CHECK_EQUAL( x.accumulate( 3.0, fo_max<Real>(), fo_abs<Real>() ), 3.0 );
     BOOST_CHECK_EQUAL( x.accumulate( -3.0, fo_max<Real>(), fo_abs<Real>() ), 3.0 );
-    x[1] = 1.0;
+    x.set( 1, 1.0 );
     BOOST_CHECK_EQUAL( x.maxAbs(), 2.0 );
     BOOST_CHECK_EQUAL( x.accumulate( 0.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
     BOOST_CHECK_EQUAL( x.accumulate( 1.0, fo_max<Real>(), fo_abs<Real>() ), 2.0 );
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK_EQUAL( x.accumulate( 3.0, fo_max<Real>(), fo_abs<Real>() ), 3.0 );
     BOOST_CHECK_EQUAL( x.accumulate( -3.0, fo_max<Real>(), fo_abs<Real>() ), 3.0 );
     for( size_t i = 0; i < x.size(); i++ )
-        x[i] = i ? (1.0 / i) : 0.0;
+        x.set( i, i ? (1.0 / i) : 0.0 );
     BOOST_CHECK_EQUAL( x.accumulate( 0.0, std::plus<Real>(), fo_inv0<Real>() ), 10.0 );
     x /= x.sum();
 
@@ -170,50 +170,50 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK( !Prob( 3, 0.0 ).hasNegatives() );
     BOOST_CHECK( !Prob( 3, 1.0 ).hasNegatives() );
     BOOST_CHECK( Prob( 3, -1.0 ).hasNegatives() );
-    x[0] = 0.0; x[1] = 0.0; x[2] = -1.0; x[3] = 1.0; x[4] = 100.0;
+    x.set( 0, 0.0 ); x.set( 1, 0.0 ); x.set( 2, -1.0 ); x.set( 3, 1.0 ); x.set( 4, 100.0 );
     BOOST_CHECK( x.hasNegatives() );
-    x[2] = -INFINITY;
+    x.set( 2, -INFINITY );
     BOOST_CHECK( x.hasNegatives() );
-    x[2] = INFINITY;
+    x.set( 2, INFINITY );
     BOOST_CHECK( !x.hasNegatives() );
-    x[2] = -1.0;
+    x.set( 2, -1.0 );
 
     // test argmax
     BOOST_CHECK( x.argmax() == std::make_pair( (size_t)4, (Real)100.0 ) );
-    x[4] = 0.5;
+    x.set( 4, 0.5 );
     BOOST_CHECK( x.argmax() == std::make_pair( (size_t)3, (Real)1.0 ) );
-    x[3] = -2.0;
+    x.set( 3, -2.0 );
     BOOST_CHECK( x.argmax() == std::make_pair( (size_t)4, (Real)0.5 ) );
-    x[4] = -1.0;
+    x.set( 4, -1.0 );
     BOOST_CHECK( x.argmax() == std::make_pair( (size_t)0, (Real)0.0 ) );
-    x[0] = -2.0;
+    x.set( 0, -2.0 );
     BOOST_CHECK( x.argmax() == std::make_pair( (size_t)1, (Real)0.0 ) );
-    x[1] = -3.0;
+    x.set( 1, -3.0 );
     BOOST_CHECK( x.argmax() == std::make_pair( (size_t)2, (Real)-1.0 ) );
-    x[2] = -2.0;
+    x.set( 2, -2.0 );
     BOOST_CHECK( x.argmax() == std::make_pair( (size_t)4, (Real)-1.0 ) );
 
     // test draw
     for( size_t i = 0; i < x.size(); i++ )
-        x[i] = i ? (1.0 / i) : 0.0;
+        x.set( i, i ? (1.0 / i) : 0.0 );
     for( size_t repeat = 0; repeat < 10000; repeat++ ) {
         BOOST_CHECK( x.draw() < x.size() );
         BOOST_CHECK( x.draw() != 0 );
     }
-    x[2] = 0.0;
+    x.set( 2, 0.0 );
     for( size_t repeat = 0; repeat < 10000; repeat++ ) {
         BOOST_CHECK( x.draw() < x.size() );
         BOOST_CHECK( x.draw() != 0 );
         BOOST_CHECK( x.draw() != 2 );
     }
-    x[4] = 0.0;
+    x.set( 4, 0.0 );
     for( size_t repeat = 0; repeat < 10000; repeat++ ) {
         BOOST_CHECK( x.draw() < x.size() );
         BOOST_CHECK( x.draw() != 0 );
         BOOST_CHECK( x.draw() != 2 );
         BOOST_CHECK( x.draw() != 4 );
     }
-    x[1] = 0.0;
+    x.set( 1, 0.0 );
     for( size_t repeat = 0; repeat < 10000; repeat++ )
         BOOST_CHECK( x.draw() == 3 );
 
@@ -222,27 +222,27 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK( !(a < b) );
     BOOST_CHECK( !(b < a) );
     BOOST_CHECK( a == b );
-    a[0] = 0.0;
+    a.set( 0, 0.0 );
     BOOST_CHECK( a < b );
     BOOST_CHECK( !(b < a) );
     BOOST_CHECK( !(a == b) );
-    b[2] = 0.0;
+    b.set( 2, 0.0 );
     BOOST_CHECK( a < b );
     BOOST_CHECK( !(b < a) );
     BOOST_CHECK( !(a == b) );
-    b[0] = 0.0;
+    b.set( 0, 0.0 );
     BOOST_CHECK( !(a < b) );
     BOOST_CHECK( b < a );
     BOOST_CHECK( !(a == b) );
-    a[1] = 0.0;
+    a.set( 1, 0.0 );
     BOOST_CHECK( a < b );
     BOOST_CHECK( !(b < a) );
     BOOST_CHECK( !(a == b) );
-    b[1] = 0.0;
+    b.set( 1, 0.0 );
     BOOST_CHECK( !(a < b) );
     BOOST_CHECK( b < a );
     BOOST_CHECK( !(a == b) );
-    a[2] = 0.0;
+    a.set( 2, 0.0 );
     BOOST_CHECK( !(a < b) );
     BOOST_CHECK( !(b < a) );
     BOOST_CHECK( a == b );
@@ -251,9 +251,9 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
 
 BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     Prob x( 3 );
-    x[0] = -2.0;
-    x[1] = 0.0;
-    x[2] = 2.0;
+    x.set( 0, -2.0 );
+    x.set( 1, 0.0 );
+    x.set( 2, 2.0 );
 
     Prob y = -x;
     Prob z = x.pwUnaryTr( std::negate<Real>() );
@@ -282,7 +282,8 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     BOOST_CHECK_EQUAL( y[1], -INFINITY );
     BOOST_CHECK_CLOSE( y[2], std::log(2.0), tol );
     BOOST_CHECK( !(y == z) );
-    y[0] = z[0] = 0.0;
+    y.set( 0, 0.0 );
+    z.set( 0, 0.0 );
     BOOST_CHECK( y == z );
 
     y = x.log(true);
@@ -291,7 +292,8 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     BOOST_CHECK_EQUAL( y[1], 0.0 );
     BOOST_CHECK_EQUAL( y[2], std::log(2.0) );
     BOOST_CHECK( !(y == z) );
-    y[0] = z[0] = 0.0;
+    y.set( 0, 0.0 );
+    z.set( 0, 0.0 );
     BOOST_CHECK( y == z );
 
     y = x.inverse(false);
@@ -308,7 +310,7 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     BOOST_CHECK_EQUAL( y[2], 0.5 );
     BOOST_CHECK( y == z );
 
-    x[0] = 2.0;
+    x.set( 0, 2.0 );
     y = x.normalized();
     BOOST_CHECK_EQUAL( y[0], 0.5 );
     BOOST_CHECK_EQUAL( y[1], 0.0 );
@@ -319,7 +321,7 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     BOOST_CHECK_EQUAL( y[1], 0.0 );
     BOOST_CHECK_EQUAL( y[2], 0.5 );
 
-    x[0] = -2.0;
+    x.set( 0, -2.0 );
     y = x.normalized( Prob::NORMLINF );
     BOOST_CHECK_EQUAL( y[0], -1.0 );
     BOOST_CHECK_EQUAL( y[1], 0.0 );
@@ -329,18 +331,18 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
 
 BOOST_AUTO_TEST_CASE( UnaryOperationsTest ) {
     Prob xorg(3);
-    xorg[0] = 2.0;
-    xorg[1] = 0.0;
-    xorg[2] = 1.0;
+    xorg.set( 0, 2.0 );
+    xorg.set( 1, 0.0 );
+    xorg.set( 2, 1.0 );
     Prob y(3);
 
     Prob x = xorg;
     BOOST_CHECK( x.setUniform() == Prob(3) );
     BOOST_CHECK( x == Prob(3) );
 
-    y[0] = std::exp(2.0);
-    y[1] = 1.0;
-    y[2] = std::exp(1.0);
+    y.set( 0, std::exp(2.0) );
+    y.set( 1, 1.0 );
+    y.set( 2, std::exp(1.0) );
     x = xorg;
     BOOST_CHECK( x.takeExp() == y );
     BOOST_CHECK( x == y );
@@ -348,9 +350,9 @@ BOOST_AUTO_TEST_CASE( UnaryOperationsTest ) {
     BOOST_CHECK( x.pwUnaryOp( fo_exp<Real>() ) == y );
     BOOST_CHECK( x == y );
 
-    y[0] = std::log(2.0);
-    y[1] = -INFINITY;
-    y[2] = 0.0;
+    y.set( 0, std::log(2.0) );
+    y.set( 1, -INFINITY );
+    y.set( 2, 0.0 );
     x = xorg;
     BOOST_CHECK( x.takeLog() == y );
     BOOST_CHECK( x == y );
@@ -361,7 +363,7 @@ BOOST_AUTO_TEST_CASE( UnaryOperationsTest ) {
     BOOST_CHECK( x.pwUnaryOp( fo_log<Real>() ) == y );
     BOOST_CHECK( x == y );
 
-    y[1] = 0.0;
+    y.set( 1, 0.0 );
     x = xorg;
     BOOST_CHECK( x.takeLog(true) == y );
     BOOST_CHECK( x == y );
@@ -369,9 +371,9 @@ BOOST_AUTO_TEST_CASE( UnaryOperationsTest ) {
     BOOST_CHECK( x.pwUnaryOp( fo_log0<Real>() ) == y );
     BOOST_CHECK( x == y );
 
-    y[0] = 2.0 / 3.0;
-    y[1] = 0.0 / 3.0;
-    y[2] = 1.0 / 3.0;
+    y.set( 0, 2.0 / 3.0 );
+    y.set( 1, 0.0 / 3.0 );
+    y.set( 2, 1.0 / 3.0 );
     x = xorg;
     BOOST_CHECK_EQUAL( x.normalize(), 3.0 );
     BOOST_CHECK( x == y );
@@ -380,17 +382,17 @@ BOOST_AUTO_TEST_CASE( UnaryOperationsTest ) {
     BOOST_CHECK_EQUAL( x.normalize( Prob::NORMPROB ), 3.0 );
     BOOST_CHECK( x == y );
 
-    y[0] = 2.0 / 2.0;
-    y[1] = 0.0 / 2.0;
-    y[2] = 1.0 / 2.0;
+    y.set( 0, 2.0 / 2.0 );
+    y.set( 1, 0.0 / 2.0 );
+    y.set( 2, 1.0 / 2.0 );
     x = xorg;
     BOOST_CHECK_EQUAL( x.normalize( Prob::NORMLINF ), 2.0 );
     BOOST_CHECK( x == y );
 
-    xorg[0] = -2.0;
-    y[0] = 2.0;
-    y[1] = 0.0;
-    y[2] = 1.0;
+    xorg.set( 0, -2.0 );
+    y.set( 0, 2.0 );
+    y.set( 1, 0.0 );
+    y.set( 2, 1.0 );
     x = xorg;
     BOOST_CHECK( x.takeAbs() == y );
     BOOST_CHECK( x == y );
@@ -407,39 +409,39 @@ BOOST_AUTO_TEST_CASE( UnaryOperationsTest ) {
 
 BOOST_AUTO_TEST_CASE( ScalarTransformationsTest ) {
     Prob x(3);
-    x[0] = 2.0;
-    x[1] = 0.0;
-    x[2] = 1.0;
+    x.set( 0, 2.0 );
+    x.set( 1, 0.0 );
+    x.set( 2, 1.0 );
     Prob y(3);
 
-    y[0] = 3.0; y[1] = 1.0; y[2] = 2.0;
+    y.set( 0, 3.0 ); y.set( 1, 1.0 ); y.set( 2, 2.0 );
     BOOST_CHECK( (x + 1.0) == y );
-    y[0] = 0.0; y[1] = -2.0; y[2] = -1.0;
+    y.set( 0, 0.0 ); y.set( 1, -2.0 ); y.set( 2, -1.0 );
     BOOST_CHECK( (x + (-2.0)) == y );
 
-    y[0] = 1.0; y[1] = -1.0; y[2] = 0.0;
+    y.set( 0, 1.0 ); y.set( 1, -1.0 ); y.set( 2, 0.0 );
     BOOST_CHECK( (x - 1.0) == y );
-    y[0] = 4.0; y[1] = 2.0; y[2] = 3.0;
+    y.set( 0, 4.0 ); y.set( 1, 2.0 ); y.set( 2, 3.0 );
     BOOST_CHECK( (x - (-2.0)) == y );
 
     BOOST_CHECK( (x * 1.0) == x );
-    y[0] = 4.0; y[1] = 0.0; y[2] = 2.0;
+    y.set( 0, 4.0 ); y.set( 1, 0.0 ); y.set( 2, 2.0 );
     BOOST_CHECK( (x * 2.0) == y );
-    y[0] = -1.0; y[1] = 0.0; y[2] = -0.5;
+    y.set( 0, -1.0 ); y.set( 1, 0.0 ); y.set( 2, -0.5 );
     BOOST_CHECK( (x * -0.5) == y );
 
     BOOST_CHECK( (x / 1.0) == x );
-    y[0] = 1.0; y[1] = 0.0; y[2] = 0.5;
+    y.set( 0, 1.0 ); y.set( 1, 0.0 ); y.set( 2, 0.5 );
     BOOST_CHECK( (x / 2.0) == y );
-    y[0] = -4.0; y[1] = 0.0; y[2] = -2.0;
+    y.set( 0, -4.0 ); y.set( 1, 0.0 ); y.set( 2, -2.0 );
     BOOST_CHECK( (x / -0.5) == y );
     BOOST_CHECK( (x / 0.0) == Prob(3, 0.0) );
 
     BOOST_CHECK( (x ^ 1.0) == x );
     BOOST_CHECK( (x ^ 0.0) == Prob(3, 1.0) );
-    y[0] = 4.0; y[1] = 0.0; y[2] = 1.0;
+    y.set( 0, 4.0 ); y.set( 1, 0.0 ); y.set( 2, 1.0 );
     BOOST_CHECK( (x ^ 2.0) == y );
-    y[0] = 1.0 / std::sqrt(2.0); y[1] = INFINITY; y[2] = 1.0;
+    y.set( 0, 1.0 / std::sqrt(2.0) ); y.set( 1, INFINITY ); y.set( 2, 1.0 );
     Prob z = (x ^ -0.5);
     BOOST_CHECK_CLOSE( z[0], y[0], tol );
     BOOST_CHECK_EQUAL( z[1], y[1] );
@@ -449,9 +451,9 @@ BOOST_AUTO_TEST_CASE( ScalarTransformationsTest ) {
 
 BOOST_AUTO_TEST_CASE( ScalarOperationsTest ) {
     Prob xorg(3), x(3);
-    xorg[0] = 2.0;
-    xorg[1] = 0.0;
-    xorg[2] = 1.0;
+    xorg.set( 0, 2.0 );
+    xorg.set( 1, 0.0 );
+    xorg.set( 2, 1.0 );
     Prob y(3);
 
     x = xorg;
@@ -463,38 +465,38 @@ BOOST_AUTO_TEST_CASE( ScalarOperationsTest ) {
     BOOST_CHECK( x == Prob(3, 0.0) );
 
     x = xorg;
-    y[0] = 3.0; y[1] = 1.0; y[2] = 2.0;
+    y.set( 0, 3.0 ); y.set( 1, 1.0 ); y.set( 2, 2.0 );
     BOOST_CHECK( (x += 1.0) == y );
     BOOST_CHECK( x == y );
-    y[0] = 1.0; y[1] = -1.0; y[2] = 0.0;
+    y.set( 0, 1.0 ); y.set( 1, -1.0 ); y.set( 2, 0.0 );
     BOOST_CHECK( (x += -2.0) == y );
     BOOST_CHECK( x == y );
 
     x = xorg;
-    y[0] = 1.0; y[1] = -1.0; y[2] = 0.0;
+    y.set( 0, 1.0 ); y.set( 1, -1.0 ); y.set( 2, 0.0 );
     BOOST_CHECK( (x -= 1.0) == y );
     BOOST_CHECK( x == y );
-    y[0] = 3.0; y[1] = 1.0; y[2] = 2.0;
+    y.set( 0, 3.0 ); y.set( 1, 1.0 ); y.set( 2, 2.0 );
     BOOST_CHECK( (x -= -2.0) == y );
     BOOST_CHECK( x == y );
 
     x = xorg;
     BOOST_CHECK( (x *= 1.0) == x );
     BOOST_CHECK( x == x );
-    y[0] = 4.0; y[1] = 0.0; y[2] = 2.0;
+    y.set( 0, 4.0 ); y.set( 1, 0.0 ); y.set( 2, 2.0 );
     BOOST_CHECK( (x *= 2.0) == y );
     BOOST_CHECK( x == y );
-    y[0] = -1.0; y[1] = 0.0; y[2] = -0.5;
+    y.set( 0, -1.0 ); y.set( 1, 0.0 ); y.set( 2, -0.5 );
     BOOST_CHECK( (x *= -0.25) == y );
     BOOST_CHECK( x == y );
 
     x = xorg;
     BOOST_CHECK( (x /= 1.0) == x );
     BOOST_CHECK( x == x );
-    y[0] = 1.0; y[1] = 0.0; y[2] = 0.5;
+    y.set( 0, 1.0 ); y.set( 1, 0.0 ); y.set( 2, 0.5 );
     BOOST_CHECK( (x /= 2.0) == y );
     BOOST_CHECK( x == y );
-    y[0] = -4.0; y[1] = 0.0; y[2] = -2.0;
+    y.set( 0, -4.0 ); y.set( 1, 0.0 ); y.set( 2, -2.0 );
     BOOST_CHECK( (x /= -0.25) == y );
     BOOST_CHECK( x == y );
     BOOST_CHECK( (x /= 0.0) == Prob(3, 0.0) );
@@ -506,10 +508,10 @@ BOOST_AUTO_TEST_CASE( ScalarOperationsTest ) {
     BOOST_CHECK( (x ^= 0.0) == Prob(3, 1.0) );
     BOOST_CHECK( x == Prob(3, 1.0) );
     x = xorg;
-    y[0] = 4.0; y[1] = 0.0; y[2] = 1.0;
+    y.set( 0, 4.0 ); y.set( 1, 0.0 ); y.set( 2, 1.0 );
     BOOST_CHECK( (x ^= 2.0) == y );
     BOOST_CHECK( x == y );
-    y[0] = 0.5; y[1] = INFINITY; y[2] = 1.0;
+    y.set( 0, 0.5 ); y.set( 1, INFINITY ); y.set( 2, 1.0 );
     BOOST_CHECK( (x ^= -0.5) == y );
     BOOST_CHECK( x == y );
 }
@@ -518,12 +520,12 @@ BOOST_AUTO_TEST_CASE( ScalarOperationsTest ) {
 BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     size_t N = 6;
     Prob xorg(N), x(N);
-    xorg[0] = 2.0; xorg[1] = 0.0; xorg[2] = 1.0; xorg[3] = 0.0; xorg[4] = 2.0; xorg[5] = 3.0;
+    xorg.set( 0, 2.0 ); xorg.set( 1, 0.0 ); xorg.set( 2, 1.0 ); xorg.set( 3, 0.0 ); xorg.set( 4, 2.0 ); xorg.set( 5, 3.0 );
     Prob y(N);
-    y[0] = 0.5; y[1] = -1.0; y[2] = 0.0; y[3] = 0.0; y[4] = -2.0; y[5] = 3.0;
+    y.set( 0, 0.5 ); y.set( 1, -1.0 ); y.set( 2, 0.0 ); y.set( 3, 0.0 ); y.set( 4, -2.0 ); y.set( 5, 3.0 );
     Prob z(N), r(N);
 
-    z[0] = 2.5; z[1] = -1.0; z[2] = 1.0; z[3] = 0.0; z[4] = 0.0; z[5] = 6.0;
+    z.set( 0, 2.5 ); z.set( 1, -1.0 ); z.set( 2, 1.0 ); z.set( 3, 0.0 ); z.set( 4, 0.0 ); z.set( 5, 6.0 );
     x = xorg;
     r = (x += y);
     for( size_t i = 0; i < N; i++ )
@@ -533,7 +535,7 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     BOOST_CHECK( x.pwBinaryOp( y, std::plus<Real>() ) == z );
     BOOST_CHECK( x == z );
 
-    z[0] = 1.5; z[1] = 1.0; z[2] = 1.0; z[3] = 0.0; z[4] = 4.0; z[5] = 0.0;
+    z.set( 0, 1.5 ); z.set( 1, 1.0 ); z.set( 2, 1.0 ); z.set( 3, 0.0 ); z.set( 4, 4.0 ); z.set( 5, 0.0 );
     x = xorg;
     r = (x -= y);
     for( size_t i = 0; i < N; i++ )
@@ -543,7 +545,7 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     BOOST_CHECK( x.pwBinaryOp( y, std::minus<Real>() ) == z );
     BOOST_CHECK( x == z );
 
-    z[0] = 1.0; z[1] = 0.0; z[2] = 0.0; z[3] = 0.0; z[4] = -4.0; z[5] = 9.0;
+    z.set( 0, 1.0 ); z.set( 1, 0.0 ); z.set( 2, 0.0 ); z.set( 3, 0.0 ); z.set( 4, -4.0 ); z.set( 5, 9.0 );
     x = xorg;
     r = (x *= y);
     for( size_t i = 0; i < N; i++ )
@@ -553,7 +555,7 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     BOOST_CHECK( x.pwBinaryOp( y, std::multiplies<Real>() ) == z );
     BOOST_CHECK( x == z );
 
-    z[0] = 4.0; z[1] = 0.0; z[2] = 0.0; z[3] = 0.0; z[4] = -1.0; z[5] = 1.0;
+    z.set( 0, 4.0 ); z.set( 1, 0.0 ); z.set( 2, 0.0 ); z.set( 3, 0.0 ); z.set( 4, -1.0 ); z.set( 5, 1.0 );
     x = xorg;
     r = (x /= y);
     for( size_t i = 0; i < N; i++ )
@@ -563,7 +565,7 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     BOOST_CHECK( x.pwBinaryOp( y, fo_divides0<Real>() ) == z );
     BOOST_CHECK( x == z );
 
-    z[0] = 4.0; z[1] = 0.0; z[2] = INFINITY; /*z[3] = INFINITY;*/ z[4] = -1.0; z[5] = 1.0;
+    z.set( 0, 4.0 ); z.set( 1, 0.0 ); z.set( 2, INFINITY ); /*z.set( 3, INFINITY );*/ z.set( 4, -1.0 ); z.set( 5, 1.0 );
     x = xorg;
     r = (x.divide( y ));
     BOOST_CHECK_CLOSE( r[0], z[0], tol );
@@ -572,7 +574,7 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     BOOST_CHECK( isnan(r[3]) );
     BOOST_CHECK_CLOSE( r[4], z[4], tol );
     BOOST_CHECK_CLOSE( r[5], z[5], tol );
-    x[3] = 0.0; r[3] = 0.0;
+    x.set( 3, 0.0 ); r.set( 3, 0.0 );
     BOOST_CHECK( x == r );
     x = xorg;
     r = x.pwBinaryOp( y, std::divides<Real>() );
@@ -582,10 +584,10 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     BOOST_CHECK( isnan(r[3]) );
     BOOST_CHECK_CLOSE( r[4], z[4], tol );
     BOOST_CHECK_CLOSE( r[5], z[5], tol );
-    x[3] = 0.0; r[3] = 0.0;
+    x.set( 3, 0.0 ); r.set( 3, 0.0 );
     BOOST_CHECK( x == r );
 
-    z[0] = std::sqrt(2.0); z[1] = INFINITY; z[2] = 1.0; z[3] = 1.0; z[4] = 0.25; z[5] = 27.0;
+    z.set( 0, std::sqrt(2.0) ); z.set( 1, INFINITY ); z.set( 2, 1.0 ); z.set( 3, 1.0 ); z.set( 4, 0.25 ); z.set( 5, 27.0 );
     x = xorg;
     r = (x ^= y);
     BOOST_CHECK_CLOSE( r[0], z[0], tol );
@@ -604,40 +606,40 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
 BOOST_AUTO_TEST_CASE( VectorTransformationsTest ) {
     size_t N = 6;
     Prob x(N);
-    x[0] = 2.0; x[1] = 0.0; x[2] = 1.0; x[3] = 0.0; x[4] = 2.0; x[5] = 3.0;
+    x.set( 0, 2.0 ); x.set( 1, 0.0 ); x.set( 2, 1.0 ); x.set( 3, 0.0 ); x.set( 4, 2.0 ); x.set( 5, 3.0 );
     Prob y(N);
-    y[0] = 0.5; y[1] = -1.0; y[2] = 0.0; y[3] = 0.0; y[4] = -2.0; y[5] = 3.0;
+    y.set( 0, 0.5 ); y.set( 1, -1.0 ); y.set( 2, 0.0 ); y.set( 3, 0.0 ); y.set( 4, -2.0 ); y.set( 5, 3.0 );
     Prob z(N), r(N);
 
-    z[0] = 2.5; z[1] = -1.0; z[2] = 1.0; z[3] = 0.0; z[4] = 0.0; z[5] = 6.0;
+    z.set( 0, 2.5 ); z.set( 1, -1.0 ); z.set( 2, 1.0 ); z.set( 3, 0.0 ); z.set( 4, 0.0 ); z.set( 5, 6.0 );
     r = x + y;
     for( size_t i = 0; i < N; i++ )
         BOOST_CHECK_CLOSE( r[i], z[i], tol );
     z = x.pwBinaryTr( y, std::plus<Real>() );
     BOOST_CHECK( r == z );
 
-    z[0] = 1.5; z[1] = 1.0; z[2] = 1.0; z[3] = 0.0; z[4] = 4.0; z[5] = 0.0;
+    z.set( 0, 1.5 ); z.set( 1, 1.0 ); z.set( 2, 1.0 ); z.set( 3, 0.0 ); z.set( 4, 4.0 ); z.set( 5, 0.0 );
     r = x - y;
     for( size_t i = 0; i < N; i++ )
         BOOST_CHECK_CLOSE( r[i], z[i], tol );
     z = x.pwBinaryTr( y, std::minus<Real>() );
     BOOST_CHECK( r == z );
 
-    z[0] = 1.0; z[1] = 0.0; z[2] = 0.0; z[3] = 0.0; z[4] = -4.0; z[5] = 9.0;
+    z.set( 0, 1.0 ); z.set( 1, 0.0 ); z.set( 2, 0.0 ); z.set( 3, 0.0 ); z.set( 4, -4.0 ); z.set( 5, 9.0 );
     r = x * y;
     for( size_t i = 0; i < N; i++ )
         BOOST_CHECK_CLOSE( r[i], z[i], tol );
     z = x.pwBinaryTr( y, std::multiplies<Real>() );
     BOOST_CHECK( r == z );
 
-    z[0] = 4.0; z[1] = 0.0; z[2] = 0.0; z[3] = 0.0; z[4] = -1.0; z[5] = 1.0;
+    z.set( 0, 4.0 ); z.set( 1, 0.0 ); z.set( 2, 0.0 ); z.set( 3, 0.0 ); z.set( 4, -1.0 ); z.set( 5, 1.0 );
     r = x / y;
     for( size_t i = 0; i < N; i++ )
         BOOST_CHECK_CLOSE( r[i], z[i], tol );
     z = x.pwBinaryTr( y, fo_divides0<Real>() );
     BOOST_CHECK( r == z );
 
-    z[0] = 4.0; z[1] = 0.0; z[2] = INFINITY; /*z[3] = INFINITY;*/ z[4] = -1.0; z[5] = 1.0;
+    z.set( 0, 4.0 ); z.set( 1, 0.0 ); z.set( 2, INFINITY ); /*z.set( 3, INFINITY );*/ z.set( 4, -1.0 ); z.set( 5, 1.0 );
     r = x.divided_by( y );
     BOOST_CHECK_CLOSE( r[0], z[0], tol );
     BOOST_CHECK_CLOSE( r[1], z[1], tol );
@@ -653,7 +655,7 @@ BOOST_AUTO_TEST_CASE( VectorTransformationsTest ) {
     BOOST_CHECK_CLOSE( r[4], z[4], tol );
     BOOST_CHECK_CLOSE( r[5], z[5], tol );
 
-    z[0] = std::sqrt(2.0); z[1] = INFINITY; z[2] = 1.0; z[3] = 1.0; z[4] = 0.25; z[5] = 27.0;
+    z.set( 0, std::sqrt(2.0) ); z.set( 1, INFINITY ); z.set( 2, 1.0 ); z.set( 3, 1.0 ); z.set( 4, 0.25 ); z.set( 5, 27.0 );
     r = x ^ y;
     BOOST_CHECK_CLOSE( r[0], z[0], tol );
     BOOST_CHECK_EQUAL( r[1], z[1] );
@@ -668,12 +670,12 @@ BOOST_AUTO_TEST_CASE( VectorTransformationsTest ) {
 
 BOOST_AUTO_TEST_CASE( RelatedFunctionsTest ) {
     Prob x(3), y(3), z(3);
-    x[0] = 0.2;
-    x[1] = 0.8;
-    x[2] = 0.0;
-    y[0] = 0.0;
-    y[1] = 0.6;
-    y[2] = 0.4;
+    x.set( 0, 0.2 );
+    x.set( 1, 0.8 );
+    x.set( 2, 0.0 );
+    y.set( 0, 0.0 );
+    y.set( 1, 0.6 );
+    y.set( 2, 0.4 );
 
     z = min( x, y );
     BOOST_CHECK_EQUAL( z[0], 0.0 );
@@ -714,8 +716,8 @@ BOOST_AUTO_TEST_CASE( RelatedFunctionsTest ) {
     BOOST_CHECK_EQUAL( dist( y, x, Prob::DISTHEL ), 0.5 * (0.2 + std::pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4) );
     BOOST_CHECK_EQUAL( dist( x, y, Prob::DISTHEL ), x.innerProduct( y, 0.0, std::plus<Real>(), fo_Hellinger<Real>() ) / 2.0 );
     BOOST_CHECK_EQUAL( dist( y, x, Prob::DISTHEL ), y.innerProduct( x, 0.0, std::plus<Real>(), fo_Hellinger<Real>() ) / 2.0 );
-    x[1] = 0.7; x[2] = 0.1;
-    y[0] = 0.1; y[1] = 0.5;
+    x.set( 1, 0.7 ); x.set( 2, 0.1 );
+    y.set( 0, 0.1 ); y.set( 1, 0.5 );
     BOOST_CHECK_CLOSE( dist( x, y, Prob::DISTKL ), 0.2 * std::log(0.2 / 0.1) + 0.7 * std::log(0.7 / 0.5) + 0.1 * std::log(0.1 / 0.4), tol );
     BOOST_CHECK_CLOSE( dist( y, x, Prob::DISTKL ), 0.1 * std::log(0.1 / 0.2) + 0.5 * std::log(0.5 / 0.7) + 0.4 * std::log(0.4 / 0.1), tol );
     BOOST_CHECK_EQUAL( dist( x, y, Prob::DISTKL ), x.innerProduct( y, 0.0, std::plus<Real>(), fo_KL<Real>() ) );

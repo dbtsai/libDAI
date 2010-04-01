@@ -195,7 +195,7 @@ void BBP::RegenerateU() {
                     const _ind_t &ind = _index( j, j.dual );
                     // multiply prod by n_jI
                     for( size_t x_I = 0; x_I < prod.size(); x_I++ )
-                        prod[x_I] *= n_jI[ind[x_I]];
+                        prod.set( x_I, prod[x_I] * n_jI[ind[x_I]] );
                 }
             _Umsg[I][i.iter] = prod;
         }
@@ -218,7 +218,7 @@ void BBP::RegenerateS() {
                             const _ind_t &ind = _index( k, k.dual );
                             Prob p( _bp_dual.msgN( k, k.dual ) );
                             for( size_t x_I = 0; x_I < prod.states(); x_I++ )
-                                prod.p()[x_I] *= p[ind[x_I]];
+                                prod.set( x_I, prod[x_I] * p[ind[x_I]] );
                         }
                     }
                     // "Marginalize" onto i|j (unnormalized)
@@ -285,7 +285,7 @@ void BBP::RegeneratePsiAdjoints() {
             const _ind_t& ind = _index( i, i.dual );
             // multiply prod with n_jI
             for( size_t x_I = 0; x_I < p.size(); x_I++ )
-                p[x_I] *= n_iI[ind[x_I]];
+                p.set( x_I, p[x_I] * n_iI[ind[x_I]] );
         }
         p += _init_adj_psi_F[I];
         _adj_psi_F.push_back( p );
@@ -319,12 +319,12 @@ void BBP::RegenerateParMessageAdjoints() {
                         const _ind_t &ind = _index( j, j.dual );
                         // multiply prod with n_jI
                         for( size_t x_I = 0; x_I < prod.size(); x_I++ )
-                            prod[x_I] *= n_jI[ind[x_I]];
+                            prod.set( x_I, prod[x_I] * n_jI[ind[x_I]] );
                     }
                 Prob marg( _fg->var(i).states(), 0.0 );
                 const _ind_t &ind = _index( i, I.iter );
                 for( size_t r = 0; r < prod.size(); r++ )
-                    marg[ind[r]] += prod[r];
+                    marg.set( ind[r], marg[ind[r]] + prod[r] );
                 _new_adj_n[i][I.iter] = marg;
                 upMsgN( i, I.iter );
             }
@@ -376,12 +376,12 @@ void BBP::RegenerateSeqMessageAdjoints() {
                     const _ind_t& ind = _index( j, j.dual );
                     // multiply prod with n_jI
                     for( size_t x_I = 0; x_I < prod.size(); x_I++ )
-                        prod[x_I] *= n_jI[ind[x_I]];
+                        prod.set( x_I, prod[x_I] * n_jI[ind[x_I]] );
                 }
             Prob marg( _fg->var(i).states(), 0.0 );
             const _ind_t &ind = _index( i, I.iter );
             for( size_t r = 0; r < prod.size(); r++ )
-                marg[ind[r]] += prod[r];
+                marg.set( ind[r], marg[ind[r]] + prod[r] );
             sendSeqMsgN( i, I.iter,marg );
         }
     }
@@ -414,7 +414,7 @@ void BBP::calcNewN( size_t i, size_t _I ) {
             const Prob &p = _Smsg[i][_I][j.iter];
             const Prob &_adj_m_unnorm_jI = _adj_m_unnorm[j][j.dual];
             LOOP_ij(
-                new_adj_n_iI[xi] += p[xij] * _adj_m_unnorm_jI[xj];
+                new_adj_n_iI.set( xi, new_adj_n_iI[xi] + p[xij] * _adj_m_unnorm_jI[xj] );
             );
             /* THE FOLLOWING WOULD BE ABOUT TWICE AS SLOW:
             Var vi = _fg->var(i);
@@ -431,7 +431,7 @@ void BBP::calcNewM( size_t i, size_t _I ) {
     const Prob &adj = _adj_m_unnorm[i][_I];
     const _ind_t &ind = _index(i,_I);
     for( size_t x_I = 0; x_I < p.size(); x_I++ )
-        p[x_I] *= adj[ind[x_I]];
+        p.set( x_I, p[x_I] * adj[ind[x_I]] );
     _adj_psi_F[I] += p;
     /* THE FOLLOWING WOULD BE SLIGHTLY SLOWER:
     _adj_psi_F[I] += (Factor( _fg->factor(I).vars(), U(I, I.dual) ) * Factor( _fg->var(i), _adj_m_unnorm[i][_I] )).p();
@@ -571,7 +571,7 @@ void BBP::sendSeqMsgM( size_t j, size_t _I ) {
     Prob um( U(I, _j) );
     const _ind_t &ind = _index(j, _I);
     for( size_t x_I = 0; x_I < um.size(); x_I++ )
-        um[x_I] *= _adj_m_unnorm_jI[ind[x_I]];
+        um.set( x_I, um[x_I] * _adj_m_unnorm_jI[ind[x_I]] );
     um *= 1 - props.damping;
     _adj_psi_F[I] += um;
 
@@ -589,7 +589,7 @@ void BBP::sendSeqMsgM( size_t j, size_t _I ) {
             const Prob &S = _Smsg[i][i.dual][_j];
             Prob msg( _fg->var(i).states(), 0.0 );
             LOOP_ij(
-                msg[xi] += S[xij] * _adj_m_unnorm_jI[xj];
+                msg.set( xi, msg[xi] + S[xij] * _adj_m_unnorm_jI[xj] );
             );
             msg *= 1.0 - props.damping;
             /* THE FOLLOWING WOULD BE ABOUT TWICE AS SLOW:
@@ -629,7 +629,7 @@ Prob BBP::unnormAdjoint( const Prob &w, Real Z_w, const Prob &adj_w ) {
     for( size_t i = 0; i < w.size(); i++ )
         s += w[i] * adj_w[i];
     for( size_t i = 0; i < w.size(); i++ )
-        adj_w_unnorm[i] = (adj_w[i] - s) / Z_w;
+        adj_w_unnorm.set( i, (adj_w[i] - s) / Z_w );
     return adj_w_unnorm;
 //  THIS WOULD BE ABOUT 50% SLOWER:  return (adj_w - (w * adj_w).sum()) / Z_w;
 }
@@ -769,22 +769,22 @@ void BBP::initCostFnAdj( const BBPCostFunction &cfn, const vector<size_t> *state
                 int c = fg.nbV(i).size();
                 Prob p(dim,0.0);
                 for( size_t xi = 0; xi < dim; xi++ )
-                    p[xi] = (1 - c) * (1 + log( _ia->beliefV(i)[xi] ));
+                    p.set( xi, (1 - c) * (1 + log( _ia->beliefV(i)[xi] )) );
                 b1_adj.push_back( p );
 
                 for( size_t xi = 0; xi < dim; xi++ )
-                    p[xi] = -_ia->beliefV(i)[xi];
+                    p.set( xi, -_ia->beliefV(i)[xi] );
                 psi1_adj.push_back( p );
             }
             for( size_t I = 0; I < fg.nrFactors(); I++ ) {
                 size_t dim = fg.factor(I).states();
                 Prob p( dim, 0.0 );
                 for( size_t xI = 0; xI < dim; xI++ )
-                    p[xI] = 1 + log( _ia->beliefF(I)[xI] / fg.factor(I).p()[xI] );
+                    p.set( xI, 1 + log( _ia->beliefF(I)[xI] / fg.factor(I).p()[xI] ) );
                 b2_adj.push_back( p );
 
                 for( size_t xI = 0; xI < dim; xI++ )
-                    p[xI] = -_ia->beliefF(I)[xI] / fg.factor(I).p()[xI];
+                    p.set( xI, -_ia->beliefF(I)[xI] / fg.factor(I).p()[xI] );
                 psi2_adj.push_back( p );
             }
             init( b1_adj, b2_adj, psi1_adj, psi2_adj );
@@ -798,9 +798,9 @@ void BBP::initCostFnAdj( const BBPCostFunction &cfn, const vector<size_t> *state
                 for( size_t xI = 0; xI < dim; xI++ ) {
                     Real bIxI = _ia->beliefF(I)[xI];
                     if( bIxI < 1.0e-15 )
-                        p[xI] = -1.0e10;
+                        p.set( xI, -1.0e10 );
                     else
-                        p[xI] = 1 + log( bIxI );
+                        p.set( xI, 1 + log( bIxI ) );
                 }
                 b2_adj.push_back(p);
             }
@@ -815,9 +815,9 @@ void BBP::initCostFnAdj( const BBPCostFunction &cfn, const vector<size_t> *state
                 for( size_t xi = 0; xi < fg.var(i).states(); xi++ ) {
                     Real bixi = _ia->beliefV(i)[xi];
                     if( bixi < 1.0e-15 )
-                        p[xi] = -1.0e10;
+                        p.set( xi, -1.0e10 );
                     else
-                        p[xi] = 1 + log( bixi );
+                        p.set( xi, 1 + log( bixi ) );
                 }
                 b1_adj.push_back( p );
             }
@@ -843,13 +843,13 @@ void BBP::initCostFnAdj( const BBPCostFunction &cfn, const vector<size_t> *state
                 Real b = _ia->beliefV(i)[state[i]];
                 switch( (size_t)cfn ) {
                     case BBPCostFunction::CFN_GIBBS_B:
-                        delta[state[i]] = 1.0;
+                        delta.set( state[i], 1.0 );
                         break;
                     case BBPCostFunction::CFN_GIBBS_B2:
-                        delta[state[i]] = b;
+                        delta.set( state[i], b );
                         break;
                     case BBPCostFunction::CFN_GIBBS_EXP:
-                        delta[state[i]] = exp(b);
+                        delta.set( state[i], exp(b) );
                         break;
                     default:
                         DAI_THROW(UNKNOWN_ENUM_VALUE);
@@ -881,13 +881,13 @@ void BBP::initCostFnAdj( const BBPCostFunction &cfn, const vector<size_t> *state
                 Real b = _ia->beliefF(I)[x_I];
                 switch( (size_t)cfn ) {
                     case BBPCostFunction::CFN_GIBBS_B_FACTOR:
-                        delta[x_I] = 1.0;
+                        delta.set( x_I, 1.0 );
                         break;
                     case BBPCostFunction::CFN_GIBBS_B2_FACTOR:
-                        delta[x_I] = b;
+                        delta.set( x_I, b );
                         break;
                     case BBPCostFunction::CFN_GIBBS_EXP_FACTOR:
-                        delta[x_I] = exp( b );
+                        delta.set( x_I, exp( b ) );
                         break;
                     default:
                         DAI_THROW(UNKNOWN_ENUM_VALUE);
@@ -1011,7 +1011,7 @@ Real numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const P
                 // perturb it
                 size_t n = bp_prb->fg().var(i).states();
                 Prob psi_1_prb( n, 1.0 );
-                psi_1_prb[xi] += h;
+                psi_1_prb.set( xi, psi_1_prb[xi] + h );
 //                 psi_1_prb.normalize();
                 size_t I = bp_prb->fg().nbV(i)[0]; // use first factor in list of neighbors of i
                 bp_prb->fg().factor(I) *= Factor( bp_prb->fg().var(i), psi_1_prb );

@@ -299,8 +299,8 @@ Real MR::calcCavityCorrelations() {
             foreach( const Neighbor &j, G.nb(i) ) {
                 // Create weights for magnetization of some spin
                 Prob p( 2, 0.0 );
-                p[0] = -1.0;
-                p[1] = 1.0;
+                p.set( 0, -1.0 );
+                p.set( 1, 1.0 );
 
                 // BBP cost function would be the magnetization of spin j
                 vector<Prob> b1_adj;
@@ -378,7 +378,7 @@ Real MR::run() {
 
 Factor MR::beliefV( size_t i ) const {
     if( supported ) {
-        Prob x(2);
+        Real x[2];
         x[0] = 0.5 - Mag[i] / 2.0;
         x[1] = 0.5 + Mag[i] / 2.0;
 

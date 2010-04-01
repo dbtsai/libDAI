@@ -1,12 +1,21 @@
 git HEAD
 --------
 
+* Fixed some bugs in the MatLab interface build system
+* Fixed a bug in utils/fginfo.cpp
+* Improved factor.h/cpp:
+  - Added get(size_t) and set(size_t,T) operators; get() is 
+    equivalent to "operator[](size_t) const" and set() should
+    be used instead of the non-const operator[], which has been deprecated
 * Improved prob.h/cpp:
   - Added TProb<T>::operator==( const TProb<T> &q )
   - TProb<T>::accumulate() now also applies op2 to init
   - Fixed bug by renaming TProb<T>::operator<=() to TProb<T>::operator<()
   - TProb<T>& operator/= (T x) now yields 0 when dividing by 0
   - Changed format of TProb<T> when streamed to an ostream
+  - Added get(size_t) and set(size_t,T) operators; get() is 
+    equivalent to "operator[](size_t) const" and set() should
+    be used instead of the non-const operator[], which has been deprecated
 * Improved index.h/cpp:
   - Added multifor::reset()
 * Improved properties.h/cpp:
@@ -29,6 +38,7 @@ git HEAD
   - More error checking in RootedTree constructor
   - The vertices in DEdge and UEdge are now named "first" and "second"
     for compatibility with a std::pair<size_t,size_t>
+  - Added GraphEL( const GraphAL& G ) constructor
 * Improved bipgraph.h/cpp:
   - Fixed bug in BipartiteGraph::eraseNode1()
   - Fixed bug in BipartiteGraph::eraseNode2()
@@ -53,7 +63,7 @@ git HEAD
     no longer has a default value in order to avoid confusion with the
      SmallSet::SmallSet( const T &t1, const T &t2 )
     constructor.
-* Removed RandomDRegularGraph()
+* Removed RandomDRegularGraph(), please use createGraphRegular() instead
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,
   weightedgraph, enum, util, properties, index, prob

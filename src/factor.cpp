@@ -41,7 +41,7 @@ Factor createFactorIsing( const Var &n1, const Var &n2, Real J ) {
 Factor createFactorExpGauss( const VarSet &ns, Real beta ) {
     Factor fac( ns );
     for( size_t t = 0; t < fac.states(); t++ )
-        fac[t] = std::exp(rnd_stdnormal() * beta);
+        fac.set( t, std::exp(rnd_stdnormal() * beta) );
     return fac;
 }
 
@@ -50,7 +50,7 @@ Factor createFactorPotts( const Var &n1, const Var &n2, Real J ) {
     Factor fac( VarSet( n1, n2 ), 1.0 );
     DAI_ASSERT( n1.states() == n2.states() );
     for( size_t s = 0; s < n1.states(); s++ )
-        fac[ s * (n1.states() + 1) ] = std::exp(J);
+        fac.set( s * (n1.states() + 1), std::exp(J) );
     return fac;
 }
 
@@ -58,7 +58,7 @@ Factor createFactorPotts( const Var &n1, const Var &n2, Real J ) {
 Factor createFactorDelta( const Var &v, size_t state ) {
     Factor fac( v, 0.0 );
     DAI_ASSERT( state < v.states() );
-    fac[state] = 1.0;
+    fac.set( state, 1.0 );
     return fac;
 }
 

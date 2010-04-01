@@ -41,11 +41,6 @@ endif
 ifdef WITH_MATLAB
   TARGETS:=$(TARGETS) matlabs
   # Specify the same C++ compiler and flags to mex
-  ifneq ($(OS),WINDOWS)
-    MEXFLAGS=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'
-  else
-    MEXFLAGS=CXX\#$(CC) CXXFLAGS\#"$(CCFLAGS)"
-  endif
   ifdef NEW_MATLAB
     MEXFLAGS:=$(MEXFLAGS) -largeArrayDims
   else
@@ -236,16 +231,16 @@ tests/testbbp$(EE) : tests/testbbp.cpp $(HEADERS) $(LIB)/libdai$(LE)
 ###################
 
 matlab/dai$(ME) : $(SRC)/matlab/dai.cpp $(HEADERS) matlab$(OE) $(LIB)/libdai$(LE)
-	$(MEX) -o$@ $< matlab$(OE) $(LIB)/libdai$(LE)
+	$(MEX) -output $@ $< matlab$(OE) $(LIB)/libdai$(LE)
 
 matlab/dai_readfg$(ME) : $(SRC)/matlab/dai_readfg.cpp $(HEADERS) factorgraph$(OE) matlab$(OE) exceptions$(OE) bipgraph$(OE)
-	$(MEX) -o$@ $< factorgraph$(OE) matlab$(OE) exceptions$(OE) bipgraph$(OE)
+	$(MEX) -output $@ $< factorgraph$(OE) matlab$(OE) exceptions$(OE) bipgraph$(OE)
 
 matlab/dai_writefg$(ME) : $(SRC)/matlab/dai_writefg.cpp $(HEADERS) factorgraph$(OE) matlab$(OE) exceptions$(OE) bipgraph$(OE)
-	$(MEX) -o$@ $< factorgraph$(OE) matlab$(OE) exceptions$(OE) bipgraph$(OE)
+	$(MEX) -output $@ $< factorgraph$(OE) matlab$(OE) exceptions$(OE) bipgraph$(OE)
 
 matlab/dai_potstrength$(ME) : $(SRC)/matlab/dai_potstrength.cpp $(HEADERS) matlab$(OE) exceptions$(OE)
-	$(MEX) -o$@ $< matlab$(OE) exceptions$(OE)
+	$(MEX) -output $@ $< matlab$(OE) exceptions$(OE)
 
 matlab$(OE) : $(SRC)/matlab/matlab.cpp $(INC)/matlab/matlab.h $(HEADERS)
 	$(MEX) -c $<

@@ -175,9 +175,9 @@ Prob BP::calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) const 
 
                 for( size_t r = 0; r < prod.size(); ++r )
                     if( props.logdomain )
-                        prod[r] += prod_j[ind[r]];
+                        prod.set( r, prod[r] + prod_j[ind[r]] );
                     else
-                        prod[r] *= prod_j[ind[r]];
+                        prod.set( r, prod[r] * prod_j[ind[r]] );
             }
     }
     return prod;
@@ -203,23 +203,23 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
 
         // Marginalize onto i
         if( !DAI_BP_FAST ) {
-            /* UNOPTIMIZED (SIMPLE TO READ, BUT SLOW) VERSION */
+            // UNOPTIMIZED (SIMPLE TO READ, BUT SLOW) VERSION
             if( props.inference == Properties::InfType::SUMPROD )
                 marg = Fprod.marginal( var(i) ).p();
             else
                 marg = Fprod.maxMarginal( var(i) ).p();
         } else {
-            /* OPTIMIZED VERSION */
+            // OPTIMIZED VERSION 
             marg = Prob( var(i).states(), 0.0 );
             // ind is the precalculated IndexFor(i,I) i.e. to x_I == k corresponds x_i == ind[k]
             const ind_t ind = index(i,_I);
             if( props.inference == Properties::InfType::SUMPROD )
                 for( size_t r = 0; r < prod.size(); ++r )
-                    marg[ind[r]] += prod[r];
+                    marg.set( ind[r], marg[ind[r]] + prod[r] );
             else
                 for( size_t r = 0; r < prod.size(); ++r )
                     if( prod[r] > marg[ind[r]] )
-                        marg[ind[r]] = prod[r];
+                        marg.set( ind[r], prod[r] );
             marg.normalize();
         }
     }

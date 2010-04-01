@@ -350,11 +350,13 @@ class BipartiteGraph {
 
         /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node \a n1 of type 1.
         /** If \a include == \c true, includes \a n1 itself, otherwise excludes \a n1.
+         *  \note In libDAI versions 0.2.4 and earlier, this function used to return a std::vector<size_t>
          */
         SmallSet<size_t> delta1( size_t n1, bool include = false ) const;
 
         /// Calculates second-order neighbors (i.e., neighbors of neighbors) of node \a n2 of type 2.
         /** If \a include == \c true, includes \a n2 itself, otherwise excludes \a n2.
+         *  \note In libDAI versions 0.2.4 and earlier, this function used to return a std::vector<size_t>
          */
         SmallSet<size_t> delta2( size_t n2, bool include = false ) const;
 

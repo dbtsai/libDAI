@@ -64,12 +64,14 @@ Prob CondProbEstimation::estimate() {
     for( size_t parent = 0; parent < _stats.size(); parent += _target_dim ) {
         // calculate norm
         size_t top = parent + _target_dim;
-        Real norm = std::accumulate( &(_stats[parent]), &(_stats[parent]) + _target_dim, 0.0 );
+        Real norm = 0.0;
+        for( size_t i = parent; i < top; ++i )
+            norm += _stats[i];
         if( norm != 0.0 )
             norm = 1.0 / norm;
         // normalize
         for( size_t i = parent; i < top; ++i )
-            _stats[i] *= norm;
+            _stats.set( i, _stats[i] * norm );
     }
     // reset _stats to _initial_stats
     Prob result = _stats;
@@ -173,7 +175,7 @@ void SharedParameters::collectSufficientStatistics( InfAlg &alg ) {
         Factor b = alg.belief(vs);
         Prob p( b.states(), 0.0 );
         for( size_t entry = 0; entry < b.states(); ++entry )
-            p[entry] = b[perm.convertLinearIndex(entry)]; // apply inverse permutation
+            p.set( entry, b[perm.convertLinearIndex(entry)] ); // apply inverse permutation
         _estimation->addSufficientStatistics( p );
     }
 }
@@ -187,7 +189,7 @@ void SharedParameters::setParameters( FactorGraph &fg ) {
 
         Factor f( vs, 0.0 );
         for( size_t entry = 0; entry < f.states(); ++entry )
-            f[perm.convertLinearIndex(entry)] = p[entry];
+            f.set( perm.convertLinearIndex(entry), p[entry] );
 
         fg.setFactor( i->first, f );
     }
