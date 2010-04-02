@@ -173,8 +173,8 @@ void SharedParameters::collectSufficientStatistics( InfAlg &alg ) {
         VarSet &vs = _varsets[i->first];
 
         Factor b = alg.belief(vs);
-        Prob p( b.states(), 0.0 );
-        for( size_t entry = 0; entry < b.states(); ++entry )
+        Prob p( b.nrStates(), 0.0 );
+        for( size_t entry = 0; entry < b.nrStates(); ++entry )
             p.set( entry, b[perm.convertLinearIndex(entry)] ); // apply inverse permutation
         _estimation->addSufficientStatistics( p );
     }
@@ -188,7 +188,7 @@ void SharedParameters::setParameters( FactorGraph &fg ) {
         VarSet &vs = _varsets[i->first];
 
         Factor f( vs, 0.0 );
-        for( size_t entry = 0; entry < f.states(); ++entry )
+        for( size_t entry = 0; entry < f.nrStates(); ++entry )
             f.set( perm.convertLinearIndex(entry), p[entry] );
 
         fg.setFactor( i->first, f );

@@ -72,7 +72,7 @@ void Gibbs::construct() {
     _factor_counts.clear();
     _factor_counts.reserve( nrFactors() );
     for( size_t I = 0; I < nrFactors(); I++ )
-        _factor_counts.push_back( _count_t( factor(I).states(), 0 ) );
+        _factor_counts.push_back( _count_t( factor(I).nrStates(), 0 ) );
 
     _sample_count = 0;
 

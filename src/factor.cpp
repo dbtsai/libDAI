@@ -40,7 +40,7 @@ Factor createFactorIsing( const Var &n1, const Var &n2, Real J ) {
 
 Factor createFactorExpGauss( const VarSet &ns, Real beta ) {
     Factor fac( ns );
-    for( size_t t = 0; t < fac.states(); t++ )
+    for( size_t t = 0; t < fac.nrStates(); t++ )
         fac.set( t, std::exp(rnd_stdnormal() * beta) );
     return fac;
 }

@@ -61,7 +61,7 @@ SprinklerNetwork = dai.FactorGraph(SprinklerFactors);
 
 % Write factorgraph to a file
 SprinklerNetwork.WriteToFile('sprinkler.fg');
-fprintf('Sprinkler network written to sprinkler.fg');
+fprintf('Sprinkler network written to sprinkler.fg\n');
 
 % Output some information about the factorgraph
 fprintf('%d variables\n', SprinklerNetwork.nrVars());

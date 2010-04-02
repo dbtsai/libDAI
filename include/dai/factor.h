@@ -95,11 +95,15 @@ template <typename T> class TFactor {
 
         /// Constructs factor depending on variables in \a vars, copying the values from \a p
         TFactor( const VarSet& vars, const TProb<T> &p ) : _vs(vars), _p(p) {
-            DAI_DEBASSERT( _vs.nrStates() == _p.size() );
+            DAI_ASSERT( _vs.nrStates() == _p.size() );
         }
 
         /// Constructs factor depending on variables in \a vars, permuting the values given in \a p accordingly
         TFactor( const std::vector<Var> &vars, const std::vector<T> &p ) : _vs(vars.begin(), vars.end(), vars.size()), _p(p.size()) {
+            size_t nrStates = 1;
+            for( size_t i = 0; i < vars.size(); i++ )
+                nrStates *= vars[i].states();
+            DAI_ASSERT( nrStates == p.size() );
             Permute permindex(vars);
             for( size_t li = 0; li < p.size(); ++li )
                 _p.set( permindex.convertLinearIndex(li), p[li] );
@@ -135,6 +139,12 @@ template <typename T> class TFactor {
 
         /// Returns the number of possible joint states of the variables on which the factor depends, \f$\prod_{l\in L} S_l\f$
         /** \note This is equal to the length of the value vector.
+         */
+        size_t nrStates() const { return _p.size(); }
+
+        /// Returns the number of possible joint states of the variables on which the factor depends, \f$\prod_{l\in L} S_l\f$
+        /** \note This is equal to the length of the value vector.
+         *  \deprecated Please use dai::TFactor::nrStates() instead.
          */
         size_t states() const { return _p.size(); }
 
@@ -173,11 +183,19 @@ template <typename T> class TFactor {
 
     /// \name Unary transformations
     //@{
-        /// Returns pointwise absolute value
-        TFactor<T> abs() const {
+        /// Returns negative of \c *this
+        TFactor<T> operator- () const { 
             // Note: the alternative (shorter) way of implementing this,
             //   return TFactor<T>( _vs, _p.abs() );
             // is slower because it invokes the copy constructor of TProb<T>
+            TFactor<T> x;
+            x._vs = _vs;
+            x._p = -_p;
+            return x;
+        }
+
+        /// Returns pointwise absolute value
+        TFactor<T> abs() const {
             TFactor<T> x;
             x._vs = _vs;
             x._p = _p.abs();
@@ -226,10 +244,21 @@ template <typename T> class TFactor {
     /// \name Unary operations
     //@{
         /// Draws all values i.i.d. from a uniform distribution on [0,1)
-        TFactor<T> & randomize () { _p.randomize(); return *this; }
+        TFactor<T>& randomize() { _p.randomize(); return *this; }
 
         /// Sets all values to \f$1/n\f$ where \a n is the number of states
-        TFactor<T>& setUniform () { _p.setUniform(); return *this; }
+        TFactor<T>& setUniform() { _p.setUniform(); return *this; }
+
+        /// Applies absolute value pointwise
+        TFactor<T>& takeAbs() { _p.takeAbs(); return *this; }
+
+        /// Applies exponent pointwise
+        TFactor<T>& takeExp() { _p.takeExp(); return *this; }
+
+        /// Applies logarithm pointwise
+        /** If \a zero == \c true, uses <tt>log(0)==0</tt>; otherwise, <tt>log(0)==-Inf</tt>.
+         */
+        TFactor<T>& takeLog( bool zero = false ) { _p.takeLog(zero); return *this; }
 
         /// Normalizes factor using the specified norm
         /** \throw NOT_NORMALIZABLE if the norm is zero
@@ -240,7 +269,7 @@ template <typename T> class TFactor {
     /// \name Operations with scalars
     //@{
         /// Sets all values to \a x
-        TFactor<T> & fill (T x) { _p.fill( x ); return *this; }
+        TFactor<T>& fill (T x) { _p.fill( x ); return *this; }
 
         /// Adds scalar \a x to each value
         TFactor<T>& operator+= (T x) { _p += x; return *this; }
@@ -430,7 +459,7 @@ template <typename T> class TFactor {
     //@{
         /// Returns a slice of \c *this, where the subset \a vars is in state \a varsState
         /** \pre \a vars sould be a subset of vars()
-         *  \pre \a varsState < vars.states()
+         *  \pre \a varsState < vars.nrStates()
          *
          *  The result is a factor that depends on the variables of *this except those in \a vars,
          *  obtained by setting the variables in \a vars to the joint state specified by the linear index
@@ -473,7 +502,7 @@ template<typename T> TFactor<T> TFactor<T>::slice( const VarSet& vars, size_t va
     // OPTIMIZE ME
     IndexFor i_vars (vars, _vs);
     IndexFor i_varsrem (varsrem, _vs);
-    for( size_t i = 0; i < states(); i++, ++i_vars, ++i_varsrem )
+    for( size_t i = 0; i < nrStates(); i++, ++i_vars, ++i_varsrem )
         if( (size_t)i_vars == varsState )
             result.set( i_varsrem, _p[i] );
 
@@ -548,7 +577,7 @@ template<typename T> T TFactor<T>::strength( const Var &i, const Var &j ) const 
  */
 template<typename T> std::ostream& operator<< (std::ostream& os, const TFactor<T>& f) {
     os << "(" << f.vars() << ", (";
-    for( size_t i = 0; i < f.states(); i++ )
+    for( size_t i = 0; i < f.nrStates(); i++ )
         os << (i == 0 ? "" : ", ") << f[i];
     os << "))";
     return os;
@@ -574,8 +603,8 @@ template<typename T> T dist( const TFactor<T> &f, const TFactor<T> &g, typename 
  *  \pre f.vars() == g.vars()
  */
 template<typename T> TFactor<T> max( const TFactor<T> &f, const TFactor<T> &g ) {
-    DAI_ASSERT( f._vs == g._vs );
-    return TFactor<T>( f._vs, max( f.p(), g.p() ) );
+    DAI_ASSERT( f.vars() == g.vars() );
+    return TFactor<T>( f.vars(), max( f.p(), g.p() ) );
 }
 
 
@@ -584,8 +613,8 @@ template<typename T> TFactor<T> max( const TFactor<T> &f, const TFactor<T> &g ) 
  *  \pre f.vars() == g.vars()
  */
 template<typename T> TFactor<T> min( const TFactor<T> &f, const TFactor<T> &g ) {
-    DAI_ASSERT( f._vs == g._vs );
-    return TFactor<T>( f._vs, min( f.p(), g.p() ) );
+    DAI_ASSERT( f.vars() == g.vars() );
+    return TFactor<T>( f.vars(), min( f.p(), g.p() ) );
 }
 
 
@@ -606,14 +635,14 @@ template<typename T> T MutualInfo(const TFactor<T> &f) {
 typedef TFactor<Real> Factor;
 
 
-/// Returns a binary single-variable factor \f$ \exp(hx) \f$ where \f$ x = \pm 1 \f$
+/// Returns a binary unnormalized single-variable factor \f$ \exp(hx) \f$ where \f$ x = \pm 1 \f$
 /** \param x Variable (should be binary)
  *  \param h Field strength
  */
 Factor createFactorIsing( const Var &x, Real h );
 
 
-/// Returns a binary pairwise factor \f$ \exp(J x_1 x_2) \f$ where \f$ x_1, x_2 = \pm 1 \f$
+/// Returns a binary unnormalized pairwise factor \f$ \exp(J x_1 x_2) \f$ where \f$ x_1, x_2 = \pm 1 \f$
 /** \param x1 First variable (should be binary)
  *  \param x2 Second variable (should be binary)
  *  \param J Coupling strength

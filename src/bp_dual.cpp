@@ -62,7 +62,7 @@ void BP_dual::regenerateBeliefs() {
     for( size_t i = 0; i < fg().nrVars(); i++ )
         _beliefs.b1.push_back( Prob( fg().var(i).states() ) );
     for( size_t I = 0; I < fg().nrFactors(); I++ )
-        _beliefs.b2.push_back( Prob( fg().factor(I).states() ) );
+        _beliefs.b2.push_back( Prob( fg().factor(I).nrStates() ) );
 }
 
 

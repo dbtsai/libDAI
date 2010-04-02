@@ -86,11 +86,11 @@ std::ostream& operator<< ( std::ostream &os, const FactorGraph &fg ) {
             os << i->states() << " ";
         os << endl;
         size_t nr_nonzeros = 0;
-        for( size_t k = 0; k < fg.factor(I).states(); k++ )
+        for( size_t k = 0; k < fg.factor(I).nrStates(); k++ )
             if( fg.factor(I)[k] != (Real)0 )
                 nr_nonzeros++;
         os << nr_nonzeros << endl;
-        for( size_t k = 0; k < fg.factor(I).states(); k++ )
+        for( size_t k = 0; k < fg.factor(I).nrStates(); k++ )
             if( fg.factor(I)[k] != (Real)0 )
                 os << k << " " << setw(os.precision()+4) << fg.factor(I)[k] << endl;
     }
@@ -320,7 +320,7 @@ void FactorGraph::clampVar( size_t i, const vector<size_t> &is, bool backup ) {
 
 
 void FactorGraph::clampFactor( size_t I, const vector<size_t> &is, bool backup ) {
-    size_t st = factor(I).states();
+    size_t st = factor(I).nrStates();
     Factor newF( factor(I).vars(), (Real)0 );
 
     foreach( size_t i, is ) {

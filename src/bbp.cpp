@@ -157,7 +157,7 @@ void BBP::RegenerateInds() {
         _indices[i].reserve( _fg->nbV(i).size() );
         foreach( const Neighbor &I, _fg->nbV(i) ) {
             _ind_t index;
-            index.reserve( _fg->factor(I).states() );
+            index.reserve( _fg->factor(I).nrStates() );
             for( IndexFor k(_fg->var(i), _fg->factor(I).vars()); k.valid(); ++k )
                 index.push_back( k );
             _indices[i].push_back( index );
@@ -188,7 +188,7 @@ void BBP::RegenerateU() {
     for( size_t I = 0; I < _fg->nrFactors(); I++ ) {
         _Umsg[I].resize( _fg->nbF(I).size() );
         foreach( const Neighbor &i, _fg->nbF(I) ) {
-            Prob prod( _fg->factor(I).states(), 1.0 );
+            Prob prod( _fg->factor(I).nrStates(), 1.0 );
             foreach( const Neighbor &j, _fg->nbF(I) )
                 if( i.node != j.node ) {
                     Prob n_jI( _bp_dual.msgN( j, j.dual ) );
@@ -217,7 +217,7 @@ void BBP::RegenerateS() {
                         if( k != i && k.node != j.node ) {
                             const _ind_t &ind = _index( k, k.dual );
                             Prob p( _bp_dual.msgN( k, k.dual ) );
-                            for( size_t x_I = 0; x_I < prod.states(); x_I++ )
+                            for( size_t x_I = 0; x_I < prod.nrStates(); x_I++ )
                                 prod.set( x_I, prod[x_I] * p[ind[x_I]] );
                         }
                     }
@@ -279,7 +279,7 @@ void BBP::RegeneratePsiAdjoints() {
     _adj_psi_F.reserve( _fg->nrFactors() );
     for( size_t I = 0; I < _fg->nrFactors(); I++ ) {
         Prob p( _adj_b_F_unnorm[I] );
-        DAI_ASSERT( p.size() == _fg->factor(I).states() );
+        DAI_ASSERT( p.size() == _fg->factor(I).nrStates() );
         foreach( const Neighbor &i, _fg->nbF(I) ) {
             Prob n_iI( _bp_dual.msgN( i, i.dual ) );
             const _ind_t& ind = _index( i, i.dual );
@@ -737,7 +737,7 @@ std::vector<Prob> BBP::getZeroAdjF( const FactorGraph &fg ) {
     vector<Prob> adj_2;
     adj_2.reserve( fg.nrFactors() );
     for( size_t I = 0; I < fg.nrFactors(); I++ )
-        adj_2.push_back( Prob( fg.factor(I).states(), 0.0 ) );
+        adj_2.push_back( Prob( fg.factor(I).nrStates(), 0.0 ) );
     return adj_2;
 }
 
@@ -777,7 +777,7 @@ void BBP::initCostFnAdj( const BBPCostFunction &cfn, const vector<size_t> *state
                 psi1_adj.push_back( p );
             }
             for( size_t I = 0; I < fg.nrFactors(); I++ ) {
-                size_t dim = fg.factor(I).states();
+                size_t dim = fg.factor(I).nrStates();
                 Prob p( dim, 0.0 );
                 for( size_t xI = 0; xI < dim; xI++ )
                     p.set( xI, 1 + log( _ia->beliefF(I)[xI] / fg.factor(I).p()[xI] ) );
@@ -793,7 +793,7 @@ void BBP::initCostFnAdj( const BBPCostFunction &cfn, const vector<size_t> *state
             vector<Prob> b2_adj;
             b2_adj.reserve( fg.nrFactors() );
             for( size_t I = 0; I < fg.nrFactors(); I++ ) {
-                size_t dim = fg.factor(I).states();
+                size_t dim = fg.factor(I).nrStates();
                 Prob p( dim, 0.0 );
                 for( size_t xI = 0; xI < dim; xI++ ) {
                     Real bIxI = _ia->beliefF(I)[xI];
@@ -872,7 +872,7 @@ void BBP::initCostFnAdj( const BBPCostFunction &cfn, const vector<size_t> *state
             vector<Prob> b2_adj;
             b2_adj.reserve( fg.nrVars() );
             for( size_t I = 0; I <  fg.nrFactors(); I++ ) {
-                size_t n = fg.factor(I).states();
+                size_t n = fg.factor(I).nrStates();
                 Prob delta( n, 0.0 );
 
                 size_t x_I = getFactorEntryForState( fg, I, state );

@@ -105,7 +105,7 @@ void BP::construct() {
             newEP.newMessage = Prob( var(i).states() );
 
             if( DAI_BP_FAST ) {
-                newEP.index.reserve( factor(I).states() );
+                newEP.index.reserve( factor(I).nrStates() );
                 for( IndexFor k( var(i), factor(I).vars() ); k.valid(); ++k )
                     newEP.index.push_back( k );
             }

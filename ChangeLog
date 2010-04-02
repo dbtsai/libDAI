@@ -7,8 +7,15 @@ TODO:
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
 * Improved factor.h/cpp:
+  - Fixed bug in min( const TFactor<T> &, const TFactor<T> & )
+  - Fixed bug in max( const TFactor<T> &, const TFactor<T> & )
+  - Added TFactor<T>::takeAbs()
+  - Added TFactor<T>::takeExp()
+  - Added TFactor<T>::takeLog( bool )
+  - Added TFactor<T>::operator-() const
   - Added TFactor<T>::sumAbs() const
   - Added TFactor<T>::operator=( const TFactor<T> &y )
+  - Renamed TFactor<T>::states() into TFactor<T>::nrStates()
   - Added get(size_t) and set(size_t,T) operators; get() is 
     equivalent to "operator[](size_t) const" and set() should
     be used instead of the non-const operator[], which has been deprecated
@@ -72,7 +79,7 @@ TODO:
 * Removed RandomDRegularGraph(), please use createGraphRegular() instead
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,
-  weightedgraph, enum, util, properties, index, prob
+  weightedgraph, enum, util, properties, index, prob, factor
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

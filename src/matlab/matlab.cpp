@@ -44,7 +44,7 @@ mxArray *Factors2mx(const vector<Factor> &Ps) {
 
         mxArray *BiP = mxCreateNumericArray(I->vars().size(), &(*(dims.begin())), mxDOUBLE_CLASS, mxREAL);
         double *BiP_data = mxGetPr(BiP);
-        for( size_t j = 0; j < I->states(); j++ )
+        for( size_t j = 0; j < I->nrStates(); j++ )
             BiP_data[j] = (*I)[j];
 
         mxSetField(Bi,0,"Member",BiMember);

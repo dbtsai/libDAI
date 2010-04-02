@@ -495,15 +495,15 @@ class TProb {
         }
 
         /// Applies absolute value pointwise
-        const TProb<T>& takeAbs() { return pwUnaryOp( fo_abs<T>() ); }
+        TProb<T>& takeAbs() { return pwUnaryOp( fo_abs<T>() ); }
 
         /// Applies exponent pointwise
-        const TProb<T>& takeExp() { return pwUnaryOp( fo_exp<T>() ); }
+        TProb<T>& takeExp() { return pwUnaryOp( fo_exp<T>() ); }
 
         /// Applies logarithm pointwise
         /** If \a zero == \c true, uses <tt>log(0)==0</tt>; otherwise, <tt>log(0)==-Inf</tt>.
          */
-        const TProb<T>& takeLog(bool zero=false) {
+        TProb<T>& takeLog(bool zero=false) {
             if( zero ) {
                 return pwUnaryOp( fo_log0<T>() );
             } else

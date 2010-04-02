@@ -196,12 +196,12 @@ void CBP::runRecurse( InfAlg *bp, Real orig_logZ, vector<size_t> clamped_vars_li
             DAI_ASSERT(/*0<=xi &&*/ xi < var(i).states() );
     else
         foreach( size_t xI, xis )
-            DAI_ASSERT(/*0<=xI &&*/ xI < factor(i).states() );
+            DAI_ASSERT(/*0<=xI &&*/ xI < factor(i).nrStates() );
     // - otherwise, clamp and recurse, saving margin estimates for each
     // clamp setting. afterwards, combine estimates.
 
     // compute complement of 'xis'
-    vector<size_t> cmp_xis = complement( xis, clampingVar ? var(i).states() : factor(i).states() );
+    vector<size_t> cmp_xis = complement( xis, clampingVar ? var(i).states() : factor(i).nrStates() );
 
     /// \idea dai::CBP::runRecurse() could be implemented more efficiently with a nesting version of backupFactors/restoreFactors
     // this improvement could also be done locally: backup the clamped factor in a local variable,
@@ -317,7 +317,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
             // only pick probable values for variable
             size_t xi;
             do {
-                xi = rnd( factor(i).states() );
+                xi = rnd( factor(i).nrStates() );
                 t++;
             } while( bp->beliefF(i).p()[xi] < tiny && t < t1 );
             DAI_ASSERT( t < t1 );
@@ -435,7 +435,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
         if( clampingVar )
             DAI_ASSERT(/*0<=xi &&*/ xi < var(i).states() );
         else
-            DAI_ASSERT(/*0<=xi &&*/ xi < factor(i).states() );
+            DAI_ASSERT(/*0<=xi &&*/ xi < factor(i).nrStates() );
         DAI_IFVERB(2, "CHOOSE_BBP (num clamped = " << clamped_vars_list.size() << ") chose " << i << " state " << xi << endl);
     } else
         DAI_THROW(UNKNOWN_ENUM_VALUE);
@@ -503,7 +503,7 @@ std::pair<size_t, size_t> BBPFindClampVar( const InfAlg &in_bp, bool clampingVar
             }
         }
         DAI_ASSERT(/*0 <= argmax_var_state &&*/
-               argmax_var_state < in_bp.fg().factor(argmax_var).states() );
+               argmax_var_state < in_bp.fg().factor(argmax_var).nrStates() );
     }
     if( maxVarOut )
         *maxVarOut = max_var;
