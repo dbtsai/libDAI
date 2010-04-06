@@ -55,12 +55,13 @@ namespace dai {
  *  \todo Define a better fileformat for .fg files (maybe using XML)?
  *  \todo Add support for sparse factors.
  */
-template <typename T> class TFactor {
+template <typename T>
+class TFactor {
     private:
         /// Stores the variables on which the factor depends
-        VarSet      _vs;
+        VarSet _vs;
         /// Stores the factor values
-        TProb<T>    _p;
+        TProb<T> _p;
 
     public:
     /// \name Constructors and destructors
@@ -110,6 +111,15 @@ template <typename T> class TFactor {
         }
     //@}
 
+    /// \name Get/set individual entries
+    //@{
+        /// Sets \a i 'th entry to \a val
+        void set( size_t i, T val ) { _p.set( i, val ); }
+
+        /// Gets \a i 'th entry
+        T get( size_t i ) const { return _p[i]; }
+    //@}
+
     /// \name Queries
     //@{
         /// Returns constant reference to value vector
@@ -124,12 +134,6 @@ template <typename T> class TFactor {
         /// Returns a reference to the \a i 'th entry of the value vector
         /// \deprecated Please use dai::TFactor::set() instead
         T& operator[] (size_t i) { return _p[i]; }
-
-        /// Gets \a i 'th entry of the value vector
-        T get( size_t i ) const { return _p[i]; }
-
-        /// Sets \a i 'th entry of the value vector to \a val
-        void set( size_t i, T val ) { _p.set( i, val ); }
 
         /// Returns constant reference to variable set (i.e., the variables on which the factor depends)
         const VarSet& vars() const { return _vs; }
@@ -219,7 +223,7 @@ template <typename T> class TFactor {
             x._p = _p.log(zero);
             return x;
         }
-        
+
         /// Returns pointwise inverse
         /** If \a zero == \c true, uses <tt>1/0==0</tt>; otherwise, <tt>1/0==Inf</tt>.
          */
@@ -233,7 +237,7 @@ template <typename T> class TFactor {
         /// Returns normalized copy of \c *this, using the specified norm
         /** \throw NOT_NORMALIZABLE if the norm is zero
          */
-        TFactor<T> normalized( typename TProb<T>::NormType norm=TProb<T>::NORMPROB ) const {
+        TFactor<T> normalized( ProbNormType norm=NORMPROB ) const {
             TFactor<T> x;
             x._vs = _vs;
             x._p = _p.normalized( norm );
@@ -263,7 +267,7 @@ template <typename T> class TFactor {
         /// Normalizes factor using the specified norm
         /** \throw NOT_NORMALIZABLE if the norm is zero
          */
-        T normalize( typename TProb<T>::NormType norm=TProb<T>::NORMPROB ) { return _p.normalize( norm ); }
+        T normalize( ProbNormType norm=NORMPROB ) { return _p.normalize( norm ); }
     //@}
 
     /// \name Operations with scalars
@@ -413,7 +417,7 @@ template <typename T> class TFactor {
                 result._p.p().clear();
                 result._p.p().reserve( N );
                 for( size_t i = 0; i < N; i++, ++i_f, ++i_g )
-                    result._p.p().push_back( op( _p[i_f], g._p[i_g] ) );
+                    result._p.p().push_back( op( _p[i_f], g[i_g] ) );
             }
             return result;
         }
@@ -520,7 +524,7 @@ template<typename T> TFactor<T> TFactor<T>::marginal(const VarSet &vars, bool no
         res.set( i_res, res[i_res] + _p[i] );
 
     if( normed )
-        res.normalize( TProb<T>::NORMPROB );
+        res.normalize( NORMPROB );
 
     return res;
 }
@@ -537,7 +541,7 @@ template<typename T> TFactor<T> TFactor<T>::maxMarginal(const VarSet &vars, bool
             res.set( i_res, _p[i] );
 
     if( normed )
-        res.normalize( TProb<T>::NORMPROB );
+        res.normalize( NORMPROB );
 
     return res;
 }
@@ -588,7 +592,7 @@ template<typename T> std::ostream& operator<< (std::ostream& os, const TFactor<T
 /** \relates TFactor
  *  \pre f.vars() == g.vars()
  */
-template<typename T> T dist( const TFactor<T> &f, const TFactor<T> &g, typename TProb<T>::DistType dt ) {
+template<typename T> T dist( const TFactor<T> &f, const TFactor<T> &g, ProbDistType dt ) {
     if( f.vars().empty() || g.vars().empty() )
         return -1;
     else {
@@ -627,7 +631,7 @@ template<typename T> T MutualInfo(const TFactor<T> &f) {
     VarSet::const_iterator it = f.vars().begin();
     Var i = *it; it++; Var j = *it;
     TFactor<T> projection = f.marginal(i) * f.marginal(j);
-    return dist( f.normalized(), projection, TProb<T>::DISTKL );
+    return dist( f.normalized(), projection, DISTKL );
 }
 
 

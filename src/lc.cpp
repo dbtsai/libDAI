@@ -307,7 +307,7 @@ Real LC::run() {
         // compare new beliefs with old ones
         maxDiff = -INFINITY;
         for( size_t i = 0; i < nrVars(); i++ ) {
-            maxDiff = std::max( maxDiff, dist( beliefV(i), oldBeliefsV[i], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( beliefV(i), oldBeliefsV[i], DISTLINF ) );
             oldBeliefsV[i] = beliefV(i);
         }
 

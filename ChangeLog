@@ -20,6 +20,13 @@ TODO:
     equivalent to "operator[](size_t) const" and set() should
     be used instead of the non-const operator[], which has been deprecated
 * Improved prob.h/cpp:
+  - Deprecated TProb::TProb( TIterator begin, TIterator end, size_t sizeHint=0 )
+    constructor: the sizeHint argument no longer defaults to 0
+  - Deprecated TProb::accumulate( T init, binOp op1, unOp op2 );
+    instead, TProb::accumulateSum( T init, unOp op ) and
+    TProb::accumulateMax( T init, unOp op, bool minimize ) should be used.
+  - Deprecated TProb::NormType and TProb::DistType;
+    ProbNormType and ProbDistType should be used instead.
   - Added TProb<T>::operator==( const TProb<T> &q )
   - TProb<T>::accumulate() now also applies op2 to init
   - Fixed bug by renaming TProb<T>::operator<=() to TProb<T>::operator<()
@@ -28,7 +35,7 @@ TODO:
   - Added get(size_t) and set(size_t,T) operators; get() is 
     equivalent to "operator[](size_t) const" and set() should
     be used instead of the non-const operator[], which has been deprecated
-  - Added TProb<T>::resize(size_t, T)
+  - Added TProb<T>::resize(size_t)
 * Improved index.h/cpp:
   - Added multifor::reset()
 * Improved properties.h/cpp:

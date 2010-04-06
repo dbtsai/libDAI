@@ -380,12 +380,12 @@ Real HAK::doGBP() {
         maxDiff = -INFINITY;
         for( size_t i = 0; i < nrVars(); ++i ) {
             Factor b = beliefV(i);
-            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], DISTLINF ) );
             oldBeliefsV[i] = b;
         }
         for( size_t I = 0; I < nrFactors(); ++I ) {
             Factor b = beliefF(I);
-            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], DISTLINF ) );
             oldBeliefsF[I] = b;
         }
 
@@ -469,12 +469,12 @@ Real HAK::doDoubleLoop() {
         maxDiff = -INFINITY;
         for( size_t i = 0; i < nrVars(); ++i ) {
             Factor b = beliefV(i);
-            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], DISTLINF ) );
             oldBeliefsV[i] = b;
         }
         for( size_t I = 0; I < nrFactors(); ++I ) {
             Factor b = beliefF(I);
-            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], DISTLINF ) );
             oldBeliefsF[I] = b;
         }
 

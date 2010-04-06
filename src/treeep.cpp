@@ -99,7 +99,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
                             if( piet.vars() >> ij ) {
                                 piet = piet.marginal( ij );
                                 Factor pietf = piet.marginal(v_i) * piet.marginal(*j);
-                                wg[UEdge(i,findVar(*j))] = dist( piet, pietf, Prob::DISTKL );
+                                wg[UEdge(i,findVar(*j))] = dist( piet, pietf, DISTKL );
                             } else
                                 wg[UEdge(i,findVar(*j))] = 0;
                         } else {
@@ -196,7 +196,7 @@ Real TreeEP::run() {
         vector<Factor> newBeliefs = beliefs();
         maxDiff = -INFINITY;
         for( size_t t = 0; t < oldBeliefs.size(); t++ )
-            maxDiff = std::max( maxDiff, dist( newBeliefs[t], oldBeliefs[t], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( newBeliefs[t], oldBeliefs[t], DISTLINF ) );
         swap( newBeliefs, oldBeliefs );
 
         if( props.verbose >= 3 )

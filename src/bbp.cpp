@@ -1036,7 +1036,7 @@ Real numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const P
             cout << "i: " << i
                  << ", p_adj_est: " << p_adj_est
                  << ", bbp.adj_psi_V(i): " << bbp.adj_psi_V(i) << endl;
-            d += dist( p_adj_est, bbp.adj_psi_V(i), Prob::DISTL1 );
+            d += dist( p_adj_est, bbp.adj_psi_V(i), DISTL1 );
         }
     }
     /*    if(1) {
@@ -1086,14 +1086,14 @@ Real numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const P
                 cerr << "i: " << i << ", I: " << I
                      << ", adj_n_est: " << p_adj_n_est
                      << ", bbp.adj_n(i,I): " << bbp.adj_n(i,I) << endl;
-                d += dist(p_adj_n_est, bbp.adj_n(i,I), Prob::DISTL1);
+                d += dist(p_adj_n_est, bbp.adj_n(i,I), DISTL1);
 
                 Prob p_adj_m_est( adj_m_est );
                 // compare this numerical estimate to the BBP estimate; sum the distances
                 cerr << "i: " << i << ", I: " << I
                      << ", adj_m_est: " << p_adj_m_est
                      << ", bbp.adj_m(I,i): " << bbp.adj_m(I,i) << endl;
-                d += dist(p_adj_m_est, bbp.adj_m(I,i), Prob::DISTL1);
+                d += dist(p_adj_m_est, bbp.adj_m(I,i), DISTL1);
             }
         }
     }
@@ -1120,7 +1120,7 @@ Real numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const P
             cerr << "i: " << i
                  << ", adj_b_V_est: " << p_adj_b_V_est
                  << ", bbp.adj_b_V(i): " << bbp.adj_b_V(i) << endl;
-            d += dist(p_adj_b_V_est, bbp.adj_b_V(i), Prob::DISTL1);
+            d += dist(p_adj_b_V_est, bbp.adj_b_V(i), DISTL1);
         }
     }
     */

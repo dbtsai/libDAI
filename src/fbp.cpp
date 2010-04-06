@@ -153,7 +153,7 @@ void FBP::calcNewMessage( size_t i, size_t _I ) {
 
     // Update the residual if necessary
     if( props.updates == Properties::UpdateType::SEQMAX )
-        updateResidual( i, _I , dist( newMessage( i, _I ), message( i, _I ), Prob::DISTLINF ) );
+        updateResidual( i, _I , dist( newMessage( i, _I ), message( i, _I ), DISTLINF ) );
 }
 
 

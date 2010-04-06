@@ -131,7 +131,7 @@ Real MF::run() {
             if( props.damping != 0.0 )
                 nb = (nb^(1.0 - props.damping)) * (_beliefs[i]^props.damping);
 
-            maxDiff = std::max( maxDiff, dist( nb, _beliefs[i], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( nb, _beliefs[i], DISTLINF ) );
             _beliefs[i] = nb;
         }
 

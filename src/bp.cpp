@@ -232,7 +232,7 @@ void BP::calcNewMessage( size_t i, size_t _I ) {
 
     // Update the residual if necessary
     if( props.updates == Properties::UpdateType::SEQMAX )
-        updateResidual( i, _I , dist( newMessage( i, _I ), message( i, _I ), Prob::DISTLINF ) );
+        updateResidual( i, _I , dist( newMessage( i, _I ), message( i, _I ), DISTLINF ) );
 }
 
 
@@ -316,12 +316,12 @@ Real BP::run() {
         maxDiff = -INFINITY;
         for( size_t i = 0; i < nrVars(); ++i ) {
             Factor b( beliefV(i) );
-            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], DISTLINF ) );
             oldBeliefsV[i] = b;
         }
         for( size_t I = 0; I < nrFactors(); ++I ) {
             Factor b( beliefF(I) );
-            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], Prob::DISTLINF ) );
+            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], DISTLINF ) );
             oldBeliefsF[I] = b;
         }
 
@@ -418,7 +418,7 @@ Real BP::logZ() const {
     for( size_t i = 0; i < nrVars(); ++i )
         sum += (1.0 - nbV(i).size()) * beliefV(i).entropy();
     for( size_t I = 0; I < nrFactors(); ++I )
-        sum -= dist( beliefF(I), factor(I), Prob::DISTKL );
+        sum -= dist( beliefF(I), factor(I), DISTKL );
     return sum;
 }
 
@@ -455,7 +455,7 @@ void BP::updateMessage( size_t i, size_t _I ) {
         else
             message(i,_I) = (message(i,_I) ^ props.damping) * (newMessage(i,_I) ^ (1.0 - props.damping));
         if( props.updates == Properties::UpdateType::SEQMAX )
-            updateResidual( i, _I, dist( newMessage(i,_I), message(i,_I), Prob::DISTLINF ) );
+            updateResidual( i, _I, dist( newMessage(i,_I), message(i,_I), DISTLINF ) );
     }
 }
 

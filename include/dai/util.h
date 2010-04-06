@@ -186,6 +186,24 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
 void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
 
 
+/// Enumerates different ways of normalizing a probability measure.
+/**
+ *  - NORMPROB means that the sum of all entries should be 1;
+ *  - NORMLINF means that the maximum absolute value of all entries should be 1.
+ */
+typedef enum { NORMPROB, NORMLINF } ProbNormType;
+
+/// Enumerates different distance measures between probability measures.
+/**
+ *  - DISTL1 is the \f$\ell_1\f$ distance (sum of absolute values of pointwise difference);
+ *  - DISTLINF is the \f$\ell_\infty\f$ distance (maximum absolute value of pointwise difference);
+ *  - DISTTV is the total variation distance (half of the \f$\ell_1\f$ distance);
+ *  - DISTKL is the Kullback-Leibler distance (\f$\sum_i p_i (\log p_i - \log q_i)\f$).
+ *  - DISTHEL is the Hellinger distance (\f$\frac{1}{2}\sum_i (\sqrt{p_i}-\sqrt{q_i})^2\f$).
+ */
+typedef enum { DISTL1, DISTLINF, DISTTV, DISTKL, DISTHEL } ProbDistType;
+
+
 } // end of namespace dai
 
 

@@ -153,7 +153,7 @@ class TestDAI {
             err.clear();
             err.reserve( varMarginals.size() );
             for( size_t i = 0; i < varMarginals.size(); i++ )
-                err.push_back( dist( varMarginals[i], x.varMarginals[i], Prob::DISTTV ) );
+                err.push_back( dist( varMarginals[i], x.varMarginals[i], DISTTV ) );
         }
 
         /// Calculate total variation distance of variable marginals with respect to those in \a x
@@ -161,7 +161,7 @@ class TestDAI {
             err.clear();
             err.reserve( varMarginals.size() );
             for( size_t i = 0; i < varMarginals.size(); i++ )
-                err.push_back( dist( varMarginals[i], x[i], Prob::DISTTV ) );
+                err.push_back( dist( varMarginals[i], x[i], DISTTV ) );
         }
 
         /// Return maximum error

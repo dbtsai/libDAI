@@ -69,7 +69,7 @@ Real logSumExp( Real a, Real b ) {
 Real dist( const vector<Factor> &b1, const vector<Factor> &b2, size_t nv ) {
     Real d = 0.0;
     for( size_t k = 0; k < nv; k++ )
-        d += dist( b1[k], b2[k], Prob::DISTLINF );
+        d += dist( b1[k], b2[k], DISTLINF );
     return d;
 }
 
@@ -388,7 +388,7 @@ bool CBP::chooseNextClampVar( InfAlg *bp, vector<size_t> &clamped_vars_list, siz
                 Real cost = 0;
                 if( doL1 )
                     for( size_t j = 0; j < nrVars(); j++ )
-                        cost += dist( bp->beliefV(j), bp1->beliefV(j), Prob::DISTL1 );
+                        cost += dist( bp->beliefV(j), bp1->beliefV(j), DISTL1 );
                 else
                     cost = props.bbp_cfn.evaluate( *bp1, &state );
                 if( cost > max_cost || win_k == -1 ) {

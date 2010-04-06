@@ -249,13 +249,13 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     BOOST_CHECK_EQUAL( y[1], 0.0 );
     BOOST_CHECK_EQUAL( y[2], 0.5 );
 
-    y = x.normalized( Prob::NORMPROB );
+    y = x.normalized( NORMPROB );
     BOOST_CHECK_EQUAL( y[0], 0.5 );
     BOOST_CHECK_EQUAL( y[1], 0.0 );
     BOOST_CHECK_EQUAL( y[2], 0.5 );
 
     x.set( 0, -2.0 );
-    y = x.normalized( Prob::NORMLINF );
+    y = x.normalized( NORMLINF );
     BOOST_CHECK_EQUAL( y[0], -1.0 );
     BOOST_CHECK_EQUAL( y[1], 0.0 );
     BOOST_CHECK_EQUAL( y[2], 1.0 );
@@ -304,14 +304,14 @@ BOOST_AUTO_TEST_CASE( UnaryOperationsTest ) {
     BOOST_CHECK( x == y );
 
     x = xorg;
-    BOOST_CHECK_EQUAL( x.normalize( Prob::NORMPROB ), 3.0 );
+    BOOST_CHECK_EQUAL( x.normalize( NORMPROB ), 3.0 );
     BOOST_CHECK( x == y );
 
     y.set( 0, 2.0 / 2.0 );
     y.set( 1, 0.0 / 2.0 );
     y.set( 2, 1.0 / 2.0 );
     x = xorg;
-    BOOST_CHECK_EQUAL( x.normalize( Prob::NORMLINF ), 2.0 );
+    BOOST_CHECK_EQUAL( x.normalize( NORMLINF ), 2.0 );
     BOOST_CHECK( x == y );
 
     xorg.set( 0, -2.0 );
@@ -814,30 +814,30 @@ BOOST_AUTO_TEST_CASE( RelatedFunctionsTest ) {
     BOOST_CHECK_EQUAL( z[1], 0.8 );
     BOOST_CHECK_EQUAL( z[2], 0.4 );
 
-    BOOST_CHECK_EQUAL( dist( x, x, Prob::DISTL1 ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( y, y, Prob::DISTL1 ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( x, y, Prob::DISTL1 ), 0.2 + 0.2 + 0.4 );
-    BOOST_CHECK_EQUAL( dist( y, x, Prob::DISTL1 ), 0.2 + 0.2 + 0.4 );
-    BOOST_CHECK_EQUAL( dist( x, x, Prob::DISTLINF ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( y, y, Prob::DISTLINF ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( x, y, Prob::DISTLINF ), 0.4 );
-    BOOST_CHECK_EQUAL( dist( y, x, Prob::DISTLINF ), 0.4 );
-    BOOST_CHECK_EQUAL( dist( x, x, Prob::DISTTV ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( y, y, Prob::DISTTV ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( x, y, Prob::DISTTV ), 0.5 * (0.2 + 0.2 + 0.4) );
-    BOOST_CHECK_EQUAL( dist( y, x, Prob::DISTTV ), 0.5 * (0.2 + 0.2 + 0.4) );
-    BOOST_CHECK_EQUAL( dist( x, x, Prob::DISTKL ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( y, y, Prob::DISTKL ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( x, y, Prob::DISTKL ), INFINITY );
-    BOOST_CHECK_EQUAL( dist( y, x, Prob::DISTKL ), INFINITY );
-    BOOST_CHECK_EQUAL( dist( x, x, Prob::DISTHEL ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( y, y, Prob::DISTHEL ), 0.0 );
-    BOOST_CHECK_EQUAL( dist( x, y, Prob::DISTHEL ), 0.5 * (0.2 + std::pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4) );
-    BOOST_CHECK_EQUAL( dist( y, x, Prob::DISTHEL ), 0.5 * (0.2 + std::pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4) );
+    BOOST_CHECK_EQUAL( dist( x, x, DISTL1 ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( y, y, DISTL1 ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( x, y, DISTL1 ), 0.2 + 0.2 + 0.4 );
+    BOOST_CHECK_EQUAL( dist( y, x, DISTL1 ), 0.2 + 0.2 + 0.4 );
+    BOOST_CHECK_EQUAL( dist( x, x, DISTLINF ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( y, y, DISTLINF ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( x, y, DISTLINF ), 0.4 );
+    BOOST_CHECK_EQUAL( dist( y, x, DISTLINF ), 0.4 );
+    BOOST_CHECK_EQUAL( dist( x, x, DISTTV ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( y, y, DISTTV ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( x, y, DISTTV ), 0.5 * (0.2 + 0.2 + 0.4) );
+    BOOST_CHECK_EQUAL( dist( y, x, DISTTV ), 0.5 * (0.2 + 0.2 + 0.4) );
+    BOOST_CHECK_EQUAL( dist( x, x, DISTKL ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( y, y, DISTKL ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( x, y, DISTKL ), INFINITY );
+    BOOST_CHECK_EQUAL( dist( y, x, DISTKL ), INFINITY );
+    BOOST_CHECK_EQUAL( dist( x, x, DISTHEL ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( y, y, DISTHEL ), 0.0 );
+    BOOST_CHECK_EQUAL( dist( x, y, DISTHEL ), 0.5 * (0.2 + std::pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4) );
+    BOOST_CHECK_EQUAL( dist( y, x, DISTHEL ), 0.5 * (0.2 + std::pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4) );
     x.set( 1, 0.7 ); x.set( 2, 0.1 );
     y.set( 0, 0.1 ); y.set( 1, 0.5 );
-    BOOST_CHECK_CLOSE( dist( x, y, Prob::DISTKL ), 0.2 * std::log(0.2 / 0.1) + 0.7 * std::log(0.7 / 0.5) + 0.1 * std::log(0.1 / 0.4), tol );
-    BOOST_CHECK_CLOSE( dist( y, x, Prob::DISTKL ), 0.1 * std::log(0.1 / 0.2) + 0.5 * std::log(0.5 / 0.7) + 0.4 * std::log(0.4 / 0.1), tol );
+    BOOST_CHECK_CLOSE( dist( x, y, DISTKL ), 0.2 * std::log(0.2 / 0.1) + 0.7 * std::log(0.7 / 0.5) + 0.1 * std::log(0.1 / 0.4), tol );
+    BOOST_CHECK_CLOSE( dist( y, x, DISTKL ), 0.1 * std::log(0.1 / 0.2) + 0.5 * std::log(0.5 / 0.7) + 0.4 * std::log(0.4 / 0.1), tol );
 
     std::stringstream ss;
     ss << x;
