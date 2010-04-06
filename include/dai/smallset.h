@@ -79,6 +79,14 @@ class SmallSet {
 
     /// \name Operators for set-theoretic operations
     //@{
+        /// Inserts \a t into \c *this
+        SmallSet& insert( const T& t ) {
+            SmallSet::iterator it = std::lower_bound( _elements.begin(), _elements.end(), t );
+            if( (it == _elements.end()) || (*it != t) )
+                _elements.insert( it, t );
+            return *this;
+        }
+
         /// Set-minus operator: returns all elements in \c *this, except those in \a x
         SmallSet operator/ ( const SmallSet& x ) const {
             SmallSet res;

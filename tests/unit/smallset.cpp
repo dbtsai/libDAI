@@ -461,6 +461,32 @@ BOOST_AUTO_TEST_CASE( OperatorTest ) {
     y = x123; y /= x13;  BOOST_CHECK_EQUAL( y, x2   );
     y = x123; y /= x123; BOOST_CHECK_EQUAL( y, x    );
 
+    // check insert
+    y = x   ; y.insert( 1 );   BOOST_CHECK_EQUAL( y, x1   );
+    y = x   ; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x2   );
+    y = x   ; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x3   );
+    y = x1  ; y.insert( 1 );   BOOST_CHECK_EQUAL( y, x1   );
+    y = x1  ; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x12  );
+    y = x1  ; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x13  );
+    y = x2  ; y.insert( 1 );   BOOST_CHECK_EQUAL( y, x12  );
+    y = x2  ; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x2   );
+    y = x2  ; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x23  );
+    y = x3  ; y.insert( 1 );   BOOST_CHECK_EQUAL( y, x13  );
+    y = x3  ; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x23  );
+    y = x3  ; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x3   );
+    y = x12 ; y.insert( 1 );   BOOST_CHECK_EQUAL( y, x12  );
+    y = x12 ; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x12  );
+    y = x12 ; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x123 );
+    y = x23 ; y.insert( 1 );   BOOST_CHECK_EQUAL( y, x123 );
+    y = x23 ; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x23  );
+    y = x23 ; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x23  );
+    y = x13 ; y.insert( 1 );   BOOST_CHECK_EQUAL( y, x13  );
+    y = x13 ; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x123 );
+    y = x13 ; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x13  );
+    y = x123; y.insert( 1 );   BOOST_CHECK_EQUAL( y, x123 );
+    y = x123; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x123 );
+    y = x123; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x123 );
+
     // check operator|=
     y = x   ; y |= x;    BOOST_CHECK_EQUAL( y, x    );
     y = x   ; y |= x1;   BOOST_CHECK_EQUAL( y, x1   );

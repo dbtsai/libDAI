@@ -37,6 +37,15 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK( G.isTree() );
     G.checkConsistency();
 
+    BipartiteGraph G1( 2, 3 );
+    BOOST_CHECK_EQUAL( G1.nrNodes1(), 2 );
+    BOOST_CHECK_EQUAL( G1.nrNodes2(), 3 );
+    BOOST_CHECK_EQUAL( G1.nrEdges(), 0 );
+    BOOST_CHECK( !G1.isConnected() );
+    BOOST_CHECK( !G1.isTree() );
+    BOOST_CHECK( !(G1 == G) );
+    G1.checkConsistency();
+
     std::vector<Edge> edges;
     edges.push_back( Edge(0, 0) );
     edges.push_back( Edge(0, 1) );
@@ -49,6 +58,8 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( G2.nrEdges(), 4 );
     BOOST_CHECK( G2.isConnected() );
     BOOST_CHECK( G2.isTree() );
+    BOOST_CHECK( !(G2 == G) );
+    BOOST_CHECK( !(G2 == G1) );
     G2.checkConsistency();
 
     edges.push_back( Edge(1, 0) );
@@ -58,6 +69,9 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( G3.nrEdges(), 5 );
     BOOST_CHECK( G3.isConnected() );
     BOOST_CHECK( !G3.isTree() );
+    BOOST_CHECK( !(G3 == G) );
+    BOOST_CHECK( !(G3 == G1) );
+    BOOST_CHECK( !(G3 == G2) );
     G3.checkConsistency();
 
     BipartiteGraph G4( 3, 3, edges.begin(), edges.end() );
@@ -66,6 +80,10 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( G4.nrEdges(), 5 );
     BOOST_CHECK( !G4.isConnected() );
     BOOST_CHECK( !G4.isTree() );
+    BOOST_CHECK( !(G4 == G) );
+    BOOST_CHECK( !(G4 == G1) );
+    BOOST_CHECK( !(G4 == G2) );
+    BOOST_CHECK( !(G4 == G3) );
     G4.checkConsistency();
 
     G.construct( 3, 3, edges.begin(), edges.end() );
@@ -74,7 +92,17 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( G.nrEdges(), 5 );
     BOOST_CHECK( !G.isConnected() );
     BOOST_CHECK( !G.isTree() );
+    BOOST_CHECK( !(G == G1) );
+    BOOST_CHECK( !(G == G2) );
+    BOOST_CHECK( !(G == G3) );
+    BOOST_CHECK( G == G4 );
     G.checkConsistency();
+    
+    BipartiteGraph G5( G4 );
+    BOOST_CHECK( G5 == G4 );
+
+    BipartiteGraph G6 = G4;
+    BOOST_CHECK( G6 == G4 );
 }
 
 

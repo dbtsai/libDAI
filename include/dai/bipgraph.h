@@ -146,6 +146,9 @@ class BipartiteGraph {
         /// Default constructor (creates an empty bipartite graph)
         BipartiteGraph() : _nb1(), _nb2() {}
 
+        /// Constructs BipartiteGraph with \a nr1 nodes of type 1, \a nr2 nodes of type 2 and no edges.
+        BipartiteGraph( size_t nr1, size_t nr2 ) : _nb1(nr1), _nb2(nr2) {}
+
         /// Constructs BipartiteGraph from a range of edges.
         /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
          *  \param nrNodes1 The number of nodes of type 1.
@@ -311,7 +314,7 @@ class BipartiteGraph {
         /// Returns true if the graph contains an edge between node \a n1 of type 1 and node \a n2 of type 2.
         /** \note The time complexity is linear in the number of neighbors of \a n1 or \a n2
          */
-        bool hasEdge( size_t n1, size_t n2 ) {
+        bool hasEdge( size_t n1, size_t n2 ) const {
             if( nb1(n1).size() < nb2(n2).size() ) {
                 for( size_t _n2 = 0; _n2 < nb1(n1).size(); _n2++ )
                     if( nb1( n1, _n2 ) == n2 )
@@ -365,6 +368,29 @@ class BipartiteGraph {
 
         /// Returns true if the graph is a tree, i.e., if it is singly connected and connected.
         bool isTree() const;
+
+        /// Comparison operator which returns true if two graphs are identical
+        /** \note Two graphs are called identical if they have the same number of nodes
+         *  of both types and the same edges (i.e., \a x has an edge between nodes
+         *  n1 and n2 if and only if \c *this has an edge between nodes n1 and n2).
+         */
+        bool operator==( const BipartiteGraph& x ) const {
+            if( nrNodes1() != x.nrNodes1() )
+                return false;
+            if( nrNodes2() != x.nrNodes2() )
+                return false;
+            for( size_t n1 = 0; n1 < nrNodes1(); n1++ ) {
+                if( nb1(n1).size() != x.nb1(n1).size() )
+                    return false;
+                foreach( const Neighbor &n2, nb1(n1) )
+                    if( !x.hasEdge( n1, n2 ) )
+                        return false;
+                foreach( const Neighbor &n2, x.nb1(n1) )
+                    if( !hasEdge( n1, n2 ) )
+                        return false;
+            }
+            return true;
+        }
 
         /// Asserts internal consistency
         void checkConsistency() const;

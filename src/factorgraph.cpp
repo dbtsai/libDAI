@@ -30,7 +30,7 @@ namespace dai {
 using namespace std;
 
 
-FactorGraph::FactorGraph( const std::vector<Factor> &P ) : G(), _backup() {
+FactorGraph::FactorGraph( const std::vector<Factor> &P ) : _G(), _backup() {
     // add factors, obtain variables
     set<Var> varset;
     _factors.reserve( P.size() );
@@ -68,7 +68,7 @@ void FactorGraph::constructGraph( size_t nrEdges ) {
     }
 
     // create bipartite graph
-    G.construct( nrVars(), nrFactors(), edges.begin(), edges.end() );
+    _G.construct( nrVars(), nrFactors(), edges.begin(), edges.end() );
 }
 
 
@@ -201,11 +201,6 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
 }
 
 
-VarSet FactorGraph::delta( size_t i ) const {
-    return( Delta(i) / var(i) );
-}
-
-
 VarSet FactorGraph::Delta( size_t i ) const {
     // calculate Markov Blanket
     VarSet Del;
@@ -220,7 +215,7 @@ VarSet FactorGraph::Delta( size_t i ) const {
 VarSet FactorGraph::Delta( const VarSet &ns ) const {
     VarSet result;
     for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
-        result |= Delta(findVar(*n));
+        result |= Delta( findVar(*n) );
     return result;
 }
 
@@ -272,7 +267,18 @@ void FactorGraph::printDot( std::ostream &os ) const {
 }
 
 
-vector<VarSet> FactorGraph::Cliques() const {
+GraphAL FactorGraph::MarkovGraph() const {
+    GraphAL G( nrVars() );
+    for( size_t i = 0; i < nrVars(); i++ )
+        foreach( const Neighbor &I, nbV(i) )
+            foreach( const Neighbor &j, nbF(I) )
+                if( i < j )
+                    G.addEdge( i, j );
+    return G;
+}
+
+
+vector<VarSet> FactorGraph::maximalFactorDomains() const {
     vector<VarSet> result;
 
     for( size_t I = 0; I < nrFactors(); I++ ) {
@@ -345,7 +351,8 @@ void FactorGraph::restoreFactor( size_t I ) {
     if( it != _backup.end() ) {
         setFactor(I, it->second);
         _backup.erase(it);
-    }
+    } else
+        DAI_THROW(OBJECT_NOT_FOUND);
 }
 
 
@@ -403,6 +410,7 @@ FactorGraph FactorGraph::clamped( size_t i, size_t state ) const {
     Var v = var( i );
     Real zeroth_order = (Real)1;
     vector<Factor> clamped_facs;
+    clamped_facs.push_back( createFactorDelta( v, state ) );
     for( size_t I = 0; I < nrFactors(); I++ ) {
         VarSet v_I = factor(I).vars();
         Factor new_factor;

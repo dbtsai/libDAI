@@ -168,6 +168,14 @@ BOOST_AUTO_TEST_CASE( RootedTreeTest ) {
     edges.push_back( E(5, 6) );
     G = GraphEL( edges.begin(), edges.end() );
     BOOST_CHECK_THROW( RootedTree T( G, 1 ), Exception );
+
+    GraphAL H( 3 );
+    H.addEdge( 0, 1 );
+    H.addEdge( 1, 2 );
+    H.addEdge( 2, 1 );
+    G = GraphEL( H );
+    for( GraphEL::const_iterator e = G.begin(); e != G.end(); e++ )
+        BOOST_CHECK( H.hasEdge( e->first, e->second ) );
 }
 
 

@@ -88,6 +88,18 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     
     Prob x8 = x6;
     BOOST_CHECK( x8 == x6 );
+
+    x7.resize( 5 );
+    BOOST_CHECK_EQUAL( x7.size(), 5 );
+    BOOST_CHECK_EQUAL( x7[0], 2.0 );
+    BOOST_CHECK_EQUAL( x7[1], 2.0 );
+    BOOST_CHECK_EQUAL( x7[2], 2.0 );
+    BOOST_CHECK_EQUAL( x7[3], 0.0 );
+    BOOST_CHECK_EQUAL( x7[4], 0.0 );
+
+    x8.resize( 1 );
+    BOOST_CHECK_EQUAL( x8.size(), 1 );
+    BOOST_CHECK_EQUAL( x8[0], 2.0 );
 }
 
 

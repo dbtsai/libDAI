@@ -1,11 +1,17 @@
 git HEAD
 --------
 
-TODO:
-* Write unit tests for newly added functions
-
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
+* Improved factorgraph.h/factorgraph.cpp:
+  - FactorGraph::clamped() now contains a delta factor for the clamped variable
+  - Renamed FactorGraph::Cliques() into FactorGraph::maximalFactorDomains()
+  - Added FactorGraph::MarkovGraph()
+  - Fixed bug in FactorGraph::clone()
+  - FactorGraph::findVars( const VarSet& ) now returns a SmallSet<size_t>
+    and its argument now has a const-qualifier (which fixes a small bug)
+  - Made previously public member G private and added the bipGraph() method,
+    which offers read-only access to it
 * Improved factor.h/cpp:
   - Fixed bug in min( const TFactor<T> &, const TFactor<T> & )
   - Fixed bug in max( const TFactor<T> &, const TFactor<T> & )
@@ -14,7 +20,7 @@ TODO:
   - Added TFactor<T>::takeLog( bool )
   - Added TFactor<T>::operator-() const
   - Added TFactor<T>::sumAbs() const
-  - Added TFactor<T>::operator=( const TFactor<T> &y )
+  - Added TFactor<T>::operator==( const TFactor<T> &y )
   - Renamed TFactor<T>::states() into TFactor<T>::nrStates()
   - Added get(size_t) and set(size_t,T) operators; get() is 
     equivalent to "operator[](size_t) const" and set() should
@@ -68,6 +74,8 @@ TODO:
   - Added BipartiteGraph::findNb2()
   - BipartiteGraph::delta1() and BipartiteGraph::delta2() now 
     return a SmallSet<size_t> instead of a vector<size_t>
+  - Added BipartiteGraph::operator==( const BipartiteGraph& )
+  - Added BipartiteGraph( size_t nr1, size_t nr2 ) constructor
 * Improved graph.h/cpp:
   - Fixed bug in GraphAL::nrEdges()
   - Fixed bug in GraphAL::addEdge()
@@ -77,16 +85,19 @@ TODO:
   - Fixed bug in createGraphGrid3D()
   - Fixed bug in createGraphRegular()
   - Added GraphAL::hasEdge(size_t,size_t)
+  - Added GraphAL::operator==( const GraphAL& )
 * Improved smallset.h/cpp:
   - The sizeHint argument of the iterator constructor
      SmallSet::SmallSet( TIterator begin, TIterator end, size_t sizeHint=0 )
     no longer has a default value in order to avoid confusion with the
      SmallSet::SmallSet( const T &t1, const T &t2 )
     constructor.
+  - Added SmallSet& insert( const T& t )
 * Removed RandomDRegularGraph(), please use createGraphRegular() instead
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,
-  weightedgraph, enum, util, properties, index, prob, factor
+  weightedgraph, enum, util, exceptions, properties, index, prob, 
+  factor, factorgraph
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

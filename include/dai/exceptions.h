@@ -110,7 +110,7 @@ class Exception : public std::runtime_error {
         Code code() const { return errorcode; }
 
         /// Returns error message corresponding to an error code
-        const std::string &message( const Code c ) const { return ErrorStrings[c]; }
+        const std::string& message( const Code c ) const { return ErrorStrings[c]; }
 
 
     private:

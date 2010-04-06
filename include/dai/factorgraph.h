@@ -4,7 +4,7 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
  */
 
@@ -20,6 +20,7 @@
 #include <iostream>
 #include <map>
 #include <dai/bipgraph.h>
+#include <dai/graph.h>
 #include <dai/factor.h>
 
 
@@ -64,9 +65,6 @@ namespace dai {
  */ 
 class FactorGraph {
     public:
-        /// Stores the neighborhood structure
-        BipartiteGraph                    G;
-
         /// Shorthand for BipartiteGraph::Neighbor
         typedef BipartiteGraph::Neighbor  Neighbor;
 
@@ -82,8 +80,9 @@ class FactorGraph {
         /// Constant iterator over factors
         typedef std::vector<Factor>::const_iterator const_iterator;
 
-
     private:
+        /// Stores the neighborhood structure
+        BipartiteGraph           _G;
         /// Stores the variables
         std::vector<Var>         _vars;
         /// Stores the factors
@@ -95,48 +94,59 @@ class FactorGraph {
     /// \name Constructors and destructors
     //@{
         /// Default constructor
-        FactorGraph() : G(), _vars(), _factors(), _backup() {}
+        FactorGraph() : _G(), _vars(), _factors(), _backup() {}
 
         /// Constructs a factor graph from a vector of factors
-        FactorGraph( const std::vector<Factor> &P );
+        FactorGraph( const std::vector<Factor>& P );
 
         /// Constructs a factor graph from given factor and variable iterators
         /** \tparam FactorInputIterator Iterates over instances of type dai::Factor
          *  \tparam VarInputIterator Iterates over instances of type Var
-         *  \pre Assumes that the set of variables in [\a var_begin, \a var_end) is the union of the variables in the factors in [\a fact_begin, \a fact_end)
+         *  \pre Assumes that the set of variables in [\a varBegin, \a varEnd) is the union of the variables in the factors in [\a facBegin, \a facEnd)
          */
         template<typename FactorInputIterator, typename VarInputIterator>
-        FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint = 0, size_t nr_var_hint = 0 );
+        FactorGraph(FactorInputIterator facBegin, FactorInputIterator facEnd, VarInputIterator varBegin, VarInputIterator varEnd, size_t nrFacHint = 0, size_t nrVarHint = 0 );
 
         /// Destructor
         virtual ~FactorGraph() {}
 
         /// Virtual copy constructor
-        virtual FactorGraph* clone() const { return new FactorGraph(); }
+        virtual FactorGraph* clone() const { return new FactorGraph(*this); }
     //@}
 
     /// \name Accessors and mutators
     //@{ 
         /// Returns constant reference the \a i 'th variable
-        const Var & var(size_t i) const { return _vars[i]; }
+        const Var& var( size_t i ) const { 
+            DAI_DEBASSERT( i < nrVars() );
+            return _vars[i]; 
+        }
+
         /// Returns constant reference to all variables
-        const std::vector<Var> & vars() const { return _vars; }
+        const std::vector<Var>& vars() const { return _vars; }
 
         /// Returns reference to \a I 'th factor
-        Factor & factor(size_t I) { return _factors[I]; }
+        Factor& factor( size_t I ) { 
+            DAI_DEBASSERT( I < nrFactors() );
+            return _factors[I]; 
+        }
+
         /// Returns constant reference to \a I 'th factor
-        const Factor & factor(size_t I) const { return _factors[I]; }
+        const Factor& factor( size_t I ) const { 
+            DAI_DEBASSERT( I < nrFactors() );
+            return _factors[I]; 
+        }
         /// Returns constant reference to all factors
-        const std::vector<Factor> & factors() const { return _factors; }
+        const std::vector<Factor>& factors() const { return _factors; }
 
         /// Returns constant reference to neighbors of the \a i 'th variable
-        const Neighbors & nbV( size_t i ) const { return G.nb1(i); }
+        const Neighbors& nbV( size_t i ) const { return _G.nb1(i); }
         /// Returns constant reference to neighbors of the \a I 'th factor
-        const Neighbors & nbF( size_t I ) const { return G.nb2(I); }
+        const Neighbors& nbF( size_t I ) const { return _G.nb2(I); }
         /// Returns constant reference to the \a _I 'th neighbor of the \a i 'th variable
-        const Neighbor & nbV( size_t i, size_t _I ) const { return G.nb1(i)[_I]; }
+        const Neighbor& nbV( size_t i, size_t _I ) const { return _G.nb1(i)[_I]; }
         /// Returns constant reference to the \a _i 'th neighbor of the \a I 'th factor
-        const Neighbor & nbF( size_t I, size_t _i ) const { return G.nb2(I)[_i]; }
+        const Neighbor& nbF( size_t I, size_t _i ) const { return _G.nb2(I)[_i]; }
     //@}
 
     /// \name Iterator interface
@@ -153,6 +163,8 @@ class FactorGraph {
 
     /// \name Queries
     //@{
+        /// Returns neighborhood structure
+        const BipartiteGraph& bipGraph() const { return _G; }
         /// Returns number of variables
         size_t nrVars() const { return vars().size(); }
         /// Returns number of factors
@@ -160,13 +172,13 @@ class FactorGraph {
         /// Calculates number of edges
         /** \note Time complexity: O(nrVars())
          */
-        size_t nrEdges() const { return G.nrEdges(); }
+        size_t nrEdges() const { return _G.nrEdges(); }
 
         /// Returns the index of a particular variable
         /** \note Time complexity: O(nrVars())
          *  \throw OBJECT_NOT_FOUND if the variable is not part of this factor graph
          */
-        size_t findVar( const Var &n ) const {
+        size_t findVar( const Var& n ) const {
             size_t i = find( vars().begin(), vars().end(), n ) - vars().begin();
             if( i == nrVars() )
                 DAI_THROW(OBJECT_NOT_FOUND);
@@ -177,18 +189,18 @@ class FactorGraph {
         /** \note Time complexity: O( nrVars() * ns.size() )
          *  \throw OBJECT_NOT_FOUND if one of the variables is not part of this factor graph
          */
-        std::set<size_t> findVars( VarSet &ns ) const {
-            std::set<size_t> indexes;
+        SmallSet<size_t> findVars( const VarSet& ns ) const {
+            SmallSet<size_t> result;
             for( VarSet::const_iterator n = ns.begin(); n != ns.end(); n++ )
-                indexes.insert( findVar( *n ) );
-            return indexes;
+                result.insert( findVar( *n ) );
+            return result;
         }
 
         /// Returns index of the first factor that depends on the variables
         /** \note Time complexity: O(nrFactors())
          *  \throw OBJECT_NOT_FOUND if no factor in this factor graph depends on those variables
          */
-        size_t findFactor( const VarSet &ns ) const {
+        size_t findFactor( const VarSet& ns ) const {
             size_t I;
             for( I = 0; I < nrFactors(); I++ )
                 if( factor(I).vars() == ns )
@@ -202,21 +214,23 @@ class FactorGraph {
         VarSet Delta( size_t i ) const;
 
         /// Return all variables that occur in a factor involving some variable in \a vs, \a vs itself included
-        VarSet Delta( const VarSet &vs ) const;
+        VarSet Delta( const VarSet& vs ) const;
 
         /// Return all variables that occur in a factor involving the \a i 'th variable, itself excluded
-        VarSet delta( size_t i ) const;
+        VarSet delta( size_t i ) const {
+            return( Delta( i ) / var( i ) );
+        }
 
         /// Return all variables that occur in a factor involving some variable in \a vs, \a vs itself excluded
-        VarSet delta( const VarSet &vs ) const {
+        VarSet delta( const VarSet& vs ) const {
             return Delta( vs ) / vs;
         }
 
         /// Returns \c true if the factor graph is connected
-        bool isConnected() const { return G.isConnected(); }
+        bool isConnected() const { return _G.isConnected(); }
 
         /// Returns \c true if the factor graph is a tree (i.e., has no cycles and is connected)
-        bool isTree() const { return G.isTree(); }
+        bool isTree() const { return _G.isTree(); }
 
         /// Returns \c true if each factor depends on at most two variables
         bool isPairwise() const;
@@ -224,14 +238,30 @@ class FactorGraph {
         /// Returns \c true if each variable has only two possible values
         bool isBinary() const;
 
-        /// Returns the cliques (fully connected subgraphs of the corresponding Markov graph) in this factor graph
-        std::vector<VarSet> Cliques() const;
+        /// Constructs the corresponding Markov graph 
+        /** \note The Markov graph has the variables as nodes and an edge
+         *  between two variables if and only if the variables share a factor.
+         */
+        GraphAL MarkovGraph() const;
+
+        /// Returns the maximal factor domains in this factorgraph
+        /** \note A factor domain is \a maximal if and only if it is not a
+         *  strict subset of another factor domain.
+         */
+        std::vector<VarSet> maximalFactorDomains() const;
+
+        /// Returns the maximal factors domains in this factorgraph
+        /** \deprecated Please use dai::FactorGraph::maximalFactorDomains() instead
+         */
+        std::vector<VarSet> cliques() const {
+            return maximalFactorDomains();
+        }
     //@}
 
     /// \name Backup/restore mechanism for factors
     //@{
         /// Set the content of the \a I 'th factor and make a backup of its old content if \a backup == \c true
-        virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {
+        virtual void setFactor( size_t I, const Factor& newFactor, bool backup = false ) {
             DAI_ASSERT( newFactor.vars() == factor(I).vars() );
             if( backup )
                 backupFactor( I );
@@ -239,7 +269,7 @@ class FactorGraph {
         }
 
         /// Set the contents of all factors as specified by \a facs and make a backup of the old contents if \a backup == \c true
-        virtual void setFactors( const std::map<size_t, Factor> & facs, bool backup = false ) {
+        virtual void setFactors( const std::map<size_t, Factor>& facs, bool backup = false ) {
             for( std::map<size_t, Factor>::const_iterator fac = facs.begin(); fac != facs.end(); fac++ ) {
                 if( backup )
                     backupFactor( fac->first );
@@ -253,12 +283,14 @@ class FactorGraph {
         void backupFactor( size_t I );
 
         /// Restores the \a I 'th factor from the backup (it should be backed up first)
+        /** \throw OBJECT_NOT_FOUND if a backup does not exist
+         */
         void restoreFactor( size_t I );
 
         /// Backup the factors specified by indices in \a facs
         /** \throw MULTIPLE_UNDO if a backup already exists
          */
-        virtual void backupFactors( const std::set<size_t> & facs );
+        virtual void backupFactors( const std::set<size_t>& facs );
 
         /// Restore all factors to the backup copies
         virtual void restoreFactors();
@@ -266,10 +298,10 @@ class FactorGraph {
         /// Makes a backup of all factors connected to a set of variables
         /** \throw MULTIPLE_UNDO if a backup already exists
          */
-        void backupFactors( const VarSet &ns );
+        void backupFactors( const VarSet& ns );
 
         /// Restores all factors connected to a set of variables from their backups
-        void restoreFactors( const VarSet &ns );
+        void restoreFactors( const VarSet& ns );
     //@}
 
     /// \name Transformations
@@ -277,7 +309,7 @@ class FactorGraph {
         /// Returns a copy of \c *this, where all factors that are subsumed by some larger factor are merged with the larger factors.
         FactorGraph maximalFactors() const;
 
-        /// Clamp the \a i 'th variable to value \a x (i.e. multiply with a Kronecker delta \f$\delta_{x_i,x}\f$);
+        /// Returns a copy of \c *this, where the \a i 'th variable has been clamped to value \a x
         /** \note This version changes the factor graph structure and thus returns a newly constructed FactorGraph
          *  and keeps the current one constant, contrary to clamp()
          */
@@ -294,12 +326,12 @@ class FactorGraph {
         /// Clamp a variable in a factor graph to have one out of a list of values
         /** If \a backup == \c true, make a backup of all factors that are changed
          */
-        void clampVar( size_t i, const std::vector<size_t> &xis, bool backup = false );
+        void clampVar( size_t i, const std::vector<size_t>& xis, bool backup = false );
 
         /// Clamp a factor in a factor graph to have one out of a list of values
         /** If \a backup == \c true, make a backup of all factors that are changed
          */
-        void clampFactor( size_t I, const std::vector<size_t> &xIs, bool backup = false );
+        void clampFactor( size_t I, const std::vector<size_t>& xIs, bool backup = false );
 
         /// Set all factors interacting with the \a i 'th variable to 1
         /** If \a backup == \c true, make a backup of all factors that are changed
@@ -325,13 +357,13 @@ class FactorGraph {
         /// Writes a factor graph to an output stream
         /** \see \ref fileformats-factorgraph
          */
-        friend std::ostream& operator<< (std::ostream &os, const FactorGraph &fg );
+        friend std::ostream& operator<< (std::ostream& os, const FactorGraph& fg );
 
         /// Reads a factor graph from an input stream
         /** \see \ref fileformats-factorgraph
          *  \throw INVALID_FACTORGRAPH_FILE if the input stream is not valid
          */
-        friend std::istream& operator>> (std::istream &is, FactorGraph &fg );
+        friend std::istream& operator>> (std::istream& is, FactorGraph& fg );
 
         /// Writes a factor graph to a GraphViz .dot file
         void printDot( std::ostream& os ) const;
@@ -344,18 +376,18 @@ class FactorGraph {
 
 
 template<typename FactorInputIterator, typename VarInputIterator>
-FactorGraph::FactorGraph(FactorInputIterator fact_begin, FactorInputIterator fact_end, VarInputIterator var_begin, VarInputIterator var_end, size_t nr_fact_hint, size_t nr_var_hint ) : G(), _backup() {
+FactorGraph::FactorGraph(FactorInputIterator facBegin, FactorInputIterator facEnd, VarInputIterator varBegin, VarInputIterator varEnd, size_t nrFacHint, size_t nrVarHint ) : _G(), _backup() {
     // add factors
     size_t nrEdges = 0;
-    _factors.reserve( nr_fact_hint );
-    for( FactorInputIterator p2 = fact_begin; p2 != fact_end; ++p2 ) {
+    _factors.reserve( nrFacHint );
+    for( FactorInputIterator p2 = facBegin; p2 != facEnd; ++p2 ) {
         _factors.push_back( *p2 );
         nrEdges += p2->vars().size();
     }
 
     // add variables
-    _vars.reserve( nr_var_hint );
-    for( VarInputIterator p1 = var_begin; p1 != var_end; ++p1 )
+    _vars.reserve( nrVarHint );
+    for( VarInputIterator p1 = varBegin; p1 != varEnd; ++p1 )
         _vars.push_back( *p1 );
 
     // create graph structure

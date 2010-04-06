@@ -235,7 +235,7 @@ class GraphAL {
         /// Returns true if the graph contains an edge between nodes \a n1 and \a n2
         /** \note The time complexity is linear in the number of neighbors of \a n1 or \a n2
          */
-        bool hasEdge( size_t n1, size_t n2 ) {
+        bool hasEdge( size_t n1, size_t n2 ) const {
             if( nb(n1).size() < nb(n2).size() ) {
                 for( size_t _n2 = 0; _n2 < nb(n1).size(); _n2++ )
                     if( nb( n1, _n2 ) == n2 )
@@ -268,6 +268,27 @@ class GraphAL {
 
         /// Asserts internal consistency
         void checkConsistency() const;
+
+        /// Comparison operator which returns true if two graphs are identical
+        /** \note Two graphs are called identical if they have the same number 
+         *  of nodes and the same edges (i.e., \a x has an edge between nodes
+         *  n1 and n2 if and only if \c *this has an edge between nodes n1 and n2).
+         */
+        bool operator==( const GraphAL& x ) const {
+            if( nrNodes() != x.nrNodes() )
+                return false;
+            for( size_t n1 = 0; n1 < nrNodes(); n1++ ) {
+                if( nb(n1).size() != x.nb(n1).size() )
+                    return false;
+                foreach( const Neighbor &n2, nb(n1) )
+                    if( !x.hasEdge( n1, n2 ) )
+                        return false;
+                foreach( const Neighbor &n2, x.nb(n1) )
+                    if( !hasEdge( n1, n2 ) )
+                        return false;
+            }
+            return true;
+        }
     //@}
 
     /// \name Input and output

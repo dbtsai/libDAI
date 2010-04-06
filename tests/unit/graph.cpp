@@ -40,6 +40,7 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( G2.isConnected(), false );
     BOOST_CHECK_EQUAL( G2.isTree(), false );
     G2.checkConsistency();
+    BOOST_CHECK( !(G2 == G0) );
     
     typedef GraphAL::Edge Edge;
     std::vector<Edge> edges;
@@ -53,6 +54,18 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( G3.isConnected(), true );
     BOOST_CHECK_EQUAL( G3.isTree(), true );
     G3.checkConsistency();
+    BOOST_CHECK( !(G3 == G0) );
+    BOOST_CHECK( !(G3 == G2) );
+
+    GraphAL G4( G3 );
+    BOOST_CHECK( !(G4 == G0) );
+    BOOST_CHECK( !(G4 == G2) );
+    BOOST_CHECK( G4 == G3 );
+
+    GraphAL G5 = G3;
+    BOOST_CHECK( !(G5 == G0) );
+    BOOST_CHECK( !(G5 == G2) );
+    BOOST_CHECK( G5 == G3 );
 }
 
 

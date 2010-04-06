@@ -154,7 +154,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
 
     vector<VarSet> cl;
     if( props.clusters == Properties::ClustersType::MIN ) {
-        cl = fg.Cliques();
+        cl = fg.maximalFactorDomains();
         constructCVM( fg, cl );
     } else if( props.clusters == Properties::ClustersType::DELTA ) {
         cl.reserve( fg.nrVars() );
@@ -162,7 +162,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
             cl.push_back( fg.Delta(i) );
         constructCVM( fg, cl );
     } else if( props.clusters == Properties::ClustersType::LOOP ) {
-        cl = fg.Cliques();
+        cl = fg.maximalFactorDomains();
         set<VarSet> scl;
         for( size_t i0 = 0; i0 < fg.nrVars(); i0++ ) {
             VarSet i0d = fg.delta(i0);
@@ -178,8 +178,8 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
         }
         constructCVM( fg, cl );
     } else if( props.clusters == Properties::ClustersType::BETHE ) {
-        // build outer regions (the cliques)
-        cl = fg.Cliques();
+        // build outer regions (the maximal factor domains)
+        cl = fg.maximalFactorDomains();
         size_t nrEdges = 0;
         for( size_t c = 0; c < cl.size(); c++ )
             nrEdges += cl[c].size();
