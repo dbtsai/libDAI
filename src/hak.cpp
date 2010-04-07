@@ -421,7 +421,7 @@ Real HAK::doDoubleLoop() {
     double tic = toc();
 
     // Save original outer regions
-    vector<FRegion> org_ORs = ORs;
+    vector<FRegion> org_ORs = _ORs;
 
     // Save original inner counting numbers and set negative counting numbers to zero
     vector<Real> org_IR_cs( nrIRs(), 0.0 );
@@ -494,7 +494,7 @@ Real HAK::doDoubleLoop() {
         _maxdiff = maxDiff;
 
     // Restore original outer regions
-    ORs = org_ORs;
+    _ORs = org_ORs;
 
     // Restore original inner counting numbers
     for( size_t beta = 0; beta < nrIRs(); ++beta )

@@ -708,9 +708,9 @@ BOOST_AUTO_TEST_CASE( MiscOperationsTest ) {
     BOOST_CHECK_EQUAL( y[1], (x[1] + x[3] + x[5]) / x.sum() );
     y = x.marginal( v2 );
     BOOST_CHECK( y.vars() == VarSet( v2 ) );
-    BOOST_CHECK_EQUAL( y[0], (x[0] + x[1]) / x.sum() );
-    BOOST_CHECK_EQUAL( y[1], (x[2] + x[3]) / x.sum() );
-    BOOST_CHECK_EQUAL( y[2], (x[4] + x[5]) / x.sum() );
+    BOOST_CHECK_CLOSE( y[0], (x[0] + x[1]) / x.sum(), tol );
+    BOOST_CHECK_CLOSE( y[1], (x[2] + x[3]) / x.sum(), tol );
+    BOOST_CHECK_CLOSE( y[2], (x[4] + x[5]) / x.sum(), tol );
     y = x.marginal( VarSet() );
     BOOST_CHECK( y.vars() == VarSet() );
     BOOST_CHECK_EQUAL( y[0], 1.0 );
@@ -723,9 +723,9 @@ BOOST_AUTO_TEST_CASE( MiscOperationsTest ) {
     BOOST_CHECK_EQUAL( y[1], (x[1] + x[3] + x[5]) / x.sum() );
     y = x.marginal( v2, true );
     BOOST_CHECK( y.vars() == VarSet( v2 ) );
-    BOOST_CHECK_EQUAL( y[0], (x[0] + x[1]) / x.sum() );
-    BOOST_CHECK_EQUAL( y[1], (x[2] + x[3]) / x.sum() );
-    BOOST_CHECK_EQUAL( y[2], (x[4] + x[5]) / x.sum() );
+    BOOST_CHECK_CLOSE( y[0], (x[0] + x[1]) / x.sum(), tol );
+    BOOST_CHECK_CLOSE( y[1], (x[2] + x[3]) / x.sum(), tol );
+    BOOST_CHECK_CLOSE( y[2], (x[4] + x[5]) / x.sum(), tol );
     y = x.marginal( VarSet(), true );
     BOOST_CHECK( y.vars() == VarSet() );
     BOOST_CHECK_EQUAL( y[0], 1.0 );

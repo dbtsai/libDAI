@@ -61,18 +61,18 @@ string JTree::printProperties() const {
 }
 
 
-JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) : DAIAlgRG(fg), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {
+JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) : DAIAlgRG(), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {
     setProperties( opts );
 
-    if( !isConnected() )
+    if( !fg.isConnected() )
        DAI_THROW(FACTORGRAPH_NOT_CONNECTED);
 
     if( automatic ) {
         // Create ClusterGraph which contains factors as clusters
         vector<VarSet> cl;
         cl.reserve( fg.nrFactors() );
-        for( size_t I = 0; I < nrFactors(); I++ )
-            cl.push_back( factor(I).vars() );
+        for( size_t I = 0; I < fg.nrFactors(); I++ )
+            cl.push_back( fg.factor(I).vars() );
         ClusterGraph _cg( cl );
 
         if( props.verbose >= 3 )
@@ -106,12 +106,15 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
             cerr << "VarElim result: " << ElimVec << endl;
 
         // Generate the junction tree corresponding to the elimination sequence
-        GenerateJT( ElimVec );
+        GenerateJT( fg, ElimVec );
     }
 }
 
 
-void JTree::construct( const std::vector<VarSet> &cl, bool verify ) {
+void JTree::construct( const FactorGraph &fg, const std::vector<VarSet> &cl, bool verify ) {
+    // Copy the factor graph
+    FactorGraph::operator=( fg );
+
     // Construct a weighted graph (each edge is weighted with the cardinality
     // of the intersection of the nodes, where the nodes are the elements of cl).
     WeightedGraph<int> JuncGraph;
@@ -128,20 +131,20 @@ void JTree::construct( const std::vector<VarSet> &cl, bool verify ) {
     // Construct corresponding region graph
 
     // Create outer regions
-    ORs.clear();
-    ORs.reserve( cl.size() );
+    _ORs.clear();
+    _ORs.reserve( cl.size() );
     for( size_t i = 0; i < cl.size(); i++ )
-        ORs.push_back( FRegion( Factor(cl[i], 1.0), 1.0 ) );
+        _ORs.push_back( FRegion( Factor(cl[i], 1.0), 1.0 ) );
 
     // For each factor, find an outer region that subsumes that factor.
     // Then, multiply the outer region with that factor.
-    fac2OR.clear();
-    fac2OR.resize( nrFactors(), -1U );
+    _fac2OR.clear();
+    _fac2OR.resize( nrFactors(), -1U );
     for( size_t I = 0; I < nrFactors(); I++ ) {
         size_t alpha;
         for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
-                fac2OR[I] = alpha;
+                _fac2OR[I] = alpha;
                 break;
             }
         if( verify )
@@ -150,19 +153,19 @@ void JTree::construct( const std::vector<VarSet> &cl, bool verify ) {
     RecomputeORs();
 
     // Create inner regions and edges
-    IRs.clear();
-    IRs.reserve( RTree.size() );
+    _IRs.clear();
+    _IRs.reserve( RTree.size() );
     vector<Edge> edges;
     edges.reserve( 2 * RTree.size() );
     for( size_t i = 0; i < RTree.size(); i++ ) {
         edges.push_back( Edge( RTree[i].first, nrIRs() ) );
         edges.push_back( Edge( RTree[i].second, nrIRs() ) );
         // inner clusters have counting number -1
-        IRs.push_back( Region( cl[RTree[i].first] & cl[RTree[i].second], -1.0 ) );
+        _IRs.push_back( Region( cl[RTree[i].first] & cl[RTree[i].second], -1.0 ) );
     }
 
     // create bipartite graph
-    G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
+    _G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 
     // Check counting numbers
 #ifdef DAI_DEBUG
@@ -182,8 +185,8 @@ void JTree::construct( const std::vector<VarSet> &cl, bool verify ) {
 }
 
 
-void JTree::GenerateJT( const std::vector<VarSet> &cl ) {
-    construct( cl, true );
+void JTree::GenerateJT( const FactorGraph &fg, const std::vector<VarSet> &cl ) {
+    construct( fg, cl, true );
 
     // Create messages
     _mes.clear();

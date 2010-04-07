@@ -123,7 +123,7 @@ void TreeEP::construct( const RootedTree &tree ) {
 
     // If no outer region can be found subsuming that factor, label the
     // factor as off-tree.
-    JTree::construct( cl, false );
+    JTree::construct( *this, cl, false );
 
     if( props.verbose >= 1 )
         cerr << "TreeEP::construct: The tree has size " << JTree::RTree.size() << endl;

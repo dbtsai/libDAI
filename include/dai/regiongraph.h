@@ -72,7 +72,7 @@ class FRegion : public Factor {
 /** A RegionGraph inherits from a FactorGraph and adds additional structure in the form of a "region graph". Our definition of region graph
  *  is inspired by [\ref HAK03], which is less general than the definition given in [\ref YFW05].
  *
- *  The extra structure described by a RegionGraph over that described by a FactorGraph is:
+ *  The extra structure described by a RegionGraph compared with that described by a FactorGraph is:
  *  - a set of outer regions (indexed by \f$\alpha\f$), where each outer region consists of
  *    - a factor defined on a subset of variables
  *    - a counting number
@@ -85,33 +85,30 @@ class FRegion : public Factor {
  *  of an outer region would be the product of all the factors that belong to that region.
  */
 class RegionGraph : public FactorGraph {
-    public:
+    protected:
         /// Stores the neighborhood structure
-        BipartiteGraph          G;
+        BipartiteGraph          _G;
 
         /// The outer regions (corresponding to nodes of type 1)
-        std::vector<FRegion>    ORs;
+        std::vector<FRegion>    _ORs;
 
         /// The inner regions (corresponding to nodes of type 2)
-        std::vector<Region>     IRs;
+        std::vector<Region>     _IRs;
 
         /// Stores for each factor index the index of the outer region it belongs to
-        std::vector<size_t>     fac2OR;
+        std::vector<size_t>     _fac2OR;
 
 
     public:
     /// \name Constructors and destructors
     //@{
         /// Default constructor
-        RegionGraph() : FactorGraph(), G(), ORs(), IRs(), fac2OR() {}
-
-        /// Partially constructs a region graph from a factor graph
-        RegionGraph( const FactorGraph &fg ) : FactorGraph(fg), G(), ORs(), IRs(), fac2OR() {}
+        RegionGraph() : FactorGraph(), _G(), _ORs(), _IRs(), _fac2OR() {}
 
         /// Constructs a region graph from a factor graph, a vector of outer regions, a vector of inner regions and a vector of edges
         /** The counting numbers for the outer regions are set to 1.
          */
-        RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &ors, const std::vector<Region> &irs, const std::vector<std::pair<size_t,size_t> > &edges ) : FactorGraph(), G(), ORs(), IRs(), fac2OR() {
+        RegionGraph( const FactorGraph& fg, const std::vector<VarSet>& ors, const std::vector<Region>& irs, const std::vector<std::pair<size_t,size_t> >& edges ) : FactorGraph(), _G(), _ORs(), _IRs(), _fac2OR() {
             construct( fg, ors, irs, edges );
 
             // Check counting numbers
@@ -132,7 +129,7 @@ class RegionGraph : public FactorGraph {
          *  subset of the variables in the outer region. The counting numbers for the inner
          *  regions are calculated by calcCountingNumbers() and satisfy the Moebius formula.
          */
-        RegionGraph( const FactorGraph &fg, const std::vector<VarSet> &cl ) : FactorGraph(), G(), ORs(), IRs(), fac2OR() {
+        RegionGraph( const FactorGraph& fg, const std::vector<VarSet>& cl ) : FactorGraph(), _G(), _ORs(), _IRs(), _fac2OR() {
             constructCVM( fg, cl );
 
             // Check counting numbers
@@ -148,24 +145,43 @@ class RegionGraph : public FactorGraph {
     /// \name Queries
     //@{
         /// Returns number of outer regions
-        size_t nrORs() const { return ORs.size(); }
+        size_t nrORs() const { return _ORs.size(); }
         /// Returns number of inner regions
-        size_t nrIRs() const { return IRs.size(); }
+        size_t nrIRs() const { return _IRs.size(); }
 
         /// Returns constant reference to outer region \a alpha
-        const FRegion & OR(size_t alpha) const { return ORs[alpha]; }
+        const FRegion& OR( size_t alpha ) const {
+            DAI_DEBASSERT( alpha < nrORs() );
+            return _ORs[alpha]; 
+        }
         /// Returns reference to outer region \a alpha
-        FRegion & OR(size_t alpha) { return ORs[alpha]; }
+        FRegion& OR( size_t alpha ) {
+            DAI_DEBASSERT( alpha < nrORs() );
+            return _ORs[alpha]; 
+        }
 
         /// Returns constant reference to inner region \a beta
-        const Region & IR(size_t beta) const { return IRs[beta]; }
+        const Region& IR( size_t beta ) const {
+            DAI_DEBASSERT( beta < nrIRs() );
+            return _IRs[beta]; 
+        }
         /// Returns reference to inner region \a beta
-        Region & IR(size_t beta) { return IRs[beta]; }
+        Region& IR( size_t beta ) {
+            DAI_DEBASSERT( beta < nrIRs() );
+            return _IRs[beta];
+        }
+
+        /// Returns the index of the outer region to which the \a I 'th factor corresponds
+        size_t fac2OR( size_t I ) {
+            DAI_DEBASSERT( I < nrFactors() );
+            DAI_DEBASSERT( I < _fac2OR.size() );
+            return _fac2OR[I];
+        }
 
         /// Returns constant reference to the neighbors of outer region \a alpha
-        const Neighbors & nbOR( size_t alpha ) const { return G.nb1(alpha); }
+        const Neighbors& nbOR( size_t alpha ) const { return _G.nb1(alpha); }
         /// Returns constant reference to the neighbors of inner region \a beta
-        const Neighbors & nbIR( size_t beta ) const { return G.nb2(beta); }
+        const Neighbors& nbIR( size_t beta ) const { return _G.nb2(beta); }
 
         /// Check whether the counting numbers are valid
         /** Counting numbers are said to be (variable) valid if for each variable \f$x\f$,
@@ -179,13 +195,13 @@ class RegionGraph : public FactorGraph {
     /// \name Operations
     //@{
         /// Set the content of the \a I 'th factor and make a backup of its old content if \a backup == \c true
-        virtual void setFactor( size_t I, const Factor &newFactor, bool backup = false ) {
+        virtual void setFactor( size_t I, const Factor& newFactor, bool backup = false ) {
             FactorGraph::setFactor( I, newFactor, backup );
             RecomputeOR( I );
         }
 
         /// Set the contents of all factors as specified by \a facs and make a backup of the old contents if \a backup == \c true
-        virtual void setFactors( const std::map<size_t, Factor> & facs, bool backup = false ) {
+        virtual void setFactors( const std::map<size_t, Factor>& facs, bool backup = false ) {
             FactorGraph::setFactors( facs, backup );
             VarSet ns;
             for( std::map<size_t, Factor>::const_iterator fac = facs.begin(); fac != facs.end(); fac++ )
@@ -201,7 +217,7 @@ class RegionGraph : public FactorGraph {
         /// Recompute all outer regions involving the variables in \a vs
         /** The factor contents of each outer region involving at least one of the variables in \a vs is set to the product of the factors belonging to that region.
          */
-        void RecomputeORs( const VarSet &vs );
+        void RecomputeORs( const VarSet& vs );
 
         /// Recompute all outer regions involving factor \a I
         /** The factor contents of each outer region involving the \a I 'th factor is set to the product of the factors belonging to that region.
@@ -221,15 +237,15 @@ class RegionGraph : public FactorGraph {
     /// \name Input/output
     //@{
         /// Writes a RegionGraph to an output stream
-        friend std::ostream & operator << ( std::ostream & os, const RegionGraph & rg );
+        friend std::ostream& operator << ( std::ostream& os, const RegionGraph& rg );
     //@}
 
     protected:
         /// Helper function for constructors
-        void construct( const FactorGraph &fg, const std::vector<VarSet> &ors, const std::vector<Region> &irs, const std::vector<std::pair<size_t,size_t> > &edges );
+        void construct( const FactorGraph& fg, const std::vector<VarSet>& ors, const std::vector<Region>& irs, const std::vector<std::pair<size_t,size_t> >& edges );
 
         /// Helper function for constructors (CVM style)
-        void constructCVM( const FactorGraph &fg, const std::vector<VarSet> &cl );
+        void constructCVM( const FactorGraph& fg, const std::vector<VarSet>& cl );
 };
 
 

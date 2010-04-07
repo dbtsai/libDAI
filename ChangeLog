@@ -3,24 +3,35 @@ git HEAD
 
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
-* Improved clustergraph.h/clustergraph.cpp:
-  - Made (previously public) members G, vars and clusters private and added
-    bipGraph(), vars() and clusters() methods which offer read-only access to 
-    these members.
-  - Deprecated toVector()
-  - Added nrVars() method
-  - Renamed size() method into nrClusters()
-  - Added var( size_t ) method
-  - Added cluster( size_t ) method
-* Improved factorgraph.h/factorgraph.cpp:
+* Improved jtree.h/cpp:
+  - changed JTree::construct( const std::vector<VarSet>&, bool ) into
+    JTree::construct( const FactorGraph&, const std::vector<VarSet>&, bool )
+  - changed JTree::GenerateJT( const std::vector<VarSet> & )
+    into JTree::GenerateJT( const FactorGraph &, const std::vector<VarSet> & )
+* Improved regiongraph.h/cpp:
+  - Made (previously public) members RegionGraph::G, RegionGraph::ORs,
+    RegionGraph::IRs and RegionGraph::fac2OR protected.
+  - Removed partial constructor RegionGraph::RegionGraph( const FactorGraph& fg )
+  - Added some error checking code
+* Improved clustergraph.h/cpp:
+  - Made (previously public) members ClusterGraph::G, ClusterGraph::vars and 
+    ClusterGraph::clusters private and added ClusterGraph::bipGraph(), 
+    ClusterGraph::vars() and ClusterGraph::clusters() methods which offer 
+    read-only access to these members.
+  - Deprecated ClusterGraph::toVector()
+  - Added ClusterGraph::nrVars() method
+  - Renamed ClusterGraph::size() method into ClusterGraph::nrClusters()
+  - Added ClusterGraph::var( size_t ) method
+  - Added ClusterGraph::cluster( size_t ) method
+* Improved factorgraph.h/cpp:
   - FactorGraph::clamped() now contains a delta factor for the clamped variable
   - Renamed FactorGraph::Cliques() into FactorGraph::maximalFactorDomains()
   - Added FactorGraph::MarkovGraph()
   - Fixed bug in FactorGraph::clone()
   - FactorGraph::findVars( const VarSet& ) now returns a SmallSet<size_t>
-    and its argument now has a const-qualifier (which fixes a small bug)
-  - Made (previously public) member G private and added the bipGraph() method,
-    which offers read-only access to it
+    and its argument now has a const-qualifier (which fixes a small bug).
+  - Made (previously public) member FactorGraph::G private and added the 
+    FactorGraph::bipGraph() method, which offers read-only access to it.
 * Improved factor.h/cpp:
   - Fixed bug in min( const TFactor<T> &, const TFactor<T> & )
   - Fixed bug in max( const TFactor<T> &, const TFactor<T> & )
@@ -31,8 +42,8 @@ git HEAD
   - Added TFactor<T>::sumAbs() const
   - Added TFactor<T>::operator==( const TFactor<T> &y )
   - Renamed TFactor<T>::states() into TFactor<T>::nrStates()
-  - Added get(size_t) and set(size_t,T) operators; get() is 
-    equivalent to "operator[](size_t) const" and set() should
+  - Added TFactor<T>::get(size_t) and TFactor<T>::set(size_t,T) operators; 
+    get() is equivalent to "operator[](size_t) const" and set() should
     be used instead of the non-const operator[], which has been deprecated
 * Improved prob.h/cpp:
   - Deprecated TProb::TProb( TIterator begin, TIterator end, size_t sizeHint=0 )
@@ -47,8 +58,8 @@ git HEAD
   - Fixed bug by renaming TProb<T>::operator<=() to TProb<T>::operator<()
   - TProb<T>& operator/= (T x) now yields 0 when dividing by 0
   - Changed format of TProb<T> when streamed to an ostream
-  - Added get(size_t) and set(size_t,T) operators; get() is 
-    equivalent to "operator[](size_t) const" and set() should
+  - Added TProb<T>::get(size_t) and TProb<T>::set(size_t,T) operators; 
+    get() is equivalent to "operator[](size_t) const" and set() should
     be used instead of the non-const operator[], which has been deprecated
   - Added TProb<T>::resize(size_t)
 * Improved index.h/cpp:
@@ -64,16 +75,16 @@ git HEAD
   - Fixed bug in PropertySet::setAsString<T>()
 * Improved util.h/cpp:
   - Fixed a bug in rnd_seed()
-  - Removed Real max( const std::vector<Real> &v )
+  - Removed max( const std::vector<Real> &v )
 * Improved weightedgraph.h/cpp:
   - Renamed MaxSpanningTreePrims into MaxSpanningTree
   - Renamed MinSpanningTreePrims into MinSpanningTree
   - Added option to MaxSpanningTree and MinSpanningTree for
     choosing between Prim's algorithm and Kruskal's algorithm
-  - More error checking in RootedTree constructor
+  - Better error checking in RootedTree constructor
   - The vertices in DEdge and UEdge are now named "first" and "second"
     for compatibility with a std::pair<size_t,size_t>
-  - Added GraphEL( const GraphAL& G ) constructor
+  - Added GraphEL::GraphEL( const GraphAL& G ) constructor
 * Improved bipgraph.h/cpp:
   - Fixed bug in BipartiteGraph::eraseNode1()
   - Fixed bug in BipartiteGraph::eraseNode2()
@@ -101,7 +112,7 @@ git HEAD
     no longer has a default value in order to avoid confusion with the
      SmallSet::SmallSet( const T &t1, const T &t2 )
     constructor.
-  - Added SmallSet& insert( const T& t )
+  - Added SmallSet::insert( const T& t ) method
 * Removed RandomDRegularGraph(), please use createGraphRegular() instead
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,

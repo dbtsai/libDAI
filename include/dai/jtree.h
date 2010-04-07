@@ -152,13 +152,13 @@ class JTree : public DAIAlgRG {
          *  Finally, Beliefs are constructed.
          *  If \a verify == \c true, checks whether each factor is subsumed by a clique.
          */
-        void construct( const std::vector<VarSet> &cl, bool verify=false );
+        void construct( const FactorGraph &fg, const std::vector<VarSet> &cl, bool verify=false );
 
         /// Constructs a junction tree based on the cliques \a cl (corresponding to some elimination sequence).
         /** Invokes construct() and then constructs messages.
          *  \see construct()
          */
-        void GenerateJT( const std::vector<VarSet> &cl );
+        void GenerateJT( const FactorGraph &fg, const std::vector<VarSet> &cl );
 
         /// Returns constant reference to the message from outer region \a alpha to its \a _beta 'th neighboring inner region
         const Factor & message( size_t alpha, size_t _beta ) const { return _mes[alpha][_beta]; }

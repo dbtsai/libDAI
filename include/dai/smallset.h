@@ -81,7 +81,7 @@ class SmallSet {
     //@{
         /// Inserts \a t into \c *this
         SmallSet& insert( const T& t ) {
-            SmallSet::iterator it = std::lower_bound( _elements.begin(), _elements.end(), t );
+            typename SmallSet<T>::iterator it = std::lower_bound( _elements.begin(), _elements.end(), t );
             if( (it == _elements.end()) || (*it != t) )
                 _elements.insert( it, t );
             return *this;

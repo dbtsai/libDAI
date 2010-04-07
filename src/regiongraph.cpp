@@ -28,23 +28,23 @@ void RegionGraph::construct( const FactorGraph &fg, const std::vector<VarSet> &o
     FactorGraph::operator=( fg );
 
     // Copy inner regions
-    IRs = irs;
+    _IRs = irs;
 
     // Construct outer regions (giving them counting number 1.0)
-    ORs.clear();
-    ORs.reserve( ors.size() );
+    _ORs.clear();
+    _ORs.reserve( ors.size() );
     foreach( const VarSet &alpha, ors )
-        ORs.push_back( FRegion(Factor(alpha, 1.0), 1.0) );
+        _ORs.push_back( FRegion(Factor(alpha, 1.0), 1.0) );
 
     // For each factor, find an outer region that subsumes that factor.
     // Then, multiply the outer region with that factor.
-    fac2OR.clear();
-    fac2OR.reserve( nrFactors() );
+    _fac2OR.clear();
+    _fac2OR.reserve( nrFactors() );
     for( size_t I = 0; I < nrFactors(); I++ ) {
         size_t alpha;
         for( alpha = 0; alpha < nrORs(); alpha++ )
             if( OR(alpha).vars() >> factor(I).vars() ) {
-                fac2OR.push_back( alpha );
+                _fac2OR.push_back( alpha );
                 break;
             }
         DAI_ASSERT( alpha != nrORs() );
@@ -52,7 +52,7 @@ void RegionGraph::construct( const FactorGraph &fg, const std::vector<VarSet> &o
     RecomputeORs();
 
     // Create bipartite graph
-    G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
+    _G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
 }
 
 
@@ -167,8 +167,8 @@ void RegionGraph::RecomputeORs() {
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         OR(alpha).fill( 1.0 );
     for( size_t I = 0; I < nrFactors(); I++ )
-        if( fac2OR[I] != -1U )
-            OR( fac2OR[I] ) *= factor( I );
+        if( fac2OR(I) != -1U )
+            OR( fac2OR(I) ) *= factor( I );
 }
 
 
@@ -177,19 +177,19 @@ void RegionGraph::RecomputeORs( const VarSet &ns ) {
         if( OR(alpha).vars().intersects( ns ) )
             OR(alpha).fill( 1.0 );
     for( size_t I = 0; I < nrFactors(); I++ )
-        if( fac2OR[I] != -1U )
-            if( OR( fac2OR[I] ).vars().intersects( ns ) )
-                OR( fac2OR[I] ) *= factor( I );
+        if( fac2OR(I) != -1U )
+            if( OR( fac2OR(I) ).vars().intersects( ns ) )
+                OR( fac2OR(I) ) *= factor( I );
 }
 
 
 void RegionGraph::RecomputeOR( size_t I ) {
     DAI_ASSERT( I < nrFactors() );
-    if( fac2OR[I] != -1U ) {
-        size_t alpha = fac2OR[I];
+    if( fac2OR(I) != -1U ) {
+        size_t alpha = fac2OR(I);
         OR(alpha).fill( 1.0 );
         for( size_t J = 0; J < nrFactors(); J++ )
-            if( fac2OR[J] == alpha )
+            if( fac2OR(J) == alpha )
                 OR(alpha) *= factor( J );
     }
 }
