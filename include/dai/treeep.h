@@ -198,7 +198,7 @@ class TreeEP : public JTree {
 
     private:
         /// Helper function for constructors
-        void construct( const RootedTree &tree );
+        void construct( const FactorGraph& fg, const RootedTree& tree );
         /// Returns \c true if factor \a I is not part of the tree
         bool offtree( size_t I ) const { return (fac2OR(I) == -1U); }
 };

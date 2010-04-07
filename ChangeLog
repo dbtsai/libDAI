@@ -3,6 +3,9 @@ git HEAD
 
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
+* Improved treeep.h/cpp:
+  - changed TreeEP::construct( const RootedTree& ) into
+    TreeEP::construct( const FactorGraph&, const RootedTree& )
 * Improved jtree.h/cpp:
   - changed JTree::construct( const std::vector<VarSet>&, bool ) into
     JTree::construct( const FactorGraph&, const std::vector<VarSet>&, bool )

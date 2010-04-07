@@ -172,7 +172,7 @@ class RegionGraph : public FactorGraph {
         }
 
         /// Returns the index of the outer region to which the \a I 'th factor corresponds
-        size_t fac2OR( size_t I ) {
+        size_t fac2OR( size_t I ) const {
             DAI_DEBASSERT( I < nrFactors() );
             DAI_DEBASSERT( I < _fac2OR.size() );
             return _fac2OR[I];
