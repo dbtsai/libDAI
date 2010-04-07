@@ -198,6 +198,8 @@ class TProb {
     public:
         /// Type of data structure used for storing the values
         typedef std::vector<T> container_type;
+
+        /// Shorthand
         typedef TProb<T> this_type;
 
     private:

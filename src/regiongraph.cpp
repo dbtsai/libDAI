@@ -63,9 +63,9 @@ void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet>
 
     // Create inner regions - first pass
     set<VarSet> betas;
-    for( size_t alpha = 0; alpha < cg.clusters.size(); alpha++ )
-        for( size_t alpha2 = alpha; (++alpha2) != cg.clusters.size(); ) {
-            VarSet intersection = cg.clusters[alpha] & cg.clusters[alpha2];
+    for( size_t alpha = 0; alpha < cg.nrClusters(); alpha++ )
+        for( size_t alpha2 = alpha; (++alpha2) != cg.nrClusters(); ) {
+            VarSet intersection = cg.cluster(alpha) & cg.cluster(alpha2);
             if( intersection.size() > 0 )
                 betas.insert( intersection );
         }
@@ -92,12 +92,12 @@ void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet>
     // Create edges
     vector<pair<size_t,size_t> > edges;
     for( size_t beta = 0; beta < irs.size(); beta++ )
-        for( size_t alpha = 0; alpha < cg.clusters.size(); alpha++ )
-            if( cg.clusters[alpha] >> irs[beta] )
+        for( size_t alpha = 0; alpha < cg.nrClusters(); alpha++ )
+            if( cg.cluster(alpha) >> irs[beta] )
                 edges.push_back( pair<size_t,size_t>(alpha,beta) );
 
     // Construct region graph
-    construct( fg, cg.clusters, irs, edges );
+    construct( fg, cg.clusters(), irs, edges );
 
     // Calculate counting numbers
     calcCountingNumbers();

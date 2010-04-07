@@ -3,6 +3,15 @@ git HEAD
 
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
+* Improved clustergraph.h/clustergraph.cpp:
+  - Made (previously public) members G, vars and clusters private and added
+    bipGraph(), vars() and clusters() methods which offer read-only access to 
+    these members.
+  - Deprecated toVector()
+  - Added nrVars() method
+  - Renamed size() method into nrClusters()
+  - Added var( size_t ) method
+  - Added cluster( size_t ) method
 * Improved factorgraph.h/factorgraph.cpp:
   - FactorGraph::clamped() now contains a delta factor for the clamped variable
   - Renamed FactorGraph::Cliques() into FactorGraph::maximalFactorDomains()
@@ -10,7 +19,7 @@ git HEAD
   - Fixed bug in FactorGraph::clone()
   - FactorGraph::findVars( const VarSet& ) now returns a SmallSet<size_t>
     and its argument now has a const-qualifier (which fixes a small bug)
-  - Made previously public member G private and added the bipGraph() method,
+  - Made (previously public) member G private and added the bipGraph() method,
     which offers read-only access to it
 * Improved factor.h/cpp:
   - Fixed bug in min( const TFactor<T> &, const TFactor<T> & )
@@ -97,7 +106,7 @@ git HEAD
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,
   weightedgraph, enum, util, exceptions, properties, index, prob, 
-  factor, factorgraph
+  factor, factorgraph, clustergraph
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

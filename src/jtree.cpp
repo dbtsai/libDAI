@@ -101,7 +101,7 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
             default:
                 DAI_THROW(UNKNOWN_ENUM_VALUE);
         }
-        vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( ec ) ).eraseNonMaximal().toVector();
+        vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( ec ) ).eraseNonMaximal().clusters();
         if( props.verbose >= 3 )
             cerr << "VarElim result: " << ElimVec << endl;
 
@@ -531,7 +531,7 @@ std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableEl
     _cg.eraseNonMaximal();
 
     // Obtain elimination sequence
-    vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( fn ) ).eraseNonMaximal().toVector();
+    vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( fn ) ).eraseNonMaximal().clusters();
 
     // Calculate treewidth
     size_t treewidth = 0;
