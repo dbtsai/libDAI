@@ -295,9 +295,9 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
         }
 
     // createGraphGrid3D
-    for( size_t N1 = 0; N1 < 10; N1++ )
-        for( size_t N2 = 0; N2 < 10; N2++ )
-            for( size_t N3 = 0; N3 < 10; N3++ ) {
+    for( size_t N1 = 0; N1 < 8; N1++ )
+        for( size_t N2 = 0; N2 < 8; N2++ )
+            for( size_t N3 = 0; N3 < 8; N3++ ) {
                 GraphAL G = createGraphGrid3D( N1, N2, N3, false );
                 BOOST_CHECK_EQUAL( G.nrNodes(), N1 * N2 * N3 );
                 BOOST_CHECK_EQUAL( G.nrEdges(), (N1 > 0 && N2 > 0 && N3 > 0) ? 3 * (N1-1) * (N2-1) * (N3-1) + 2 * (N1-1) * (N2-1) + 2 * (N1-1) * (N3-1) + 2 *  (N2-1) * (N3-1) + (N1-1) + (N2-1) + (N3-1) : 0 );
@@ -394,8 +394,8 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
     }
 
     // createGraphRegular
-    for( size_t N = 0; N < 100; N++ ) {
-        for( size_t d = 0; d < N && d <= 20; d++ ) {
+    for( size_t N = 0; N < 50; N++ ) {
+        for( size_t d = 0; d < N && d <= 15; d++ ) {
             if( (N * d) % 2 == 0 ) {
                 GraphAL G = createGraphRegular( N, d );
                 BOOST_CHECK_EQUAL( G.nrNodes(), N );
@@ -435,26 +435,15 @@ BOOST_AUTO_TEST_CASE( StreamTest ) {
     G.printDot( ss );
 
     std::string s;
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "graph G {" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "node[shape=circle,width=0.4,fixedsize=true];" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "\tx0;" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "\tx1;" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "\tx2;" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "\tx3;" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "\tx0 -- x1;" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "\tx0 -- x2;" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "\tx1 -- x3;" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "\tx2 -- x3;" );
-    std::getline( ss, s );
-    BOOST_CHECK_EQUAL( s, "}" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "graph G {" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "node[shape=circle,width=0.4,fixedsize=true];" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx0;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx1;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx2;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx3;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx0 -- x1;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx0 -- x2;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx1 -- x3;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx2 -- x3;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "}" );
 }

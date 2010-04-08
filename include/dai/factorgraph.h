@@ -75,9 +75,13 @@ class FactorGraph {
         typedef BipartiteGraph::Edge      Edge;
 
         /// Iterator over factors
+        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
+         */
         typedef std::vector<Factor>::iterator iterator;
 
         /// Constant iterator over factors
+        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
+         */
         typedef std::vector<Factor>::const_iterator const_iterator;
 
     private:
@@ -126,6 +130,9 @@ class FactorGraph {
         const std::vector<Var>& vars() const { return _vars; }
 
         /// Returns reference to \a I 'th factor
+        /** \deprecated Please use the const member dai::FactorGraph::factor( size_t ) instead,
+         *  or dai::FactorGraph::setFactor() for changing a factor.
+         */
         Factor& factor( size_t I ) { 
             DAI_DEBASSERT( I < nrFactors() );
             return _factors[I]; 
@@ -152,12 +159,20 @@ class FactorGraph {
     /// \name Iterator interface
     //@{
         /// Returns iterator pointing to first factor
+        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
+         */
         iterator begin() { return _factors.begin(); }
         /// Returns constant iterator pointing to first factor
+        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
+         */
         const_iterator begin() const { return _factors.begin(); }
         /// Returns iterator pointing beyond last factor
+        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
+         */
         iterator end() { return _factors.end(); }
         /// Returns constant iterator pointing beyond last factor
+        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
+         */
         const_iterator end() const { return _factors.end(); }
     //@}
 
@@ -346,13 +361,13 @@ class FactorGraph {
          *  \throw CANNOT_READ_FILE if the file cannot be opened
          *  \throw INVALID_FACTORGRAPH_FILE if the file is not valid
          */
-        void ReadFromFile( const char *filename );
+        virtual void ReadFromFile( const char *filename );
 
         /// Writes a factor graph to a file
         /** \see \ref fileformats-factorgraph
          *  \throw CANNOT_WRITE_FILE if the file cannot be written
          */
-        void WriteToFile( const char *filename, size_t precision=15 ) const;
+        virtual void WriteToFile( const char *filename, size_t precision=15 ) const;
 
         /// Writes a factor graph to an output stream
         /** \see \ref fileformats-factorgraph
@@ -366,7 +381,7 @@ class FactorGraph {
         friend std::istream& operator>> (std::istream& is, FactorGraph& fg );
 
         /// Writes a factor graph to a GraphViz .dot file
-        void printDot( std::ostream& os ) const;
+        virtual void printDot( std::ostream& os ) const;
     //@}
 
     private:

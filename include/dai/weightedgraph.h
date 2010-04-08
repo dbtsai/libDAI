@@ -11,7 +11,7 @@
 
 /** \file
  *  \brief Defines some utility functions for (weighted) undirected graphs, trees and rooted trees.
- *  \todo Improve general support for graphs and trees.
+ *  \todo Improve general support for graphs and trees: implement a DAG and a Tree.
  */
 
 

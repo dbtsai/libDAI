@@ -155,10 +155,11 @@ class BipartiteGraph {
          *  \param nrNodes2 The number of nodes of type 2.
          *  \param begin Points to the first edge.
          *  \param end Points just beyond the last edge.
+         *  \param check Whether to only add an edge if it does not exist already.
          */
         template<typename EdgeInputIterator>
-        BipartiteGraph( size_t nrNodes1, size_t nrNodes2, EdgeInputIterator begin, EdgeInputIterator end ) : _nb1(), _nb2() {
-            construct( nrNodes1, nrNodes2, begin, end );
+        BipartiteGraph( size_t nrNodes1, size_t nrNodes2, EdgeInputIterator begin, EdgeInputIterator end, bool check=true ) : _nb1(), _nb2() {
+            construct( nrNodes1, nrNodes2, begin, end, check );
         }
     //@}
 
@@ -221,9 +222,10 @@ class BipartiteGraph {
          *  \param nrNodes2 The number of nodes of type 2.
          *  \param begin Points to the first edge.
          *  \param end Points just beyond the last edge.
+         *  \param check Whether to only add an edge if it does not exist already.
          */
         template<typename EdgeInputIterator>
-        void construct( size_t nrNodes1, size_t nrNodes2, EdgeInputIterator begin, EdgeInputIterator end );
+        void construct( size_t nrNodes1, size_t nrNodes2, EdgeInputIterator begin, EdgeInputIterator end, bool check=true );
 
         /// Adds a node of type 1 without neighbors and returns the index of the added node.
         size_t addNode1() { _nb1.push_back( Neighbors() ); return _nb1.size() - 1; }
@@ -400,24 +402,25 @@ class BipartiteGraph {
     //@{
         /// Writes this BipartiteGraph to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
+
+        /// Writes this BipartiteGraph to an output stream
+        friend std::ostream& operator<<( std::ostream& os, const BipartiteGraph& g ) {
+            g.printDot( os );
+            return os;
+        }
     //@}
 };
 
 
 template<typename EdgeInputIterator>
-void BipartiteGraph::construct( size_t nrNodes1, size_t nrNodes2, EdgeInputIterator begin, EdgeInputIterator end ) {
+void BipartiteGraph::construct( size_t nrNodes1, size_t nrNodes2, EdgeInputIterator begin, EdgeInputIterator end, bool check ) {
     _nb1.clear();
     _nb1.resize( nrNodes1 );
     _nb2.clear();
     _nb2.resize( nrNodes2 );
 
-    for( EdgeInputIterator e = begin; e != end; e++ ) {
-#ifdef DAI_DEBUG
-        addEdge( e->first, e->second, true );
-#else
-        addEdge( e->first, e->second, false );
-#endif
-    }
+    for( EdgeInputIterator e = begin; e != end; e++ )
+        addEdge( e->first, e->second, check );
 }
 
 

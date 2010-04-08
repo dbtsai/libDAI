@@ -142,11 +142,6 @@ unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) 
 	tests/unit/factorgraph$(EE)
 	tests/unit/clustergraph$(EE)
 	tests/unit/regiongraph$(EE)
-ifneq ($(OS),WINDOWS)
-	rm factorgraph_test.fg
-else
-	del factorgraph_test.fg
-endif
 
 tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE) $(unittests)
 
@@ -287,19 +282,19 @@ TAGS :
 # CLEAN
 ########
 
-ifneq ($(OS),WINDOWS)
 .PHONY : clean
+ifneq ($(OS),WINDOWS)
 clean :
 	-rm $(OBJECTS)
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE)
 	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
 	-rm tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/util$(EE) tests/unit/exceptions$(EE) tests/unit/properties$(EE) tests/unit/index$(EE) tests/unit/prob$(EE) tests/unit/factor$(EE) tests/unit/factorgraph$(EE) tests/unit/clustergraph$(EE) tests/unit/regiongraph$(EE)
+	-rm factorgraph_test.fg
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
 	-rm -R lib
 else
-.PHONY : clean
 clean :
 	-del *.obj
 	-del *.ilk
@@ -341,6 +336,7 @@ clean :
 	-del tests\unit\factorgraph$(EE)
 	-del tests\unit\clustergraph$(EE)
 	-del tests\unit\regiongraph$(EE)
+	-del factorgraph_test.fg
 	-del $(LIB)\libdai$(LE)
 	-rmdir lib
 endif

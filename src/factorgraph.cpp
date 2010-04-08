@@ -253,7 +253,7 @@ void FactorGraph::WriteToFile( const char *filename, size_t precision ) const {
 
 
 void FactorGraph::printDot( std::ostream &os ) const {
-    os << "graph G {" << endl;
+    os << "graph FactorGraph {" << endl;
     os << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
     for( size_t i = 0; i < nrVars(); i++ )
         os << "\tv" << var(i).label() << ";" << endl;

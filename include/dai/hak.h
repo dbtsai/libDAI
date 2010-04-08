@@ -12,6 +12,7 @@
 /// \file
 /// \brief Defines class HAK, which implements a variant of Generalized Belief Propagation.
 /// \idea Implement more general region graphs and corresponding Generalized Belief Propagation updates as described in [\ref YFW05].
+/// \todo Implement TRW / FBP using HAK.
 
 
 #ifndef __defined_libdai_hak_h

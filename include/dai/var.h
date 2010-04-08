@@ -57,30 +57,30 @@ class Var {
         size_t& label() { return _label; }
 
         /// Returns the number of states
-        size_t states () const { return _states; }
+        size_t states() const { return _states; }
         /// Returns reference to number of states
-        size_t& states () { return _states; }
+        size_t& states() { return _states; }
 
         /// Smaller-than operator (only compares labels)
-        bool operator < ( const Var& n ) const { 
+        bool operator< ( const Var& n ) const { 
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 DAI_ASSERT( _states == n._states );
 #endif
-            return( _label <  n._label );
+            return( _label < n._label );
         }
 
         /// Larger-than operator (only compares labels)
-        bool operator > ( const Var& n ) const { 
+        bool operator> ( const Var& n ) const { 
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 DAI_ASSERT( _states == n._states );
 #endif
-            return( _label >  n._label ); 
+            return( _label > n._label ); 
         }
 
         /// Smaller-than-or-equal-to operator (only compares labels)
-        bool operator <= ( const Var& n ) const {
+        bool operator<= ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 DAI_ASSERT( _states == n._states );
@@ -89,7 +89,7 @@ class Var {
         }
 
         /// Larger-than-or-equal-to operator (only compares labels)
-        bool operator >= ( const Var& n ) const {
+        bool operator>= ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 DAI_ASSERT( _states == n._states );
@@ -98,7 +98,7 @@ class Var {
         }
 
         /// Not-equal-to operator (only compares labels)
-        bool operator != ( const Var& n ) const {
+        bool operator!= ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 DAI_ASSERT( _states == n._states );
@@ -107,7 +107,7 @@ class Var {
         }
 
         /// Equal-to operator (only compares labels)
-        bool operator == ( const Var& n ) const {
+        bool operator== ( const Var& n ) const {
 #ifdef DAI_DEBUG
             if( _label == n._label )
                 DAI_ASSERT( _states == n._states );

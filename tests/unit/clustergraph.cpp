@@ -35,8 +35,10 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK( G.bipGraph() == BipartiteGraph() );
     BOOST_CHECK_EQUAL( G.nrVars(), 0 );
     BOOST_CHECK_EQUAL( G.nrClusters(), 0 );
+#ifdef DAI_DEBUG
     BOOST_CHECK_THROW( G.var( 0 ), Exception );
     BOOST_CHECK_THROW( G.cluster( 0 ), Exception );
+#endif
     BOOST_CHECK_THROW( G.findVar( Var( 0, 2 ) ), Exception );
 
     Var v0( 0, 2 );

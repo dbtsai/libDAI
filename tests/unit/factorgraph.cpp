@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
 }
 
 
-BOOST_AUTO_TEST_CASE( AccMutIterTest ) {
+BOOST_AUTO_TEST_CASE( AccMutTest ) {
     std::vector<Factor> facs;
     facs.push_back( Factor( VarSet( Var(0, 2), Var(1, 2) ) ) );
     facs.push_back( Factor( VarSet( Var(0, 2), Var(2, 2) ) ) );
@@ -110,15 +110,6 @@ BOOST_AUTO_TEST_CASE( AccMutIterTest ) {
     BOOST_CHECK_EQUAL( G.nbF(2,1), 2 );
     BOOST_CHECK_EQUAL( G.nbF(3).size(), 1 );
     BOOST_CHECK_EQUAL( G.nbF(3,0), 1 );
-
-    FactorGraph::const_iterator cit = G.begin();
-    FactorGraph::iterator it = G.begin();
-    for( size_t I = 0; I < G.nrFactors(); I++, cit++, it++ ) {
-        BOOST_CHECK_EQUAL( *cit, G.factor(I) );
-        BOOST_CHECK_EQUAL( *it, G.factor(I) );
-    }
-    BOOST_CHECK( cit == G.end() );
-    BOOST_CHECK( it == G.end() );
 }
 
 
@@ -674,7 +665,7 @@ BOOST_AUTO_TEST_CASE( IOTest ) {
     std::stringstream ss;
     std::string s;
     G.printDot( ss );
-    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "graph G {" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "graph FactorGraph {" );
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "node[shape=circle,width=0.4,fixedsize=true];" );
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tv0;" );
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tv1;" );
@@ -690,9 +681,9 @@ BOOST_AUTO_TEST_CASE( IOTest ) {
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tv2 -- f1;" );
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "}" );
 
-    G.factor(0).fill(1.0);
-    G.factor(1).fill(2.0);
-    G.factor(2).fill(3.0);
+    G.setFactor( 0, Factor( G.factor(0).vars(), 1.0 ) );
+    G.setFactor( 1, Factor( G.factor(1).vars(), 2.0 ) );
+    G.setFactor( 2, Factor( G.factor(2).vars(), 3.0 ) );
     ss << G;
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "3" );
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "" );

@@ -16,6 +16,20 @@ git HEAD
     RegionGraph::IRs and RegionGraph::fac2OR protected.
   - Removed partial constructor RegionGraph::RegionGraph( const FactorGraph& fg )
   - Added some error checking code
+  - Renamed RegionGraph::calcCountingNumbers() into
+    RegionGraph::calcCVMCountingNumbers() and made it protected, because
+    exposing it to the world serves no purpose.
+  - Added RegionGraph::DAG() accessor which returns a reference to the 
+    region graph DAG structure (currently implemented as a BipartiteGraph)
+  - Made RegionGraph::RecomputeORs(), RegionGraph::RecomputeORs( const VarSet& )
+    and RegionGraph::RecomputeOR( size_t ) protected and renamed them by changing
+    the "Recompute" into "recompute", because exposing them to the world serves no 
+    purpose.
+  - RegionGraph::WriteToFile( const char* ), RegionGraph::ReadFromFile( const char * )
+    and RegionGraph::printDot( std::ostream& ) incorrectly called their respective
+    FactorGraph ancestor methods; this has been corrected by letting them throw a
+    NOT_IMPLEMENTED exception.
+  - Changed the way a RegionGraph is streamed to an std::ostream.
 * Improved clustergraph.h/cpp:
   - Made (previously public) members ClusterGraph::G, ClusterGraph::vars and 
     ClusterGraph::clusters private and added ClusterGraph::bipGraph(), 
@@ -35,6 +49,14 @@ git HEAD
     and its argument now has a const-qualifier (which fixes a small bug).
   - Made (previously public) member FactorGraph::G private and added the 
     FactorGraph::bipGraph() method, which offers read-only access to it.
+  - Deprecated the iterator interface:
+    o FactorGraph::iterator typedef
+    o FactorGraph::const_iterator typedef
+    o FactorGraph::begin() members
+    o FactorGraph::end() members
+  - Deprecated FactorGraph::factor(size_t) which offered write access to a factor
+    because using this functionality in the descendant RegionGraph is dangerous,
+    as the outer regions are not automatically recomputed.
 * Improved factor.h/cpp:
   - Fixed bug in min( const TFactor<T> &, const TFactor<T> & )
   - Fixed bug in max( const TFactor<T> &, const TFactor<T> & )
@@ -99,6 +121,7 @@ git HEAD
     return a SmallSet<size_t> instead of a vector<size_t>
   - Added BipartiteGraph::operator==( const BipartiteGraph& )
   - Added BipartiteGraph( size_t nr1, size_t nr2 ) constructor
+  - Added operator<<( std::ostream&, const BipartiteGraph& )
 * Improved graph.h/cpp:
   - Fixed bug in GraphAL::nrEdges()
   - Fixed bug in GraphAL::addEdge()
@@ -120,7 +143,7 @@ git HEAD
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,
   weightedgraph, enum, util, exceptions, properties, index, prob, 
-  factor, factorgraph, clustergraph
+  factor, factorgraph, clustergraph, regiongraph
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:

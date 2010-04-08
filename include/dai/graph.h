@@ -133,10 +133,11 @@ class GraphAL {
          *  \param nr The number of nodes.
          *  \param begin Points to the first edge.
          *  \param end Points just beyond the last edge.
+         *  \param check Whether to only add an edge if it does not exist already.
          */
         template<typename EdgeInputIterator>
-        GraphAL( size_t nr, EdgeInputIterator begin, EdgeInputIterator end ) : _nb() {
-            construct( nr, begin, end );
+        GraphAL( size_t nr, EdgeInputIterator begin, EdgeInputIterator end, bool check=true ) : _nb() {
+            construct( nr, begin, end, check );
         }
     //@}
 
@@ -174,9 +175,10 @@ class GraphAL {
          *  \param nr The number of nodes.
          *  \param begin Points to the first edge.
          *  \param end Points just beyond the last edge.
+         *  \param check Whether to only add an edge if it does not exist already.
          */
         template<typename EdgeInputIterator>
-        void construct( size_t nr, EdgeInputIterator begin, EdgeInputIterator end );
+        void construct( size_t nr, EdgeInputIterator begin, EdgeInputIterator end, bool check=true );
 
         /// Adds a node without neighbors and returns the index of the added node.
         size_t addNode() { _nb.push_back( Neighbors() ); return _nb.size() - 1; }
@@ -300,17 +302,12 @@ class GraphAL {
 
 
 template<typename EdgeInputIterator>
-void GraphAL::construct( size_t nr, EdgeInputIterator begin, EdgeInputIterator end ) {
+void GraphAL::construct( size_t nr, EdgeInputIterator begin, EdgeInputIterator end, bool check ) {
     _nb.clear();
     _nb.resize( nr );
 
-    for( EdgeInputIterator e = begin; e != end; e++ ) {
-#ifdef DAI_DEBUG
-        addEdge( e->first, e->second, true );
-#else
-        addEdge( e->first, e->second, false );
-#endif
-    }
+    for( EdgeInputIterator e = begin; e != end; e++ )
+        addEdge( e->first, e->second, check );
 }
 
 

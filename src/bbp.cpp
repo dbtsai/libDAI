@@ -1014,7 +1014,8 @@ Real numericBBPTest( const InfAlg &bp, const std::vector<size_t> *state, const P
                 psi_1_prb.set( xi, psi_1_prb[xi] + h );
 //                 psi_1_prb.normalize();
                 size_t I = bp_prb->fg().nbV(i)[0]; // use first factor in list of neighbors of i
-                bp_prb->fg().factor(I) *= Factor( bp_prb->fg().var(i), psi_1_prb );
+                Factor tmp = bp_prb->fg().factor(I) * Factor( bp_prb->fg().var(i), psi_1_prb );
+                bp_prb->fg().setFactor( I, tmp );
 
                 // call 'init' on the perturbed variables
                 bp_prb->init( bp_prb->fg().var(i) );

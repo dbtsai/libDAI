@@ -289,7 +289,7 @@ bool BipartiteGraph::isTree() const {
 
 
 void BipartiteGraph::printDot( std::ostream& os ) const {
-    os << "graph G {" << endl;
+    os << "graph BipartiteGraph {" << endl;
     os << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
     for( size_t n1 = 0; n1 < nrNodes1(); n1++ )
         os << "\tx" << n1 << ";" << endl;

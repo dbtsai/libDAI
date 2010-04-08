@@ -49,7 +49,7 @@ void RegionGraph::construct( const FactorGraph &fg, const std::vector<VarSet> &o
             }
         DAI_ASSERT( alpha != nrORs() );
     }
-    RecomputeORs();
+    recomputeORs();
 
     // Create bipartite graph
     _G.construct( nrORs(), nrIRs(), edges.begin(), edges.end() );
@@ -100,11 +100,11 @@ void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet>
     construct( fg, cg.clusters(), irs, edges );
 
     // Calculate counting numbers
-    calcCountingNumbers();
+    calcCVMCountingNumbers();
 }
 
 
-void RegionGraph::calcCountingNumbers() {
+void RegionGraph::calcCVMCountingNumbers() {
     // Calculates counting numbers of inner regions based upon counting numbers of outer regions
 
     vector<vector<size_t> > ancestors(nrIRs());
@@ -163,7 +163,7 @@ bool RegionGraph::checkCountingNumbers() const {
 }
 
 
-void RegionGraph::RecomputeORs() {
+void RegionGraph::recomputeORs() {
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         OR(alpha).fill( 1.0 );
     for( size_t I = 0; I < nrFactors(); I++ )
@@ -172,7 +172,7 @@ void RegionGraph::RecomputeORs() {
 }
 
 
-void RegionGraph::RecomputeORs( const VarSet &ns ) {
+void RegionGraph::recomputeORs( const VarSet &ns ) {
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         if( OR(alpha).vars().intersects( ns ) )
             OR(alpha).fill( 1.0 );
@@ -183,7 +183,7 @@ void RegionGraph::RecomputeORs( const VarSet &ns ) {
 }
 
 
-void RegionGraph::RecomputeOR( size_t I ) {
+void RegionGraph::recomputeOR( size_t I ) {
     DAI_ASSERT( I < nrFactors() );
     if( fac2OR(I) != -1U ) {
         size_t alpha = fac2OR(I);
@@ -197,20 +197,18 @@ void RegionGraph::RecomputeOR( size_t I ) {
 
 /// Send RegionGraph to output stream
 ostream & operator << (ostream & os, const RegionGraph & rg) {
-    os << "Outer regions" << endl;
+    os << "digraph RegionGraph {" << endl;
+    os << "node[shape=box];" << endl;
     for( size_t alpha = 0; alpha < rg.nrORs(); alpha++ )
-        os << alpha << ": " << rg.OR(alpha).vars() << ": c = " << rg.OR(alpha).c() << endl;
-
-    os << "Inner regions" << endl;
+        os << "\ta" << alpha << " [label=\"a" << alpha << ": " << rg.OR(alpha).vars() << ", c=" << rg.OR(alpha).c() << "\"];" << endl;
+    os << "node[shape=ellipse];" << endl;
     for( size_t beta = 0; beta < rg.nrIRs(); beta++ )
-        os << beta << ": " << (VarSet)rg.IR(beta) << ": c = " << rg.IR(beta).c() << endl;
-
-    os << "Edges" << endl;
+        os << "\tb" << beta << " [label=\"b" << beta << ": " << (VarSet)rg.IR(beta) << ", c=" << rg.IR(beta).c() << "\"];" << endl;
     for( size_t alpha = 0; alpha < rg.nrORs(); alpha++ )
         foreach( const RegionGraph::Neighbor &beta, rg.nbOR(alpha) )
-            os << alpha << "->" << beta << endl;
-
-    return(os);
+            os << "\ta" << alpha << " -> b" << beta << ";" << endl;
+    os << "}" << endl;
+    return os;
 }
 
 

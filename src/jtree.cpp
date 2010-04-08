@@ -150,7 +150,7 @@ void JTree::construct( const FactorGraph &fg, const std::vector<VarSet> &cl, boo
         if( verify )
             DAI_ASSERT( alpha != nrORs() );
     }
-    RecomputeORs();
+    recomputeORs();
 
     // Create inner regions and edges
     _IRs.clear();
