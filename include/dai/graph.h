@@ -297,6 +297,12 @@ class GraphAL {
     //@{
         /// Writes this GraphAL to an output stream in GraphViz .dot syntax
         void printDot( std::ostream& os ) const;
+
+        /// Writes this GraphAL to an output stream
+        friend std::ostream& operator<<( std::ostream& os, const GraphAL& g ) {
+            g.printDot( os );
+            return os;
+        }
     //@}
 };
 

@@ -203,7 +203,7 @@ bool GraphAL::isTree() const {
 
 
 void GraphAL::printDot( std::ostream& os ) const {
-    os << "graph G {" << endl;
+    os << "graph GraphAL {" << endl;
     os << "node[shape=circle,width=0.4,fixedsize=true];" << endl;
     for( size_t n = 0; n < nrNodes(); n++ )
         os << "\tx" << n << ";" << endl;

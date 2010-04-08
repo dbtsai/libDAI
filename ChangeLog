@@ -132,6 +132,7 @@ git HEAD
   - Fixed bug in createGraphRegular()
   - Added GraphAL::hasEdge(size_t,size_t)
   - Added GraphAL::operator==( const GraphAL& )
+  - Added operator<<( std::ostream&, const GraphAL& )
 * Improved smallset.h/cpp:
   - The sizeHint argument of the iterator constructor
      SmallSet::SmallSet( TIterator begin, TIterator end, size_t sizeHint=0 )

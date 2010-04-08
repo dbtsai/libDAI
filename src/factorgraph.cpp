@@ -273,7 +273,7 @@ GraphAL FactorGraph::MarkovGraph() const {
         foreach( const Neighbor &I, nbV(i) )
             foreach( const Neighbor &j, nbF(I) )
                 if( i < j )
-                    G.addEdge( i, j );
+                    G.addEdge( i, j, true );
     return G;
 }
 

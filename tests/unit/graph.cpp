@@ -432,10 +432,23 @@ BOOST_AUTO_TEST_CASE( StreamTest ) {
     G.addEdge( 3, 2 );
 
     std::stringstream ss;
-    G.printDot( ss );
-
     std::string s;
-    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "graph G {" );
+
+    G.printDot( ss );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "graph GraphAL {" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "node[shape=circle,width=0.4,fixedsize=true];" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx0;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx1;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx2;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx3;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx0 -- x1;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx0 -- x2;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx1 -- x3;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx2 -- x3;" );
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "}" );
+
+    ss << G;
+    std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "graph GraphAL {" );
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "node[shape=circle,width=0.4,fixedsize=true];" );
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx0;" );
     std::getline( ss, s ); BOOST_CHECK_EQUAL( s, "\tx1;" );
