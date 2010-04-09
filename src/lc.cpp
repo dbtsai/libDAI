@@ -30,15 +30,17 @@ const char *LC::Name = "LC";
 void LC::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("maxiter") );
-    DAI_ASSERT( opts.hasKey("verbose") );
     DAI_ASSERT( opts.hasKey("cavity") );
     DAI_ASSERT( opts.hasKey("updates") );
 
     props.tol = opts.getStringAs<Real>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
-    props.verbose = opts.getStringAs<size_t>("verbose");
     props.cavity = opts.getStringAs<Properties::CavityType>("cavity");
     props.updates = opts.getStringAs<Properties::UpdateType>("updates");
+    if( opts.hasKey("verbose") )
+        props.verbose = opts.getStringAs<size_t>("verbose");
+    else
+        props.verbose = 0;
     if( opts.hasKey("cavainame") )
         props.cavainame = opts.getStringAs<string>("cavainame");
     if( opts.hasKey("cavaiopts") )

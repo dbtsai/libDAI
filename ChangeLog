@@ -1,6 +1,8 @@
-git HEAD
---------
+git master HEAD
+---------------
 
+* Made all "verbose" properties optional
+* Unit tests should now also work on WINDOWS
 * [Stefano Pellegrini] Fixed bug in JTree::findMaximum()
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp

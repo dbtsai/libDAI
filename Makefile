@@ -34,16 +34,13 @@ else
 endif
 
 # Define build targets
-TARGETS:=tests utils lib examples
-ifneq ($(OS),WINDOWS)
-  TARGETS:=$(TARGETS) unittests
-endif
-TARGETS:=$(TARGETS) testregression testem
-ifdef WITH_DOC
-  TARGETS:=$(TARGETS) doc
-endif
+TARGETS:=lib tests utils examples
 ifdef WITH_MATLAB
   TARGETS:=$(TARGETS) matlabs
+endif
+TARGETS:=$(TARGETS) unittests testregression testem
+ifdef WITH_DOC
+  TARGETS:=$(TARGETS) doc
 endif
 
 # Define conditional build targets
@@ -188,7 +185,11 @@ examples/%$(EE) : examples/%.cpp $(HEADERS) $(LIB)/libdai$(LE)
 #############
 
 tests/unit/%$(EE) : tests/unit/%.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
+ifneq ($(OS),WINDOWS)
+	$(CC) -DBOOST_TEST_DYN_LINK $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
+else
+	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF) /SUBSYSTEM:CONSOLE
+endif
 
 
 # TESTS
@@ -322,24 +323,8 @@ clean :
 	-del utils\*.ilk
 	-del tests\unit\*.ilk
 	-del tests\unit\*.pdb
-	-del tests\unit\var$(EE)
-	-del tests\unit\smallset$(EE)
-	-del tests\unit\varset$(EE)
-	-del tests\unit\graph$(EE)
-	-del tests\unit\bipgraph$(EE)
-	-del tests\unit\weightedgraph$(EE)
-	-del tests\unit\enum$(EE)
-	-del tests\unit\util$(EE)
-	-del tests\unit\exceptions$(EE)
-	-del tests\unit\properties$(EE)
-	-del tests\unit\index$(EE)
-	-del tests\unit\prob$(EE)
-	-del tests\unit\factor$(EE)
-	-del tests\unit\factorgraph$(EE)
-	-del tests\unit\clustergraph$(EE)
-	-del tests\unit\regiongraph$(EE)
-	-del tests\unit\daialg$(EE)
-	-del tests\unit\alldai$(EE)
+	-del tests\unit\*$(EE)
+	-del tests\unit\*$(EE).manifest
 	-del factorgraph_test.fg
 	-del alldai_test.aliases
 	-del $(LIB)\libdai$(LE)

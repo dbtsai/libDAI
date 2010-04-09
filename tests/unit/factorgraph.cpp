@@ -8,9 +8,6 @@
  */
 
 
-#define BOOST_TEST_DYN_LINK
-
-
 #include <dai/bipgraph.h>
 #include <dai/factorgraph.h>
 #include <vector>

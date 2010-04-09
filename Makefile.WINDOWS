@@ -34,9 +34,9 @@ CC=cl
 # Output filename option of the compiler
 CCO=/Fe
 # Flags for the C++ compiler
-CCFLAGS=/EHsc /GR /W3 /DWINDOWS /DNOMINMAX
-# For MatLab R2008b, the following flags seem to be necessary: /MD /D_SECURE_SCL=0
-# but the last one generates exceptions in executables... therefore, the MatLab 
+CCFLAGS=/EHac /GR /W3 /DWINDOWS /DNOMINMAX /MD
+# For MatLab R2008b, the following flag seems to be necessary: /D_SECURE_SCL=0
+# but it generates exceptions in normal executables... therefore, the MatLab 
 # interface is now built from source completely using mex
 # Flags to add in debugging mode (if DEBUG=true)
 CCDEBUGFLAGS=/Ox /Zi /DDAI_DEBUG

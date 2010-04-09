@@ -29,13 +29,15 @@ const char *TreeEP::Name = "TREEEP";
 void TreeEP::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("maxiter") );
-    DAI_ASSERT( opts.hasKey("verbose") );
     DAI_ASSERT( opts.hasKey("type") );
 
     props.tol = opts.getStringAs<Real>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
-    props.verbose = opts.getStringAs<size_t>("verbose");
     props.type = opts.getStringAs<Properties::TypeType>("type");
+    if( opts.hasKey("verbose") )
+        props.verbose = opts.getStringAs<size_t>("verbose");
+    else
+        props.verbose = 0;
 }
 
 

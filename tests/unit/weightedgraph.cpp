@@ -8,9 +8,6 @@
  */
 
 
-#define BOOST_TEST_DYN_LINK
-
-
 #include <dai/weightedgraph.h>
 #include <dai/exceptions.h>
 #include <strstream>

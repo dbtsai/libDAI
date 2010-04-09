@@ -8,9 +8,6 @@
  */
 
 
-#define BOOST_TEST_DYN_LINK
-
-
 #include <dai/prob.h>
 #include <strstream>
 
@@ -180,7 +177,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     // test entropy
     BOOST_CHECK( x.entropy() < Prob(5).entropy() );
     for( size_t i = 1; i < 100; i++ )
-        BOOST_CHECK_CLOSE( Prob(i).entropy(), std::log(i), tol );
+        BOOST_CHECK_CLOSE( Prob(i).entropy(), std::log((Real)i), tol );
 
     // test hasNaNs and hasNegatives
     BOOST_CHECK( !Prob( 3, 0.0 ).hasNaNs() );

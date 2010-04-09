@@ -8,9 +8,6 @@
  */
 
 
-#define BOOST_TEST_DYN_LINK
-
-
 #include <dai/exceptions.h>
 #include <strstream>
 
@@ -49,12 +46,12 @@ BOOST_AUTO_TEST_CASE( ExceptionsTest ) {
     try {
         DAI_THROW(NOT_IMPLEMENTED);
     } catch( std::runtime_error& e ) {
-        BOOST_CHECK_EQUAL( e.what(), std::string("Feature not implemented [tests/unit/exceptions.cpp, line 50]") );
+        BOOST_CHECK_EQUAL( e.what(), std::string("Feature not implemented [tests/unit/exceptions.cpp, line 47]") );
     }
 
     try {
         DAI_THROWE(NOT_IMPLEMENTED,"Detailed error message");
     } catch( std::runtime_error& e ) {
-        BOOST_CHECK_EQUAL( e.what(), std::string("Feature not implemented [tests/unit/exceptions.cpp, line 56]") );
+        BOOST_CHECK_EQUAL( e.what(), std::string("Feature not implemented [tests/unit/exceptions.cpp, line 53]") );
     }
 }

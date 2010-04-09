@@ -348,7 +348,7 @@ class BBP {
            DAI_ENUM(UpdateType,SEQ_FIX,SEQ_MAX,SEQ_BP_REV,SEQ_BP_FWD,PAR);
 
            /// Verbosity (amount of output sent to stderr)
-           size_t verbose;
+           size_t verbose = 0;
 
            /// Maximum number of iterations
            size_t maxiter;
