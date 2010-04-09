@@ -84,8 +84,9 @@ class TFactor {
          *  \param x Vector with values to be copied.
          */
         template<typename S>
-        TFactor( const VarSet& vars, const std::vector<S> &x ) : _vs(vars), _p(x.begin(), x.begin() + _vs.nrStates(), _vs.nrStates()) {
+        TFactor( const VarSet& vars, const std::vector<S> &x ) : _vs(vars), _p() {
             DAI_ASSERT( x.size() == vars.nrStates() );
+	    _p = TProb<T>( x.begin(), x.begin() + _vs.nrStates(), _vs.nrStates() );
         }
 
         /// Constructs factor depending on variables in \a vars, copying the values from an array
