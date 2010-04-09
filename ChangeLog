@@ -1,6 +1,7 @@
 git HEAD
 --------
 
+* [Stefano Pellegrini] Fixed bug in JTree::findMaximum()
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
 * Improved treeep.h/cpp:
