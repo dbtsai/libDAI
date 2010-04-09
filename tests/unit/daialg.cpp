@@ -51,6 +51,8 @@ BOOST_AUTO_TEST_CASE( calcMarginalTest ) {
     Factor joint = facs[0] * facs[1] * facs[2] * facs[3] * facs[4] * facs[5] * facs[6] * facs[7];
     FactorGraph fg( facs );
     ExactInf ei( fg, PropertySet()("verbose",(size_t)0) );
+    ei.init();
+    ei.run();
     VarSet vs;
 
     vs = v0;        BOOST_CHECK( dist( calcMarginal( ei, vs, false ), joint.marginal( vs ), DISTTV ) < tol );
@@ -94,6 +96,8 @@ BOOST_AUTO_TEST_CASE( calcPairBeliefsTest ) {
     Factor joint = facs[0] * facs[1] * facs[2] * facs[3] * facs[4] * facs[5] * facs[6] * facs[7];
     FactorGraph fg( facs );
     ExactInf ei( fg, PropertySet()("verbose",(size_t)0) );
+    ei.init();
+    ei.run();
     VarSet vs;
 
     std::vector<Factor> pb = calcPairBeliefs( ei, v01 | v23, false, false );
