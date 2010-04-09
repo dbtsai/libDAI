@@ -124,7 +124,7 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/enum$(EE) tests/unit/util$(EE) tests/unit/exceptions$(EE) tests/unit/properties$(EE) tests/unit/index$(EE) tests/unit/prob$(EE) tests/unit/factor$(EE) tests/unit/factorgraph$(EE) tests/unit/clustergraph$(EE) tests/unit/regiongraph$(EE)
+unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/enum$(EE) tests/unit/util$(EE) tests/unit/exceptions$(EE) tests/unit/properties$(EE) tests/unit/index$(EE) tests/unit/prob$(EE) tests/unit/factor$(EE) tests/unit/factorgraph$(EE) tests/unit/clustergraph$(EE) tests/unit/regiongraph$(EE) tests/unit/daialg$(EE)
 	echo Running unit tests...
 	tests/unit/var$(EE)
 	tests/unit/smallset$(EE)
@@ -142,6 +142,7 @@ unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) 
 	tests/unit/factorgraph$(EE)
 	tests/unit/clustergraph$(EE)
 	tests/unit/regiongraph$(EE)
+	tests/unit/daialg$(EE)
 
 tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE) $(unittests)
 
@@ -289,7 +290,7 @@ clean :
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE)
 	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
-	-rm tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/util$(EE) tests/unit/exceptions$(EE) tests/unit/properties$(EE) tests/unit/index$(EE) tests/unit/prob$(EE) tests/unit/factor$(EE) tests/unit/factorgraph$(EE) tests/unit/clustergraph$(EE) tests/unit/regiongraph$(EE)
+	-rm tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/util$(EE) tests/unit/exceptions$(EE) tests/unit/properties$(EE) tests/unit/index$(EE) tests/unit/prob$(EE) tests/unit/factor$(EE) tests/unit/factorgraph$(EE) tests/unit/clustergraph$(EE) tests/unit/regiongraph$(EE) tests/unit/daialg$(EE)
 	-rm factorgraph_test.fg
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
@@ -336,6 +337,7 @@ clean :
 	-del tests\unit\factorgraph$(EE)
 	-del tests\unit\clustergraph$(EE)
 	-del tests\unit\regiongraph$(EE)
+	-del tests\unit\daialg$(EE)
 	-del factorgraph_test.fg
 	-del $(LIB)\libdai$(LE)
 	-rmdir lib

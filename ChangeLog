@@ -144,7 +144,7 @@ git HEAD
 * Compressed Makefile
 * Added unit tests for var, smallset, varset, graph, bipgraph,
   weightedgraph, enum, util, exceptions, properties, index, prob, 
-  factor, factorgraph, clustergraph, regiongraph
+  factor, factorgraph, clustergraph, regiongraph, daialg
 * Added unit testing framework
 * Added initialization of TRWBP weights by sampling spanning trees
 * Cleaned up MR code:
