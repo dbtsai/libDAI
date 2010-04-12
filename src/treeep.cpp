@@ -100,8 +100,11 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
                                 piet = piet.marginal( ij );
                                 Factor pietf = piet.marginal(v_i) * piet.marginal(*j);
                                 wg[UEdge(i,fg.findVar(*j))] = dist( piet, pietf, DISTKL );
-                            } else
+                            } else {
+                                // this should never happen...
+                                DAI_ASSERT( 0 == 1 );
                                 wg[UEdge(i,fg.findVar(*j))] = 0;
+                            }
                         } else {
                             wg[UEdge(i,fg.findVar(*j))] = piet.strength(v_i, *j);
                         }

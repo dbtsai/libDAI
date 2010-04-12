@@ -110,10 +110,9 @@ class JTree : public DAIAlgRG {
         JTree() : DAIAlgRG(), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \param fg factor graph (which has to be connected);
+        /** \param fg factor graph
          ** \param opts Parameters @see Properties
          *  \param automatic if \c true, construct the junction tree automatically, using the heuristic in opts['heuristic'].
-         *  \throw FACTORGRAPH_NOT_CONNECTED if \a fg is not connected
          */
         JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic=true );
     //@}
