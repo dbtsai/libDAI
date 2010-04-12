@@ -32,14 +32,16 @@ const char *MR::Name = "MR";
 
 void MR::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
-    DAI_ASSERT( opts.hasKey("verbose") );
     DAI_ASSERT( opts.hasKey("updates") );
     DAI_ASSERT( opts.hasKey("inits") );
 
     props.tol = opts.getStringAs<Real>("tol");
-    props.verbose = opts.getStringAs<size_t>("verbose");
     props.updates = opts.getStringAs<Properties::UpdateType>("updates");
     props.inits = opts.getStringAs<Properties::InitType>("inits");
+    if( opts.hasKey("verbose") )
+        props.verbose = opts.getStringAs<size_t>("verbose");
+    else
+        props.verbose = 0;
 }
 
 

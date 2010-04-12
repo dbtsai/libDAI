@@ -34,16 +34,13 @@ else
 endif
 
 # Define build targets
-TARGETS:=tests utils lib examples
-ifneq ($(OS),WINDOWS)
-  TARGETS:=$(TARGETS) unittests
-endif
-TARGETS:=$(TARGETS) testregression testem
-ifdef WITH_DOC
-  TARGETS:=$(TARGETS) doc
-endif
+TARGETS:=lib tests utils examples
 ifdef WITH_MATLAB
   TARGETS:=$(TARGETS) matlabs
+endif
+TARGETS:=$(TARGETS) unittests testregression testem
+ifdef WITH_DOC
+  TARGETS:=$(TARGETS) doc
 endif
 
 # Define conditional build targets
@@ -124,26 +121,26 @@ examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
-unittests : tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/enum$(EE) tests/unit/util$(EE) tests/unit/exceptions$(EE) tests/unit/properties$(EE) tests/unit/index$(EE) tests/unit/prob$(EE) tests/unit/factor$(EE) tests/unit/factorgraph$(EE) tests/unit/clustergraph$(EE) tests/unit/regiongraph$(EE) tests/unit/daialg$(EE) tests/unit/alldai$(EE)
+unittests : tests/unit/var_test$(EE) tests/unit/smallset_test$(EE) tests/unit/varset_test$(EE) tests/unit/graph_test$(EE) tests/unit/bipgraph_test$(EE) tests/unit/weightedgraph_test$(EE) tests/unit/enum_test$(EE) tests/unit/enum_test$(EE) tests/unit/util_test$(EE) tests/unit/exceptions_test$(EE) tests/unit/properties_test$(EE) tests/unit/index_test$(EE) tests/unit/prob_test$(EE) tests/unit/factor_test$(EE) tests/unit/factorgraph_test$(EE) tests/unit/clustergraph_test$(EE) tests/unit/regiongraph_test$(EE) tests/unit/daialg_test$(EE) tests/unit/alldai_test$(EE)
 	echo Running unit tests...
-	tests/unit/var$(EE)
-	tests/unit/smallset$(EE)
-	tests/unit/varset$(EE)
-	tests/unit/graph$(EE)
-	tests/unit/bipgraph$(EE)
-	tests/unit/weightedgraph$(EE)
-	tests/unit/enum$(EE)
-	tests/unit/util$(EE)
-	tests/unit/exceptions$(EE)
-	tests/unit/properties$(EE)
-	tests/unit/index$(EE)
-	tests/unit/prob$(EE)
-	tests/unit/factor$(EE)
-	tests/unit/factorgraph$(EE)
-	tests/unit/clustergraph$(EE)
-	tests/unit/regiongraph$(EE)
-	tests/unit/daialg$(EE)
-	tests/unit/alldai$(EE)
+	tests/unit/var_test$(EE)
+	tests/unit/smallset_test$(EE)
+	tests/unit/varset_test$(EE)
+	tests/unit/graph_test$(EE)
+	tests/unit/bipgraph_test$(EE)
+	tests/unit/weightedgraph_test$(EE)
+	tests/unit/enum_test$(EE)
+	tests/unit/util_test$(EE)
+	tests/unit/exceptions_test$(EE)
+	tests/unit/properties_test$(EE)
+	tests/unit/index_test$(EE)
+	tests/unit/prob_test$(EE)
+	tests/unit/factor_test$(EE)
+	tests/unit/factorgraph_test$(EE)
+	tests/unit/clustergraph_test$(EE)
+	tests/unit/regiongraph_test$(EE)
+	tests/unit/daialg_test$(EE)
+	tests/unit/alldai_test$(EE)
 
 tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE) $(unittests)
 
@@ -188,7 +185,11 @@ examples/%$(EE) : examples/%.cpp $(HEADERS) $(LIB)/libdai$(LE)
 #############
 
 tests/unit/%$(EE) : tests/unit/%.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
+ifneq ($(OS),WINDOWS)
+	$(CC) -DBOOST_TEST_DYN_LINK $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF)
+else
+	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_UTF) /SUBSYSTEM:CONSOLE
+endif
 
 
 # TESTS
@@ -291,7 +292,7 @@ clean :
 	-rm matlab/*$(ME)
 	-rm examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE)
 	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
-	-rm tests/unit/var$(EE) tests/unit/smallset$(EE) tests/unit/varset$(EE) tests/unit/graph$(EE) tests/unit/bipgraph$(EE) tests/unit/weightedgraph$(EE) tests/unit/enum$(EE) tests/unit/util$(EE) tests/unit/exceptions$(EE) tests/unit/properties$(EE) tests/unit/index$(EE) tests/unit/prob$(EE) tests/unit/factor$(EE) tests/unit/factorgraph$(EE) tests/unit/clustergraph$(EE) tests/unit/regiongraph$(EE) tests/unit/daialg$(EE) tests/unit/alldai$(EE)
+	-rm tests/unit/var_test$(EE) tests/unit/smallset_test$(EE) tests/unit/varset_test$(EE) tests/unit/graph_test$(EE) tests/unit/bipgraph_test$(EE) tests/unit/weightedgraph_test$(EE) tests/unit/enum_test$(EE) tests/unit/util_test$(EE) tests/unit/exceptions_test$(EE) tests/unit/properties_test$(EE) tests/unit/index_test$(EE) tests/unit/prob_test$(EE) tests/unit/factor_test$(EE) tests/unit/factorgraph_test$(EE) tests/unit/clustergraph_test$(EE) tests/unit/regiongraph_test$(EE) tests/unit/daialg_test$(EE) tests/unit/alldai_test$(EE)
 	-rm factorgraph_test.fg alldai_test.aliases
 	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
 	-rm -R doc
@@ -320,26 +321,10 @@ clean :
 	-del utils\*$(EE).manifest
 	-del utils\*.pdb
 	-del utils\*.ilk
-	-del tests\unit\*.ilk
-	-del tests\unit\*.pdb
-	-del tests\unit\var$(EE)
-	-del tests\unit\smallset$(EE)
-	-del tests\unit\varset$(EE)
-	-del tests\unit\graph$(EE)
-	-del tests\unit\bipgraph$(EE)
-	-del tests\unit\weightedgraph$(EE)
-	-del tests\unit\enum$(EE)
-	-del tests\unit\util$(EE)
-	-del tests\unit\exceptions$(EE)
-	-del tests\unit\properties$(EE)
-	-del tests\unit\index$(EE)
-	-del tests\unit\prob$(EE)
-	-del tests\unit\factor$(EE)
-	-del tests\unit\factorgraph$(EE)
-	-del tests\unit\clustergraph$(EE)
-	-del tests\unit\regiongraph$(EE)
-	-del tests\unit\daialg$(EE)
-	-del tests\unit\alldai$(EE)
+	-del tests\unit\*_test.ilk
+	-del tests\unit\*_test.pdb
+	-del tests\unit\*_test$(EE)
+	-del tests\unit\*_test$(EE).manifest
 	-del factorgraph_test.fg
 	-del alldai_test.aliases
 	-del $(LIB)\libdai$(LE)

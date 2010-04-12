@@ -8,9 +8,6 @@
  */
 
 
-#define BOOST_TEST_DYN_LINK
-
-
 #include <dai/clustergraph.h>
 #include <vector>
 #include <strstream>

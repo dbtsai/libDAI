@@ -46,16 +46,18 @@ TFactor<T>& makeZero( TFactor<T> &f, T epsilon ) {
 void HAK::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("maxiter") );
-    DAI_ASSERT( opts.hasKey("verbose") );
     DAI_ASSERT( opts.hasKey("doubleloop") );
     DAI_ASSERT( opts.hasKey("clusters") );
 
     props.tol = opts.getStringAs<Real>("tol");
     props.maxiter = opts.getStringAs<size_t>("maxiter");
-    props.verbose = opts.getStringAs<size_t>("verbose");
     props.doubleloop = opts.getStringAs<bool>("doubleloop");
     props.clusters = opts.getStringAs<Properties::ClustersType>("clusters");
 
+    if( opts.hasKey("verbose") )
+        props.verbose = opts.getStringAs<size_t>("verbose");
+    else
+        props.verbose = 0;
     if( opts.hasKey("loopdepth") )
         props.loopdepth = opts.getStringAs<size_t>("loopdepth");
     else

@@ -10,6 +10,9 @@
 # This template contains configurations for compiling libDAI with Visual C++
 # under Windows (and GNU Make)
 #
+# It has been tested with Windows XP, Visual Studio 2008, MatLab R2008b and
+# Boost 1.42.0
+#
 # To use it, simply copy this file to 'Makefile.conf' and adapt 'Makefile.conf'
 # to your local setup
 
@@ -34,23 +37,23 @@ CC=cl
 # Output filename option of the compiler
 CCO=/Fe
 # Flags for the C++ compiler
-CCFLAGS=/EHsc /GR /W3 /DWINDOWS /DNOMINMAX
-# For MatLab R2008b, the following flags seem to be necessary: /MD /D_SECURE_SCL=0
-# but the last one generates exceptions in executables... therefore, the MatLab 
+CCFLAGS=/EHac /GR /W3 /DWINDOWS /DNOMINMAX /MD
+# For MatLab R2008b, the following flag seems to be necessary: /D_SECURE_SCL=0
+# but it generates exceptions in normal executables... therefore, the MatLab 
 # interface is now built from source completely using mex
 # Flags to add in debugging mode (if DEBUG=true)
 CCDEBUGFLAGS=/Ox /Zi /DDAI_DEBUG
 # Flags to add in non-debugging mode (if DEBUG=false)
 CCNODEBUGFLAGS=/Ox
 # Standard include directories
-CCINC=-Iinclude -IE:\boost_1_42_0
+CCINC=-Iinclude -IE:\windows\boost_1_42_0
 
 # LINKER
 # Standard libraries to include
 LIBS=/link $(LIB)/libdai$(LE)
 # For linking with BOOST libraries
-BOOSTLIBS_PO=/LIBPATH:E:\boost_1_42_0\stage\lib
-BOOSTLIBS_UTF=/LIBPATH:E:\boost_1_42_0\stage\lib
+BOOSTLIBS_PO=/LIBPATH:E:\windows\boost_1_42_0\stage\lib
+BOOSTLIBS_UTF=/LIBPATH:E:\windows\boost_1_42_0\stage\lib
 # Additional library search paths for linker
 # (For some reason, we have to add the VC library path, although it is in the environment)
 CCLIB=/LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\ATLMFC\LIB" /LIBPATH:"C:\Program Files\Microsoft Visual Studio 9.0\VC\LIB" /LIBPATH:"C:\Program Files\Microsoft SDKs\Windows\v6.0A\lib"
@@ -73,4 +76,4 @@ SWIG=swig
 # Location of Python header files
 INCLUDE_PYTHON=C:\python2.5
 # Location of Boost C++ library header files
-INCLUDE_BOOST=E:\boost_1_42_0
+INCLUDE_BOOST=E:\windows\boost_1_42_0

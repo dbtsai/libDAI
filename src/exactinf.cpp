@@ -23,9 +23,10 @@ const char *ExactInf::Name = "EXACT";
 
 
 void ExactInf::setProperties( const PropertySet &opts ) {
-    DAI_ASSERT( opts.hasKey("verbose") );
-
-    props.verbose = opts.getStringAs<size_t>("verbose");
+    if( opts.hasKey("verbose") )
+        props.verbose = opts.getStringAs<size_t>("verbose");
+    else
+        props.verbose = 0;
 }
 
 

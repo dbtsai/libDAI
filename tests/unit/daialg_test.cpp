@@ -8,9 +8,6 @@
  */
 
 
-#define BOOST_TEST_DYN_LINK
-
-
 #include <dai/daialg.h>
 #include <dai/alldai.h>
 #include <strstream>

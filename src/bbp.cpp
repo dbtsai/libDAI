@@ -1153,8 +1153,6 @@ void BBP::Properties::set(const PropertySet &opts)
     }
     if( !errormsg.empty() )
         DAI_THROWE(UNKNOWN_PROPERTY, errormsg);
-    if( !opts.hasKey("verbose") )
-        errormsg = errormsg + "BBP: Missing property \"verbose\" for method \"BBP\"\n";
     if( !opts.hasKey("maxiter") )
         errormsg = errormsg + "BBP: Missing property \"maxiter\" for method \"BBP\"\n";
     if( !opts.hasKey("tol") )
@@ -1165,7 +1163,11 @@ void BBP::Properties::set(const PropertySet &opts)
         errormsg = errormsg + "BBP: Missing property \"updates\" for method \"BBP\"\n";
     if( !errormsg.empty() )
         DAI_THROWE(NOT_ALL_PROPERTIES_SPECIFIED,errormsg);
-    verbose = opts.getStringAs<size_t>("verbose");
+    if( opts.hasKey("verbose") ) {
+        verbose = opts.getStringAs<size_t>("verbose");
+    } else {
+        verbose = 0;
+    }
     maxiter = opts.getStringAs<size_t>("maxiter");
     tol = opts.getStringAs<Real>("tol");
     damping = opts.getStringAs<Real>("damping");

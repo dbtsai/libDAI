@@ -24,11 +24,13 @@ const char *JTree::Name = "JTREE";
 
 
 void JTree::setProperties( const PropertySet &opts ) {
-    DAI_ASSERT( opts.hasKey("verbose") );
     DAI_ASSERT( opts.hasKey("updates") );
 
-    props.verbose = opts.getStringAs<size_t>("verbose");
     props.updates = opts.getStringAs<Properties::UpdateType>("updates");
+    if( opts.hasKey("verbose") )
+        props.verbose = opts.getStringAs<size_t>("verbose");
+    else
+        props.verbose = 0;
     if( opts.hasKey("inference") )
         props.inference = opts.getStringAs<Properties::InfType>("inference");
     else
