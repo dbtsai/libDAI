@@ -25,6 +25,9 @@
 #include <boost/foreach.hpp>
 #include <boost/functional/hash.hpp>
 #include <algorithm>
+#include <cerrno>
+
+#include <dai/exceptions.h>
 
 
 #if defined(WINDOWS)
@@ -58,6 +61,12 @@
 
 /// Macro to write message \a stmt to \c std::cerr if \a props.verbose >= \a n
 #define DAI_IFVERB(n, stmt) if(props.verbose>=n) { std::cerr << stmt; }
+
+
+#ifdef CYGWIN
+    /// Returns true if argument is NAN (Not A Number)
+    bool isnan( double x );
+#endif
 
 
 #ifdef WINDOWS
@@ -94,6 +103,14 @@ inline Real log0( Real x ) {
 /// Returns exponent of \a x
 inline Real exp( Real x ) {
     return std::exp(x);
+}
+
+/// Returns \a to the power \a y
+inline Real pow( Real x, Real y ) {
+    errno = 0;
+    Real result = std::pow(x, y);
+    DAI_DEBASSERT( errno == 0 );
+    return result;
 }
 
 
