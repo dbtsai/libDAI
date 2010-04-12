@@ -48,8 +48,8 @@ CCINC=-Iinclude
 # Standard libraries to include
 LIBS=-ldai
 # For linking with BOOST libraries
-BOOSTLIBS_PO=-lboost_program_options
-BOOSTLIBS_UTF=-lboost_unit_test_framework
+BOOSTLIBS_PO=-lboost_program_options-mt
+BOOSTLIBS_UTF=-lboost_unit_test_framework-mt
 # Additional library search paths for linker
 CCLIB=-Llib
 
