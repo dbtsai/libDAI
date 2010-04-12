@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     // test entropy
     BOOST_CHECK( x.entropy() < Prob(5).entropy() );
     for( size_t i = 1; i < 100; i++ )
-        BOOST_CHECK_CLOSE( Factor( Var(0,i) ).entropy(), log((Real)i), tol );
+        BOOST_CHECK_CLOSE( Factor( Var(0,i) ).entropy(), dai::log((Real)i), tol );
 
     // test hasNaNs and hasNegatives
     BOOST_CHECK( !Factor( 0.0 ).hasNaNs() );
@@ -216,19 +216,19 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     BOOST_CHECK_CLOSE( y[2], (Real)2.0, tol );
 
     y = x.exp();
-    BOOST_CHECK_CLOSE( y[0], exp((Real)-2.0), tol );
+    BOOST_CHECK_CLOSE( y[0], dai::exp((Real)-2.0), tol );
     BOOST_CHECK_CLOSE( y[1], (Real)1.0, tol );
     BOOST_CHECK_CLOSE( y[2], (Real)1.0 / y[0], tol );
 
     y = x.log(false);
     BOOST_CHECK( isnan( y[0] ) );
     BOOST_CHECK_EQUAL( y[1], -INFINITY );
-    BOOST_CHECK_CLOSE( y[2], log((Real)2.0), tol );
+    BOOST_CHECK_CLOSE( y[2], dai::log((Real)2.0), tol );
 
     y = x.log(true);
     BOOST_CHECK( isnan( y[0] ) );
     BOOST_CHECK_CLOSE( y[1], (Real)0.0, tol );
-    BOOST_CHECK_CLOSE( y[2], log((Real)2.0), tol );
+    BOOST_CHECK_CLOSE( y[2], dai::log((Real)2.0), tol );
 
     y = x.inverse(false);
     BOOST_CHECK_CLOSE( y[0], (Real)-0.5, tol );
@@ -271,14 +271,14 @@ BOOST_AUTO_TEST_CASE( UnaryOperationsTest ) {
     BOOST_CHECK( x.setUniform() == Factor( v ) );
     BOOST_CHECK( x == Factor( v ) );
 
-    y.set( 0, exp(2.0) );
+    y.set( 0, dai::exp(2.0) );
     y.set( 1, 1.0 );
-    y.set( 2, exp(1.0) );
+    y.set( 2, dai::exp(1.0) );
     x = xorg;
     BOOST_CHECK_SMALL( dist( x.takeExp(), y, DISTL1 ), tol );
     BOOST_CHECK_SMALL( dist( x, y, DISTL1 ), tol );
 
-    y.set( 0, log(2.0) );
+    y.set( 0, dai::log(2.0) );
     y.set( 1, -INFINITY );
     y.set( 2, 0.0 );
     x = xorg;
@@ -400,15 +400,9 @@ BOOST_AUTO_TEST_CASE( ScalarOperationsTest ) {
     y.set( 0, 4.0 ); y.set( 1, 0.0 ); y.set( 2, 1.0 );
     BOOST_CHECK_SMALL( dist( (x ^= 2.0), y, DISTL1 ), tol );
     BOOST_CHECK_SMALL( dist( x, y, DISTL1 ), tol );
-    y.set( 0, 0.5 ); y.set( 1, INFINITY ); y.set( 2, 1.0 );
-//    BOOST_CHECK( (x ^= -0.5) == y );
-//    BOOST_CHECK( x == y );
-    BOOST_CHECK_CLOSE( (x ^= -0.5)[0], y[0], tol );
-    x = xorg;
-//    BOOST_CHECK_CLOSE( (x ^= -0.5)[1], y[1], tol );
-//    x = xorg;
-    BOOST_CHECK_CLOSE( (x ^= -0.5)[2], y[2], tol );
-    x = xorg;
+    y.set( 0, 2.0 ); y.set( 1, 0.0 ); y.set( 2, 1.0 );
+    BOOST_CHECK( (x ^= 0.5) == y );
+    BOOST_CHECK( x == y );
 }
 
 
@@ -447,11 +441,8 @@ BOOST_AUTO_TEST_CASE( ScalarTransformationsTest ) {
     BOOST_CHECK_SMALL( dist( (x ^ 0.0), Factor(v, 1.0), DISTL1 ), tol );
     y.set( 0, 4.0 ); y.set( 1, 0.0 ); y.set( 2, 1.0 );
     BOOST_CHECK_SMALL( dist( (x ^ 2.0), y, DISTL1 ), tol );
-    y.set( 0, 1.0 / std::sqrt(2.0) ); y.set( 1, INFINITY ); y.set( 2, 1.0 );
-    Factor z = (x ^ -0.5);
-    BOOST_CHECK_CLOSE( z[0], y[0], tol );
-//    BOOST_CHECK_EQUAL( z[1], y[1] );
-    BOOST_CHECK_CLOSE( z[2], y[2], tol );
+    y.set( 0, std::sqrt(2.0) ); y.set( 1, 0.0 ); y.set( 2, 1.0 );
+    BOOST_CHECK_SMALL( dist( (x ^ 0.5), y, DISTL1 ), tol );
 }
 
 
@@ -839,12 +830,12 @@ BOOST_AUTO_TEST_CASE( RelatedFunctionsTest ) {
     BOOST_CHECK_EQUAL( dist( y, x, DISTKL ), INFINITY );
     BOOST_CHECK_CLOSE( dist( x, x, DISTHEL ), (Real)0.0, tol );
     BOOST_CHECK_CLOSE( dist( y, y, DISTHEL ), (Real)0.0, tol );
-    BOOST_CHECK_CLOSE( dist( x, y, DISTHEL ), (Real)(0.5 * (0.2 + pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4)), tol );
-    BOOST_CHECK_CLOSE( dist( y, x, DISTHEL ), (Real)(0.5 * (0.2 + pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4)), tol );
+    BOOST_CHECK_CLOSE( dist( x, y, DISTHEL ), (Real)(0.5 * (0.2 + dai::pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4)), tol );
+    BOOST_CHECK_CLOSE( dist( y, x, DISTHEL ), (Real)(0.5 * (0.2 + dai::pow(std::sqrt(0.8) - std::sqrt(0.6), 2.0) + 0.4)), tol );
     x.set( 1, 0.7 ); x.set( 2, 0.1 );
     y.set( 0, 0.1 ); y.set( 1, 0.5 );
-    BOOST_CHECK_CLOSE( dist( x, y, DISTKL ), (Real)(0.2 * log(0.2 / 0.1) + 0.7 * log(0.7 / 0.5) + 0.1 * log(0.1 / 0.4)), tol );
-    BOOST_CHECK_CLOSE( dist( y, x, DISTKL ), (Real)(0.1 * log(0.1 / 0.2) + 0.5 * log(0.5 / 0.7) + 0.4 * log(0.4 / 0.1)), tol );
+    BOOST_CHECK_CLOSE( dist( x, y, DISTKL ), (Real)(0.2 * dai::log(0.2 / 0.1) + 0.7 * dai::log(0.7 / 0.5) + 0.1 * dai::log(0.1 / 0.4)), tol );
+    BOOST_CHECK_CLOSE( dist( y, x, DISTKL ), (Real)(0.1 * dai::log(0.1 / 0.2) + 0.5 * dai::log(0.5 / 0.7) + 0.4 * dai::log(0.4 / 0.1)), tol );
 
     std::stringstream ss;
     ss << x;
@@ -867,11 +858,11 @@ BOOST_AUTO_TEST_CASE( RelatedFunctionsTest ) {
 
     for( Real J = -1.0; J <= 1.01; J += 0.1 ) {
         Factor x = createFactorIsing( Var(0,2), Var(1,2), J ).normalized();
-        BOOST_CHECK_CLOSE( x[0], exp(J) / (4.0 * std::cosh(J)), tol );
-        BOOST_CHECK_CLOSE( x[1], exp(-J) / (4.0 * std::cosh(J)), tol );
-        BOOST_CHECK_CLOSE( x[2], exp(-J) / (4.0 * std::cosh(J)), tol );
-        BOOST_CHECK_CLOSE( x[3], exp(J) / (4.0 * std::cosh(J)), tol );
-        BOOST_CHECK_SMALL( MutualInfo( x ) - (J * std::tanh(J) - log(std::cosh(J))), tol );
+        BOOST_CHECK_CLOSE( x[0], dai::exp(J) / (4.0 * std::cosh(J)), tol );
+        BOOST_CHECK_CLOSE( x[1], dai::exp(-J) / (4.0 * std::cosh(J)), tol );
+        BOOST_CHECK_CLOSE( x[2], dai::exp(-J) / (4.0 * std::cosh(J)), tol );
+        BOOST_CHECK_CLOSE( x[3], dai::exp(J) / (4.0 * std::cosh(J)), tol );
+        BOOST_CHECK_SMALL( MutualInfo( x ) - (J * std::tanh(J) - dai::log(std::cosh(J))), tol );
     }
     Var v1( 1, 3 );
     Var v2( 2, 4 );
@@ -881,9 +872,9 @@ BOOST_AUTO_TEST_CASE( RelatedFunctionsTest ) {
     BOOST_CHECK_THROW( createFactorIsing( v1, v2, 0.0 ), Exception );
     for( Real J = -1.0; J <= 1.01; J += 0.1 ) {
         Factor x = createFactorIsing( Var(0,2), J ).normalized();
-        BOOST_CHECK_CLOSE( x[0], exp(-J) / (2.0 * std::cosh(J)), tol );
-        BOOST_CHECK_CLOSE( x[1], exp(J) / (2.0 * std::cosh(J)), tol );
-        BOOST_CHECK_SMALL( x.entropy() - (-J * std::tanh(J) + log(2.0 * std::cosh(J))), tol );
+        BOOST_CHECK_CLOSE( x[0], dai::exp(-J) / (2.0 * std::cosh(J)), tol );
+        BOOST_CHECK_CLOSE( x[1], dai::exp(J) / (2.0 * std::cosh(J)), tol );
+        BOOST_CHECK_SMALL( x.entropy() - (-J * std::tanh(J) + dai::log(2.0 * std::cosh(J))), tol );
     }
     
     x = createFactorDelta( v1, 2 );
