@@ -42,16 +42,16 @@ CCDEBUGFLAGS=-O3 -g -DDAI_DEBUG
 # Flags to add in non-debugging mode (if DEBUG=false)
 CCNODEBUGFLAGS=-O3
 # Standard include directories
-CCINC=-Iinclude -I/usr/local/include/boost-1_37
+CCINC=-Iinclude -I/cygdrive/e/cygwin/boost_1_42_0
 
 # LINKER
 # Standard libraries to include
 LIBS=-ldai
 # For linking with BOOST libraries
-BOOSTLIBS_PO=-lboost_program_options-gcc34-mt
-BOOSTLIBS_UTF=-lboost_unit_test_framework-gcc34-mt
+BOOSTLIBS_PO=-lboost_program_options
+BOOSTLIBS_UTF=-lboost_unit_test_framework
 # Additional library search paths for linker
-CCLIB=-Llib
+CCLIB=-Llib -L/cygdrive/e/cygwin/boost_1_42_0/stage/lib
 
 # MATLAB
 # Replace the following by the directory where MatLab has been installed
@@ -71,4 +71,4 @@ SWIG=swig
 # Location of Python header files
 INCLUDE_PYTHON=/usr/include/python2.5
 # Location of Boost C++ library header files
-INCLUDE_BOOST=/usr/local/include/boost-1_37
+INCLUDE_BOOST=/cygdrive/e/cygwin/boost_1_42_0

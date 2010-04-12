@@ -150,7 +150,7 @@ template<typename T> struct fo_pow : public std::binary_function<T, T, T> {
     /// Returns (\a x ^ \a y)
     T operator()( const T &x, const T &y ) const {
         if( y != 1 )
-            return std::pow( x, y );
+            return pow( x, y );
         else
             return x;
     }
