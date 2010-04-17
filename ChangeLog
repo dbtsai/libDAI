@@ -13,6 +13,7 @@ git master HEAD
 * Improved treeep.h/cpp:
   - changed TreeEP::construct( const RootedTree& ) into
     TreeEP::construct( const FactorGraph&, const RootedTree& )
+  - Now also supports disconnected factor graphs
 * Improved jtree.h/cpp:
   - changed JTree::construct( const std::vector<VarSet>&, bool ) into
     JTree::construct( const FactorGraph&, const std::vector<VarSet>&, bool )
