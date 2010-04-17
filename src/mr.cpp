@@ -389,6 +389,18 @@ Factor MR::beliefV( size_t i ) const {
         return Factor();
 }
 
+    
+Factor MR::belief (const VarSet &ns) const {
+    if( ns.size() == 0 )
+        return Factor();
+    else if( ns.size() == 1 )
+        return beliefV( findVar( *(ns.begin()) ) );
+    else {
+        DAI_THROW(BELIEF_NOT_AVAILABLE);
+        return Factor();
+    }
+}
+
 
 vector<Factor> MR::beliefs() const {
     vector<Factor> result;

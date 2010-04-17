@@ -66,9 +66,6 @@ string JTree::printProperties() const {
 JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) : DAIAlgRG(), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {
     setProperties( opts );
 
-    if( !fg.isConnected() )
-        DAI_THROW(FACTORGRAPH_NOT_CONNECTED);
-
     if( automatic ) {
         // Create ClusterGraph which contains factors as clusters
         vector<VarSet> cl;
@@ -120,12 +117,22 @@ void JTree::construct( const FactorGraph &fg, const std::vector<VarSet> &cl, boo
     // Construct a weighted graph (each edge is weighted with the cardinality
     // of the intersection of the nodes, where the nodes are the elements of cl).
     WeightedGraph<int> JuncGraph;
-    for( size_t i = 0; i < cl.size(); i++ )
-        for( size_t j = i+1; j < cl.size(); j++ ) {
+    std::vector<bool> connected( cl.size(), false );
+    for( size_t i = 0; i < cl.size(); i++ ) {
+        for( size_t j = i + 1; j < cl.size(); j++ ) {
             size_t w = (cl[i] & cl[j]).size();
-            if( w )
+            if( w ) {
                 JuncGraph[UEdge(i,j)] = w;
+                connected[i] = true;
+                connected[j] = true;
+            }
         }
+    }
+    // for clusters that have no overlap with other clusters,
+    // connect them with the zeroth cluster
+    for( size_t i = 1; i < cl.size(); i++ )
+        if( !connected[i] )
+            JuncGraph[UEdge(i,0)] = 0;
 
     // Construct maximal spanning tree using Prim's algorithm
     RTree = MaxSpanningTree( JuncGraph, true );
@@ -162,8 +169,9 @@ void JTree::construct( const FactorGraph &fg, const std::vector<VarSet> &cl, boo
     for( size_t i = 0; i < RTree.size(); i++ ) {
         edges.push_back( Edge( RTree[i].first, nrIRs() ) );
         edges.push_back( Edge( RTree[i].second, nrIRs() ) );
-        // inner clusters have counting number -1
-        _IRs.push_back( Region( cl[RTree[i].first] & cl[RTree[i].second], -1.0 ) );
+        // inner clusters have counting number -1, except if they are empty
+        VarSet intersection = cl[RTree[i].first] & cl[RTree[i].second];
+        _IRs.push_back( Region( intersection, intersection.size() ? -1.0 : 0.0 ) );
     }
 
     // create bipartite graph

@@ -110,10 +110,9 @@ class JTree : public DAIAlgRG {
         JTree() : DAIAlgRG(), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
-        /** \param fg factor graph (which has to be connected);
+        /** \param fg factor graph
          ** \param opts Parameters @see Properties
          *  \param automatic if \c true, construct the junction tree automatically, using the heuristic in opts['heuristic'].
-         *  \throw FACTORGRAPH_NOT_CONNECTED if \a fg is not connected
          */
         JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic=true );
     //@}
@@ -146,7 +145,8 @@ class JTree : public DAIAlgRG {
          *  Subsequently, a corresponding region graph is built:
          *    - the outer regions correspond with the cliques and have counting number 1;
          *    - the inner regions correspond with the seperators, i.e., the intersections of two 
-         *      cliques that are neighbors in the spanning tree, and have counting number -1;
+         *      cliques that are neighbors in the spanning tree, and have counting number -1
+         *      (except empty ones, which have counting number 0);
          *    - inner and outer regions are connected by an edge if the inner region is a
          *      seperator for the outer region.
          *  Finally, Beliefs are constructed.
