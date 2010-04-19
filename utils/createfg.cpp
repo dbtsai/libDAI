@@ -29,7 +29,7 @@ namespace po = boost::program_options;
 
 
 /// Possible factor types
-DAI_ENUM(FactorType,ISING,EXPGAUSS,POTTS);
+DAI_ENUM(FactorType,ISINGGAUSS,ISINGUNIFORM,EXPGAUSS,POTTS);
 
 
 /// Creates a factor graph from a pairwise interactions graph
@@ -42,11 +42,11 @@ FactorGraph createFG( const GraphAL &G, FactorType ft, size_t states, const Prop
     size_t N = G.nrNodes();
 
     if( states > 2 )
-        DAI_ASSERT( ft != FactorType::ISING );
+        DAI_ASSERT( ft != FactorType::ISINGGAUSS && ft != FactorType::ISINGUNIFORM );
 
     // Get inverse temperature
     Real beta = 1.0;
-    if( ft != FactorType::ISING ) 
+    if( ft != FactorType::ISINGGAUSS && ft != FactorType::ISINGUNIFORM ) 
         beta = props.getAs<Real>("beta");
 
     // Get properties for Ising factors
@@ -54,11 +54,21 @@ FactorGraph createFG( const GraphAL &G, FactorType ft, size_t states, const Prop
     Real sigma_h = 0.0;
     Real mean_J = 0.0;
     Real sigma_J = 0.0;
-    if( ft == FactorType::ISING ) {
+    if( ft == FactorType::ISINGGAUSS ) {
         mean_h = props.getAs<Real>("mean_th");
         sigma_h = props.getAs<Real>("sigma_th");
         mean_J = props.getAs<Real>("mean_w");
         sigma_J = props.getAs<Real>("sigma_w");
+    }
+    Real min_h = 0.0;
+    Real min_J = 0.0;
+    Real max_h = 0.0;
+    Real max_J = 0.0;
+    if( ft == FactorType::ISINGUNIFORM ) {
+        min_h = props.getAs<Real>("min_th");
+        min_J = props.getAs<Real>("min_w");
+        max_h = props.getAs<Real>("max_th");
+        max_J = props.getAs<Real>("max_w");
     }
     
     // Create variables
@@ -78,15 +88,23 @@ FactorGraph createFG( const GraphAL &G, FactorType ft, size_t states, const Prop
                     factors.push_back( createFactorPotts( vars[i], vars[j], beta ) );
                 else if( ft == FactorType::EXPGAUSS )
                     factors.push_back( createFactorExpGauss( VarSet( vars[i], vars[j] ), beta ) );
-                else if( ft == FactorType::ISING ) {
+                else if( ft == FactorType::ISINGGAUSS ) {
                     Real J = rnd_stdnormal() * sigma_J + mean_J;
+                    factors.push_back( createFactorIsing( vars[i], vars[j], J ) );
+                } else if( ft == FactorType::ISINGUNIFORM ) {
+                    Real J = min_J + rnd_uniform() * (max_J - min_J);
                     factors.push_back( createFactorIsing( vars[i], vars[j], J ) );
                 }
             }
     // Unary factors
-    if( ft == FactorType::ISING )
+    if( ft == FactorType::ISINGGAUSS )
         for( size_t i = 0; i < N; i++ ) {
             Real h = rnd_stdnormal() * sigma_h + mean_h;
+            factors.push_back( createFactorIsing( vars[i], h ) );
+        }
+    else if( ft == FactorType::ISINGUNIFORM )
+        for( size_t i = 0; i < N; i++ ) {
+            Real h = min_h + rnd_uniform() * (max_h - min_h);
             factors.push_back( createFactorIsing( vars[i], h ) );
         }
 
@@ -315,7 +333,7 @@ int main( int argc, char *argv[] ) {
         bool periodic = false;
         FactorType ft;
         LDPCType ldpc;
-        Real beta, sigma_w, sigma_th, mean_w, mean_th, noise;
+        Real beta, sigma_w, sigma_th, mean_w, mean_th, min_w, min_th, max_w, max_th, noise;
 
         // Declare the supported options.
         po::options_description opts("General command line options");
@@ -342,12 +360,16 @@ int main( int argc, char *argv[] ) {
         // Factor options
         po::options_description opts_factors("Options for specifying factors");
         opts_factors.add_options()
-            ("factors",  po::value<FactorType>(&ft), "factor type (one of 'EXPGAUSS','POTTS','ISING')")
-            ("beta",     po::value<Real>(&beta),     "inverse temperature (ignored for factors=='ISING')")
-            ("mean_w",   po::value<Real>(&mean_w),   "mean of pairwise interactions w_{ij} (only for factors=='ISING')")
-            ("mean_th",  po::value<Real>(&mean_th),  "mean of unary interactions th_i (only for factors=='ISING')")
-            ("sigma_w",  po::value<Real>(&sigma_w),  "stddev of pairwise interactions w_{ij} (only for factors=='ISING')")
-            ("sigma_th", po::value<Real>(&sigma_th), "stddev of unary interactions th_i (only for factors=='ISING'")
+            ("factors",  po::value<FactorType>(&ft), "factor type (one of 'EXPGAUSS','POTTS','ISINGGAUSS','ISINGUNIFORM')")
+            ("beta",     po::value<Real>(&beta),     "inverse temperature (ignored for factors=='ISINGGAUSS','ISINGUNIFORM')")
+            ("mean_w",   po::value<Real>(&mean_w),   "mean of pairwise interactions w_{ij} (only for factors=='ISINGGAUSS')")
+            ("mean_th",  po::value<Real>(&mean_th),  "mean of unary interactions th_i (only for factors=='ISINGGAUSS')")
+            ("sigma_w",  po::value<Real>(&sigma_w),  "stddev of pairwise interactions w_{ij} (only for factors=='ISINGGAUSS')")
+            ("sigma_th", po::value<Real>(&sigma_th), "stddev of unary interactions th_i (only for factors=='ISINGGAUSS'")
+            ("min_w",    po::value<Real>(&min_w),    "minimum of pairwise interactions w_{ij} (only for factors=='ISINGUNIFORM')")
+            ("min_th",   po::value<Real>(&min_th),   "minimum of unary interactions th_i (only for factors=='ISINGUNIFORM')")
+            ("max_w",    po::value<Real>(&max_w),    "maximum of pairwise interactions w_{ij} (only for factors=='ISINGUNIFORM')")
+            ("max_th",   po::value<Real>(&max_th),   "maximum of unary interactions th_i (only for factors=='ISINGUNIFORM')")
         ;
 
         // LDPC options
@@ -401,12 +423,15 @@ int main( int argc, char *argv[] ) {
             cout << "In case of pairwise interactions, one can also choose POTTS factors, for which" << endl;
             cout << "the log-factors are simply delta functions multiplied by the strength <beta>." << endl << endl;
 
-            cout << "For pairwise interactions and binary variables, one can also use ISING factors." << endl;
+            cout << "For pairwise interactions and binary variables, one can also use ISINGGAUSS factors." << endl;
             cout << "Here variables x1...xN are assumed to be +1/-1--valued, and unary interactions" << endl;
             cout << "are of the form exp(th*xi) with th drawn from a Gaussian distribution with mean" << endl;
             cout << "<mean_th> and standard deviation <sigma_th>, and pairwise interactions are of the" << endl;
             cout << "form exp(w*xi*xj) with w drawn from a Gaussian distribution with mean <mean_w>" << endl;
             cout << "and standard deviation <sigma_w>." << endl;
+            cout << "Alternatively, one can use ISINGUNIFORM factors: here th is drawn from a uniform" << endl;
+            cout << "distribution on [<min_th>, <max_th>), and w is drawn from a uniform distribution" << endl;
+            cout << "on [<min_w>, <max_w>)." << endl;
             return 1;
         }
 
@@ -421,9 +446,12 @@ int main( int argc, char *argv[] ) {
         if( ft == FactorType::POTTS )
             if( type == HOI_TYPE )
                 throw "For factors=='POTTS', interactions should be pairwise (type!='HOI')";
-        if( ft == FactorType::ISING )
+        if( ft == FactorType::ISINGGAUSS )
             if( ((states != 2) || (type == HOI_TYPE)) )
-                throw "For factors=='ISING', variables should be binary (states==2) and interactions should be pairwise (type!='HOI')";
+                throw "For factors=='ISINGGAUSS', variables should be binary (states==2) and interactions should be pairwise (type!='HOI')";
+        if( ft == FactorType::ISINGUNIFORM )
+            if( ((states != 2) || (type == HOI_TYPE)) )
+                throw "For factors=='ISINGUNIFORM', variables should be binary (states==2) and interactions should be pairwise (type!='HOI')";
 
         // Read random seed
         if( !vm.count("seed") ) {
@@ -457,6 +485,14 @@ int main( int argc, char *argv[] ) {
             options.set("sigma_w", sigma_w);
         if( vm.count("beta") )
             options.set("beta", beta);
+        if( vm.count("min_w") )
+            options.set("min_w", min_w);
+        if( vm.count("min_th") )
+            options.set("min_th", min_th);
+        if( vm.count("max_w") )
+            options.set("max_w", max_w);
+        if( vm.count("max_th") )
+            options.set("max_th", max_th);
 
         // Output some comments
         cout << "# Factor graph made by " << argv[0] << endl;
@@ -484,14 +520,18 @@ int main( int argc, char *argv[] ) {
             } else
                 NEED_ARG("N", "number of variables");
 
-            if( ft != FactorType::ISING ) {
-                NEED_ARG("beta", "stddev of log-factor entries");
-            } else {
+            if( ft == FactorType::ISINGGAUSS ) {
                 NEED_ARG("mean_w", "mean of pairwise interactions");
                 NEED_ARG("mean_th", "mean of unary interactions");
                 NEED_ARG("sigma_w", "stddev of pairwise interactions");
                 NEED_ARG("sigma_th", "stddev of unary interactions");
-            }
+            } else if( ft == FactorType::ISINGUNIFORM ) {
+                NEED_ARG("min_w", "minimum of pairwise interactions");
+                NEED_ARG("min_th", "minimum of unary interactions");
+                NEED_ARG("max_w", "maximum of pairwise interactions");
+                NEED_ARG("max_th", "maximum of unary interactions");
+            } else
+                NEED_ARG("beta", "stddev of log-factor entries");
 
             if( type == DREG_TYPE )
                 NEED_ARG("d", "connectivity (number of neighboring variables of each variable)");

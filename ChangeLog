@@ -6,6 +6,8 @@ git master HEAD
 * [Stefano Pellegrini] Fixed bug in JTree::findMaximum()
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
+* utils/createfg now has a new factor type ('ISINGUNIFORM') and the old
+  'ISING' factor type has been renamed to 'ISINGGAUSS'
 * tests/testdai option "marginals" now has five possible values: NONE
   outputs no marginals, VAR only variable marginals, FAC only factor
   marginals, VARFAC both types of marginals, and ALL outputs all
