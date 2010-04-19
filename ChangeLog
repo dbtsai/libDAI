@@ -6,6 +6,10 @@ git master HEAD
 * [Stefano Pellegrini] Fixed bug in JTree::findMaximum()
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
+* Improved mf.h/cpp:
+  - Added an "init" option that allows to initialize randomly
+  - Added an "updates" option that allows to choose between standard
+    mean field and "hard-spin" mean field
 * Improved treeep.h/cpp:
   - changed TreeEP::construct( const RootedTree& ) into
     TreeEP::construct( const FactorGraph&, const RootedTree& )
