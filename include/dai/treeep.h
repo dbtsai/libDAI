@@ -175,8 +175,6 @@ class TreeEP : public JTree {
         /// Construct from FactorGraph \a fg and PropertySet \a opts
         /** \param fg Factor graph.
          *  \param opts Parameters @see Properties
-         *  \note The factor graph has to be connected.
-         *  \throw FACTORGRAPH_NOT_CONNECTED if \a fg is not connected
          */
         TreeEP( const FactorGraph &fg, const PropertySet &opts );
 

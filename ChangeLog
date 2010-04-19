@@ -10,14 +10,22 @@ git master HEAD
   - Added an "init" option that allows to initialize randomly
   - Added an "updates" option that allows to choose between standard
     mean field and "hard-spin" mean field
+* utils/createfg now has a new factor type ('ISINGUNIFORM') and the old
+  'ISING' factor type has been renamed to 'ISINGGAUSS'
+* tests/testdai option "marginals" now has five possible values: NONE
+  outputs no marginals, VAR only variable marginals, FAC only factor
+  marginals, VARFAC both types of marginals, and ALL outputs all
+  marginals calculated by the algorithm.
 * Improved treeep.h/cpp:
   - changed TreeEP::construct( const RootedTree& ) into
     TreeEP::construct( const FactorGraph&, const RootedTree& )
+  - Now also supports disconnected factor graphs
 * Improved jtree.h/cpp:
   - changed JTree::construct( const std::vector<VarSet>&, bool ) into
     JTree::construct( const FactorGraph&, const std::vector<VarSet>&, bool )
   - changed JTree::GenerateJT( const std::vector<VarSet> & )
     into JTree::GenerateJT( const FactorGraph &, const std::vector<VarSet> & )
+  - Now also supports disconnected factor graphs
 * Improved regiongraph.h/cpp:
   - Made (previously public) members RegionGraph::G, RegionGraph::ORs,
     RegionGraph::IRs and RegionGraph::fac2OR protected.

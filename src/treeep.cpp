@@ -65,9 +65,6 @@ string TreeEP::printProperties() const {
 TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opts("updates",string("HUGIN")), false), _maxdiff(0.0), _iters(0), props(), _Q() {
     setProperties( opts );
 
-    if( !fg.isConnected() )
-       DAI_THROW(FACTORGRAPH_NOT_CONNECTED);
-
     if( opts.hasKey("tree") ) {
         construct( fg, opts.getAs<RootedTree>("tree") );
     } else {
@@ -81,14 +78,16 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
             for( size_t i = 0; i < fg.nrVars(); ++i ) {
                 Var v_i = fg.var(i);
                 VarSet di = fg.delta(i);
-                for( VarSet::const_iterator j = di.begin(); j != di.end(); j++ )
-                    if( v_i < *j ) {
-                        VarSet ij(v_i,*j);
+                if( i )
+                    wg[UEdge(i,0)] = 0.0;
+                for( VarSet::const_iterator cit_j = di.begin(); cit_j != di.end(); cit_j++ )
+                    if( v_i < *cit_j ) {
+                        VarSet ij(v_i,*cit_j);
                         Factor piet;
                         for( size_t I = 0; I < fg.nrFactors(); I++ ) {
                             VarSet Ivars = fg.factor(I).vars();
                             if( props.type == Properties::TypeType::ORG ) {
-                                if( (Ivars == v_i) || (Ivars == *j) )
+                                if( (Ivars == v_i) || (Ivars == *cit_j) )
                                     piet *= fg.factor(I);
                                 else if( Ivars >> ij )
                                     piet *= fg.factor(I).marginal( ij );
@@ -97,24 +96,29 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
                                     piet *= fg.factor(I);
                             }
                         }
+                        size_t j = fg.findVar( *cit_j );
                         if( props.type == Properties::TypeType::ORG ) {
                             if( piet.vars() >> ij ) {
                                 piet = piet.marginal( ij );
-                                Factor pietf = piet.marginal(v_i) * piet.marginal(*j);
-                                wg[UEdge(i,fg.findVar(*j))] = dist( piet, pietf, DISTKL );
+                                Factor pietf = piet.marginal(v_i) * piet.marginal(*cit_j);
+                                wg[UEdge(i,j)] = dist( piet, pietf, DISTKL );
                             } else {
                                 // this should never happen...
                                 DAI_ASSERT( 0 == 1 );
-                                wg[UEdge(i,fg.findVar(*j))] = 0;
+                                wg[UEdge(i,j)] = 0;
                             }
-                        } else {
-                            wg[UEdge(i,fg.findVar(*j))] = piet.strength(v_i, *j);
-                        }
+                        } else
+                            wg[UEdge(i,j)] = piet.strength(v_i, *cit_j);
                     }
             }
 
             // find maximal spanning tree
-            construct( fg, MaxSpanningTree( wg, true ) );
+            if( props.verbose >= 3 )
+                cerr << "WeightedGraph: " << wg << endl;
+            RootedTree t = MaxSpanningTree( wg, true );
+            if( props.verbose >= 3 )
+                cerr << "Spanningtree: " << t << endl;
+            construct( fg, t );
         } else
             DAI_THROW(UNKNOWN_ENUM_VALUE);
     }

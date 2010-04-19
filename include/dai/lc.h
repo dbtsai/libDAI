@@ -110,7 +110,7 @@ class LC : public DAIAlgFG {
         virtual LC* clone() const { return new LC(*this); }
         virtual std::string identify() const;
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
-        virtual Factor belief( const VarSet &/*vs*/ ) const { DAI_THROW(NOT_IMPLEMENTED); return Factor(); }
+        virtual Factor belief( const VarSet &/*vs*/ ) const;
         virtual Factor beliefV( size_t i ) const { return _beliefs[i]; }
         virtual std::vector<Factor> beliefs() const { return _beliefs; }
         virtual Real logZ() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }

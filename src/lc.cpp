@@ -121,6 +121,18 @@ void LC::CalcBelief (size_t i) {
 }
 
 
+Factor LC::belief (const VarSet &ns) const {
+    if( ns.size() == 0 )
+        return Factor();
+    else if( ns.size() == 1 )
+        return beliefV( findVar( *(ns.begin()) ) );
+    else {
+        DAI_THROW(BELIEF_NOT_AVAILABLE);
+        return Factor();
+    }
+}
+
+
 Real LC::CalcCavityDist (size_t i, const std::string &name, const PropertySet &opts) {
     Factor Bi;
     Real maxdiff = 0;
