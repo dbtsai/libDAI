@@ -14,6 +14,10 @@ git master HEAD
   outputs no marginals, VAR only variable marginals, FAC only factor
   marginals, VARFAC both types of marginals, and ALL outputs all
   marginals calculated by the algorithm.
+* Improved mf.h/cpp:
+  - Added an "init" option that allows to initialize randomly
+  - Added an "updates" option that allows to choose between standard
+    mean field and "hard-spin" mean field
 * Improved exactinf.h/cpp:
   - Added ExactInf::findMaximum()
 * Improved treeep.h/cpp:
