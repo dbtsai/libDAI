@@ -75,11 +75,13 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
             // effective interaction strength between pairs of nodes
 
             WeightedGraph<Real> wg;
-            for( size_t i = 0; i < fg.nrVars(); ++i ) {
+            // in order to get a connected weighted graph, we start
+            // by connecting every variable to the zero'th variable with weight 0
+            for( size_t i = 1; i < fg.nrVars(); i++ )
+                wg[UEdge(i,0)] = 0.0;
+            for( size_t i = 0; i < fg.nrVars(); i++ ) {
                 Var v_i = fg.var(i);
                 VarSet di = fg.delta(i);
-                if( i )
-                    wg[UEdge(i,0)] = 0.0;
                 for( VarSet::const_iterator cit_j = di.begin(); cit_j != di.end(); cit_j++ )
                     if( v_i < *cit_j ) {
                         VarSet ij(v_i,*cit_j);
