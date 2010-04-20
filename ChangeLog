@@ -6,12 +6,16 @@ git master HEAD
 * [Stefano Pellegrini] Fixed bug in JTree::findMaximum()
 * Fixed some bugs in the MatLab interface build system
 * Fixed a bug in utils/fginfo.cpp
+* Added utils/uai2fg, a utility to convert the UAI inference competition file
+  formats to the libDAI factor graph file format
 * utils/createfg now has a new factor type ('ISINGUNIFORM') and the old
   'ISING' factor type has been renamed to 'ISINGGAUSS'
 * tests/testdai option "marginals" now has five possible values: NONE
   outputs no marginals, VAR only variable marginals, FAC only factor
   marginals, VARFAC both types of marginals, and ALL outputs all
   marginals calculated by the algorithm.
+* Improved exactinf.h/cpp:
+  - Added ExactInf::findMaximum()
 * Improved treeep.h/cpp:
   - changed TreeEP::construct( const RootedTree& ) into
     TreeEP::construct( const FactorGraph&, const RootedTree& )
@@ -22,6 +26,7 @@ git master HEAD
   - changed JTree::GenerateJT( const std::vector<VarSet> & )
     into JTree::GenerateJT( const FactorGraph &, const std::vector<VarSet> & )
   - Now also supports disconnected factor graphs
+  - Fixed a bug in JTree::findMaximum() and simplified the code
 * Improved regiongraph.h/cpp:
   - Made (previously public) members RegionGraph::G, RegionGraph::ORs,
     RegionGraph::IRs and RegionGraph::fac2OR protected.

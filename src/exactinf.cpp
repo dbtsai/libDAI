@@ -97,6 +97,25 @@ Factor ExactInf::calcMarginal( const VarSet &vs ) const {
     return P.marginal( vs, true );
 }
 
+        
+std::vector<std::size_t> ExactInf::findMaximum() const {
+    Factor P;
+    for( size_t I = 0; I < nrFactors(); I++ )
+        P *= factor(I);
+    size_t linearState = P.p().argmax().first;
+
+    // convert to state
+    map<Var, size_t> state = calcState( P.vars(), linearState );
+
+    // convert to desired output data structure
+    vector<size_t> mapState;
+    mapState.reserve( nrVars() );
+    for( size_t i = 0; i < nrVars(); i++ )
+        mapState.push_back( state[var(i)] );
+
+    return mapState;
+}
+
 
 vector<Factor> ExactInf::beliefs() const {
     vector<Factor> result = _beliefsV;

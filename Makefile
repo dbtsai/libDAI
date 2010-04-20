@@ -144,7 +144,7 @@ unittests : tests/unit/var_test$(EE) tests/unit/smallset_test$(EE) tests/unit/va
 
 tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE) $(unittests)
 
-utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE)
+utils : utils/createfg$(EE) utils/fg2dot$(EE) utils/fginfo$(EE) utils/uai2fg$(EE)
 
 lib: $(LIB)/libdai$(LE)
 
@@ -233,6 +233,9 @@ utils/fg2dot$(EE) : utils/fg2dot.cpp $(HEADERS) $(LIB)/libdai$(LE)
 utils/fginfo$(EE) : utils/fginfo.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS)
 
+utils/uai2fg$(EE) : utils/uai2fg.cpp $(HEADERS) $(LIB)/libdai$(LE)
+	$(CC) $(CCO)$@ $< $(LIBS)
+
 
 # LIBRARY
 ##########
@@ -294,7 +297,7 @@ clean :
 	-rm tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE)
 	-rm tests/unit/var_test$(EE) tests/unit/smallset_test$(EE) tests/unit/varset_test$(EE) tests/unit/graph_test$(EE) tests/unit/bipgraph_test$(EE) tests/unit/weightedgraph_test$(EE) tests/unit/enum_test$(EE) tests/unit/util_test$(EE) tests/unit/exceptions_test$(EE) tests/unit/properties_test$(EE) tests/unit/index_test$(EE) tests/unit/prob_test$(EE) tests/unit/factor_test$(EE) tests/unit/factorgraph_test$(EE) tests/unit/clustergraph_test$(EE) tests/unit/regiongraph_test$(EE) tests/unit/daialg_test$(EE) tests/unit/alldai_test$(EE)
 	-rm factorgraph_test.fg alldai_test.aliases
-	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE)
+	-rm utils/fg2dot$(EE) utils/createfg$(EE) utils/fginfo$(EE) utils/uai2fg$(EE)
 	-rm -R doc
 	-rm -R lib
 else
@@ -307,24 +310,22 @@ clean :
 	-del examples\*$(EE).manifest
 	-del examples\*.ilk
 	-del examples\*.pdb
-	-del tests\testdai$(EE)
-	-del tests\testbbp$(EE)
-	-del tests\testdai$(EE).manifest
-	-del tests\testbbp$(EE).manifest
-	-del tests\testem\testem$(EE)
-	-del tests\testem\testem$(EE).manifest
+	-del tests\*$(EE)
+	-del tests\*$(EE).manifest
 	-del tests\*.pdb
 	-del tests\*.ilk
+	-del tests\testem\*$(EE)
+	-del tests\testem\*$(EE).manifest
 	-del tests\testem\*.pdb
 	-del tests\testem\*.ilk
 	-del utils\*$(EE)
 	-del utils\*$(EE).manifest
 	-del utils\*.pdb
 	-del utils\*.ilk
-	-del tests\unit\*_test.ilk
-	-del tests\unit\*_test.pdb
 	-del tests\unit\*_test$(EE)
 	-del tests\unit\*_test$(EE).manifest
+	-del tests\unit\*_test.pdb
+	-del tests\unit\*_test.ilk
 	-del factorgraph_test.fg
 	-del alldai_test.aliases
 	-del $(LIB)\libdai$(LE)

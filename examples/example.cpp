@@ -10,11 +10,31 @@
 
 
 #include <iostream>
+#include <map>
 #include <dai/alldai.h>  // Include main libDAI header file
 
 
 using namespace dai;
 using namespace std;
+
+
+// Evaluates the log probability of the joint configuration vstate of the variables in factor graph fg
+Real evalState( const FactorGraph& fg, const std::vector<size_t> vstate ) {
+    // First, construct a map from Var objects to their states
+    // This decouples the representation of the joint state in vstate
+    // from the factor graph
+    map<Var, size_t> state;
+    for( size_t i = 0; i < vstate.size(); i++ )
+        state[fg.var(i)] = vstate[i];
+
+    // Evaluate the log probability of the joint configuration in state
+    // by summing the log factor entries of the factors in factor graph fg
+    // that correspond to the joint configuration
+    Real logZ = 0.0;
+    for( size_t I = 0; I < fg.nrFactors(); I++ )
+        logZ += dai::log( fg.factor(I)[calcLinearState( fg.factor(I).vars(), state )] );
+    return logZ;
+}
 
 
 int main( int argc, char *argv[] ) {
@@ -131,12 +151,12 @@ int main( int argc, char *argv[] ) {
             cout << mp.belief(fg.factor(I).vars()) << "=" << mp.beliefF(I) << endl;
 
         // Report exact MAP joint state
-        cout << "Exact MAP state:" << endl;
+        cout << "Exact MAP state (log probability = " << evalState( fg, jtmapstate ) << "):" << endl;
         for( size_t i = 0; i < jtmapstate.size(); i++ )
             cout << fg.var(i) << ": " << jtmapstate[i] << endl;
 
         // Report max-product MAP joint state
-        cout << "Approximate (max-product) MAP state:" << endl;
+        cout << "Approximate (max-product) MAP state (log probability = " << evalState( fg, mpstate ) << "):" << endl;
         for( size_t i = 0; i < mpstate.size(); i++ )
             cout << fg.var(i) << ": " << mpstate[i] << endl;
     }

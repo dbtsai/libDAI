@@ -87,14 +87,18 @@ class ExactInf : public DAIAlgFG {
         virtual std::string printProperties() const;
     //@}
 
-    /// \name Additional interface specific for JTree
+    /// \name Additional interface specific for ExactInf
     //@{
         /// Calculates marginal probability distribution for variables \a vs
         /** \note The complexity of this calculation is exponential in the number of variables.
          */
         Factor calcMarginal( const VarSet &vs ) const;
-    //@}
 
+        /// Calculates the joint state of all variables that has maximum probability
+        /** \note The complexity of this calculation is exponential in the number of variables.
+         */
+        std::vector<std::size_t> findMaximum() const;
+    //@}
 
     private:
         /// Helper function for constructors

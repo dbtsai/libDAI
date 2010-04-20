@@ -117,25 +117,25 @@ void JTree::construct( const FactorGraph &fg, const std::vector<VarSet> &cl, boo
     // Construct a weighted graph (each edge is weighted with the cardinality
     // of the intersection of the nodes, where the nodes are the elements of cl).
     WeightedGraph<int> JuncGraph;
-    std::vector<bool> connected( cl.size(), false );
+    // Start by connecting all clusters with cluster zero, and weight zero,
+    // in order to get a connected weighted graph
+    for( size_t i = 1; i < cl.size(); i++ )
+        JuncGraph[UEdge(i,0)] = 0;
     for( size_t i = 0; i < cl.size(); i++ ) {
         for( size_t j = i + 1; j < cl.size(); j++ ) {
             size_t w = (cl[i] & cl[j]).size();
-            if( w ) {
+            if( w )
                 JuncGraph[UEdge(i,j)] = w;
-                connected[i] = true;
-                connected[j] = true;
-            }
         }
     }
-    // for clusters that have no overlap with other clusters,
-    // connect them with the zeroth cluster
-    for( size_t i = 1; i < cl.size(); i++ )
-        if( !connected[i] )
-            JuncGraph[UEdge(i,0)] = 0;
+    if( props.verbose >= 3 )
+        cerr << "Weightedgraph: " << JuncGraph << endl;
 
     // Construct maximal spanning tree using Prim's algorithm
     RTree = MaxSpanningTree( JuncGraph, true );
+    if( props.verbose >= 3 )
+        cerr << "Spanning tree: " << RTree << endl;
+    DAI_DEBASSERT( RTree.size() == cl.size() - 1 );
 
     // Construct corresponding region graph
 
@@ -223,9 +223,12 @@ Factor JTree::belief( const VarSet &vs ) const {
     for( beta = Qb.begin(); beta != Qb.end(); beta++ )
         if( beta->vars() >> vs )
             break;
-    if( beta != Qb.end() )
-        return( beta->marginal(vs) );
-    else {
+    if( beta != Qb.end() ) {
+        if( props.inference == Properties::InfType::SUMPROD )
+            return( beta->marginal(vs) );
+        else
+            return( beta->maxMarginal(vs) );
+    } else {
         vector<Factor>::const_iterator alpha;
         for( alpha = Qa.begin(); alpha != Qa.end(); alpha++ )
             if( alpha->vars() >> vs )
@@ -233,8 +236,12 @@ Factor JTree::belief( const VarSet &vs ) const {
         if( alpha == Qa.end() ) {
             DAI_THROW(BELIEF_NOT_AVAILABLE);
             return Factor();
-        } else
-            return( alpha->marginal(vs) );
+        } else {
+            if( props.inference == Properties::InfType::SUMPROD )
+                return( alpha->marginal(vs) );
+            else
+                return( alpha->maxMarginal(vs) );
+        }
     }
 }
 
@@ -454,16 +461,22 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
     for( beta = Qb.begin(); beta != Qb.end(); beta++ )
         if( beta->vars() >> vs )
             break;
-    if( beta != Qb.end() )
-        return( beta->marginal(vs) );
-    else {
+    if( beta != Qb.end() ) {
+        if( props.inference == Properties::InfType::SUMPROD )
+            return( beta->marginal(vs) );
+        else
+            return( beta->maxMarginal(vs) );
+    } else {
         vector<Factor>::const_iterator alpha;
         for( alpha = Qa.begin(); alpha != Qa.end(); alpha++ )
             if( alpha->vars() >> vs )
                 break;
-        if( alpha != Qa.end() )
-            return( alpha->marginal(vs) );
-        else {
+        if( alpha != Qa.end() ) {
+            if( props.inference == Properties::InfType::SUMPROD )
+                return( alpha->marginal(vs) );
+            else
+                return( alpha->maxMarginal(vs) );
+        } else {
             // Find subtree to do efficient inference
             RootedTree T;
             size_t Tsize = findEfficientTree( vs, T );
@@ -509,7 +522,11 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
                             Qa[T[i].second] *= piet;
                         }
 
-                    Factor new_Qb = Qa[T[i].second].marginal( IR( b[i] ), false );
+                    Factor new_Qb;
+                    if( props.inference == Properties::InfType::SUMPROD )
+                        new_Qb = Qa[T[i].second].marginal( IR( b[i] ), false );
+                    else
+                        new_Qb = Qa[T[i].second].maxMarginal( IR( b[i] ), false );
                     logZ += log(new_Qb.normalize());
                     Qa[T[i].first] *= new_Qb / Qb[b[i]];
                     Qb[b[i]] = new_Qb;
@@ -518,7 +535,10 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
 
                 Factor piet( vsrem, 0.0 );
                 piet.set( s, exp(logZ) );
-                Pvs += piet * Qa[T[0].first].marginal( vs / vsrem, false );      // OPTIMIZE ME
+                if( props.inference == Properties::InfType::SUMPROD )
+                    Pvs += piet * Qa[T[0].first].marginal( vs / vsrem, false );      // OPTIMIZE ME
+                else
+                    Pvs += piet * Qa[T[0].first].maxMarginal( vs / vsrem, false );      // OPTIMIZE ME
 
                 // Restore clamped beliefs
                 for( map<size_t,Factor>::const_iterator alpha = Qa_old.begin(); alpha != Qa_old.end(); alpha++ )
@@ -562,80 +582,38 @@ std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableEl
 
 
 std::vector<size_t> JTree::findMaximum() const {
-    vector<size_t> maximum( nrVars() );
-    vector<bool> visitedVars( nrVars(), false );
-    vector<bool> visitedFactors( nrFactors(), false );
-    stack<size_t> scheduledFactors;
-    for( size_t i = 0; i < nrVars(); ++i ) {
-        if( visitedVars[i] )
-            continue;
-        visitedVars[i] = true;
-
-        // Maximise with respect to variable i
-        Prob prod = beliefV(i).p();
-        maximum[i] = prod.argmax().first;
-
-        foreach( const Neighbor &I, nbV(i) )
-            if( !visitedFactors[I] )
-                scheduledFactors.push(I);
-
-        while( !scheduledFactors.empty() ){
-            size_t I = scheduledFactors.top();
-            scheduledFactors.pop();
-            if( visitedFactors[I] )
-                continue;
-            visitedFactors[I] = true;
-
-            // Evaluate if some neighboring variables still need to be fixed; if not, we're done
-            bool allDetermined = true;
-            foreach( const Neighbor &j, nbF(I) )
-                if( !visitedVars[j.node] ) {
-                    allDetermined = false;
-                    break;
-                }
-            if( allDetermined )
-                continue;
-
-            // Calculate product of incoming messages on factor I
-            Prob prod2 = beliefF(I).p();
-
-            // The allowed configuration is restrained according to the variables assigned so far:
-            // pick the argmax amongst the allowed states
-            Real maxProb = -numeric_limits<Real>::max();
-            State maxState( factor(I).vars() );
-            for( State s( factor(I).vars() ); s.valid(); ++s ){
-                // First, calculate whether this state is consistent with variables that
-                // have been assigned already
-                bool allowedState = true;
-                foreach( const Neighbor &j, nbF(I) )
-                    if( visitedVars[j.node] && maximum[j.node] != s(var(j.node)) ) {
-                        allowedState = false;
-                        break;
-                    }
-                // If it is consistent, check if its probability is larger than what we have seen so far
-                if( allowedState && prod2[s] > maxProb ) {
-                    maxState = s;
-                    maxProb = prod2[s];
-                }
-            }
-
-            // Decode the argmax
-            foreach( const Neighbor &j, nbF(I) ) {
-                if( visitedVars[j.node] ) {
-                    // We have already visited j earlier - hopefully our state is consistent
-                    if( maximum[j.node] != maxState(var(j.node)) && props.verbose >= 1 )
-                        cerr << "JTree::findMaximum - warning: maximum not consistent due to loops." << endl;
-                } else {
-                    // We found a consistent state for variable j
-                    visitedVars[j.node] = true;
-                    maximum[j.node] = maxState( var(j.node) );
-                    foreach( const Neighbor &J, nbV(j) )
-                        if( !visitedFactors[J] )
-                            scheduledFactors.push(J);
-                }
+#ifdef DAI_DEBUG
+    // check consistency of variables and factors
+    for( size_t I = 0; I < nrFactors(); I++ ) {
+        size_t linearState = beliefF(I).p().argmax().first;
+        map<Var,size_t> state = calcState( factor(I).vars(), linearState );
+        foreach( const Neighbor& i, nbF(I) ) {
+            if( state[var(i)] != beliefV(i).p().argmax().first ) {
+                cerr << "ERROR: inconsistency between MAP beliefs: factor belief " << beliefF(I) << ": " << state << " is inconsistent with " << beliefV(i) << endl;
+                DAI_THROW(RUNTIME_ERROR);
             }
         }
     }
+    // check consistency of 
+    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
+        size_t linearStateQa = Qa[alpha].p().argmax().first;
+        map<Var,size_t> stateQa = calcState( Qa[alpha].vars(), linearStateQa );
+        foreach( const Neighbor& beta, nbOR(alpha) ) {
+            size_t linearStateQb = Qb[beta].p().argmax().first;
+            map<Var,size_t> stateQb = calcState( Qb[beta].vars(), linearStateQb );
+            for( map<Var,size_t>::const_iterator it = stateQb.begin(); it != stateQb.end(); it++ )
+                if( stateQa[it->first] != it->second ) {
+                    cerr << "ERROR: inconsistency between MAP beliefs: OR belief " << Qa[alpha] << " (with MAP " << stateQa << ") is inconsistent with IR belief " << Qb[beta] << " (with MAP " << stateQb << ")" << endl;
+                    DAI_THROW(RUNTIME_ERROR);
+                }
+        }
+    }
+#endif
+
+    vector<size_t> maximum;
+    maximum.reserve( nrVars() );
+    for( size_t i = 0; i < nrVars(); i++ )
+        maximum.push_back( beliefV(i).p().argmax().first );
     return maximum;
 }
 
