@@ -119,6 +119,7 @@ git master HEAD
   - Added PropertySet::erase()
   - Fixed bug in PropertySet::setAsString<T>()
 * Improved util.h/cpp:
+  - Added std::string toString( const T& x )
   - Fixed a bug in rnd_seed()
   - Removed max( const std::vector<Real> &v )
 * Improved weightedgraph.h/cpp:

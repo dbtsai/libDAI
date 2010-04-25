@@ -24,6 +24,7 @@
 #include <iostream>
 #include <boost/foreach.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <cerrno>
 
@@ -147,6 +148,13 @@ int rnd_int( int min, int max );
 /// Returns a random integer in the half-open interval [0, \a n)
 inline int rnd( int n ) {
     return rnd_int( 0, n-1 );
+}
+
+
+/// Converts a variable of type \a T to a \c std::string by using a \c std::stringstream
+template<class T>
+std::string toString( const T& x ) {
+    return boost::lexical_cast<std::string>(x);
 }
 
 
