@@ -1,6 +1,7 @@
 git master HEAD
 ---------------
 
+* [Ofer Meshi] Added a script for converting from FastInf to libDAI format
 * Made all "verbose" properties optional
 * Unit tests should now also work on WINDOWS
 * [Stefano Pellegrini] Fixed bug in JTree::findMaximum()
