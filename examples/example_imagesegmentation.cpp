@@ -131,11 +131,12 @@ FactorGraph img2fg( const CImg<T> &img, double J, double th_min, double th_plus,
     vector<Var> vars;
     vector<Factor> factors;
 
-    size_t dimx = img.dimx();
-    size_t dimy = img.dimy();
+    size_t dimx = img.width();
+    size_t dimy = img.height();
     size_t N = dimx * dimy;
 
     // create variables
+    cout << "Creating " << N << " variables..." << endl;
     vars.reserve( N );
     for( size_t i = 0; i < N; i++ )
         vars.push_back( Var( i, 2 ) );
@@ -151,6 +152,7 @@ FactorGraph img2fg( const CImg<T> &img, double J, double th_min, double th_plus,
     }
 
     // create factors
+    cout << "Creating " << (3 * N - dimx - dimy) << " factors..." << endl;
     factors.reserve( 3 * N - dimx - dimy );
     double th_avg = (th_min + th_plus) / 2.0;
     double th_width = (th_plus - th_min) / 2.0;
@@ -163,8 +165,8 @@ FactorGraph img2fg( const CImg<T> &img, double J, double th_min, double th_plus,
             double x = img(i,j);
             factors.push_back( createFactorIsing( vars[i*dimy+j], th_avg + th_width * tanh((x - level)/th_tol) ) );
         }
-    }
 
+    cout << "Creating factor graph..." << endl;
     return FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
 }
 
@@ -192,14 +194,14 @@ int main(int argc,char **argv) {
     CImg<int> image3(image1);
     image3 -= image2;
     image3.abs();
-    image3.norm_pointwise(1); // 1 = L1, 2 = L2, -1 = Linf
+    image3.norm(1); // 1 = L1, 2 = L2, -1 = Linf
     // normalize
-    for( size_t i = 0; i < image3.dimx(); i++ ) {
-        for( size_t j = 0; j < image3.dimy(); j++ ) {
+    for( size_t i = 0; i < image3.width(); i++ ) {
+        for( size_t j = 0; j < image3.height(); j++ ) {
             int avg = 0;
-            for( size_t c = 0; c < image1.dimv(); c++ )
+            for( size_t c = 0; c < image1.spectrum(); c++ )
                 avg += image1(i,j,c);
-            avg /= image1.dimv();
+            avg /= image1.spectrum();
             image3(i,j,0) /= (1.0 + avg / 255.0);
         }
     }
@@ -211,10 +213,11 @@ int main(int argc,char **argv) {
 
     //BinaryPairwiseGM net;
     //Image2net( image3, J, th_min, th_plus, th_tol, p_background, net );
-    FactorGraph fg = img2fg( image3, J, th_min, th_plis, th_tol, p_background );
+    FactorGraph fg = img2fg( image3, J, th_min, th_plus, th_tol, p_background );
+    cout << "Done" << endl;
 
-    size_t dimx = image3.dimx();
-    size_t dimy = image3.dimy();
+    size_t dimx = image3.width();
+    size_t dimy = image3.height();
     CImg<unsigned char> image4(dimx,dimy,1,3);
 
     ublasvector m;
@@ -262,18 +265,13 @@ int main(int argc,char **argv) {
                 image4(i,j,1) = image2(i,j,1);
                 image4(i,j,2) = image2(i,j,2);
             } else
-                for( size_t c = 0; c < (size_t)image4.dimv(); c++ )
+                for( size_t c = 0; c < (size_t)image4.spectrum(); c++ )
                     image4(i,j,c) = 255;
-/*              if( g > 127 ) {
-                    image4(i,j,0) = image4(i,j,1) = image4(i,j,2) = 0;
-                } else {
-                    image4(i,j,0) = image4(i,j,1) = image4(i,j,2) = 255;
-                }*/
         }
     CImgDisplay main_disp(image4,"Segmentation result",0);
     image4.save_jpeg(file_o,100);
 
-    while( !main_disp.is_closed )
+    while( !main_disp.is_closed() )
         cimg::wait( 40 );
 
     return 0;
@@ -343,7 +341,7 @@ double myBP( BinaryPairwiseGM &net, size_t maxiter, double tol, size_t verbose, 
                     image(i,j,2) = 2*g;
                 }
             }
-        disp << image;
+        disp = image;
         char filename[30] = "/tmp/movie000.jpg";
         sprintf( &filename[10], "%03ld", (long)_iterations );
         strcat( filename, ".jpg" );
@@ -393,7 +391,7 @@ double doInference( FactorGraph& fg, string AlgOpts, size_t maxiter, double tol,
                     image(i,j,2) = 2*g;
                 }
             }
-        disp << image;
+        disp = image;
         /*
         char filename[30] = "/tmp/movie000.jpg";
         sprintf( &filename[10], "%03ld", (long)_iterations );
@@ -450,7 +448,7 @@ double myMF( BinaryPairwiseGM &net, size_t maxiter, double tol, size_t verbose, 
                     image(i,j,2) = 2*g;
                 }
             }
-        disp << image;
+        disp = image;
         char filename[30] = "/tmp/movie000.jpg";
         sprintf( &filename[10], "%03ld", (long)_iterations );
         strcat( filename, ".jpg" );

@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK( G0.isPairwise() );
     BOOST_CHECK( G0.MarkovGraph() == GraphAL() );
     BOOST_CHECK( G0.bipGraph() == BipartiteGraph() );
-    BOOST_CHECK_EQUAL( G0.maximalFactorDomains().size(), 0 );
+    BOOST_CHECK_EQUAL( G0.maximalFactorDomains().size(), 1 );
 
     std::vector<Factor> facs;
     facs.push_back( Factor( v01 ) );
