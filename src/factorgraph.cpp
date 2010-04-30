@@ -283,14 +283,24 @@ vector<VarSet> FactorGraph::maximalFactorDomains() const {
 
     for( size_t I = 0; I < nrFactors(); I++ ) {
         bool maximal = true;
-        for( size_t J = 0; (J < nrFactors()) && maximal; J++ )
-            if( (factor(J).vars() >> factor(I).vars()) && (factor(J).vars() != factor(I).vars()) )
-                maximal = false;
+        const VarSet& I_vars = factor(I).vars();
+        size_t I_size = I_vars.size();
 
+        if( I_size == 0 )
+            maximal = false;
+        foreach( const Neighbor& i, nbF(I) ) {
+            foreach( const Neighbor& J, nbV(i) ) {
+                if( J != I )
+                    if( (factor(J).vars() >> I_vars) && (factor(J).vars().size() != I_size) )
+                        maximal = false;
+            }
+        }
         if( maximal )
             result.push_back( factor(I).vars() );
     }
 
+    if( result.size() == 0 )
+        result.push_back( VarSet() );
     return result;
 }
 

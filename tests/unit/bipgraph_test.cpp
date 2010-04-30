@@ -141,6 +141,16 @@ BOOST_AUTO_TEST_CASE( NeighborTest ) {
     BOOST_CHECK_EQUAL( G.nb2(2,0).iter, 0 );
     BOOST_CHECK_EQUAL( G.nb2(2,0).node, 1 );
     BOOST_CHECK_EQUAL( G.nb2(2,0).dual, 1 );
+    BOOST_CHECK_EQUAL( G.nb1Set(0).size(), 2 );
+    BOOST_CHECK_EQUAL( G.nb1Set(1).size(), 2 );
+    BOOST_CHECK_EQUAL( G.nb2Set(0).size(), 1 );
+    BOOST_CHECK_EQUAL( G.nb2Set(1).size(), 2 );
+    BOOST_CHECK_EQUAL( G.nb2Set(2).size(), 1 );
+    BOOST_CHECK( G.nb1Set(0) == SmallSet<size_t>( 0, 1 ) );
+    BOOST_CHECK( G.nb1Set(1) == SmallSet<size_t>( 1, 2 ) );
+    BOOST_CHECK( G.nb2Set(0) == SmallSet<size_t>( 0 ) );
+    BOOST_CHECK( G.nb2Set(1) == SmallSet<size_t>( 0, 1 ) );
+    BOOST_CHECK( G.nb2Set(2) == SmallSet<size_t>( 1 ) );
 }
 
 

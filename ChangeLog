@@ -1,6 +1,7 @@
 git master HEAD
 ---------------
 
+* Added examples/example_imagesegmentation
 * [Ofer Meshi] Added a script for converting from FastInf to libDAI format
 * Made all "verbose" properties optional
 * Unit tests should now also work on WINDOWS
@@ -64,6 +65,7 @@ git master HEAD
 * Improved factorgraph.h/cpp:
   - FactorGraph::clamped() now contains a delta factor for the clamped variable
   - Renamed FactorGraph::Cliques() into FactorGraph::maximalFactorDomains()
+    and made it faster
   - Added FactorGraph::MarkovGraph()
   - Fixed bug in FactorGraph::clone()
   - FactorGraph::findVars( const VarSet& ) now returns a SmallSet<size_t>
@@ -139,6 +141,8 @@ git master HEAD
   - Added BipartiteGraph::hasEdge()
   - Added BipartiteGraph::findNb1()
   - Added BipartiteGraph::findNb2()
+  - Added BipartiteGraph::nb1Set()
+  - Added BipartiteGraph::nb2Set()
   - BipartiteGraph::delta1() and BipartiteGraph::delta2() now 
     return a SmallSet<size_t> instead of a vector<size_t>
   - Added BipartiteGraph::operator==( const BipartiteGraph& )

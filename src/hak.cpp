@@ -180,6 +180,55 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
         }
         constructCVM( fg, cl );
     } else if( props.clusters == Properties::ClustersType::BETHE ) {
+/*      if( props.verbose >= 3 )
+            cerr << "Copy factor graph" << endl;
+        // Copy factor graph structure
+        FactorGraph::operator=( fg );
+
+        if( props.verbose >= 3 )
+            cerr << "Copy region graph from factor graph" << endl;
+        // Copy bipartite graph
+        _G = fg.bipGraph();
+
+        // Throw away non-maximal regions
+        if( props.verbose >= 3 )
+            cerr << "Throw away non-maximal regions" << endl;
+        for( size_t OR = 0; OR < _G.nrNodes1(); ) {
+            // check if it is maximal
+            bool maximal = true;
+            size_t OR_size = _G.nb1(OR).size();
+            if( OR_size == 0 )
+                maximal = false;
+            size_t OR2;
+            foreach( OR2, _G.delta1(OR, false) )
+                if( (_G.nb1(OR2).size() > OR_size) && (_G.nb1Set(OR2) >> _G.nb1Set(OR1)) ) {
+                    maximal = false;
+                    break;
+                }
+            if( !maximal ) {
+                // if not maximal, throw away and assign factor to OR2
+                _G.eraseNode1( OR );
+            } else {
+                OR++;
+            }
+        }
+
+        // For each factor, find an outer region that subsumes that factor.
+        // Then, multiply the outer region with that factor.
+        _fac2OR.clear();
+        _fac2OR.reserve( nrFactors() );
+        for( size_t I = 0; I < nrFactors(); I++ ) {
+            size_t alpha;
+            for( alpha = 0; alpha < nrORs(); alpha++ )
+                if( OR(alpha).vars() >> factor(I).vars() ) {
+                    _fac2OR.push_back( alpha );
+                    break;
+                }
+            DAI_ASSERT( alpha != nrORs() );
+        }
+
+        if( props.verbose >= 3 )
+            cerr << "Build outer regions" << endl;*/
         // build outer regions (the maximal factor domains)
         cl = fg.maximalFactorDomains();
         size_t nrEdges = 0;
@@ -198,7 +247,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
         edges.reserve( nrEdges );
         for( size_t c = 0; c < cl.size(); c++ )
             for( size_t i = 0; i < irs.size(); i++ )
-                if( cl[c] >> irs[i] ) {
+                if( cl[c].contains( var(i) ) ) {
                     edges.push_back( make_pair( c, i ) );
                     irs[i].c() -= 1.0;
                 }

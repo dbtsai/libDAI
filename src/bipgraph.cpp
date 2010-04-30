@@ -124,6 +124,22 @@ void BipartiteGraph::eraseEdge( size_t n1, size_t n2 ) {
 }
 
 
+SmallSet<size_t> BipartiteGraph::nb1Set( size_t n1 ) const {
+    SmallSet<size_t> result;
+    foreach( const Neighbor &n2, nb1(n1) )
+        result |= n2;
+    return result;
+}
+
+
+SmallSet<size_t> BipartiteGraph::nb2Set( size_t n2 ) const {
+    SmallSet<size_t> result;
+    foreach( const Neighbor &n1, nb2(n2) )
+        result |= n1;
+    return result;
+}
+
+
 SmallSet<size_t> BipartiteGraph::delta1( size_t n1, bool include ) const {
     // get all second-order neighbors
     SmallSet<size_t> result;
