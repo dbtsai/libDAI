@@ -163,6 +163,7 @@ void Gibbs::init() {
     for( size_t I = 0; I < nrFactors(); I++ )
         fill( _factor_counts[I].begin(), _factor_counts[I].end(), 0 );
     _sample_count = 0;
+    randomizeState();
 }
 
 
@@ -174,11 +175,9 @@ Real Gibbs::run() {
 
     double tic = toc();
 
-    randomizeState();
-
     for( size_t iter = 0; iter < props.iters; iter++ ) {
-        for( size_t j = 0; j < nrVars(); j++ )
-            resampleVar( j );
+        for( size_t i = 0; i < nrVars(); i++ )
+            resampleVar( i );
         updateCounts();
     }
 
@@ -192,17 +191,26 @@ Real Gibbs::run() {
     if( props.verbose >= 3 )
         cerr << Name << "::run:  ran " << props.iters << " passes (" << toc() - tic << " clocks)." << endl;
 
-    return 0.0;
+    if( _sample_count == 0 )
+        return INFINITY;
+    else
+        return 1.0 / _sample_count;
 }
 
 
 Factor Gibbs::beliefV( size_t i ) const {
-    return Factor( var(i), _var_counts[i] ).normalized();
+    if( _sample_count <= props.burnin  )
+        return Factor( var(i) );
+    else
+        return Factor( var(i), _var_counts[i] ).normalized();
 }
 
 
 Factor Gibbs::beliefF( size_t I ) const {
-    return Factor( factor(I).vars(), _factor_counts[I] ).normalized();
+    if( _sample_count <= props.burnin  )
+        return Factor( factor(I).vars() );
+    else
+        return Factor( factor(I).vars(), _factor_counts[I] ).normalized();
 }
 
 

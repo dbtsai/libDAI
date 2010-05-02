@@ -247,7 +247,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
         edges.reserve( nrEdges );
         for( size_t c = 0; c < cl.size(); c++ )
             for( size_t i = 0; i < irs.size(); i++ )
-                if( cl[c].contains( var(i) ) ) {
+                if( cl[c].contains( fg.var(i) ) ) {
                     edges.push_back( make_pair( c, i ) );
                     irs[i].c() -= 1.0;
                 }

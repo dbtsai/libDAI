@@ -1,264 +1,293 @@
-#include <iostream>
-#include <vector>
-#include <iterator>
-#include <algorithm>
-#include <dai/alldai.h>
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/io.hpp>
-#include <CImg.h>
+/*  This file is part of libDAI - http://www.libdai.org/
+ *
+ *  libDAI is licensed under the terms of the GNU General Public License version
+ *  2, or (at your option) any later version. libDAI is distributed without any
+ *  warranty. See the file COPYING for more details.
+ *
+ *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
+ */
 
+
+#include <iostream>
+#include <dai/alldai.h>  // Include main libDAI header file
+#include <CImg.h>        // This example needs a recent version of CImg to be installed
+
+
+using namespace dai;
 using namespace std;
 using namespace cimg_library;
-using namespace dai;
-
-typedef boost::numeric::ublas::vector<double> ublasvector;
-typedef boost::numeric::ublas::compressed_matrix<double> ublasmatrix;
-typedef ublasmatrix::value_array_type::const_iterator matrix_vcit;
-typedef ublasmatrix::index_array_type::const_iterator matrix_icit;
 
 
-class BinaryPairwiseGM {
-    public:
-        size_t N;
-        ublasmatrix w;
-        ublasvector th;
-        double logZ0;
-
-        BinaryPairwiseGM() {}
-        BinaryPairwiseGM( const FactorGraph &fg );
-        BinaryPairwiseGM( size_t _N, const ublasmatrix &_w, const ublasvector &_th, double _logZ0 ) : N(_N), w(_w), th(_th), logZ0(_logZ0) {}
-        BinaryPairwiseGM( const BinaryPairwiseGM &x ) : N(x.N), w(x.w), th(x.th), logZ0(x.logZ0) {};
-        BinaryPairwiseGM & operator=( const BinaryPairwiseGM &x ) {
-            if( this != &x ) {
-                N  = x.N;
-                w  = x.w;
-                th = x.th;
-                logZ0 = x.logZ0;
-            }
-            return *this;
-        }
-        double doBP( size_t maxiter, double tol, size_t verbose, ublasvector &m );
-        FactorGraph toFactorGraph();
-};
-
-
-// w should be upper triangular or lower triangular
-void WTh2FG( const ublasmatrix &w, const vector<double> &th, FactorGraph &fg ) {
-    vector<Var>    vars;
-    vector<Factor> factors;
-
-    size_t N = th.size();
-    assert( (w.size1() == N) && (w.size2() == N) );
-
-    vars.reserve(N);
-    for( size_t i = 0; i < N; i++ )
-        vars.push_back(Var(i,2));
-
-    factors.reserve( w.nnz() + N );
-    // walk through the sparse array structure
-    // this is similar to matlab sparse arrays
-    // index2 gives the column index
-    // index1 gives the starting indices for each row
-    size_t i = 0;
-//    cout << w << endl;
-    for( size_t pos = 0; pos < w.nnz(); pos++ ) {
-        while( pos == w.index1_data()[i+1] )
-            i++;
-        size_t j = w.index2_data()[pos];
-        double w_ij = w.value_data()[pos];
-//        cout << "(" << i << "," << j << "): " << w_ij << endl;
-        factors.push_back( createFactorIsing( vars[i], vars[j], w_ij ) );
-    }
-    for( size_t i = 0; i < N; i++ )
-        factors.push_back( createFactorIsing( vars[i], th[i] ) );
-
-    fg = FactorGraph(factors);
-}
-
-
+/// Converts an image into a FactorGraph as described in section 1.1.3 of [\ref Moo08]
+/** The grayscale pixel values of the image are transformed by a nonlinear transformation
+    into the local fields for each binary Ising variable, and the pairwise interactions
+    are uniform.
+    \param img The input image (should be grayscale, with 0 corresponding to background
+           and 255 corresponding to foreground)
+    \param J The pairwise interaction strength (should be positive for smoothing)
+    \param th_min Minimal value of local field strength (corresponding to background)
+    \param th_max Maximal value of local field strength (corresponding to foreground)
+    \param scale Typical difference in pixel values between fore- and background
+    \param pbg Probability that a pixel belongs to the background (in percent)
+    \param evidence The local evidence (represented as a grayscale image)
+**/
 template<class T>
-void Image2net( const CImg<T> &img, double J, double th_min, double th_plus, double th_tol, double p_background, BinaryPairwiseGM &net ) {
-    size_t dimx = img.dimx();
-    size_t dimy = img.dimy();
-
-    net.N = dimx * dimy;
-    net.w = ublasmatrix(net.N,net.N,4*net.N);
-    net.th = ublasvector(net.N);
-    for( size_t i = 0; i < net.N; i++ )
-        net.th[i] = 0.0;
-    net.logZ0 = 0.0;
-
-    CImg<float> hist = img.get_channel(0).get_histogram(256,0,255);
-    size_t cum_hist = 0;
-    size_t level = 0;
-    for( level = 0; level < 256; level++ ) {
-        cum_hist += (size_t)hist(level);
-        if( cum_hist > p_background * dimx * dimy )
-            break;
-    }
-
-    double th_avg = (th_min + th_plus) / 2.0;
-    double th_width = (th_plus - th_min) / 2.0;
-    for( size_t i = 0; i < dimx; i++ )
-        for( size_t j = 0; j < dimy; j++ ) {
-            if( i+1 < dimx )
-                net.w(i*dimy+j, (i+1)*dimy+j) = J;
-            if( i >= 1 )
-                net.w(i*dimy+j, (i-1)*dimy+j) = J;
-            if( j+1 < dimy )
-                net.w(i*dimy+j, i*dimy+(j+1)) = J;
-            if( j >= 1 )
-                net.w(i*dimy+j, i*dimy+(j-1)) = J;
-            double x = img(i,j);
-            net.th[i*dimy+j] = th_avg + th_width * tanh((x - level)/th_tol);
-/*            if( x < level )
-                x = x / level * 0.5;
-            else
-                x = 0.5 + 0.5 * ((x - level) / (255 - level));*/
-/*            if( x < level )
-                x = 0.01;
-            else
-                x = 0.99;
-            th[i*dimy+j] = 0.5 * (log(x) - log(1.0 - x));*/
-        }
-}
-
-
-template<class T>
-FactorGraph img2fg( const CImg<T> &img, double J, double th_min, double th_plus, double th_tol, double p_background ) {
+FactorGraph img2fg( const CImg<T> &img, double J, double th_min, double th_max, double scale, double pbg, CImg<unsigned char> &evidence ) {
     vector<Var> vars;
     vector<Factor> factors;
 
-    size_t dimx = img.width();
-    size_t dimy = img.height();
-    size_t N = dimx * dimy;
+    size_t dimx = img.width();   // Width of the image in pixels
+    size_t dimy = img.height();  // Height of the image in pixels
+    size_t N = dimx * dimy;      // One variable for each pixel
 
-    // create variables
-    cout << "Creating " << N << " variables..." << endl;
+    // Create variables
+    cout << "  Image width:  " << dimx << endl;
+    cout << "  Image height: " << dimy << endl;
+    cout << "  Pairwise interaction strength:   " << J << endl;
+    cout << "  Minimal local evidence strength: " << th_min << endl;
+    cout << "  Maximal local evidence strength: " << th_max << endl;
+    cout << "  Scale of pixel values:           " << scale << endl;
+    cout << "  Percentage of background:        " << pbg << endl;
+    cout << "  Creating " << N << " variables..." << endl;
+    // Reserve memory for the variables
     vars.reserve( N );
+    // Create a binary variable for each pixel
     for( size_t i = 0; i < N; i++ )
         vars.push_back( Var( i, 2 ) );
 
-    // build histogram
-    CImg<float> hist = img.get_channel(0).get_histogram(256,0,255);
+    // Build image histogram
+    CImg<float> hist = img.get_channel( 0 ).get_histogram( 256, 0, 255 );
     size_t cum_hist = 0;
+
+    // Find the critical level which corresponds with the seperation
+    // between foreground and background, assuming that the percentage
+    // of pixels in the image that belong to the background is pbg
     size_t level = 0;
     for( level = 0; level < 256; level++ ) {
         cum_hist += (size_t)hist(level);
-        if( cum_hist > p_background * dimx * dimy )
+        if( cum_hist > pbg * dimx * dimy / 100.0 )
             break;
     }
 
-    // create factors
-    cout << "Creating " << (3 * N - dimx - dimy) << " factors..." << endl;
+    // Create factors
+    cout << "  Creating " << (3 * N - dimx - dimy) << " factors..." << endl;
+    // Reserve memory for the factors
     factors.reserve( 3 * N - dimx - dimy );
-    double th_avg = (th_min + th_plus) / 2.0;
-    double th_width = (th_plus - th_min) / 2.0;
+    // th_avg is the local field strength that would correspond with pixel value level
+    // th_width is the width of the local field strength range
+    double th_avg = (th_min + th_max) / 2.0;
+    double th_width = (th_max - th_min) / 2.0;
+    // For each pixel
     for( size_t i = 0; i < dimx; i++ )
         for( size_t j = 0; j < dimy; j++ ) {
+            // Add a pairwise interaction with the left neighboring pixel
             if( i >= 1 )
                 factors.push_back( createFactorIsing( vars[i*dimy+j], vars[(i-1)*dimy+j], J ) );
+            // Add a pairwise interaction with the upper neighboring pixel
             if( j >= 1 )
                 factors.push_back( createFactorIsing( vars[i*dimy+j], vars[i*dimy+(j-1)], J ) );
+            // Get the pixel value
             double x = img(i,j);
-            factors.push_back( createFactorIsing( vars[i*dimy+j], th_avg + th_width * tanh((x - level)/th_tol) ) );
+            // Apply the nonlinear transformation to get the local field strength
+            double th = th_avg + th_width * tanh( (x - level) / scale );
+            // Add a single-variable interaction with strength th
+            factors.push_back( createFactorIsing( vars[i*dimy+j], th ) );
+
+            // For visualization, we calculate a grayscale level corresponding to the local field strength
+            unsigned char g = (unsigned char)((tanh(th) + 1.0) / 2.0 * 255.0);
+            // and store it in the evidence image
+            if( g > 127 ) {
+                evidence(i,j,0) = 255;
+                evidence(i,j,1) = 2 * (g - 127);
+                evidence(i,j,2) = 2 * (g - 127);
+            } else {
+                evidence(i,j,0) = 0;
+                evidence(i,j,1) = 0;
+                evidence(i,j,2) = 2*g;
+            }
         }
 
-    cout << "Creating factor graph..." << endl;
+    // Create the factor graph out of the variables and factors
+    cout << "Creating the factor graph..." << endl;
     return FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
 }
 
 
-double myBP( BinaryPairwiseGM &net, size_t maxiter, double tol, size_t verbose, ublasvector &m, size_t dimx, size_t dimy, CImgDisplay &disp );
-double myMF( BinaryPairwiseGM &net, size_t maxiter, double tol, size_t verbose, ublasvector &m, size_t dimx, size_t dimy, CImgDisplay &disp );
-double doInference( FactorGraph &fg, string AlgOpts, size_t maxiter, double tol, size_t verbose, ublasvector &m, size_t dimx, size_t dimy, CImgDisplay &disp );
+/// Perform an inference algorithm on a factorgraph, and visualize intermediate beliefs
+/** \param fg The factorgraph (should have only binary variables)
+ *  \param algOpts String specifying the inference algorithm and its options in the format "NAME[key1=val1,key2=val2,...,keyn=valn]"
+ *  \param maxIter Maximum number of iterations to perform
+ *  \param tol Convergence tolerance
+ *  \param m Final magnetizations
+ *  \param dimx Image width
+ *  \param dimy Image height
+ *  \param disp Handle for displaying the intermediate beliefs
+ */
+double doInference( FactorGraph& fg, string algOpts, size_t maxIter, double tol, vector<double> &m, size_t dimx, size_t dimy, CImgDisplay &disp ) {
+    // Construct inference algorithm
+    cout << "Inference algorithm: " << algOpts << endl;
+    cout << "Constructing inference algorithm object..." << endl;
+    InfAlg* ia = newInfAlgFromString( algOpts, fg );
 
+    // Initialize inference algorithm
+    cout << "Initializing inference algorithm..." << endl;
+    ia->init();
+
+    // Initialize vector for storing the magnetizations
+    m = vector<double>( fg.nrVars(), 0.0 );
+
+    // Construct an image that will hold the intermediate single-variable beliefs
+    CImg<unsigned char> image( dimx, dimy, 1, 3 );
+
+    // maxDiff stores the current convergence level
+    double maxDiff = 1.0;
+    
+    // Iterate while maximum number of iterations has not been
+    // reached and requested convergence level has not been reached
+    cout << "Starting inference algorithm..." << endl;
+    for( size_t iter = 0; iter < maxIter && maxDiff > tol; iter++ ) {
+        // Set magnetizations to beliefs
+        for( size_t i = 0; i < fg.nrVars(); i++ )
+            m[i] = ia->beliefV(i)[1] - ia->beliefV(i)[0];
+
+        // For each pixel, calculate a color coded magnetization
+        // and store it in the image for visualization
+        for( size_t i = 0; i < dimx; i++ )
+            for( size_t j = 0; j < dimy; j++ ) {
+                unsigned char g = (unsigned char)((m[i*dimy+j] + 1.0) / 2.0 * 255.0);
+                if( g > 127 ) {
+                    image(i,j,0) = 255;
+                    image(i,j,1) = 2 * (g - 127);
+                    image(i,j,2) = 2 * (g - 127);
+                } else {
+                    image(i,j,0) = 0;
+                    image(i,j,1) = 0;
+                    image(i,j,2) = 2*g;
+                }
+            }
+
+        // Display the image with the current beliefs
+        disp = image;
+
+        // Perform the requested inference algorithm
+        // (which could be limited to perform only 1 iteration)
+        maxDiff = ia->run();
+
+        // Output progress
+        cout << "  Iterations = " << iter << ", maxDiff = " << maxDiff << endl;
+    }
+    cout << "Finished inference algorithm" << endl;
+
+    // Clean up inference algorithm
+    delete ia;
+
+    // Return reached convergence level
+    return maxDiff;
+}
+
+
+/// Main program
+/** This example shows how one can use approximate inference in factor graphs
+ *  on a simple vision task: given two images, identify smooth regions where these
+ *  two images differ more than some threshold. This can be used to seperate 
+ *  foreground from background if one image contains the background and the other
+ *  one the combination of background and foreground.
+ */
 int main(int argc,char **argv) {
-    // Display program usage, when invoked from the command line with option '-h'.
-    cimg_usage("Usage: example_imagesegmentation -i <inputimage1> -j <inputimage2> -o <outputimage1> -p <outputimage2> -J <J> -t <t> -s <s> -u <u> -x <x>");
-    const char* file_i = cimg_option("-i","","Input image 1");
-    const char* file_j = cimg_option("-j","","Input image 2");
-    const char* file_o = cimg_option("-o","","Output image (with BP)");
-    const char* file_p = cimg_option("-p","","Output image (without BP)");
-    const double J = cimg_option("-J",0.0,"Coupling strength");
-    const double th_min = cimg_option("-t",0.0,"Local evidence strength background");
-    const double th_plus = cimg_option("-s",0.0,"Local evidence strength foreground");
-    const double th_tol = cimg_option("-u",0.0,"Sensitivity for fore/background");
-    const double p_background = cimg_option("-x",0.0,"Percentage of background in image");
+    cout << "This program is part of libDAI - http://www.libdai.org/" << endl;
+    cout << "(Use the option -h for getting help with the command line arguments.)" << endl;
+    // Display program usage, when invoked from the command line with option '-h'
+    cimg_usage( "This example shows how libDAI can be used for a simple image segmentation task" );
+    // Get command line arguments
+    const char* file_i1 = cimg_option( "-i1", "example_img_in1.jpg", "Input image 1" );
+    const char* file_i2 = cimg_option( "-i2", "example_img_in2.jpg", "Input image 2" );
+    const char* file_o1 = cimg_option( "-o1", "example_img_out1.jpg", "Output image (local evidence)" );
+    const char* file_o2 = cimg_option( "-o2", "example_img_out2.jpg", "Output image (magnetizations)" );
+    const double J = cimg_option( "-J", 2.4, "Pairwise interaction strength (i.e., smoothing strength)" );
+    const double th_min = cimg_option( "-thmin", -3.0, "Local evidence strength of background" );
+    const double th_max = cimg_option( "-thmax", 3.2, "Local evidence strength of foreground" );
+    const double scale = cimg_option( "-scale", 40.0, "Typical difference in pixel values between fore- and background" );
+    const double pbg = cimg_option( "-pbg", 90.0, "Percentage of background in image" );
+    const char *file_fg = cimg_option( "-fg", "", "Output factor graph" );
 
-    CImg<unsigned char> image1 = CImg<>(file_i);
-    CImg<unsigned char> image2 = CImg<>(file_j);
+    // Read input images
+    cout << endl;
+    cout << "Reading input image 1 (" << file_i1 << ")..." << endl;
+    CImg<unsigned char> image1 = CImg<>( file_i1 );
+    cout << "Reading input image 2 (" << file_i2 << ")..." << endl;
+    CImg<unsigned char> image2 = CImg<>( file_i2 );
 
-    CImg<int> image3(image1);
+    // Check image sizes
+    if( (image1.width() != image2.width()) || (image1.height() != image2.height()) )
+        cerr << "Error: input images should have same size." << endl;
+    size_t dimx = image1.width();
+    size_t dimy = image1.height();
+
+    // Display input images
+    cout << "Displaying input image 1..." << endl;
+    CImgDisplay disp1( image1, "Input image 1", 0 );
+    cout << "Displaying input image 2..." << endl;
+    CImgDisplay disp2( image2, "Input image 2", 0 );
+
+    // Construct absolute difference image
+    cout << "Constructing difference image..." << endl;
+    CImg<int> image3( image1 );
     image3 -= image2;
     image3.abs();
-    image3.norm(1); // 1 = L1, 2 = L2, -1 = Linf
-    // normalize
-    for( size_t i = 0; i < image3.width(); i++ ) {
-        for( size_t j = 0; j < image3.height(); j++ ) {
+    // Normalize difference image
+    image3.norm( 1 ); // 1 = L1, 2 = L2, -1 = Linf
+
+    // Normalize the difference by the average value of the background image
+    for( size_t i = 0; i < dimx; i++ ) {
+        for( size_t j = 0; j < dimy; j++ ) {
             int avg = 0;
-            for( size_t c = 0; c < image1.spectrum(); c++ )
-                avg += image1(i,j,c);
+            for( int c = 0; c < image1.spectrum(); c++ )
+                avg += image1( i, j, c );
             avg /= image1.spectrum();
-            image3(i,j,0) /= (1.0 + avg / 255.0);
+            image3( i, j, 0 ) /= (1.0 + avg / 255.0);
         }
     }
-    image3.normalize(0,255);
+    image3.normalize( 0, 255 );
 
-    CImgDisplay disp1(image1,"Input 1",0);
-    CImgDisplay disp2(image2,"Input 2",0);
-    CImgDisplay disp3(image3,"Absolute difference of both inputs",0);
+    // Display difference image
+    cout << "Displaying difference image..." << endl;
+    CImgDisplay disp3( image3, "Relative difference of both inputs", 0 );
 
-    //BinaryPairwiseGM net;
-    //Image2net( image3, J, th_min, th_plus, th_tol, p_background, net );
-    FactorGraph fg = img2fg( image3, J, th_min, th_plus, th_tol, p_background );
-    cout << "Done" << endl;
+    // Convert difference image into a factor graph and store
+    // the local evidence in image4 for visualization
+    CImg<unsigned char> image4( dimx, dimy, 1, 3 );
+    cout << "Converting difference image into factor graph..." << endl;
+    FactorGraph fg = img2fg( image3, J, th_min, th_max, scale, pbg, image4 );
 
-    size_t dimx = image3.width();
-    size_t dimy = image3.height();
-    CImg<unsigned char> image4(dimx,dimy,1,3);
-
-    ublasvector m;
-    //net.doBP( 0, 1e-2, 3, m );
-    BP bp( fg, PropertySet("[updates=SEQFIX,maxiter=0,tol=1e-9,verbose=0,logdomain=0]") );
-    bp.init();
-    for( size_t i = 0; i < dimx; i++ )
-        for( size_t j = 0; j < dimy; j++ ) {
-            unsigned char g = (unsigned char)(bp.belief(fg.var(i*dimy+j))[1] * 255.0);
- //           unsigned char g = (unsigned char)((m[i*dimy+j] + 1.0) / 2.0 * 255.0);
-            if( g > 127 ) {
-                image4(i,j,0) = 255;
-                image4(i,j,1) = 2 * (g - 127);
-                image4(i,j,2) = 2 * (g - 127);
-            } else {
-                image4(i,j,0) = 0;
-                image4(i,j,1) = 0;
-                image4(i,j,2) = 2*g;
-            }
-        }
-    CImgDisplay disp4(image4,"Local evidence",0);
-    image4.save_jpeg(file_p,100);
-
-    // solve the problem and show intermediate steps
-    CImgDisplay disp5(dimx,dimy,"Beliefs during inference",0);
-    if( 1 ) {
-        //FactorGraph fg = net.toFactorGraph();
-        fg.WriteToFile( "joris.fg" );
-
-        doInference( fg, "BP[updates=SEQMAX,maxiter=1,tol=1e-9,verbose=0,logdomain=0]", 1000, 1e-5, 3, m, dimx, dimy, disp5 );
-        // doInference( fg, "HAK[doubleloop=0,clusters=LOOP,init=UNIFORM,loopdepth=4,tol=1e-9,maxiter=1,verbose=3]", 1000, 1e-5, 3, m, dimx, dimy, disp5 );
-        // doInference( fg, "HAK[doubleloop=0,clusters=BETHE,init=UNIFORM,maxiter=1,tol=1e-9,verbose=3]", 1000, 1e-5, 3, m, dimx, dimy, disp5 );
-        // doInference( fg, "MF[tol=1e-9,maxiter=1,damping=0.0,init=RANDOM,updates=NAIVE]", 1000, 1e-5, 3, m, dimx, dimy, disp5 );
-    } else {
-    //  myBP( net, 1000, 1e-5, 3, m, dimx, dimy, disp5 );
-    //  myMF( net, 1000, 1e-5, 3, m, dimx, dimy, disp5 );
+    // Display local evidence
+    cout << "Displaying local evidence..." << endl;
+    CImgDisplay disp4( image4, "Local evidence", 0 );
+    cout << "Saving local evidence as JPEG in " << file_o1 << endl;
+    image4.save_jpeg( file_o1, 100 );
+    if( strlen( file_fg ) > 0 ) {
+        cout << "Saving factor graph as " << file_fg << endl;
+        fg.WriteToFile( file_fg );
     }
 
+    // Solve the inference problem and visualize intermediate steps
+    CImgDisplay disp5( dimx, dimy, "Beliefs during inference", 0 );
+    vector<double> m; // Stores the final magnetizations
+    cout << "Solving the inference problem...please be patient!" << endl;
+    // doInference( fg, "BP[updates=SEQFIX,maxiter=1,tol=1e-9,verbose=0,logdomain=0]", 100, 1e-9, m, dimx, dimy, disp5 );
+    doInference( fg, "BP[updates=SEQMAX,maxiter=1,tol=1e-9,verbose=0,logdomain=0]", 100, 1e-9, m, dimx, dimy, disp5 );
+    // doInference( fg, "BP[updates=SEQRND,maxiter=1,tol=1e-9,verbose=0,logdomain=0]", 100, 1e-9, m, dimx, dimy, disp5 );
+    // doInference( fg, "HAK[doubleloop=0,clusters=LOOP,init=UNIFORM,loopdepth=4,tol=1e-9,maxiter=1,verbose=3]", 1000, 1e-5, m, dimx, dimy, disp5 );
+    // doInference( fg, "HAK[doubleloop=0,clusters=BETHE,init=UNIFORM,maxiter=1,tol=1e-9,verbose=3]", 1000, 1e-5, m, dimx, dimy, disp5 );
+    // doInference( fg, "MF[tol=1e-9,maxiter=1,damping=0.0,init=RANDOM,updates=HARDSPIN]", 1000, 1e-5, m, dimx, dimy, disp5 );
+    // doInference( fg, "TREEEP[type=ORG,tol=1e-9,maxiter=10000,verbose=3]", 1000, 1e-5, m, dimx, dimy, disp5 );
+    // doInference( fg, "GIBBS[iters=1,burnin=0]", 100, 1e-9, m, dimx, dimy, disp5 );
+    // doInference( fg, "GIBBS[iters=1,burnin=0]", 100, 1e-9, m, dimx, dimy, disp5 );
+    // doInference( fg, "GIBBS[iters=1,burnin=0]", 100, 1e-9, m, dimx, dimy, disp5 );
+
+    // Visualize the final magnetizations
     for( size_t i = 0; i < dimx; i++ )
         for( size_t j = 0; j < dimy; j++ ) {
-//          unsigned char g = (unsigned char)(bp.belief(fg.var(i*dimy+j))[1] * 255.0);
             unsigned char g = (unsigned char)((m[i*dimy+j] + 1.0) / 2.0 * 255.0);
             if( g > 127 ) {
                 image4(i,j,0) = image2(i,j,0);
@@ -268,344 +297,15 @@ int main(int argc,char **argv) {
                 for( size_t c = 0; c < (size_t)image4.spectrum(); c++ )
                     image4(i,j,c) = 255;
         }
-    CImgDisplay main_disp(image4,"Segmentation result",0);
-    image4.save_jpeg(file_o,100);
+    cout << "Displaying the final result of the segmentation problem..." << endl;
+    CImgDisplay main_disp( image4, "Foreground/background segmentation result", 0 );
 
+    cout << "Saving the final result of the segmentation problem as JPEG in " << file_o2 << endl;
+    image4.save_jpeg( file_o2, 100 );
+
+    cout << "Close the last image display in order to finish." << endl;
     while( !main_disp.is_closed() )
         cimg::wait( 40 );
 
     return 0;
-}
-
-
-double myBP( BinaryPairwiseGM &net, size_t maxiter, double tol, size_t verbose, ublasvector &m, size_t dimx, size_t dimy, CImgDisplay &disp ) {
-    clock_t tic = toc();
-
-    if( verbose >= 1 )
-        cout << "Starting myBP..." << endl;
-
-    size_t nr_messages = net.w.nnz();
-    ublasmatrix message( net.w );
-    for( size_t ij = 0; ij < nr_messages; ij++ )
-        message.value_data()[ij] = 0.0;
-    // NOTE: message(i,j) is \mu_{j\to i}
-
-    m = ublasvector(net.N);
-
-    size_t _iterations = 0;
-    double max_diff = 1.0;
-    for( _iterations = 0; _iterations < maxiter && max_diff > tol; _iterations++ ) {
-        // walk through the sparse array structure
-        // this is similar to matlab sparse arrays
-        // index2 gives the column index (ir in matlab)
-        // index1 gives the starting indices for each row (jc in matlab)
-//        for( size_t t = 0; t < 3; t++ ) {
-            size_t i = 0;
-            max_diff = 0.0;
-            for( size_t pos = 0; pos < nr_messages; pos++ ) {
-                while( pos == net.w.index1_data()[i+1] )
-                    i++;
-                size_t j = net.w.index2_data()[pos];
-                double w_ij = net.w.value_data()[pos];
-                // \mu_{j\to i} = \atanh \tanh w_{ij} \tanh (\theta_j + \sum_{k\in\nb{j}\setm i} \mu_{k\to j})
-                double field = sum(row(message,j)) - message(j,i) + net.th[j];
-                double new_message = atanh( tanh( w_ij ) * tanh( field ) );
-                double diff = fabs(message(i,j) - new_message);
-                if( diff > max_diff )
-                    max_diff = diff;
-//                if( (pos % 3) == t )
-                    message(i,j) = new_message;
-            }
-//        }
-
-        if( verbose >= 3 )
-            cout << "myBP:  maxdiff " << max_diff << " after " << _iterations+1 << " passes" << endl;
-
-        for( size_t j = 0; j < net.N; j++ ) {
-            // m_j = \tanh (\theta_j + \sum_{k\in\nb{j}} \mu_{k\to j})
-            double field = sum(row(message,j)) + net.th[j];
-            m[j] = tanh( field );
-        }
-        CImg<unsigned char> image(dimx,dimy,1,3);
-        for( size_t i = 0; i < dimx; i++ )
-            for( size_t j = 0; j < dimy; j++ ) {
-                // unsigned char g = (unsigned char)(bp.belief(fg.var(i*dimy+j))[1] * 255.0);
-                unsigned char g = (unsigned char)((m[i*dimy+j] + 1.0) / 2.0 * 255.0);
-                if( g > 127 ) {
-                    image(i,j,0) = 255;
-                    image(i,j,1) = 2 * (g - 127);
-                    image(i,j,2) = 2 * (g - 127);
-                } else {
-                    image(i,j,0) = 0;
-                    image(i,j,1) = 0;
-                    image(i,j,2) = 2*g;
-                }
-            }
-        disp = image;
-        char filename[30] = "/tmp/movie000.jpg";
-        sprintf( &filename[10], "%03ld", (long)_iterations );
-        strcat( filename, ".jpg" );
-        image.save_jpeg(filename,100);
-    }
-
-    if( verbose >= 1 ) {
-        if( max_diff > tol ) {
-            if( verbose == 1 )
-                cout << endl;
-                cout << "myBP:  WARNING: not converged within " << maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << max_diff << endl;
-        } else {
-            if( verbose >= 3 )
-                cout << "myBP:  ";
-                cout << "converged in " << _iterations << " passes (" << toc() - tic << " clocks)." << endl;
-        }
-    }
-
-    return max_diff;
-}
-
-
-double doInference( FactorGraph& fg, string AlgOpts, size_t maxiter, double tol, size_t verbose, ublasvector &m, size_t dimx, size_t dimy, CImgDisplay &disp ) {
-    InfAlg* ia = newInfAlgFromString( AlgOpts, fg );
-    ia->init();
-
-    m = ublasvector( fg.nrVars() );
-    CImg<unsigned char> image(dimx,dimy,1,3);
-
-    size_t _iterations = 0;
-    double max_diff = 1.0;
-    for( _iterations = 0; _iterations < maxiter && max_diff > tol; _iterations++ ) {
-        max_diff = ia->run();
-        for( size_t i = 0; i < fg.nrVars(); i++ )
-            m[i] = ia->beliefV(i)[1] - ia->beliefV(i)[0];
-        for( size_t i = 0; i < dimx; i++ )
-            for( size_t j = 0; j < dimy; j++ ) {
-                // unsigned char g = (unsigned char)(ia->beliefV(i*dimy+j)[1] * 255.0);
-                unsigned char g = (unsigned char)((m[i*dimy+j] + 1.0) / 2.0 * 255.0);
-                if( g > 127 ) {
-                    image(i,j,0) = 255;
-                    image(i,j,1) = 2 * (g - 127);
-                    image(i,j,2) = 2 * (g - 127);
-                } else {
-                    image(i,j,0) = 0;
-                    image(i,j,1) = 0;
-                    image(i,j,2) = 2*g;
-                }
-            }
-        disp = image;
-        /*
-        char filename[30] = "/tmp/movie000.jpg";
-        sprintf( &filename[10], "%03ld", (long)_iterations );
-        strcat( filename, ".jpg" );
-        image.save_jpeg(filename,100);
-        */
-        cout << "_iterations = " << _iterations << ", max_diff = " << max_diff << endl;
-    }
-
-    delete ia;
-
-    return max_diff;
-}
-
-
-double myMF( BinaryPairwiseGM &net, size_t maxiter, double tol, size_t verbose, ublasvector &m, size_t dimx, size_t dimy, CImgDisplay &disp ) {
-    clock_t tic = toc();
-
-    if( verbose >= 1 )
-        cout << "Starting myMF..." << endl;
-
-    m = ublasvector(net.N);
-    for( size_t i = 0; i < net.N; i++ )
-        m[i] = 0.0;
-
-    size_t _iterations = 0;
-    double max_diff = 1.0;
-    for( _iterations = 0; _iterations < maxiter && max_diff > tol; _iterations++ ) {
-        max_diff = 0.0;
-        for( size_t t = 0; t < net.N; t++ ) {
-            size_t i = (size_t)(rnd_uniform() * net.N);
-            double new_m_i = tanh(net.th[i] + inner_prod(row(net.w,i), m));
-            double diff = fabs( new_m_i - m[i] );
-            if( diff > max_diff )
-                max_diff = diff;
-            m[i] = new_m_i;
-        }
-
-        if( verbose >= 3 )
-            cout << "myMF:  maxdiff " << max_diff << " after " << _iterations+1 << " passes" << endl;
-
-        CImg<unsigned char> image(dimx,dimy,1,3);
-        for( size_t i = 0; i < dimx; i++ )
-            for( size_t j = 0; j < dimy; j++ ) {
-                // unsigned char g = (unsigned char)(bp.belief(fg.var(i*dimy+j))[1] * 255.0);
-                unsigned char g = (unsigned char)((m[i*dimy+j] + 1.0) / 2.0 * 255.0);
-                if( g > 127 ) {
-                    image(i,j,0) = 255;
-                    image(i,j,1) = 2 * (g - 127);
-                    image(i,j,2) = 2 * (g - 127);
-                } else {
-                    image(i,j,0) = 0;
-                    image(i,j,1) = 0;
-                    image(i,j,2) = 2*g;
-                }
-            }
-        disp = image;
-        char filename[30] = "/tmp/movie000.jpg";
-        sprintf( &filename[10], "%03ld", (long)_iterations );
-        strcat( filename, ".jpg" );
-        image.save_jpeg(filename,100);
-    }
-
-    if( verbose >= 1 ) {
-        if( max_diff > tol ) {
-            if( verbose == 1 )
-                cout << endl;
-                cout << "myMF:  WARNING: not converged within " << maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << max_diff << endl;
-        } else {
-            if( verbose >= 3 )
-                cout << "myMF:  ";
-                cout << "converged in " << _iterations << " passes (" << toc() - tic << " clocks)." << endl;
-        }
-    }
-
-    return max_diff;
-}
-
-
-BinaryPairwiseGM::BinaryPairwiseGM( const FactorGraph &fg ) {
-    assert( fg.isPairwise() );
-    assert( fg.isBinary() );
-
-    // create w and th
-    N = fg.nrVars();
-
-    // count non_zeros in w
-    size_t non_zeros = 0;
-    for( size_t I = 0; I < fg.nrFactors(); I++ )
-        if( fg.factor(I).vars().size() == 2 )
-            non_zeros++;
-    w = ublasmatrix(N, N, non_zeros * 2);
-
-    th = ublasvector(N);
-    for( size_t i = 0; i < N; i++ )
-        th[i] = 0.0;
-    
-    logZ0 = 0.0;
-
-    for( size_t I = 0; I < fg.nrFactors(); I++ ) {
-        const Factor &psi = fg.factor(I);
-        if( psi.vars().size() == 0 )
-            logZ0 += dai::log( psi[0] );
-        else if( psi.vars().size() == 1 ) {
-            size_t i = fg.findVar( *(psi.vars().begin()) );
-            th[i] += 0.5 * (dai::log(psi[1]) - dai::log(psi[0]));
-            logZ0 += 0.5 * (dai::log(psi[0]) + dai::log(psi[1]));
-        } else if( psi.vars().size() == 2 ) {
-            size_t i = fg.findVar( *(psi.vars().begin()) );
-            VarSet::const_iterator jit = psi.vars().begin();
-            size_t j = fg.findVar( *(++jit) );
-
-            double w_ij = 0.25 * (dai::log(psi[3]) + dai::log(psi[0]) - dai::log(psi[2]) - dai::log(psi[1]));
-            w(i,j) += w_ij; 
-            w(j,i) += w_ij; 
-
-            th[i] += 0.25 * (dai::log(psi[3]) - dai::log(psi[2]) + dai::log(psi[1]) - dai::log(psi[0]));
-            th[j] += 0.25 * (dai::log(psi[3]) - dai::log(psi[1]) + dai::log(psi[2]) - dai::log(psi[0]));
-
-            logZ0 += 0.25 * (dai::log(psi[0]) + dai::log(psi[1]) + dai::log(psi[2]) + dai::log(psi[3]));
-        }
-    }
-}
-
-
-double BinaryPairwiseGM::doBP( size_t maxiter, double tol, size_t verbose, ublasvector &m ) {
-    double tic = toc();
-
-    if( verbose >= 1 )
-        cout << "Starting BinaryPairwiseGM::doBP..." << endl;
-
-    size_t nr_messages = w.nnz();
-    ublasmatrix message( w );
-    for( size_t ij = 0; ij < nr_messages; ij++ )
-        message.value_data()[ij] = 0.0;
-    // NOTE: message(i,j) is \mu_{j\to i}
-    Real maxDiff = INFINITY;
-
-    size_t _iterations = 0;
-    for( _iterations = 0; _iterations < maxiter && maxDiff > tol; _iterations++ ) {
-        // walk through the sparse array structure
-        // this is similar to matlab sparse arrays
-        // index2 gives the column index (ir in matlab)
-        // index1 gives the starting indices for each row (jc in matlab)
-        size_t i = 0;
-        maxDiff = -INFINITY;
-        for( size_t pos = 0; pos < nr_messages; pos++ ) {
-            while( pos == w.index1_data()[i+1] )
-                i++;
-            size_t j = w.index2_data()[pos];
-            double w_ij = w.value_data()[pos];
-            // \mu_{j\to i} = \atanh \tanh w_{ij} \tanh (\theta_j + \sum_{k\in\nb{j}\setm i} \mu_{k\to j})
-            double field = sum(row(message,j)) - message(j,i) + th[j];
-            double new_message = atanh( tanh( w_ij ) * tanh( field ) );
-            maxDiff = std::max( maxDiff, fabs(message(i,j) - new_message) );
-            message(i,j) = new_message;
-        }
-
-        if( verbose >= 3 )
-            cout << "BinaryPairwiseGM::doBP:  maxdiff " << maxDiff << " after " << _iterations+1 << " passes" << endl;
-    }
-
-    m = ublasvector(N);
-    for( size_t j = 0; j < N; j++ ) {
-        // m_j = \tanh (\theta_j + \sum_{k\in\nb{j}} \mu_{k\to j})
-        double field = sum(row(message,j)) + th[j];
-        m[j] = tanh( field );
-    }
-
-    if( verbose >= 1 ) {
-        if( maxDiff > tol ) {
-            if( verbose == 1 )
-                cout << endl;
-                cout << "BinaryPairwiseGM::doBP:  WARNING: not converged within " << maxiter << " passes (" << toc() - tic << " clocks)...final maxdiff:" << maxDiff << endl;
-        } else {
-            if( verbose >= 3 )
-                cout << "BinaryPairwiseGM::doBP:  ";
-                cout << "converged in " << _iterations << " passes (" << toc() - tic << " clocks)." << endl;
-        }
-    }
-
-    return maxDiff;
-}
-
-
-FactorGraph BinaryPairwiseGM::toFactorGraph() {
-    vector<Var> vars;
-    vector<Factor> factors;
-
-    // create variables
-    vars.reserve( N );
-    for( size_t i = 0; i < N; i++ )
-        vars.push_back( Var( i, 2 ) );
-
-    // create single-variable factors
-    size_t nrE = w.nnz();
-    factors.reserve( N + nrE / 2 );
-    for( size_t i = 0; i < N; i++ )
-        factors.push_back( createFactorIsing( vars[i], th[i] ) );
-
-    // create pairwise factors
-    // walk through the sparse array structure
-    // this is similar to matlab sparse arrays
-    size_t i = 0;
-    for( size_t pos = 0; pos < nrE; pos++ ) {
-        while( pos == w.index1_data()[i+1] )
-            i++;
-        size_t j = w.index2_data()[pos];
-        double w_ij = w.value_data()[pos];
-        if( i < j )
-            factors.push_back( createFactorIsing( vars[i], vars[j], w_ij ) );
-    }
-
-    factors.front() *= dai::exp( logZ0 );
-
-    return FactorGraph( factors.begin(), factors.end(), vars.begin(), vars.end(), factors.size(), vars.size() );
 }

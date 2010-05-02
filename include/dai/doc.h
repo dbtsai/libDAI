@@ -794,6 +794,12 @@
  *  <em>IEEE Transactions on Information Theory</em> 53(12):4422-4437,
  *  http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=4385778
  *
+ *  \anchor Moo08 \ref Moo08
+ *  J. M. Mooij (2008):
+ *  "Understanding and Improving Belief Propagation",
+ *  <em>Ph.D. Thesis</em> Radboud University Nijmegen
+ *  http://webdoc.ubn.ru.nl/mono/m/mooij_j/undeanimb.pdf
+ *
  *  \anchor MoR05 \ref MoR05
  *  A. Montanari and T. Rizzo (2005):
  *  "How to Compute Loop Corrections to the Bethe Approximation",
