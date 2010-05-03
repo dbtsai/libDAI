@@ -181,7 +181,7 @@ examples/%$(EE) : examples/%.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS)
 
 examples/example_imagesegmentation$(EE) : examples/example_imagesegmentation.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	$(CC) $(CCO)$@ $< $(LIBS) -lpthread -lX11
+	-$(CC) $(CCO)$@ $< $(LIBS) -lpthread -lX11
 
 
 # UNIT TESTS
