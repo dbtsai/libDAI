@@ -35,8 +35,7 @@ CC=g++
 # Output filename option of the compiler
 CCO=-o
 # Flags for the C++ compiler
-# (dynamic linking of Boost libraries seems not to work on Cygwin)
-CCFLAGS=-Wno-deprecated -Wall -W -Wextra -DCYGWIN -static
+CCFLAGS=-Wno-deprecated -Wall -W -Wextra -DCYGWIN
 # Flags to add in debugging mode (if DEBUG=true)
 CCDEBUGFLAGS=-O3 -g -DDAI_DEBUG
 # Flags to add in non-debugging mode (if DEBUG=false)
