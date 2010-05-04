@@ -1,6 +1,7 @@
 git master HEAD
 ---------------
 
+* Improved regression test
 * Added examples/example_imagesegmentation
 * [Ofer Meshi] Added a script for converting from FastInf to libDAI format
 * Made all "verbose" properties optional
