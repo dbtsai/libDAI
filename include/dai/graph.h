@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <dai/util.h>
 #include <dai/exceptions.h>
+#include <dai/smallset.h>
 
 
 namespace dai {
@@ -209,7 +210,7 @@ class GraphAL {
         /// Adds an edge between node \a n1 and node \a n2.
         /** If \a check == \c true, only adds the edge if it does not exist already.
          */
-        void addEdge( size_t n1, size_t n2, bool check = true );
+        GraphAL& addEdge( size_t n1, size_t n2, bool check = true );
     //@}
 
     /// \name Erasing nodes and edges
@@ -262,6 +263,9 @@ class GraphAL {
             return nb(n1).size();
         }
 
+        /// Returns neighbors of node \a n as a SmallSet<size_t>.
+        SmallSet<size_t> nbSet( size_t n ) const;
+
         /// Returns true if the graph is connected
         bool isConnected() const;
 
@@ -274,7 +278,7 @@ class GraphAL {
         /// Comparison operator which returns true if two graphs are identical
         /** \note Two graphs are called identical if they have the same number 
          *  of nodes and the same edges (i.e., \a x has an edge between nodes
-         *  n1 and n2 if and only if \c *this has an edge between nodes n1 and n2).
+         *  \a n1 and \a n2 if and only if \c *this has an edge between nodes \a n1 and \a n2).
          */
         bool operator==( const GraphAL& x ) const {
             if( nrNodes() != x.nrNodes() )

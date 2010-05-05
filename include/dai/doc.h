@@ -11,6 +11,9 @@
 /** \file
  *  \brief Contains additional doxygen documentation
  *
+ *  \todo Replace all Neighbor subclasses with a global Neighbor class, and
+ *  introduce global (un)directed edge classes
+ *
  *  \todo Replace all Name members by virtual functions (or add virtual functions returning the Name)
  *
  *  \idea Adapt (part of the) guidelines in http://www.boost.org/development/requirements.html#Design_and_Programming

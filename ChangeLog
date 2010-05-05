@@ -1,6 +1,7 @@
 git master HEAD
 ---------------
 
+* Added dag.h/cpp, an implementation for Directed Acyclic Graphs
 * Improved regression test
 * Added examples/example_imagesegmentation
 * [Ofer Meshi] Added a script for converting from FastInf to libDAI format
@@ -158,6 +159,7 @@ git master HEAD
   - Fixed bug in createGraphGrid3D()
   - Fixed bug in createGraphRegular()
   - Added GraphAL::hasEdge(size_t,size_t)
+  - Added GraphAL::nbSet(size_t)
   - Added GraphAL::operator==( const GraphAL& )
   - Added operator<<( std::ostream&, const GraphAL& )
 * Improved smallset.h/cpp:

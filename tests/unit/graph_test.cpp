@@ -88,6 +88,9 @@ BOOST_AUTO_TEST_CASE( NeighborTest ) {
     BOOST_CHECK_EQUAL( G.nb(2,0).iter, 0 );
     BOOST_CHECK_EQUAL( G.nb(2,0).node, 1 );
     BOOST_CHECK_EQUAL( G.nb(2,0).dual, 1 );
+    BOOST_CHECK( G.nbSet(0) == SmallSet<size_t>( 1 ) );
+    BOOST_CHECK( G.nbSet(1) == SmallSet<size_t>( 0, 2 ) );
+    BOOST_CHECK( G.nbSet(2) == SmallSet<size_t>( 1 ) );
 }
 
 

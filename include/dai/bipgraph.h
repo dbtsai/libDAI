@@ -283,7 +283,7 @@ class BipartiteGraph {
         /// Adds an edge between node \a n1 of type 1 and node \a n2 of type 2.
         /** If \a check == \c true, only adds the edge if it does not exist already.
          */
-        void addEdge( size_t n1, size_t n2, bool check = true );
+        BipartiteGraph& addEdge( size_t n1, size_t n2, bool check = true );
     //@}
 
     /// \name Erasing nodes and edges
@@ -380,7 +380,7 @@ class BipartiteGraph {
         /// Comparison operator which returns true if two graphs are identical
         /** \note Two graphs are called identical if they have the same number of nodes
          *  of both types and the same edges (i.e., \a x has an edge between nodes
-         *  n1 and n2 if and only if \c *this has an edge between nodes n1 and n2).
+         *  \a n1 and \a n2 if and only if \c *this has an edge between nodes \a n1 and \a n2).
          */
         bool operator==( const BipartiteGraph& x ) const {
             if( nrNodes1() != x.nrNodes1() )

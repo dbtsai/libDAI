@@ -18,7 +18,7 @@ namespace dai {
 using namespace std;
 
 
-void BipartiteGraph::addEdge( size_t n1, size_t n2, bool check ) {
+BipartiteGraph& BipartiteGraph::addEdge( size_t n1, size_t n2, bool check ) {
     DAI_ASSERT( n1 < nrNodes1() );
     DAI_ASSERT( n2 < nrNodes2() );
     bool exists = false;
@@ -36,6 +36,7 @@ void BipartiteGraph::addEdge( size_t n1, size_t n2, bool check ) {
         nb1(n1).push_back( nb_1 );
         nb2(n2).push_back( nb_2 );
     }
+    return *this;
 }
 
 
@@ -50,13 +51,10 @@ void BipartiteGraph::eraseNode1( size_t n1 ) {
             if( m1.node == n1 ) {
                 // delete this entry, because it points to the deleted node
                 nb2(n2).erase( nb2(n2).begin() + iter );
-            } else if( m1.node > n1 ) {
-                // update this entry and the corresponding dual of the neighboring node of type 1
-                m1.node--;
-                nb1( m1.node, m1.dual ).dual = iter;
-                m1.iter = iter++;
             } else {
                 // update this entry and the corresponding dual of the neighboring node of type 1
+                if( m1.node > n1 )
+                    m1.node--;
                 nb1( m1.node, m1.dual ).dual = iter;
                 m1.iter = iter++;
             }
@@ -76,13 +74,10 @@ void BipartiteGraph::eraseNode2( size_t n2 ) {
             if( m2.node == n2 ) {
                 // delete this entry, because it points to the deleted node
                 nb1(n1).erase( nb1(n1).begin() + iter );
-            } else if( m2.node > n2 ) {
-                // update this entry and the corresponding dual of the neighboring node of type 2
-                m2.node--;
-                nb2( m2.node, m2.dual ).dual = iter;
-                m2.iter = iter++;
             } else {
                 // update this entry and the corresponding dual of the neighboring node of type 2
+                if( m2.node > n2 )
+                    m2.node--;
                 nb2( m2.node, m2.dual ).dual = iter;
                 m2.iter = iter++;
             }

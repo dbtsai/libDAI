@@ -209,6 +209,9 @@ int main(int argc,char **argv) {
     const double th_max = cimg_option( "-thmax", 3.2, "Local evidence strength of foreground" );
     const double scale = cimg_option( "-scale", 40.0, "Typical difference in pixel values between fore- and background" );
     const double pbg = cimg_option( "-pbg", 90.0, "Percentage of background in image" );
+    const char *infname = cimg_option( "-method", "BP[updates=SEQMAX,maxiter=1,tol=1e-9,logdomain=0]", "Inference method in format name[key1=val1,...,keyn=valn]" );
+    const size_t maxiter = cimg_option( "-maxiter", 100, "Maximum number of iterations for inference method" );
+    const double tol = cimg_option( "-tol", 1e-9, "Desired tolerance level for inference method" );
     const char *file_fg = cimg_option( "-fg", "", "Output factor graph" );
 
     // Read input images
@@ -274,16 +277,7 @@ int main(int argc,char **argv) {
     CImgDisplay disp5( dimx, dimy, "Beliefs during inference", 0 );
     vector<double> m; // Stores the final magnetizations
     cout << "Solving the inference problem...please be patient!" << endl;
-    // doInference( fg, "BP[updates=SEQFIX,maxiter=1,tol=1e-9,verbose=0,logdomain=0]", 100, 1e-9, m, dimx, dimy, disp5 );
-    doInference( fg, "BP[updates=SEQMAX,maxiter=1,tol=1e-9,verbose=0,logdomain=0]", 100, 1e-9, m, dimx, dimy, disp5 );
-    // doInference( fg, "BP[updates=SEQRND,maxiter=1,tol=1e-9,verbose=0,logdomain=0]", 100, 1e-9, m, dimx, dimy, disp5 );
-    // doInference( fg, "HAK[doubleloop=0,clusters=LOOP,init=UNIFORM,loopdepth=4,tol=1e-9,maxiter=1,verbose=3]", 1000, 1e-5, m, dimx, dimy, disp5 );
-    // doInference( fg, "HAK[doubleloop=0,clusters=BETHE,init=UNIFORM,maxiter=1,tol=1e-9,verbose=3]", 1000, 1e-5, m, dimx, dimy, disp5 );
-    // doInference( fg, "MF[tol=1e-9,maxiter=1,damping=0.0,init=RANDOM,updates=HARDSPIN]", 1000, 1e-5, m, dimx, dimy, disp5 );
-    // doInference( fg, "TREEEP[type=ORG,tol=1e-9,maxiter=10000,verbose=3]", 1000, 1e-5, m, dimx, dimy, disp5 );
-    // doInference( fg, "GIBBS[iters=1,burnin=0]", 100, 1e-9, m, dimx, dimy, disp5 );
-    // doInference( fg, "GIBBS[iters=1,burnin=0]", 100, 1e-9, m, dimx, dimy, disp5 );
-    // doInference( fg, "GIBBS[iters=1,burnin=0]", 100, 1e-9, m, dimx, dimy, disp5 );
+    doInference( fg, infname, maxiter, tol, m, dimx, dimy, disp5 );
 
     // Visualize the final magnetizations
     for( size_t i = 0; i < dimx; i++ )
