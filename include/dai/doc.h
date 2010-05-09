@@ -168,7 +168,7 @@
  *
  *  An appropriate citation would be:\n
  *
- *  Joris M. Mooij et al. (2010) "libDAI 0.2.4: A free/open source C++ library for Discrete 
+ *  Joris M. Mooij et al. (2010) "libDAI 0.2.5: A free/open source C++ library for Discrete 
  *  Approximate Inference", http://www.libdai.org
  *
  *  or in BiBTeX format:
@@ -176,7 +176,7 @@
  *  <pre>
  *  \@misc{mooij2010libdai,
  *    author = "Joris M. Mooij et al.",
- *    title = "lib{DAI} 0.2.4: A free/open source {C}++ library for {D}iscrete {A}pproximate {I}nference",
+ *    title = "lib{DAI} 0.2.5: A free/open source {C}++ library for {D}iscrete {A}pproximate {I}nference",
  *    howpublished = "http://www.libdai.org/",
  *    year = 2010
  *  }
