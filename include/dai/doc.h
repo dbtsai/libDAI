@@ -33,21 +33,13 @@
  *  \idea Use boost::uBLAS framework to deal with matrices, especially, with 2D sparse matrices.
  *  See http://www.boost.org/libs/numeric/ublas/doc/matrix_sparse.htm
  *  However: I read somewhere that boost::uBLAS concentrates more on correct implementation than on performance.
- *
- *  \idea Introduce naming scheme:
- *  - all Vars should be named v_..., e.g. v_i instead of i
- *  - all VarSets should be named vs_..., e.g. v_i instead of i
- *  - all Factors should be named f_..., e.g. f_I instead of I
- *  - all indices should be named _..., e.g. _k instead of k
- *  - all iterators should be named i_, e.g. i_i is an iterator to i
- *  - all const_iterators should be named ci_, e.g. ci_i is an iterator to i
  **/
 
 
 /** \mainpage Reference manual for libDAI - A free/open source C++ library for Discrete Approximate Inference methods
  *  \author Joris Mooij, Frederik Eaton
- *  \version git HEAD
- *  \date April 1, 2010 - or later
+ *  \version 0.2.5
+ *  \date May 9, 2010
  *
  *  <hr size="1">
  *  \section about About libDAI
@@ -128,7 +120,7 @@
  *  \section compatibility Compatibility
  *  
  *  The code has been developed under Debian GNU/Linux with the GCC compiler suite.
- *  libDAI compiles successfully with g++ versions 3.4, 4.1, 4.2 and 4.3.
+ *  libDAI compiles successfully with g++ versions 3.4 up to 4.4.
  *
  *  libDAI has also been successfully compiled with MS Visual Studio 2008 under Windows
  *  (but not all build targets are supported yet) and with Cygwin under Windows.
@@ -171,11 +163,8 @@
  *  \section citations-citations Citing libDAI
  *
  *  If you write a scientific paper describing research that made substantive use
- *  of this program, please:
- *    - mention the fashion in which this software was
- *      used, including the version number, with a citation to the literature, 
- *      to allow replication; 
- *    - mention this software in the Acknowledgements section. 
+ *  of this program, please cite the software appropriately, by mentioning the 
+ *  fashion in which this software was used, including the version number.
  *
  *  An appropriate citation would be:\n
  *
@@ -193,8 +182,8 @@
  *  }
  *  </pre>
  *
- *  Moreover, as a personal note, I would appreciate it if you would email
- *  (citations of) papers referencing this work to joris dot mooij at libdai dot org.
+ *  Moreover, as a personal note, I would appreciate it to be informed about any
+ *  publications using libDAI at joris dot mooij at libdai dot org.
  */
 
 
@@ -214,14 +203,13 @@
  *  You need:
  *    - a recent version of gcc (at least version 3.4)
  *    - GNU make
- *    - doxygen
- *    - graphviz
- *    - recent boost C++ libraries (at least version 1.34 if you have
- *      a recent version of GCC, otherwise at least version 1.37; however,
+ *    - recent boost C++ libraries (at least version 1.37; however,
  *      version 1.37 shipped with Ubuntu 9.04 is known not to work)
+ *    - doxygen (only for building the documentation)
+ *    - graphviz (only for using some of the libDAI command line utilities)
  * 
- *  On Debian/Ubuntu, you can easily install all these packages with a single command:
- *  <pre>  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev</pre>
+ *  On Debian/Ubuntu, you can easily install the required packages with a single command:
+ *  <pre>  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev</pre>
  *  (root permissions needed).
  *
  *  On Mac OS X (10.4 is known to work), these packages can be installed easily via MacPorts.
@@ -232,12 +220,20 @@
  *  
  *  On Cygwin, the prebuilt Cygwin package boost-1.33.1-x is known not to work.
  *  You can however obtain the latest boost version (you need at least 1.37.0)
- *  from http://www.boost.org/ and compile/install it with:
+ *  from http://www.boost.org/ and build it as described in the next subsection.
  *
- *  <pre>  ./configure
- *  make
- *  make install
- *  </pre>
+ *  \subsubsection build-unix-boost Building boost under Cygwin
+ *
+ *  - Download the latest boost libraries from http://www.boost.org
+ *  - Build the required boost libraries using:
+ *    <pre>
+ *    ./bootstrap.sh --with-libraries=program_options,math,graph,test --prefix=/boost_root/
+ *    ./bjam</pre>
+ *  - In order to use dynamic linking, the boost .dll's should be somewhere in the path. 
+ *    This can be achieved by a command like:
+ *    <pre>
+ *    export PATH=$PATH:/boost_root/stage/lib</pre>
+ *
  *
  *  \subsection build-unix-libdai Building libDAI
  *
@@ -267,6 +263,26 @@
  *
  *  For the regression test, you need:
  *  - GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
+ *
+ *  \subsubsection build-windows-boost Building boost under Windows
+ *
+ *  Because building boost under Windows is tricky, I provide some guidance here.
+ *
+ *  - Download the boost zip file from http://www.boost.org/users/download
+ *    and unpack it somewhere.
+ *  - Download the bjam executable from http://www.boost.org/users/download
+ *    and unpack it somewhere else.
+ *  - Download Boost.Build (v2) from http://www.boost.org/docs/tools/build/index.html
+ *    and unpack it yet somewhere else.
+ *  - Edit the file \c boost-build.jam in the main boost directory to change the
+ *    \c BOOST_BUILD directory to the place where you put Boost.Build (use UNIX
+ *    / instead of Windows \ in pathnames).
+ *  - Copy the \c bjam.exe executable into the main boost directory.
+ *    Now if you issue <tt>"bjam --version"</tt> you should get a version and no errors.
+ *    Issueing <tt>"bjam --show-libraries"</tt> will show the libraries that will be built.
+ *  - The following command builds the boost libraries that are relevant for libDAI:
+ *    <pre>
+ *    bjam --with-graph --with-math --with-program_options --with-test link=static runtime-link=shared</pre>
  *
  *  \subsection build-windows-libdai Building libDAI
  *

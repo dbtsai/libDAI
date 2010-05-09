@@ -12,8 +12,9 @@
 /// \file
 /// \brief Defines class HAK, which implements a variant of Generalized Belief Propagation.
 /// \idea Implement more general region graphs and corresponding Generalized Belief Propagation updates as described in [\ref YFW05].
-/// \todo Use ClusterGraph instead of a vector<VarSet> for speed
-/// \todo Implement TRW / FBP using HAK.
+/// \todo Use ClusterGraph instead of a vector<VarSet> for speed.
+/// \todo Optimize this code for large factor graphs.
+/// \todo Implement GBP parent-child  algorithm.
 
 
 #ifndef __defined_libdai_hak_h

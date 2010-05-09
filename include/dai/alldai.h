@@ -14,8 +14,6 @@
  * 
  *  \todo Replace VarSets by SmallSet<size_t> where appropriate, in order to minimize the use of FactorGraph::findVar().
  *
- *  \todo Implement routines for UAI probabilistic inference evaluation data
- *
  *  \todo Improve SWIG interfaces and merge their build process with the main build process
  */
 
@@ -159,6 +157,24 @@ static const char* DAINames[] = {
 
 
 } // end of namespace dai
+
+
+/** \example example.cpp
+ *  This example illustrates how to read a factor graph from a file and how to
+ *  run several inference algorithms (junction tree, loopy belief propagation,
+ *  and the max-product algorithm) on it.
+ */
+
+
+/** \example example_imagesegmentation.cpp
+ *  This example shows how one can use approximate inference in factor graphs
+ *  on a simple vision task: given two images, identify smooth regions where these
+ *  two images differ more than some threshold. This can be used to seperate 
+ *  foreground from background if one image contains the background and the other
+ *  one the combination of background and foreground.
+ *
+ *  \note In order to build this example, a recent version of CImg needs to be installed.
+ */
 
 
 #endif

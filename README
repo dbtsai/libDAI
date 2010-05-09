@@ -2,8 +2,8 @@ libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
 -------------------------------------------------------------------------------
 
-Version:  git HEAD
-Date:     April 1, 2010 - or later
+Version:  0.2.5
+Date:     May 9, 2010
 See also: http://www.libdai.org
 
 -------------------------------------------------------------------------------
@@ -27,11 +27,8 @@ along with libDAI in the file COPYING. If not, see http://www.gnu.org/licenses/
 Citing libDAI
 
 If you write a scientific paper describing research that made substantive use
-of this program, please:
-
-  * mention the fashion in which this software was used, including the version
-    number, with a citation to the literature, to allow replication;
-  * mention this software in the Acknowledgements section.
+of this program, please cite the software appropriately, by mentioning the
+fashion in which this software was used, including the version number.
 
 An appropriate citation would be:
 
@@ -48,8 +45,8 @@ or in BiBTeX format:
   }
 
 
-Moreover, as a personal note, I would appreciate it if you would email
-(citations of) papers referencing this work to joris dot mooij at libdai dot org.
+Moreover, as a personal note, I would appreciate it to be informed about any
+publications using libDAI at joris dot mooij at libdai dot org.
 
 -------------------------------------------------------------------------------
 
@@ -134,7 +131,7 @@ provides a command line interface and experimental python and octave interfaces
 Compatibility
 
 The code has been developed under Debian GNU/Linux with the GCC compiler suite.
-libDAI compiles successfully with g++ versions 3.4, 4.1, 4.2 and 4.3.
+libDAI compiles successfully with g++ versions 3.4 up to 4.4.
 
 libDAI has also been successfully compiled with MS Visual Studio 2008 under
 Windows (but not all build targets are supported yet) and with Cygwin under
@@ -151,6 +148,7 @@ Mailing list
 
 The Google group "libDAI" (http://groups.google.com/group/libdai) can be used
 for getting support and discussing development issues.
+
 -------------------------------------------------------------------------------
 
 Building libDAI under UNIX variants (Linux / Cygwin / Mac OS X)
@@ -161,16 +159,15 @@ You need:
 
   * a recent version of gcc (at least version 3.4)
   * GNU make
-  * doxygen
-  * graphviz
-  * recent boost C++ libraries (at least version 1.34 if you have a recent
-    version of GCC, otherwise at least version 1.37; however, version 1.37
+  * recent boost C++ libraries (at least version 1.37; however, version 1.37
     shipped with Ubuntu 9.04 is known not to work)
+  * doxygen (only for building the documentation)
+  * graphviz (only for using some of the libDAI command line utilities)
 
-On Debian/Ubuntu, you can easily install all these packages with a single
+On Debian/Ubuntu, you can easily install the required packages with a single
 command:
 
-  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev
+  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev
 
 (root permissions needed).
 
@@ -184,12 +181,20 @@ should be enough to install everything that is needed.
 
 On Cygwin, the prebuilt Cygwin package boost-1.33.1-x is known not to work. You
 can however obtain the latest boost version (you need at least 1.37.0) from
-http://www.boost.org/ and compile/install it with:
+http://www.boost.org/ and build it as described in the next subsection.
 
-  ./configure
-  make
-  make install
+Building boost under Cygwin
 
+  * Download the latest boost libraries from http://www.boost.org
+  * Build the required boost libraries using:
+
+        ./bootstrap.sh --with-libraries=program_options,math,graph,test --prefix=/boost_root/
+        ./bjam
+
+  * In order to use dynamic linking, the boost .dll's should be somewhere in
+    the path. This can be achieved by a command like:
+
+        export PATH=$PATH:/boost_root/stage/lib
 
 Building libDAI
 
@@ -226,6 +231,27 @@ You need:
 For the regression test, you need:
 
   * GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)
+
+Building boost under Windows
+
+Because building boost under Windows is tricky, I provide some guidance here.
+
+  * Download the boost zip file from http://www.boost.org/users/download and
+    unpack it somewhere.
+  * Download the bjam executable from http://www.boost.org/users/download and
+    unpack it somewhere else.
+  * Download Boost.Build (v2) from http://www.boost.org/docs/tools/build/
+    index.html and unpack it yet somewhere else.
+  * Edit the file boost-build.jam in the main boost directory to change the
+    BOOST_BUILD directory to the place where you put Boost.Build (use UNIX /
+    instead of Windows \ in pathnames).
+  * Copy the bjam.exe executable into the main boost directory. Now if you
+    issue "bjam --version" you should get a version and no errors. Issueing
+    "bjam --show-libraries" will show the libraries that will be built.
+  * The following command builds the boost libraries that are relevant for
+    libDAI:
+
+        bjam --with-graph --with-math --with-program_options --with-test link=static runtime-link=shared
 
 Building libDAI
 
@@ -299,3 +325,4 @@ Install doxygen, graphviz and a TeX distribution and use
 to build the documentation. If the documentation is not clear enough, feel free
 to send me an email (or even better, to improve the documentation and send a
 patch!). The documentation can also be browsed online at http://www.libdai.org.
+

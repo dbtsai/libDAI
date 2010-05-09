@@ -15,8 +15,8 @@ include Makefile.ALL
 include Makefile.conf
 
 # Set version and date
-DAI_VERSION="git HEAD"
-DAI_DATE="April 1, 2010 - or later"
+DAI_VERSION="0.2.5"
+DAI_DATE="May 9, 2010"
 
 # Directories of libDAI sources
 # Location libDAI headers
@@ -116,6 +116,7 @@ MEX:=$(MEX) $(MEXINC) $(MEXFLAGS) $(WITHFLAGS) $(MEXLIB)
 ###############
 
 all : $(TARGETS)
+	@echo libDAI built successfully!
 
 examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE) examples/example_imagesegmentation$(EE)
 

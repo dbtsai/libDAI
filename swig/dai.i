@@ -66,6 +66,7 @@
 
 %template(Factor) dai::TFactor<dai::Real>;
 %include "../include/dai/bipgraph.h"
+%include "../include/dai/graph.h"
 %include "../include/dai/factorgraph.h"
 %include "std_vector.i"
 // TODO: typemaps for the vectors (input/output python arrays)

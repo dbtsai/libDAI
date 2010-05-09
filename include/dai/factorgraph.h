@@ -410,13 +410,6 @@ FactorGraph::FactorGraph(FactorInputIterator facBegin, FactorInputIterator facEn
 }
 
 
-/** \example example.cpp
- *  This example illustrates how to read a factor graph from a file and how to
- *  run several inference algorithms (junction tree, loopy belief propagation,
- *  and the max-product algorithm) on it.
- */
-
-
 /** \example example_sprinkler.cpp
  *  This example illustrates how to manually construct a factor graph and
  *  write it to a file.
