@@ -221,12 +221,12 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
     BOOST_CHECK_CLOSE( y[2], (Real)1.0 / y[0], tol );
 
     y = x.log(false);
-    BOOST_CHECK( isnan( y[0] ) );
+    BOOST_CHECK( dai::isnan( y[0] ) );
     BOOST_CHECK_EQUAL( y[1], -INFINITY );
     BOOST_CHECK_CLOSE( y[2], dai::log((Real)2.0), tol );
 
     y = x.log(true);
-    BOOST_CHECK( isnan( y[0] ) );
+    BOOST_CHECK( dai::isnan( y[0] ) );
     BOOST_CHECK_CLOSE( y[1], (Real)0.0, tol );
     BOOST_CHECK_CLOSE( y[2], dai::log((Real)2.0), tol );
 

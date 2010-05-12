@@ -1,3 +1,11 @@
+git HEAD
+--------
+* Fixed a problem with isnan() on FreeBSD; it is now in the dai namespace.
+* Workaround for older g++ compilers (e.g. version 4.0.0 on Darwin 9.8.0)
+  which have problems when comparing const_reverse_iterator with
+  reverse_iterator.
+
+
 libDAI-0.2.5 (2010-05-09)
 -------------------------
 
