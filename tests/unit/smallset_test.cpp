@@ -138,7 +138,8 @@ BOOST_AUTO_TEST_CASE( IteratorTest ) {
         BOOST_CHECK_EQUAL( i, *rj );
         BOOST_CHECK_EQUAL( i, *rk );
     }
-    BOOST_CHECK( rj == x.rend() );
+
+    BOOST_CHECK( rj == static_cast<SmallSet<int>::const_reverse_iterator>(x.rend()) );
     BOOST_CHECK( rk == x.rend() );
 }
 

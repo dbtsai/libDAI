@@ -64,16 +64,7 @@
 #define DAI_IFVERB(n, stmt) if(props.verbose>=n) { std::cerr << stmt; }
 
 
-#ifdef CYGWIN
-    /// Returns true if argument is NAN (Not A Number)
-    bool isnan( double x );
-#endif
-
-
 #ifdef WINDOWS
-    /// Returns true if argument is NAN (Not A Number)
-    bool isnan( double x );
-
     /// Returns inverse hyperbolic tangent of argument
     double atanh( double x );
 
@@ -90,6 +81,9 @@ namespace dai {
 
 /// Real number (alias for \c double, which could be changed to <tt>long double</tt> if necessary)
 typedef double Real;
+
+/// Returns true if argument is NAN (Not A Number)
+bool isnan( Real x );
 
 /// Returns logarithm of \a x
 inline Real log( Real x ) {

@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE( IteratorTest ) {
         BOOST_CHECK_EQUAL( *it, (Real)(4 - i) );
 
     i = 0;
-    for( Prob::const_reverse_iterator crit = x.rbegin(); crit != x.rend(); crit++, i++ )
+    for( Prob::const_reverse_iterator crit = x.rbegin(); crit != static_cast<Prob::const_reverse_iterator>(x.rend()); crit++, i++ )
         BOOST_CHECK_EQUAL( *crit, (Real)i );
 
     i = 0;
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE( IteratorTest ) {
         *rit = (Real)(2 * i);
     
     i = 0;
-    for( Prob::const_reverse_iterator crit = x.rbegin(); crit != x.rend(); crit++, i++ )
+    for( Prob::const_reverse_iterator crit = x.rbegin(); crit != static_cast<Prob::const_reverse_iterator>(x.rend()); crit++, i++ )
         BOOST_CHECK_EQUAL( *crit, (Real)2 * i );
 }
 #endif
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
 
     y = x.log(false);
     z = x.pwUnaryTr( fo_log<Real>() );
-    BOOST_CHECK( isnan( y[0] ) );
+    BOOST_CHECK( dai::isnan( y[0] ) );
     BOOST_CHECK_EQUAL( y[1], -INFINITY );
     BOOST_CHECK_CLOSE( y[2], dai::log((Real)2.0), tol );
     BOOST_CHECK( !(y == z) );
@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_CASE( UnaryTransformationsTest ) {
 
     y = x.log(true);
     z = x.pwUnaryTr( fo_log0<Real>() );
-    BOOST_CHECK( isnan( y[0] ) );
+    BOOST_CHECK( dai::isnan( y[0] ) );
     BOOST_CHECK_CLOSE( y[1], (Real)0.0, tol );
     BOOST_CHECK_CLOSE( y[2], dai::log((Real)2.0), tol );
     BOOST_CHECK( !(y == z) );
@@ -593,7 +593,7 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     BOOST_CHECK_CLOSE( r[0], z[0], tol );
     BOOST_CHECK_CLOSE( r[1], z[1], tol );
     BOOST_CHECK_EQUAL( r[2], z[2] );
-    BOOST_CHECK( isnan(r[3]) );
+    BOOST_CHECK( dai::isnan(r[3]) );
     BOOST_CHECK_CLOSE( r[4], z[4], tol );
     BOOST_CHECK_CLOSE( r[5], z[5], tol );
     x.set( 3, 0.0 ); r.set( 3, 0.0 );
@@ -603,7 +603,7 @@ BOOST_AUTO_TEST_CASE( VectorOperationsTest ) {
     BOOST_CHECK_CLOSE( r[0], z[0], tol );
     BOOST_CHECK_CLOSE( r[1], z[1], tol );
     BOOST_CHECK_EQUAL( r[2], z[2] );
-    BOOST_CHECK( isnan(r[3]) );
+    BOOST_CHECK( dai::isnan(r[3]) );
     BOOST_CHECK_CLOSE( r[4], z[4], tol );
     BOOST_CHECK_CLOSE( r[5], z[5], tol );
     x.set( 3, 0.0 ); r.set( 3, 0.0 );
@@ -664,14 +664,14 @@ BOOST_AUTO_TEST_CASE( VectorTransformationsTest ) {
     BOOST_CHECK_CLOSE( r[0], z[0], tol );
     BOOST_CHECK_CLOSE( r[1], z[1], tol );
     BOOST_CHECK_EQUAL( r[2], z[2] );
-    BOOST_CHECK( isnan(r[3]) );
+    BOOST_CHECK( dai::isnan(r[3]) );
     BOOST_CHECK_CLOSE( r[4], z[4], tol );
     BOOST_CHECK_CLOSE( r[5], z[5], tol );
     z = x.pwBinaryTr( y, std::divides<Real>() );
     BOOST_CHECK_CLOSE( r[0], z[0], tol );
     BOOST_CHECK_CLOSE( r[1], z[1], tol );
     BOOST_CHECK_EQUAL( r[2], z[2] );
-    BOOST_CHECK( isnan(r[3]) );
+    BOOST_CHECK( dai::isnan(r[3]) );
     BOOST_CHECK_CLOSE( r[4], z[4], tol );
     BOOST_CHECK_CLOSE( r[5], z[5], tol );
 

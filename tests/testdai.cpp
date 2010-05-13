@@ -408,9 +408,9 @@ int main( int argc, char *argv[] ) {
                 // Output maximum difference in last iteration
                 if( testdai.has_maxdiff ) {
                     Real md = clipReal( testdai.maxdiff, 1e-9 );
-                    if( isnan( mev ) )
+                    if( dai::isnan( mev ) )
                         md = mev;
-                    if( isnan( aev ) )
+                    if( dai::isnan( aev ) )
                         md = aev;
                     if( md == INFINITY )
                         md = 1.0;

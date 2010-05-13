@@ -414,7 +414,7 @@ class TProb {
         bool hasNaNs() const {
             bool foundnan = false;
             for( const_iterator x = _p.begin(); x != _p.end(); x++ )
-                if( isnan( *x ) ) {
+                if( dai::isnan( *x ) ) {
                     foundnan = true;
                     break;
                 }

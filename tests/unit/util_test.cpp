@@ -27,8 +27,8 @@ using namespace dai;
 
 BOOST_AUTO_TEST_CASE( IsNanTest ) {
     double x = 0.0, y = 0.0;
-    BOOST_CHECK( isnan( x / y ) );
-    BOOST_CHECK( !isnan( x ) );
+    BOOST_CHECK( dai::isnan( x / y ) );
+    BOOST_CHECK( !dai::isnan( x ) );
 }
 
 

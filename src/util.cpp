@@ -26,16 +26,7 @@
 #endif
 
 
-#ifdef CYGWIN
-bool isnan( double x ) {
-    return __isnand( x );  // isnan() is a macro in Cygwin (as required by C99)
-}
-#endif
-
 #ifdef WINDOWS
-bool isnan( double x ) {
-    return _isnan( x );
-}
 double atanh( double x ) {
     return boost::math::atanh( x );
 }
@@ -47,6 +38,19 @@ double log1p( double x ) {
 
 namespace dai {
 
+#if defined CYGWIN
+bool isnan( Real x ) {
+    return __isnand( x );  // isnan() is a macro in Cygwin (as required by C99)
+}
+#elif defined WINDOWS
+bool isnan( Real x ) {
+    return _isnan( x );
+}
+#else
+bool isnan( Real x ) {
+    return std::isnan( x );
+}
+#endif
 
 // Returns user+system time in seconds
 double toc() {
