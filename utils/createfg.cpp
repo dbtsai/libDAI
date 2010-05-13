@@ -498,6 +498,7 @@ int main( int argc, char *argv[] ) {
         cout << "# Factor graph made by " << argv[0] << endl;
         cout << "# type = " << type << endl;
         cout << "# states = " << states << endl;
+        cout << "# factor type = " << ft << endl;
 
         // The factor graph to be constructed
         FactorGraph fg;
