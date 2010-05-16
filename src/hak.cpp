@@ -104,18 +104,24 @@ string HAK::printProperties() const {
 
 void HAK::construct() {
     // Create outer beliefs
+    if( props.verbose >= 3 )
+        cerr << "Constructing outer beliefs" << endl;
     _Qa.clear();
     _Qa.reserve(nrORs());
     for( size_t alpha = 0; alpha < nrORs(); alpha++ )
         _Qa.push_back( Factor( OR(alpha) ) );
 
     // Create inner beliefs
+    if( props.verbose >= 3 )
+        cerr << "Constructing inner beliefs" << endl;
     _Qb.clear();
     _Qb.reserve(nrIRs());
     for( size_t beta = 0; beta < nrIRs(); beta++ )
         _Qb.push_back( Factor( IR(beta) ) );
 
     // Create messages
+    if( props.verbose >= 3 )
+        cerr << "Constructing messages" << endl;
     _muab.clear();
     _muab.reserve( nrORs() );
     _muba.clear();
@@ -154,6 +160,9 @@ void HAK::findLoopClusters( const FactorGraph & fg, std::set<VarSet> &allcl, Var
 HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _Qb(), _muab(), _muba(), _maxdiff(0.0), _iters(0U), props() {
     setProperties( opts );
 
+    if( props.verbose >= 3 )
+        cerr << "Constructing clusters" << endl;
+
     vector<VarSet> cl;
     if( props.clusters == Properties::ClustersType::MIN ) {
         cl = fg.maximalFactorDomains();
@@ -180,80 +189,64 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
         }
         constructCVM( fg, cl );
     } else if( props.clusters == Properties::ClustersType::BETHE ) {
-/*      if( props.verbose >= 3 )
-            cerr << "Copy factor graph" << endl;
         // Copy factor graph structure
+        if( props.verbose >= 3 )
+            cerr << "Copying factor graph" << endl;
         FactorGraph::operator=( fg );
 
+        // Construct inner regions (single variables)
         if( props.verbose >= 3 )
-            cerr << "Copy region graph from factor graph" << endl;
-        // Copy bipartite graph
-        _G = fg.bipGraph();
+            cerr << "Constructing inner regions" << endl;
+        _IRs.reserve( fg.nrVars() );
+        for( size_t i = 0; i < fg.nrVars(); i++ )
+            _IRs.push_back( Region( fg.var(i), 1.0 ) );
 
-        // Throw away non-maximal regions
+        // Construct graph
         if( props.verbose >= 3 )
-            cerr << "Throw away non-maximal regions" << endl;
-        for( size_t OR = 0; OR < _G.nrNodes1(); ) {
-            // check if it is maximal
-            bool maximal = true;
-            size_t OR_size = _G.nb1(OR).size();
-            if( OR_size == 0 )
-                maximal = false;
-            size_t OR2;
-            foreach( OR2, _G.delta1(OR, false) )
-                if( (_G.nb1(OR2).size() > OR_size) && (_G.nb1Set(OR2) >> _G.nb1Set(OR1)) ) {
-                    maximal = false;
-                    break;
-                }
-            if( !maximal ) {
-                // if not maximal, throw away and assign factor to OR2
-                _G.eraseNode1( OR );
+            cerr << "Constructing graph" << endl;
+        _G = BipartiteGraph( 0, nrIRs() );
+
+        // Construct outer regions:
+        // maximal factors become new outer regions
+        // non-maximal factors are assigned an outer region that contains them
+        if( props.verbose >= 3 )
+            cerr << "Construct outer regions" << endl;
+        _fac2OR.reserve( nrFactors() );
+        queue<pair<size_t, size_t> > todo;
+        for( size_t I = 0; I < fg.nrFactors(); I++ ) {
+            size_t J = fg.maximalFactor( I );
+            if( J == I ) {
+                // I is maximal; add it to the outer regions
+                _fac2OR.push_back( nrORs() );
+                // Construct outer region (with counting number 1.0)
+                _ORs.push_back( FRegion( fg.factor(I), 1.0 ) );
+                // Add node and edges to graph
+                SmallSet<size_t> irs = fg.bipGraph().nb2Set( I );
+                _G.addNode1( irs.begin(), irs.end(), irs.size() );
+            } else if( J < I ) {
+                // J is larger and has already been assigned to an outer region
+                // so I should belong to the same outer region as J
+                _fac2OR.push_back( _fac2OR[J] );
+                _ORs[_fac2OR[J]] *= fg.factor(I);
             } else {
-                OR++;
+                // J is larger but has not yet been assigned to an outer region
+                // we handle this case later
+                _fac2OR.push_back( -1 );
+                todo.push( make_pair( I, J ) );
             }
         }
-
-        // For each factor, find an outer region that subsumes that factor.
-        // Then, multiply the outer region with that factor.
-        _fac2OR.clear();
-        _fac2OR.reserve( nrFactors() );
-        for( size_t I = 0; I < nrFactors(); I++ ) {
-            size_t alpha;
-            for( alpha = 0; alpha < nrORs(); alpha++ )
-                if( OR(alpha).vars() >> factor(I).vars() ) {
-                    _fac2OR.push_back( alpha );
-                    break;
-                }
-            DAI_ASSERT( alpha != nrORs() );
+        // finish the construction
+        while( !todo.empty() ) {
+            size_t I = todo.front().first;
+            size_t J = todo.front().second;
+            todo.pop();
+            _fac2OR[I] = _fac2OR[J];
+            _ORs[_fac2OR[J]] *= fg.factor(I);
         }
 
-        if( props.verbose >= 3 )
-            cerr << "Build outer regions" << endl;*/
-        // build outer regions (the maximal factor domains)
-        cl = fg.maximalFactorDomains();
-        size_t nrEdges = 0;
-        for( size_t c = 0; c < cl.size(); c++ )
-            nrEdges += cl[c].size();
-
-        // build inner regions (single variables)
-        vector<Region> irs;
-        irs.reserve( fg.nrVars() );
-        for( size_t i = 0; i < fg.nrVars(); i++ )
-            irs.push_back( Region( fg.var(i), 1.0 ) );
-
-        // build edges (an outer and inner region are connected if the outer region contains the inner one)
-        // and calculate counting number for inner regions
-        vector<std::pair<size_t, size_t> > edges;
-        edges.reserve( nrEdges );
-        for( size_t c = 0; c < cl.size(); c++ )
-            for( size_t i = 0; i < irs.size(); i++ )
-                if( cl[c].contains( fg.var(i) ) ) {
-                    edges.push_back( make_pair( c, i ) );
-                    irs[i].c() -= 1.0;
-                }
-
-        // build region graph
-        RegionGraph::construct( fg, cl, irs, edges );
+        // Calculate inner regions' counting numbers
+        for( size_t beta = 0; beta < nrIRs(); beta++ )
+            _IRs[beta].c() = 1.0 - _G.nb2(beta).size();
     } else
         DAI_THROW(UNKNOWN_ENUM_VALUE);
 

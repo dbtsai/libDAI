@@ -1,5 +1,11 @@
 git HEAD
 --------
+* Added FactorGraph::isMaximal(size_t) and FactorGraph::maximalFactor(size_t).
+* Added optional reverse argument to Permute::Permute( const std::vector<Var>& )
+  constructor.
+* Added Permute::ranges() accessor.
+* Added Permute::inverse() method.
+* Optimized region graph construction for HAK/GBP with clusters=BETHE.
 * Fixed a problem with isnan() on FreeBSD; it is now in the dai namespace.
 * Workaround for older g++ compilers (e.g. version 4.0.0 on Darwin 9.8.0)
   which have problems when comparing const_reverse_iterator with

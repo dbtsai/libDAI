@@ -68,12 +68,17 @@ BOOST_AUTO_TEST_CASE( PermuteTest ) {
     V.push_back( x0 );
     VarSet X( V.begin(), V.end() );
     Permute sigma(V);
+    BOOST_CHECK_EQUAL( sigma.sigma().size(), 3 );
     BOOST_CHECK_EQUAL( sigma.sigma()[0], 2 );
     BOOST_CHECK_EQUAL( sigma.sigma()[1], 0 );
     BOOST_CHECK_EQUAL( sigma.sigma()[2], 1 );
     BOOST_CHECK_EQUAL( sigma[0], 2 );
     BOOST_CHECK_EQUAL( sigma[1], 0 );
     BOOST_CHECK_EQUAL( sigma[2], 1 );
+    BOOST_CHECK_EQUAL( sigma.ranges().size(), 3 );
+    BOOST_CHECK_EQUAL( sigma.ranges()[0], 3 );
+    BOOST_CHECK_EQUAL( sigma.ranges()[1], 2 );
+    BOOST_CHECK_EQUAL( sigma.ranges()[2], 2 );
     BOOST_CHECK_EQUAL( sigma.convertLinearIndex( 0 ), 0 );
     BOOST_CHECK_EQUAL( sigma.convertLinearIndex( 1 ), 2 );
     BOOST_CHECK_EQUAL( sigma.convertLinearIndex( 2 ), 4 );
@@ -87,15 +92,41 @@ BOOST_AUTO_TEST_CASE( PermuteTest ) {
     BOOST_CHECK_EQUAL( sigma.convertLinearIndex( 10 ), 9 );
     BOOST_CHECK_EQUAL( sigma.convertLinearIndex( 11 ), 11 );
 
+    Permute sigmar(V, true);
+    BOOST_CHECK_EQUAL( sigmar.sigma().size(), 3 );
+    BOOST_CHECK_EQUAL( sigmar.sigma()[0], 0 );
+    BOOST_CHECK_EQUAL( sigmar.sigma()[1], 2 );
+    BOOST_CHECK_EQUAL( sigmar.sigma()[2], 1 );
+    BOOST_CHECK_EQUAL( sigmar[0], 0 );
+    BOOST_CHECK_EQUAL( sigmar[1], 2 );
+    BOOST_CHECK_EQUAL( sigmar[2], 1 );
+    BOOST_CHECK_EQUAL( sigmar.ranges().size(), 3 );
+    BOOST_CHECK_EQUAL( sigmar.ranges()[0], 2 );
+    BOOST_CHECK_EQUAL( sigmar.ranges()[1], 2 );
+    BOOST_CHECK_EQUAL( sigmar.ranges()[2], 3 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 0 ), 0 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 1 ), 1 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 2 ), 6 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 3 ), 7 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 4 ), 2 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 5 ), 3 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 6 ), 8 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 7 ), 9 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 8 ), 4 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 9 ), 5 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 10 ), 10 );
+    BOOST_CHECK_EQUAL( sigmar.convertLinearIndex( 11 ), 11 );
+
     std::vector<size_t> rs, sig;
-    rs.push_back(2);
     rs.push_back(3);
+    rs.push_back(2);
     rs.push_back(2);
     sig.push_back(2);
     sig.push_back(0);
     sig.push_back(1);
     Permute tau( rs, sig );
     BOOST_CHECK( tau.sigma() == sig );
+    BOOST_CHECK( tau.ranges() == rs );
     BOOST_CHECK_EQUAL( tau[0], 2 );
     BOOST_CHECK_EQUAL( tau[1], 0 );
     BOOST_CHECK_EQUAL( tau[2], 1 );
@@ -111,6 +142,20 @@ BOOST_AUTO_TEST_CASE( PermuteTest ) {
     BOOST_CHECK_EQUAL( tau.convertLinearIndex( 9 ), 7 );
     BOOST_CHECK_EQUAL( tau.convertLinearIndex( 10 ), 9 );
     BOOST_CHECK_EQUAL( tau.convertLinearIndex( 11 ), 11 );
+
+    Permute tauinv = tau.inverse();
+    BOOST_CHECK_EQUAL( tauinv.sigma().size(), 3 );
+    BOOST_CHECK_EQUAL( tauinv.ranges().size(), 3 );
+    BOOST_CHECK_EQUAL( tauinv[0], 1 );
+    BOOST_CHECK_EQUAL( tauinv[1], 2 );
+    BOOST_CHECK_EQUAL( tauinv[2], 0 );
+    BOOST_CHECK_EQUAL( tauinv.ranges()[0], 2 );
+    BOOST_CHECK_EQUAL( tauinv.ranges()[1], 3 );
+    BOOST_CHECK_EQUAL( tauinv.ranges()[2], 2 );
+    for( size_t i = 0; i < 12; i++ ) {
+        BOOST_CHECK_EQUAL( tau.convertLinearIndex( tauinv.convertLinearIndex( i ) ), i );
+        BOOST_CHECK_EQUAL( tauinv.convertLinearIndex( tau.convertLinearIndex( i ) ), i );
+    }
 }
 
 

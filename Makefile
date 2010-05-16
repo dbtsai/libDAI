@@ -19,7 +19,7 @@ DAI_VERSION="git HEAD"
 DAI_DATE="May 12, 2010, or later"
 
 # Directories of libDAI sources
-# Location libDAI headers
+# Location of libDAI headers
 INC=include/dai
 # Location of libDAI source files
 SRC=src

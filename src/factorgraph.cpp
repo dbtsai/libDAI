@@ -278,26 +278,58 @@ GraphAL FactorGraph::MarkovGraph() const {
 }
 
 
-vector<VarSet> FactorGraph::maximalFactorDomains() const {
-    vector<VarSet> result;
+bool FactorGraph::isMaximal( size_t I ) const {
+    const VarSet& I_vars = factor(I).vars();
+    size_t I_size = I_vars.size();
 
-    for( size_t I = 0; I < nrFactors(); I++ ) {
-        bool maximal = true;
-        const VarSet& I_vars = factor(I).vars();
-        size_t I_size = I_vars.size();
-
-        if( I_size == 0 )
-            maximal = false;
+    if( I_size == 0 ) {
+        for( size_t J = 0; J < nrFactors(); J++ ) 
+            if( J != I )
+                if( factor(J).vars().size() > 0 )
+                    return false;
+        return true;
+    } else {
         foreach( const Neighbor& i, nbF(I) ) {
             foreach( const Neighbor& J, nbV(i) ) {
                 if( J != I )
                     if( (factor(J).vars() >> I_vars) && (factor(J).vars().size() != I_size) )
-                        maximal = false;
+                        return false;
             }
         }
-        if( maximal )
-            result.push_back( factor(I).vars() );
+        return true;
     }
+}
+
+
+size_t FactorGraph::maximalFactor( size_t I ) const {
+    const VarSet& I_vars = factor(I).vars();
+    size_t I_size = I_vars.size();
+
+    if( I_size == 0 ) {
+        for( size_t J = 0; J < nrFactors(); J++ )
+            if( J != I )
+                if( factor(J).vars().size() > 0 )
+                    return maximalFactor( J );
+        return I;
+    } else {
+        foreach( const Neighbor& i, nbF(I) ) {
+            foreach( const Neighbor& J, nbV(i) ) {
+                if( J != I )
+                    if( (factor(J).vars() >> I_vars) && (factor(J).vars().size() != I_size) )
+                        return maximalFactor( J );
+            }
+        }
+        return I;
+    }
+}
+
+
+vector<VarSet> FactorGraph::maximalFactorDomains() const {
+    vector<VarSet> result;
+
+    for( size_t I = 0; I < nrFactors(); I++ )
+        if( isMaximal( I ) )
+            result.push_back( factor(I).vars() );
 
     if( result.size() == 0 )
         result.push_back( VarSet() );

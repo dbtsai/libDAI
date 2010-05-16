@@ -259,6 +259,18 @@ class FactorGraph {
          */
         GraphAL MarkovGraph() const;
 
+        /// Returns whether the \a I 'th factor is maximal
+        /** \note A factor (domain) is \a maximal if and only if it is not a
+         *  strict subset of another factor domain.
+         */
+        bool isMaximal( size_t I ) const;
+
+        /// Returns the index of a maximal factor that contains the \a I 'th factor
+        /** \note A factor (domain) is \a maximal if and only if it is not a
+         *  strict subset of another factor domain.
+         */
+        size_t maximalFactor( size_t I ) const;
+
         /// Returns the maximal factor domains in this factorgraph
         /** \note A factor domain is \a maximal if and only if it is not a
          *  strict subset of another factor domain.
