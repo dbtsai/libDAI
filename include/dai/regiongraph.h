@@ -226,34 +226,6 @@ class RegionGraph : public FactorGraph {
                 ns |= fac->second.vars();
             recomputeORs( ns );
         }
-
-        /// Calculates counting numbers of inner regions based upon counting numbers of outer regions
-        /** The counting numbers of the inner regions are set using the Moebius inversion formula:
-         *    \f[ c_\beta := 1 - \sum_{\gamma \in \mathrm{an}(\beta)} c_\gamma \f]
-         *  where \f$\mathrm{an}(\beta)\f$ are the ancestors of inner region \f$\beta\f$ according to
-         *  the partial ordering induced by the subset relation (i.e., a region is a child of another
-         *  region if its variables are a subset of the variables of its parent region).
-         *  \deprecated This functionality has been protected.
-         */
-        void calcCountingNumbers() { calcCVMCountingNumbers(); }
-
-        /// Recompute all outer regions
-        /** The factor contents of each outer region is set to the product of the factors belonging to that region.
-         *  \deprecated This functionality has been protected.
-         */
-        void RecomputeORs() { recomputeORs(); }
-
-        /// Recompute all outer regions involving the variables in \a vs
-        /** The factor contents of each outer region involving at least one of the variables in \a vs is set to the product of the factors belonging to that region.
-         *  \deprecated This functionality has been protected.
-         */
-        void RecomputeORs( const VarSet& vs ) { recomputeORs( vs ); }
-
-        /// Recompute all outer regions involving factor \a I
-        /** The factor contents of each outer region involving the \a I 'th factor is set to the product of the factors belonging to that region.
-         *  \deprecated This functionality has been protected.
-         */
-        void RecomputeOR( size_t I ) { recomputeOR( I ); }
     //@}
 
     /// \name Input/output

@@ -89,16 +89,6 @@ namespace dai {
                 return _clusters[I]; 
             }
 
-            /// Returns a constant reference to the clusters
-            /** \deprecated Please use dai::ClusterGraph::clusters() instead
-             */
-            const std::vector<VarSet>& toVector() const { return _clusters; }
-
-            /// Returns number of clusters
-            /** \deprecated Please use dai::ClusterGraph::nrClusters() instead
-             */
-            size_t size() const { return _G.nrNodes2(); }
-
             /// Returns the index of variable \a n
             /** \throw OBJECT_NOT_FOUND if the variable does not occur in the cluster graph
              */

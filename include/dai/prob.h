@@ -207,24 +207,6 @@ class TProb {
         container_type _p;
 
     public:
-        /// Enumerates different ways of normalizing a probability measure.
-        /**
-         *  - NORMPROB means that the sum of all entries should be 1;
-         *  - NORMLINF means that the maximum absolute value of all entries should be 1.
-         *  \deprecated Please use dai::ProbNormType instead.
-         */
-        typedef enum { NORMPROB, NORMLINF } NormType;
-        /// Enumerates different distance measures between probability measures.
-        /**
-         *  - DISTL1 is the \f$\ell_1\f$ distance (sum of absolute values of pointwise difference);
-         *  - DISTLINF is the \f$\ell_\infty\f$ distance (maximum absolute value of pointwise difference);
-         *  - DISTTV is the total variation distance (half of the \f$\ell_1\f$ distance);
-         *  - DISTKL is the Kullback-Leibler distance (\f$\sum_i p_i (\log p_i - \log q_i)\f$).
-         *  - DISTHEL is the Hellinger distance (\f$\frac{1}{2}\sum_i (\sqrt{p_i}-\sqrt{q_i})^2\f$).
-         *  \deprecated Please use dai::ProbDistType instead.
-         */
-        typedef enum { DISTL1, DISTLINF, DISTTV, DISTKL, DISTHEL } DistType;
-
     /// \name Constructors and destructors
     //@{
         /// Default constructor (constructs empty vector)
@@ -242,10 +224,9 @@ class TProb {
          *  \param end Points just beyond last instance to be added.
          *  \param sizeHint For efficiency, the number of entries can be speficied by \a sizeHint;
          *    the value 0 can be given if the size is unknown, but this will result in a performance penalty.
-         *  \deprecated In future libDAI versions, the \a sizeHint argument will no longer default to 0.
          */
         template <typename TIterator>
-        TProb( TIterator begin, TIterator end, size_t sizeHint=0 ) : _p() {
+        TProb( TIterator begin, TIterator end, size_t sizeHint ) : _p() {
             _p.reserve( sizeHint );
             _p.insert( _p.begin(), begin, end );
         }
@@ -329,31 +310,8 @@ class TProb {
         /// Returns a copy of the \a i 'th entry
         T operator[]( size_t i ) const { return get(i); }
 
-        /// Returns reference to the \a i 'th entry
-        /** \deprecated Please use dai::TProb::set() instead
-         */
-        T& operator[]( size_t i ) { return _p[i]; }
-
         /// Returns length of the vector (i.e., the number of entries)
         size_t size() const { return _p.size(); }
-
-        /// Accumulate over all values, similar to std::accumulate
-        /** The following calculation is done:
-         *  \code
-         *  T t = op2(init);
-         *  for( const_iterator it = begin(); it != end(); it++ )
-         *      t = op1( t, op2(*it) );
-         *  return t;
-         *  \endcode
-         *  \deprecated Please use dai::TProb::accumulateSum or dai::TProb::accumulateMax instead
-         */
-        template<typename binOp, typename unOp> T accumulate( T init, binOp op1, unOp op2 ) const {
-            T t = op2(init);
-            for( const_iterator it = begin(); it != end(); it++ )
-                t = op1( t, op2(*it) );
-            return t;
-        }
-
 
         /// Accumulate all values (similar to std::accumulate) by summing
         /** The following calculation is done:

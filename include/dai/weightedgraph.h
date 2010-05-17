@@ -41,18 +41,10 @@ namespace dai {
 class DEdge {
     public:
         /// First node index (source of edge)
-        union {
-            size_t first;
-            /// \deprecated Please use member dai::DEdge::first instead
-            size_t n1;
-        };
+        size_t first;
 
         /// Second node index (target of edge)
-        union {
-            size_t second;
-            /// \deprecated Please use member dai::DEdge::second instead
-            size_t n2;
-        };
+        size_t second;
 
         /// Default constructor
         DEdge() : first(0), second(0) {}
@@ -80,18 +72,10 @@ class DEdge {
 class UEdge {
     public:
         /// First node index
-        union {
-            size_t first;
-            /// \deprecated Please use member dai::UEdge::first instead
-            size_t n1;
-        };
+        size_t first;
 
         /// Second node index
-        union {
-            size_t second;
-            /// \deprecated Please use member dai::UEdge::second instead
-            size_t n2;
-        };
+        size_t second;
 
         /// Default constructor
         UEdge() : first(0), second(0) {}
@@ -258,39 +242,6 @@ template<typename T> RootedTree MaxSpanningTree( const WeightedGraph<T> &G, bool
         return MinSpanningTree( gr, usePrim );
     }
 }
-
-
-/// Constructs a minimum spanning tree from the (non-negatively) weighted graph \a G using Prim's algorithm.
-/** \param G Weighted graph that should have non-negative weights.
- *  \note Uses implementation from Boost Graph Library.
- *  \note The vertices of \a G must be in the range [0,N) where N is the number of vertices of \a G.
- *  \deprecated Please use dai::MinSpanningTree(const WeightedGraph&, bool) instead
- */
-template<typename T> RootedTree MinSpanningTree( const WeightedGraph<T> &G ) {
-    return MinSpanningTree( G, true );
-}
-
-
-/// Constructs a minimum spanning tree from the (non-negatively) weighted graph \a G using Prim's algorithm.
-/** \param G Weighted graph that should have non-negative weights.
- *  \note Uses implementation from Boost Graph Library.
- *  \note The vertices of \a G must be in the range [0,N) where N is the number of vertices of \a G.
- *  \deprecated Please use dai::MinSpanningTree(const WeightedGraph&, bool) instead
- */
-template<typename T> RootedTree MaxSpanningTree( const WeightedGraph<T> &G ) {
-    return MaxSpanningTree( G, true );
-}
-
-
-/// Constructs a random undirected graph of \a N nodes, where each node has connectivity \a d
-/** Algorithm 1 in [\ref StW99].
- *  Draws a random graph of size \a N and uniform degree \a d
- *  from an almost uniform probability distribution over these graphs
- *  (which becomes uniform in the limit that \a d is small and \a N goes
- *  to infinity).
- *  \deprecated Please use dai::createGraphRegular(size_t, size_t) instead
- */
-GraphEL RandomDRegularGraph( size_t N, size_t d );
 
 
 } // end of namespace dai

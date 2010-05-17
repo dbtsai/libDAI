@@ -98,26 +98,12 @@ class PropertySet : private std::map<PropertyKey, PropertyValue> {
             return *this; 
         }
 
-        /// Sets a property (a key \a key with a corresponding value \a val)
-        /** \deprecated Please use dai::PropertySet::set(const PropertyKey&, const PropertyValue&) instead
-         */
-        PropertySet& Set( const PropertyKey& key, const PropertyValue& val ) { 
-            return set( key, val );
-        }
-
         /// Set properties according to \a newProps, overriding properties that already exist with new values
         PropertySet& set( const PropertySet& newProps ) {
             const std::map<PropertyKey, PropertyValue> *m = &newProps;
             foreach(value_type i, *m)
                 set( i.first, i.second );
             return *this;
-        }
-
-        /// Set properties according to \a newProps, overriding properties that already exist with new values
-        /** \deprecated Please use dai::PropertySet::set(const PropertySet&) instead
-         */
-        PropertySet& Set( const PropertySet& newProps ) {
-            return set( newProps );
         }
 
         /// Shorthand for (temporarily) adding properties
@@ -161,17 +147,6 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
                     DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' from string to desired type.");
                 }
             }
-        }
-
-        /// Converts the type of the property value corresponding with \a key from string to \a ValueType (if necessary)
-        /** The implementation makes use of boost::lexical_cast
-         *  \tparam ValueType Type to which the value should be cast
-         *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
-         *  \deprecated Please use dai::PropertySet::convertTo() instead
-         */
-        template<typename ValueType>
-        void ConvertTo( const PropertyKey& key ) { 
-            convertTo<ValueType>( key );
         }
     //@}
 
@@ -219,14 +194,6 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
             return x->second;
         }
 
-        /// Gets the value corresponding to \a key
-        /** \throw OBJECT_NOT_FOUND if the key cannot be found in \c *this
-         *  \deprecated Please use dai::PropertySet::get() instead
-         */
-        const PropertyValue& Get( const PropertyKey& key ) const {
-            return get( key );
-        }
-
         /// Gets the value corresponding to \a key, cast to \a ValueType
         /** \tparam ValueType Type to which the value should be cast
          *  \throw OBJECT_NOT_FOUND if the key cannot be found in \c *this
@@ -240,17 +207,6 @@ PropertySet p()("method","BP")("verbose",1)("tol",1e-9)
                 DAI_THROWE(IMPOSSIBLE_TYPECAST,"Cannot cast value of property '" + key + "' to desired type.");
                 return ValueType();
             }
-        }
-
-        /// Gets the value corresponding to \a key, cast to \a ValueType
-        /** \tparam ValueType Type to which the value should be cast
-         *  \throw OBJECT_NOT_FOUND if the key cannot be found in \c *this
-         *  \throw IMPOSSIBLE_TYPECAST if the type cast cannot be done
-         *  \deprecated Please use dai::PropertySet::getAs() instead
-         */
-        template<typename ValueType>
-        ValueType GetAs( const PropertyKey& key ) const {
-            return getAs<ValueType>( key );
         }
 
         /// Gets the value corresponding to \a key, cast to \a ValueType, converting from a string if necessary

@@ -132,10 +132,6 @@ class TFactor {
         /// Returns a copy of the \a i 'th entry of the value vector
         T operator[] (size_t i) const { return _p[i]; }
 
-        /// Returns a reference to the \a i 'th entry of the value vector
-        /// \deprecated Please use dai::TFactor::set() instead
-        T& operator[] (size_t i) { return _p[i]; }
-
         /// Returns constant reference to variable set (i.e., the variables on which the factor depends)
         const VarSet& vars() const { return _vs; }
 
@@ -146,12 +142,6 @@ class TFactor {
         /** \note This is equal to the length of the value vector.
          */
         size_t nrStates() const { return _p.size(); }
-
-        /// Returns the number of possible joint states of the variables on which the factor depends, \f$\prod_{l\in L} S_l\f$
-        /** \note This is equal to the length of the value vector.
-         *  \deprecated Please use dai::TFactor::nrStates() instead.
-         */
-        size_t states() const { return _p.size(); }
 
         /// Returns the Shannon entropy of \c *this, \f$-\sum_i p_i \log p_i\f$
         T entropy() const { return _p.entropy(); }

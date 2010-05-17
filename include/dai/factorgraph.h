@@ -74,16 +74,6 @@ class FactorGraph {
         /// Shorthand for BipartiteGraph::Edge
         typedef BipartiteGraph::Edge      Edge;
 
-        /// Iterator over factors
-        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
-         */
-        typedef std::vector<Factor>::iterator iterator;
-
-        /// Constant iterator over factors
-        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
-         */
-        typedef std::vector<Factor>::const_iterator const_iterator;
-
     private:
         /// Stores the neighborhood structure
         BipartiteGraph           _G;
@@ -129,15 +119,6 @@ class FactorGraph {
         /// Returns constant reference to all variables
         const std::vector<Var>& vars() const { return _vars; }
 
-        /// Returns reference to \a I 'th factor
-        /** \deprecated Please use the const member dai::FactorGraph::factor( size_t ) instead,
-         *  or dai::FactorGraph::setFactor() for changing a factor.
-         */
-        Factor& factor( size_t I ) { 
-            DAI_DEBASSERT( I < nrFactors() );
-            return _factors[I]; 
-        }
-
         /// Returns constant reference to \a I 'th factor
         const Factor& factor( size_t I ) const { 
             DAI_DEBASSERT( I < nrFactors() );
@@ -154,26 +135,6 @@ class FactorGraph {
         const Neighbor& nbV( size_t i, size_t _I ) const { return _G.nb1(i)[_I]; }
         /// Returns constant reference to the \a _i 'th neighbor of the \a I 'th factor
         const Neighbor& nbF( size_t I, size_t _i ) const { return _G.nb2(I)[_i]; }
-    //@}
-
-    /// \name Iterator interface
-    //@{
-        /// Returns iterator pointing to first factor
-        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
-         */
-        iterator begin() { return _factors.begin(); }
-        /// Returns constant iterator pointing to first factor
-        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
-         */
-        const_iterator begin() const { return _factors.begin(); }
-        /// Returns iterator pointing beyond last factor
-        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
-         */
-        iterator end() { return _factors.end(); }
-        /// Returns constant iterator pointing beyond last factor
-        /** \deprecated The FactorGraph iterator interface will be removed in future versions of libDAI
-         */
-        const_iterator end() const { return _factors.end(); }
     //@}
 
     /// \name Queries
@@ -276,13 +237,6 @@ class FactorGraph {
          *  strict subset of another factor domain.
          */
         std::vector<VarSet> maximalFactorDomains() const;
-
-        /// Returns the maximal factors domains in this factorgraph
-        /** \deprecated Please use dai::FactorGraph::maximalFactorDomains() instead
-         */
-        std::vector<VarSet> cliques() const {
-            return maximalFactorDomains();
-        }
     //@}
 
     /// \name Backup/restore mechanism for factors

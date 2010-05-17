@@ -154,7 +154,7 @@ void ReadUAIFGFile( const char *filename, size_t verbose, vector<Var>& vars, vec
                 DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read number of nonzero factor values for " + toString(I) + "'th factor");
             if( verbose >= 3 ) 
                 cout << "  number of nonzero values: " << nrNonZeros << endl;
-            DAI_ASSERT( nrNonZeros == factors[I].states() );
+            DAI_ASSERT( nrNonZeros == factors[I].nrStates() );
             for( size_t li = 0; li < nrNonZeros; li++ ) {
                 Real val;
                 is >> val;
@@ -163,7 +163,7 @@ void ReadUAIFGFile( const char *filename, size_t verbose, vector<Var>& vars, vec
                 // assign value after calculating its linear index corresponding to the permutation
                 if( verbose >= 4 )
                     cout << "  " << li << "'th value " << val << " corresponds with index " << permindex.convertLinearIndex(li) << endl;
-                factors[I][permindex.convertLinearIndex( li )] = val;
+                factors[I].set( permindex.convertLinearIndex( li ), val );
             }
         }
         if( verbose >= 3 )
