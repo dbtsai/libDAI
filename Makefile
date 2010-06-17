@@ -182,6 +182,13 @@ emalg$(OE) : $(SRC)/emalg.cpp $(INC)/emalg.h $(INC)/evidence.h $(HEADERS)
 examples/%$(EE) : examples/%.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS)
 
+examples/example_sprinkler_gibbs$(EE) : examples/example_sprinkler_gibbs.cpp $(HEADERS) $(LIB)/libdai$(LE)
+ifdef WITH_GIBBS
+	$(CC) $(CCO)$@ $< $(LIBS)
+else
+	@echo Skipping $@
+endif
+
 examples/example_imagesegmentation$(EE) : examples/example_imagesegmentation.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	-$(CC) $(CCO)$@ $< $(LIBS) -lpthread -lX11
 
@@ -204,9 +211,11 @@ tests/testdai$(EE) : tests/testdai.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_PO)
 tests/testem/testem$(EE) : tests/testem/testem.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS) $(BOOSTLIBS_PO)
-ifdef WITH_CBP
 tests/testbbp$(EE) : tests/testbbp.cpp $(HEADERS) $(LIB)/libdai$(LE)
+ifdef WITH_CBP
 	$(CC) $(CCO)$@ $< $(LIBS)
+else
+	@echo Skipping $@
 endif
 
 

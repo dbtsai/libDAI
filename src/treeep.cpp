@@ -80,29 +80,30 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
             for( size_t i = 1; i < fg.nrVars(); i++ )
                 wg[UEdge(i,0)] = 0.0;
             for( size_t i = 0; i < fg.nrVars(); i++ ) {
-                Var v_i = fg.var(i);
-                VarSet di = fg.delta(i);
-                for( VarSet::const_iterator cit_j = di.begin(); cit_j != di.end(); cit_j++ )
-                    if( v_i < *cit_j ) {
-                        VarSet ij(v_i,*cit_j);
+                SmallSet<size_t> delta_i = fg.bipGraph().delta1( i, false );
+                const Var& v_i = fg.var(i);
+                foreach( size_t j, delta_i ) 
+                    if( i < j ) {
+                        const Var& v_j = fg.var(j);
+                        VarSet v_ij( v_i, v_j );
+                        SmallSet<size_t> nb_ij = fg.bipGraph().nb1Set( i ) | fg.bipGraph().nb1Set( j );
                         Factor piet;
-                        for( size_t I = 0; I < fg.nrFactors(); I++ ) {
-                            VarSet Ivars = fg.factor(I).vars();
+                        foreach( size_t I, nb_ij ) {
+                            const VarSet& Ivars = fg.factor(I).vars();
                             if( props.type == Properties::TypeType::ORG ) {
-                                if( (Ivars == v_i) || (Ivars == *cit_j) )
+                                if( (Ivars == v_i) || (Ivars == v_j) )
                                     piet *= fg.factor(I);
-                                else if( Ivars >> ij )
-                                    piet *= fg.factor(I).marginal( ij );
+                                else if( Ivars >> v_ij )
+                                    piet *= fg.factor(I).marginal( v_ij );
                             } else {
-                                if( Ivars >> ij )
+                                if( Ivars >> v_ij )
                                     piet *= fg.factor(I);
                             }
                         }
-                        size_t j = fg.findVar( *cit_j );
                         if( props.type == Properties::TypeType::ORG ) {
-                            if( piet.vars() >> ij ) {
-                                piet = piet.marginal( ij );
-                                Factor pietf = piet.marginal(v_i) * piet.marginal(*cit_j);
+                            if( piet.vars() >> v_ij ) {
+                                piet = piet.marginal( v_ij );
+                                Factor pietf = piet.marginal(v_i) * piet.marginal(v_j);
                                 wg[UEdge(i,j)] = dist( piet, pietf, DISTKL );
                             } else {
                                 // this should never happen...
@@ -110,7 +111,7 @@ TreeEP::TreeEP( const FactorGraph &fg, const PropertySet &opts ) : JTree(fg, opt
                                 wg[UEdge(i,j)] = 0;
                             }
                         } else
-                            wg[UEdge(i,j)] = piet.strength(v_i, *cit_j);
+                            wg[UEdge(i,j)] = piet.strength(v_i, v_j);
                     }
             }
 
