@@ -14,6 +14,10 @@
 #include <CImg.h>        // This example needs a recent version of CImg to be installed
 
 
+// For backwards compatibility with old CImg interface
+// #define CIMGOLD
+
+
 using namespace dai;
 using namespace std;
 using namespace cimg_library;
@@ -37,8 +41,13 @@ FactorGraph img2fg( const CImg<T> &img, double J, double th_min, double th_max, 
     vector<Var> vars;
     vector<Factor> factors;
 
+#ifdef CIMGOLD
+    size_t dimx = img.width;   // Width of the image in pixels
+    size_t dimy = img.height;  // Height of the image in pixels
+#else
     size_t dimx = img.width();   // Width of the image in pixels
     size_t dimy = img.height();  // Height of the image in pixels
+#endif
     size_t N = dimx * dimy;      // One variable for each pixel
 
     // Create variables
@@ -168,7 +177,11 @@ double doInference( FactorGraph& fg, string algOpts, size_t maxIter, double tol,
             }
 
         // Display the image with the current beliefs
+#ifdef CIMGOLD
+        disp << image;
+#else
         disp = image;
+#endif
 
         // Perform the requested inference algorithm
         // (which could be limited to perform only 1 iteration)
@@ -222,10 +235,17 @@ int main(int argc,char **argv) {
     CImg<unsigned char> image2 = CImg<>( file_i2 );
 
     // Check image sizes
+#ifdef CIMGOLD
+    if( (image1.width != image2.width) || (image1.height != image2.height) )
+        cerr << "Error: input images should have same size." << endl;
+    size_t dimx = image1.width;
+    size_t dimy = image1.height;
+#else
     if( (image1.width() != image2.width()) || (image1.height() != image2.height()) )
         cerr << "Error: input images should have same size." << endl;
     size_t dimx = image1.width();
     size_t dimy = image1.height();
+#endif
 
     // Display input images
     cout << "Displaying input image 1..." << endl;
@@ -245,9 +265,15 @@ int main(int argc,char **argv) {
     for( size_t i = 0; i < dimx; i++ ) {
         for( size_t j = 0; j < dimy; j++ ) {
             int avg = 0;
+#ifdef CIMGOLD
+            for( int c = 0; c < image1.dimv(); c++ )
+                avg += image1( i, j, c );
+            avg /= image1.dimv();
+#else
             for( int c = 0; c < image1.spectrum(); c++ )
                 avg += image1( i, j, c );
             avg /= image1.spectrum();
+#endif
             image3( i, j, 0 ) /= (1.0 + avg / 255.0);
         }
     }
@@ -288,8 +314,13 @@ int main(int argc,char **argv) {
                 image4(i,j,1) = image2(i,j,1);
                 image4(i,j,2) = image2(i,j,2);
             } else
+#ifdef CIMGOLD
+                for( size_t c = 0; c < (size_t)image4.dimv(); c++ )
+                    image4(i,j,c) = 255;
+#else
                 for( size_t c = 0; c < (size_t)image4.spectrum(); c++ )
                     image4(i,j,c) = 255;
+#endif
         }
     cout << "Displaying the final result of the segmentation problem..." << endl;
     CImgDisplay main_disp( image4, "Foreground/background segmentation result", 0 );
@@ -298,8 +329,13 @@ int main(int argc,char **argv) {
     image4.save_jpeg( file_o2, 100 );
 
     cout << "Close the last image display in order to finish." << endl;
+#ifdef CIMGOLD
+    while( !main_disp.is_closed )
+        cimg::wait( 40 );
+#else
     while( !main_disp.is_closed() )
         cimg::wait( 40 );
+#endif
 
     return 0;
 }
