@@ -49,18 +49,18 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
     if( ((nrhs < NR_IN) || (nrhs > NR_IN + NR_IN_OPT)) || ((nlhs < NR_OUT) || (nlhs > NR_OUT + NR_OUT_OPT)) ) {
         mexErrMsgTxt("Usage: [logZ,q,md,qv,qf,qmap] = dai(psi,method,opts)\n\n"
         "\n"
-        "INPUT:  psi        = linear cell array containing the factors \n"
-        "                     psi{i} should be a structure with a Member field\n"
-        "                     and a P field, like a CPTAB).\n"
-        "        method     = name of the method (see README)\n"
-        "        opts       = string of options (see README)\n"
+        "INPUT:  psi        = linear cell array containing the factors\n"
+        "                     (psi{i} should be a structure with a Member field\n"
+        "                     and a P field).\n"
+        "        method     = name of the method\n"
+        "        opts       = string of options\n"
         "\n"
         "OUTPUT: logZ       = approximation of the logarithm of the partition sum.\n"
         "        q          = linear cell array containing all final beliefs.\n"
         "        md         = maxdiff (final linf-dist between new and old single node beliefs).\n"
         "        qv         = linear cell array containing all variable beliefs.\n"
         "        qf         = linear cell array containing all factor beliefs.\n"
-        "        qmap       = (V,1) array containing the MAP labeling (only for BP,JTree).\n");
+        "        qmap       = linear array containing the MAP state (only for BP,JTree).\n");
     }
 
     char *method;
