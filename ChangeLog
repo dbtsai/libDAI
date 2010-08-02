@@ -1,5 +1,6 @@
 git HEAD
 --------
+* [Peter Rockett] Improved Makefiles for image segmentation example.
 * Removed deprecated interfaces.
 * Added FactorGraph::isMaximal(size_t) and FactorGraph::maximalFactor(size_t).
 * Added optional reverse argument to Permute::Permute( const std::vector<Var>& )

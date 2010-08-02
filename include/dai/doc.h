@@ -207,9 +207,10 @@
  *      version 1.37 shipped with Ubuntu 9.04 is known not to work)
  *    - doxygen (only for building the documentation)
  *    - graphviz (only for using some of the libDAI command line utilities)
+ *    - CImg library (only for building the image segmentation example)
  * 
  *  On Debian/Ubuntu, you can easily install the required packages with a single command:
- *  <pre>  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev</pre>
+ *  <pre>  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev cimg-dev</pre>
  *  (root permissions needed).
  *
  *  On Mac OS X (10.4 is known to work), these packages can be installed easily via MacPorts.
@@ -260,6 +261,7 @@
  *  - A recent version of MicroSoft Visual Studio (2008 is known to work)
  *  - recent boost C++ libraries (version 1.37 or higher)
  *  - GNU make (can be obtained from http://gnuwin32.sourceforge.net)
+ *  - CImg library (only for building the image segmentation example)
  *
  *  For the regression test, you need:
  *  - GNU diff, GNU sed (can be obtained from http://gnuwin32.sourceforge.net)

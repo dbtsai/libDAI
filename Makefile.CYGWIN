@@ -42,6 +42,8 @@ CCDEBUGFLAGS=-O3 -g -DDAI_DEBUG
 CCNODEBUGFLAGS=-O3
 # Standard include directories
 CCINC=-Iinclude -I/cygdrive/e/cygwin/boost_1_42_0
+# Include directory for image segmentation example
+CIMGINC=-I/cygdrive/e/cygwin/CImg-1.3.9
 
 # LINKER
 # Standard libraries to include
@@ -49,6 +51,8 @@ LIBS=-ldai
 # For linking with BOOST libraries
 BOOSTLIBS_PO=-lboost_program_options
 BOOSTLIBS_UTF=-lboost_unit_test_framework
+# Libraries for image segmentation example
+CIMGLIBS=-lpthread -lX11
 # Additional library search paths for linker
 CCLIB=-Llib -L/cygdrive/e/cygwin/boost_1_42_0/stage/lib
 

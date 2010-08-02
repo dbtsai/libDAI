@@ -43,6 +43,8 @@ CCDEBUGFLAGS=-O3 -g -DDAI_DEBUG
 CCNODEBUGFLAGS=-O3
 # Standard include directories
 CCINC=-Iinclude
+# Include directory for image segmentation example
+CIMGINC=
 
 # LINKER
 # Standard libraries to include
@@ -50,6 +52,8 @@ LIBS=-ldai
 # For linking with BOOST libraries
 BOOSTLIBS_PO=-lboost_program_options-mt
 BOOSTLIBS_UTF=-lboost_unit_test_framework-mt
+# Libraries for image segmentation example
+CIMGLIBS=-lpthread -lX11
 # Additional library search paths for linker
 CCLIB=-Llib
 

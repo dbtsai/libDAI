@@ -190,7 +190,7 @@ else
 endif
 
 examples/example_imagesegmentation$(EE) : examples/example_imagesegmentation.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	-$(CC) $(CCO)$@ $< $(LIBS) -lpthread -lX11
+	-$(CC) $(CIMGINC) $(CCO)$@ $< $(LIBS) $(CIMGLIBS)
 
 
 # UNIT TESTS
