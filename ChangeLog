@@ -1,5 +1,6 @@
 git HEAD
 --------
+* Added SmallSet::erase( const T& t )
 * Added DECMAP algorithm.
 * Added createFactorDelta( const VarSet& vs, size_t state )
 * [Peter Rockett] Improved Makefiles for image segmentation example.

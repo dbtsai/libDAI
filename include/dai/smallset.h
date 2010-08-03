@@ -87,6 +87,11 @@ class SmallSet {
             return *this;
         }
 
+        /// Erases \a t from \c *this
+        SmallSet& erase( const T& t ) {
+            return (*this /= t);
+        }
+
         /// Set-minus operator: returns all elements in \c *this, except those in \a x
         SmallSet operator/ ( const SmallSet& x ) const {
             SmallSet res;
