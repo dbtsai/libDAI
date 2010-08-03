@@ -890,4 +890,11 @@ BOOST_AUTO_TEST_CASE( RelatedFunctionsTest ) {
     BOOST_CHECK_EQUAL( x[1], (Real)0.0 );
     BOOST_CHECK_EQUAL( x[2], (Real)0.0 );
     BOOST_CHECK_THROW( createFactorDelta( v1, 4 ), Exception );
+
+    for( size_t i = 0; i < 12; i++ ) {
+        Factor xx = createFactorDelta( VarSet( v1, v2 ), i );
+        for( size_t j = 0; j < 12; j++ )
+            BOOST_CHECK_EQUAL( xx[j], (Real)(i == j) );
+    }
+    BOOST_CHECK_THROW( createFactorDelta( VarSet( v1, v2 ), 12 ), Exception );
 }

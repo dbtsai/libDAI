@@ -485,6 +485,32 @@ BOOST_AUTO_TEST_CASE( OperatorTest ) {
     y = x123; y.insert( 2 );   BOOST_CHECK_EQUAL( y, x123 );
     y = x123; y.insert( 3 );   BOOST_CHECK_EQUAL( y, x123 );
 
+    // check erase
+    y = x   ; y.erase( 1 );    BOOST_CHECK_EQUAL( y, x    );
+    y = x   ; y.erase( 2 );    BOOST_CHECK_EQUAL( y, x    );
+    y = x   ; y.erase( 3 );    BOOST_CHECK_EQUAL( y, x    );
+    y = x1  ; y.erase( 1 );    BOOST_CHECK_EQUAL( y, x    );
+    y = x1  ; y.erase( 2 );    BOOST_CHECK_EQUAL( y, x1   );
+    y = x1  ; y.erase( 3 );    BOOST_CHECK_EQUAL( y, x1   );
+    y = x2  ; y.erase( 1 );    BOOST_CHECK_EQUAL( y, x2   );
+    y = x2  ; y.erase( 2 );    BOOST_CHECK_EQUAL( y, x    );
+    y = x2  ; y.erase( 3 );    BOOST_CHECK_EQUAL( y, x2   );
+    y = x3  ; y.erase( 1 );    BOOST_CHECK_EQUAL( y, x3   );
+    y = x3  ; y.erase( 2 );    BOOST_CHECK_EQUAL( y, x3   );
+    y = x3  ; y.erase( 3 );    BOOST_CHECK_EQUAL( y, x    );
+    y = x12 ; y.erase( 1 );    BOOST_CHECK_EQUAL( y, x2   );
+    y = x12 ; y.erase( 2 );    BOOST_CHECK_EQUAL( y, x1   );
+    y = x12 ; y.erase( 3 );    BOOST_CHECK_EQUAL( y, x12  );
+    y = x13 ; y.erase( 1 );    BOOST_CHECK_EQUAL( y, x3   );
+    y = x13 ; y.erase( 2 );    BOOST_CHECK_EQUAL( y, x13  );
+    y = x13 ; y.erase( 3 );    BOOST_CHECK_EQUAL( y, x1   );
+    y = x23 ; y.erase( 1 );    BOOST_CHECK_EQUAL( y, x23  );
+    y = x23 ; y.erase( 2 );    BOOST_CHECK_EQUAL( y, x3   );
+    y = x23 ; y.erase( 3 );    BOOST_CHECK_EQUAL( y, x2   );
+    y = x123; y.erase( 1 );    BOOST_CHECK_EQUAL( y, x23  );
+    y = x123; y.erase( 2 );    BOOST_CHECK_EQUAL( y, x13  );
+    y = x123; y.erase( 3 );    BOOST_CHECK_EQUAL( y, x12  );
+
     // check operator|=
     y = x   ; y |= x;    BOOST_CHECK_EQUAL( y, x    );
     y = x   ; y |= x1;   BOOST_CHECK_EQUAL( y, x1   );
