@@ -337,6 +337,23 @@ vector<VarSet> FactorGraph::maximalFactorDomains() const {
 }
 
 
+Real FactorGraph::logScore( const std::vector<size_t>& statevec ) {
+    // Construct a State object that represents statevec
+    // This decouples the representation of the joint state in statevec from the factor graph
+    map<Var, size_t> statemap;
+    for( size_t i = 0; i < statevec.size(); i++ )
+        statemap[var(i)] = statevec[i];
+    State S(statemap);
+
+    // Evaluate the log probability of the joint configuration in statevec
+    // by summing the log factor entries of the factors that correspond to this joint configuration
+    Real lS = 0.0;
+    for( size_t I = 0; I < nrFactors(); I++ )
+        lS += dai::log( factor(I)[S(factor(I).vars())] );
+    return lS;
+}
+
+
 void FactorGraph::clamp( size_t i, size_t x, bool backup ) {
     DAI_ASSERT( x <= var(i).states() );
     Factor mask( var(i), (Real)0 );

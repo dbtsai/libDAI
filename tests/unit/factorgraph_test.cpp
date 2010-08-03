@@ -139,6 +139,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK( G0.MarkovGraph() == GraphAL() );
     BOOST_CHECK( G0.bipGraph() == BipartiteGraph() );
     BOOST_CHECK_EQUAL( G0.maximalFactorDomains().size(), 1 );
+    BOOST_CHECK_CLOSE( G0.logScore( std::vector<size_t>() ), (Real)0.0, tol );
 
     std::vector<Factor> facs;
     facs.push_back( Factor( v01 ) );
@@ -207,6 +208,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK_EQUAL( G1.maximalFactorDomains().size(), 2 );
     BOOST_CHECK_EQUAL( G1.maximalFactorDomains()[0], v01 );
     BOOST_CHECK_EQUAL( G1.maximalFactorDomains()[1], v12 );
+    BOOST_CHECK_CLOSE( G1.logScore( std::vector<size_t>(3,0) ), -dai::log((Real)32.0), tol ); 
 
     facs.push_back( Factor( v02 ) );
     H.addEdge( 0, 2 );
@@ -251,6 +253,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK_EQUAL( G2.maximalFactorDomains()[0], v01 );
     BOOST_CHECK_EQUAL( G2.maximalFactorDomains()[1], v12 );
     BOOST_CHECK_EQUAL( G2.maximalFactorDomains()[2], v02 );
+    BOOST_CHECK_CLOSE( G2.logScore( std::vector<size_t>(3,0) ), -dai::log((Real)128.0), tol );
 
     Var v3( 3, 3 );
     VarSet v03( v0, v3 );
@@ -312,6 +315,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK_EQUAL( G3.maximalFactorDomains()[1], v12 );
     BOOST_CHECK_EQUAL( G3.maximalFactorDomains()[2], v02 );
     BOOST_CHECK_EQUAL( G3.maximalFactorDomains()[3], v3 );
+    BOOST_CHECK_CLOSE( G3.logScore( std::vector<size_t>(4,0) ), -dai::log((Real)384.0), tol );
 
     facs.push_back( Factor( v123 ) );
     H.addEdge( 1, 3 );
@@ -368,6 +372,7 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK_EQUAL( G4.maximalFactorDomains()[0], v01 );
     BOOST_CHECK_EQUAL( G4.maximalFactorDomains()[1], v02 );
     BOOST_CHECK_EQUAL( G4.maximalFactorDomains()[2], v123 );
+    BOOST_CHECK_CLOSE( G4.logScore( std::vector<size_t>(4,0) ), -dai::log((Real)4608.0), tol );
 }
 
 

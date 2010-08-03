@@ -33,22 +33,34 @@ class Gibbs : public DAIAlgFG {
         typedef std::vector<size_t> _count_t;
         /// Type used to store the joint state of all variables
         typedef std::vector<size_t> _state_t;
-        /// Number of samples counted so far (excluding burn-in)
+        /// Number of samples counted so far (excluding burn-in periods)
         size_t _sample_count;
         /// State counts for each variable
         std::vector<_count_t> _var_counts;
         /// State counts for each factor
         std::vector<_count_t> _factor_counts;
+        /// Number of iterations done (including burn-in periods)
+        size_t _iters;
         /// Current joint state of all variables
         _state_t _state;
+        /// Joint state with maximum probability seen so far
+        _state_t _max_state;
+        /// Highest score so far
+        Real _max_score;
 
     public:
         /// Parameters for Gibbs
         struct Properties {
-            /// Total number of iterations
-            size_t iters;
+            /// Maximum number of iterations
+            size_t maxiter;
 
-            /// Number of "burn-in" iterations
+            /// Maximum time (in seconds)
+            double maxtime;
+
+            /// Number of iterations after which a random restart is made
+            size_t restart;
+
+            /// Number of "burn-in" iterations after each (re)start (for which no statistics are gathered)
             size_t burnin;
 
             /// Verbosity (amount of output sent to stderr)
@@ -60,13 +72,13 @@ class Gibbs : public DAIAlgFG {
 
     public:
         /// Default constructor
-        Gibbs() : DAIAlgFG(), _sample_count(0), _var_counts(), _factor_counts(), _state() {}
+        Gibbs() : DAIAlgFG(), _sample_count(0), _var_counts(), _factor_counts(), _iters(0), _state(), _max_state(), _max_score(-INFINITY) {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
         /** \param fg Factor graph.
          *  \param opts Parameters @see Properties
          */
-        Gibbs( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _sample_count(0), _var_counts(), _factor_counts(), _state() {
+        Gibbs( const FactorGraph &fg, const PropertySet &opts ) : DAIAlgFG(fg), _sample_count(0), _var_counts(), _factor_counts(), _iters(0), _state(), _max_state(), _max_score(-INFINITY) {
             setProperties( opts );
             construct();
         }
@@ -86,7 +98,8 @@ class Gibbs : public DAIAlgFG {
         virtual void init( const VarSet &/*ns*/ ) { init(); }
         virtual Real run();
         virtual Real maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
-        virtual size_t Iterations() const { return props.iters; }
+        virtual size_t Iterations() const { return _iters; }
+        std::vector<std::size_t> findMaximum() const { return _max_state; }
         virtual void setProperties( const PropertySet &opts );
         virtual PropertySet getProperties() const;
         virtual std::string printProperties() const;

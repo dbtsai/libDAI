@@ -1,5 +1,11 @@
 git HEAD
 --------
+* Added FactorGraph::logScore( const std::vector<size_t>& statevec )
+* Improved Gibbs
+  - renamed 'iters' property into 'maxiter'
+  - added 'maxtime' property
+  - added 'restart' property
+  - added Gibbs::findMaximum()
 * Improved BP (added 'maxtime' property)
 * Added fromString<>( const std::string& x )
 * Added SmallSet::erase( const T& t )

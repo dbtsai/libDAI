@@ -18,25 +18,6 @@ using namespace dai;
 using namespace std;
 
 
-// Evaluates the log probability of the joint configuration vstate of the variables in factor graph fg
-Real evalState( const FactorGraph& fg, const std::vector<size_t> vstate ) {
-    // First, construct a map from Var objects to their states
-    // This decouples the representation of the joint state in vstate
-    // from the factor graph
-    map<Var, size_t> state;
-    for( size_t i = 0; i < vstate.size(); i++ )
-        state[fg.var(i)] = vstate[i];
-
-    // Evaluate the log probability of the joint configuration in state
-    // by summing the log factor entries of the factors in factor graph fg
-    // that correspond to the joint configuration
-    Real logZ = 0.0;
-    for( size_t I = 0; I < fg.nrFactors(); I++ )
-        logZ += dai::log( fg.factor(I)[calcLinearState( fg.factor(I).vars(), state )] );
-    return logZ;
-}
-
-
 int main( int argc, char *argv[] ) {
     if ( argc != 2 ) {
         cout << "Usage: " << argv[0] << " <filename.fg>" << endl << endl;
@@ -160,17 +141,17 @@ int main( int argc, char *argv[] ) {
             cout << mp.belief(fg.factor(I).vars()) << "=" << mp.beliefF(I) << endl;
 
         // Report exact MAP joint state
-        cout << "Exact MAP state (log probability = " << evalState( fg, jtmapstate ) << "):" << endl;
+        cout << "Exact MAP state (log score = " << fg.logScore( jtmapstate ) << "):" << endl;
         for( size_t i = 0; i < jtmapstate.size(); i++ )
             cout << fg.var(i) << ": " << jtmapstate[i] << endl;
 
         // Report max-product MAP joint state
-        cout << "Approximate (max-product) MAP state (log probability = " << evalState( fg, mpstate ) << "):" << endl;
+        cout << "Approximate (max-product) MAP state (log score = " << fg.logScore( mpstate ) << "):" << endl;
         for( size_t i = 0; i < mpstate.size(); i++ )
             cout << fg.var(i) << ": " << mpstate[i] << endl;
 
         // Report DecMAP joint state
-        cout << "Approximate DecMAP state (log probability = " << evalState( fg, decmapstate ) << "):" << endl;
+        cout << "Approximate DecMAP state (log score = " << fg.logScore( decmapstate ) << "):" << endl;
         for( size_t i = 0; i < decmapstate.size(); i++ )
             cout << fg.var(i) << ": " << decmapstate[i] << endl;
     }
