@@ -56,12 +56,21 @@ void RegionGraph::construct( const FactorGraph &fg, const std::vector<VarSet> &o
 }
 
 
-void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet> &cl ) {
+void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet> &cl, size_t verbose ) {
+    if( verbose )
+        cerr << "constructCVM called (" << fg.nrVars() << " vars, " << fg.nrFactors() << " facs, " << cl.size() << " clusters)" << endl;
+
     // Retain only maximal clusters
+    if( verbose )
+        cerr << "  Constructing ClusterGraph" << endl;
     ClusterGraph cg( cl );
+    if( verbose )
+        cerr << "  Erasing non-maximal clusters" << endl;
     cg.eraseNonMaximal();
 
     // Create inner regions - first pass
+    if( verbose )
+        cerr << "  Creating inner regions (first pass)" << endl;
     set<VarSet> betas;
     for( size_t alpha = 0; alpha < cg.nrClusters(); alpha++ )
         for( size_t alpha2 = alpha; (++alpha2) != cg.nrClusters(); ) {
@@ -71,6 +80,8 @@ void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet>
         }
 
     // Create inner regions - subsequent passes
+    if( verbose )
+        cerr << "  Creating inner regions (next passes)" << endl;
     set<VarSet> new_betas;
     do {
         new_betas.clear();
@@ -84,12 +95,16 @@ void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet>
     } while( new_betas.size() );
 
     // Create inner regions - final phase
+    if( verbose )
+        cerr << "  Creating inner regions (final phase)" << endl;
     vector<Region> irs;
     irs.reserve( betas.size() );
     for( set<VarSet>::const_iterator beta = betas.begin(); beta != betas.end(); beta++ )
         irs.push_back( Region(*beta,0.0) );
 
     // Create edges
+    if( verbose )
+        cerr << "  Creating edges" << endl;
     vector<pair<size_t,size_t> > edges;
     for( size_t beta = 0; beta < irs.size(); beta++ )
         for( size_t alpha = 0; alpha < cg.nrClusters(); alpha++ )
@@ -97,10 +112,17 @@ void RegionGraph::constructCVM( const FactorGraph &fg, const std::vector<VarSet>
                 edges.push_back( pair<size_t,size_t>(alpha,beta) );
 
     // Construct region graph
+    if( verbose )
+        cerr << "  Constructing region graph" << endl;
     construct( fg, cg.clusters(), irs, edges );
 
     // Calculate counting numbers
+    if( verbose )
+        cerr << "  Calculating counting numbers" << endl;
     calcCVMCountingNumbers();
+    
+    if( verbose )
+        cerr << "Done." << endl;
 }
 
 

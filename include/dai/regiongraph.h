@@ -260,7 +260,7 @@ class RegionGraph : public FactorGraph {
         void construct( const FactorGraph& fg, const std::vector<VarSet>& ors, const std::vector<Region>& irs, const std::vector<std::pair<size_t,size_t> >& edges );
 
         /// Helper function for constructors (CVM style)
-        void constructCVM( const FactorGraph& fg, const std::vector<VarSet>& cl );
+        void constructCVM( const FactorGraph& fg, const std::vector<VarSet>& cl, size_t verbose=0 );
 
         /// Recompute all outer regions
         /** The factor contents of each outer region is set to the product of the factors belonging to that region.

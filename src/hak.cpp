@@ -45,15 +45,21 @@ TFactor<T>& makeZero( TFactor<T> &f, T epsilon ) {
 
 void HAK::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
-    DAI_ASSERT( opts.hasKey("maxiter") );
     DAI_ASSERT( opts.hasKey("doubleloop") );
     DAI_ASSERT( opts.hasKey("clusters") );
 
     props.tol = opts.getStringAs<Real>("tol");
-    props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.doubleloop = opts.getStringAs<bool>("doubleloop");
     props.clusters = opts.getStringAs<Properties::ClustersType>("clusters");
 
+    if( opts.hasKey("maxiter") )
+        props.maxiter = opts.getStringAs<size_t>("maxiter");
+    else
+        props.maxiter = 10000;
+    if( opts.hasKey("maxtime") )
+        props.maxtime = opts.getStringAs<Real>("maxtime");
+    else
+        props.maxtime = INFINITY;
     if( opts.hasKey("verbose") )
         props.verbose = opts.getStringAs<size_t>("verbose");
     else
@@ -77,6 +83,7 @@ PropertySet HAK::getProperties() const {
     PropertySet opts;
     opts.set( "tol", props.tol );
     opts.set( "maxiter", props.maxiter );
+    opts.set( "maxtime", props.maxtime );
     opts.set( "verbose", props.verbose );
     opts.set( "doubleloop", props.doubleloop );
     opts.set( "clusters", props.clusters );
@@ -92,6 +99,7 @@ string HAK::printProperties() const {
     s << "[";
     s << "tol=" << props.tol << ",";
     s << "maxiter=" << props.maxiter << ",";
+    s << "maxtime=" << props.maxtime << ",";
     s << "verbose=" << props.verbose << ",";
     s << "doubleloop=" << props.doubleloop << ",";
     s << "clusters=" << props.clusters << ",";
@@ -175,11 +183,15 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
     } else if( props.clusters == Properties::ClustersType::LOOP ) {
         cl = fg.maximalFactorDomains();
         set<VarSet> scl;
+        if( props.verbose >= 2 )
+            cerr << "Searching loops...";
         for( size_t i0 = 0; i0 < fg.nrVars(); i0++ ) {
             VarSet i0d = fg.delta(i0);
             if( props.loopdepth > 1 )
                 findLoopClusters( fg, scl, fg.var(i0), fg.var(i0), props.loopdepth - 1, fg.delta(i0) );
         }
+        if( props.verbose >= 2 )
+            cerr << "done" << endl;
         for( set<VarSet>::const_iterator c = scl.begin(); c != scl.end(); c++ )
             cl.push_back(*c);
         if( props.verbose >= 3 ) {
@@ -497,7 +509,7 @@ Real HAK::doDoubleLoop() {
     size_t outer_iter = 0;
     size_t total_iter = 0;
     Real maxDiff = INFINITY;
-    for( outer_iter = 0; outer_iter < outer_maxiter && maxDiff > outer_tol; outer_iter++ ) {
+    for( outer_iter = 0; outer_iter < outer_maxiter && maxDiff > outer_tol && (toc() - tic) < props.maxtime; outer_iter++ ) {
         // Calculate new outer regions
         for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
             OR(alpha) = org_ORs[alpha];
@@ -548,7 +560,7 @@ Real HAK::doDoubleLoop() {
         if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-                cerr << Name << "::doDoubleLoop:  WARNING: not converged within " << outer_maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
+                cerr << Name << "::doDoubleLoop:  WARNING: not converged after " << total_iter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
             } else {
                 if( props.verbose >= 3 )
                     cerr << Name << "::doDoubleLoop:  ";

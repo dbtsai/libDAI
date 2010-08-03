@@ -1,5 +1,6 @@
 git HEAD
 --------
+* Improved HAK (added 'maxtime' property)
 * Improved TreeEP (added 'maxtime' property)
 * Added FactorGraph::logScore( const std::vector<size_t>& statevec )
 * Improved Gibbs
