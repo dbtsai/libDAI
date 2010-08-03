@@ -28,12 +28,18 @@ const char *TreeEP::Name = "TREEEP";
 
 void TreeEP::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
-    DAI_ASSERT( opts.hasKey("maxiter") );
     DAI_ASSERT( opts.hasKey("type") );
 
     props.tol = opts.getStringAs<Real>("tol");
-    props.maxiter = opts.getStringAs<size_t>("maxiter");
     props.type = opts.getStringAs<Properties::TypeType>("type");
+    if( opts.hasKey("maxiter") )
+        props.maxiter = opts.getStringAs<size_t>("maxiter");
+    else
+        props.maxiter = 10000;
+    if( opts.hasKey("maxtime") )
+        props.maxtime = opts.getStringAs<Real>("maxtime");
+    else
+        props.maxtime = INFINITY;
     if( opts.hasKey("verbose") )
         props.verbose = opts.getStringAs<size_t>("verbose");
     else
@@ -45,6 +51,7 @@ PropertySet TreeEP::getProperties() const {
     PropertySet opts;
     opts.set( "tol", props.tol );
     opts.set( "maxiter", props.maxiter );
+    opts.set( "maxtime", props.maxtime );
     opts.set( "verbose", props.verbose );
     opts.set( "type", props.type );
     return opts;
@@ -56,6 +63,7 @@ string TreeEP::printProperties() const {
     s << "[";
     s << "tol=" << props.tol << ",";
     s << "maxiter=" << props.maxiter << ",";
+    s << "maxtime=" << props.maxtime << ",";
     s << "verbose=" << props.verbose << ",";
     s << "type=" << props.type << "]";
     return s.str();
@@ -199,7 +207,7 @@ Real TreeEP::run() {
     // do several passes over the network until maximum number of iterations has
     // been reached or until the maximum belief difference is smaller than tolerance
     Real maxDiff = INFINITY;
-    for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
+    for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol && (toc() - tic) < props.maxtime; _iters++ ) {
         for( size_t I = 0; I < nrFactors(); I++ )
             if( offtree(I) ) {
                 _Q[I].InvertAndMultiply( Qa, Qb );
@@ -225,7 +233,7 @@ Real TreeEP::run() {
         if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-            cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
+            cerr << Name << "::run:  WARNING: not converged after " << _iters << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 3 )
                 cerr << Name << "::run:  ";

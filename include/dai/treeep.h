@@ -61,6 +61,9 @@ class TreeEP : public JTree {
             /// Maximum number of iterations
             size_t maxiter;
 
+            /// Maximum time (in seconds)
+            double maxtime;
+
             /// Tolerance for convergence test
             Real tol;
 
