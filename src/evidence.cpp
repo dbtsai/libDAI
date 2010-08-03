@@ -71,7 +71,7 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
             if( fields[i].size() > 0 ) { // skip if missing observation
                 if( fields[i].find_first_not_of("0123456789") != std::string::npos )
                     DAI_THROWE(INVALID_EVIDENCE_FILE,"Invalid state " + fields[i] + " in line " + boost::lexical_cast<std::string>(line_number));
-                size_t state = atoi( fields[i].c_str() );
+                size_t state = fromString<size_t>( fields[i].c_str() );
                 if( state >= vars[i].states() )
                     DAI_THROWE(INVALID_EVIDENCE_FILE,"State " + fields[i] + " too large in line " + boost::lexical_cast<std::string>(line_number));
                 sample[vars[i]] = state;

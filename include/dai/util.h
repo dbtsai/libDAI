@@ -145,10 +145,17 @@ inline int rnd( int n ) {
 }
 
 
-/// Converts a variable of type \a T to a \c std::string by using a \c std::stringstream
+/// Converts a variable of type \a T to a \c std::string by using a \c boost::lexical_cast
 template<class T>
 std::string toString( const T& x ) {
     return boost::lexical_cast<std::string>(x);
+}
+
+
+/// Converts a variable of type std::string to \a T by using a \c boost::lexical_cast
+template<class T>
+T fromString( const std::string& x ) {
+    return boost::lexical_cast<T>(x);
 }
 
 

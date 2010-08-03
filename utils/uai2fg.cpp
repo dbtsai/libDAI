@@ -190,9 +190,9 @@ int main( int argc, char *argv[] ) {
         cout << "If run_jtree!=0, runs a junction tree and reports the results in the UAI 2008 results file format." << endl;
         return 1;
     } else {
-        long verbose = atoi( argv[6] );
-        long type = atoi( argv[4] );
-        bool run_jtree = atoi( argv[5] );
+        long verbose = fromString<long>( argv[6] );
+        long type = fromString<long>( argv[4] );
+        bool run_jtree = fromString<bool>( argv[5] );
 
         // read factor graph
         vector<Var> vars;

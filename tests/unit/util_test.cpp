@@ -130,6 +130,25 @@ BOOST_AUTO_TEST_CASE( concatTest ) {
 }
 
 
+BOOST_AUTO_TEST_CASE( stringTest ) {
+    int a = 5;
+    BOOST_CHECK_EQUAL( toString( a ), std::string("5") );
+    BOOST_CHECK_EQUAL( fromString<int>( "5" ), a );
+    
+    bool b = true;
+    BOOST_CHECK_EQUAL( toString( b ), std::string("1") );
+    BOOST_CHECK_EQUAL( fromString<bool>( "1" ), b );
+
+    double c = -3.5;
+    BOOST_CHECK_EQUAL( toString( c ), std::string("-3.5") );
+    BOOST_CHECK_EQUAL( fromString<double>( "-3.5" ), c );
+
+    unsigned char d = 'e';
+    BOOST_CHECK_EQUAL( toString( d ), std::string("e") );
+    BOOST_CHECK_EQUAL( fromString<unsigned char>( "e" ), d );
+}
+
+
 BOOST_AUTO_TEST_CASE( tokenizeStringTest ) {
     std::string s("Hello\tworld.\nThis is it.");
     std::vector<std::string> words;

@@ -83,7 +83,7 @@ int main( int argc, char *argv[] ) {
         // Read factorgraph
         FactorGraph fg;
         char *infile = argv[1];
-        int calc_tw = atoi(argv[2]);
+        size_t maxstates = fromString<size_t>( argv[2] );
         fg.ReadFromFile( infile );
 
         // Output various statistics
