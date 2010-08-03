@@ -114,6 +114,9 @@ class BP : public DAIAlgFG {
             /// Maximum number of iterations
             size_t maxiter;
 
+            /// Maximum time (in seconds)
+            double maxtime;
+
             /// Tolerance for convergence test
             Real tol;
 
@@ -135,6 +138,15 @@ class BP : public DAIAlgFG {
 
         /// Specifies whether the history of message updates should be recorded
         bool recordSentMessages;
+
+        /// Stores variable beliefs of previous iteration
+        std::vector<Factor> oldBeliefsV;
+
+        /// Stores factor beliefs of previous iteration
+        std::vector<Factor> oldBeliefsF;
+
+        /// Stores the update schedule
+        std::vector<Edge> updateSeq;
 
     public:
     /// \name Constructors/destructors

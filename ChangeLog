@@ -1,5 +1,6 @@
 git HEAD
 --------
+* Improved BP (added 'maxtime' property)
 * Added fromString<>( const std::string& x )
 * Added SmallSet::erase( const T& t )
 * Added DECMAP algorithm.
