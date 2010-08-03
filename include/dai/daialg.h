@@ -111,15 +111,21 @@ class InfAlg {
          */
         virtual Real logZ() const = 0;
 
+        /// Calculates the joint state of all variables that has maximum probability
+        /** \note Before this method is called, run() should have been called.
+         *  \throw NOT_IMPLEMENTED if not implemented/supported
+         */
+        virtual std::vector<std::size_t> findMaximum() const { DAI_THROW(NOT_IMPLEMENTED); }
+
         /// Returns maximum difference between single variable beliefs in the last iteration.
         /** \throw NOT_IMPLEMENTED if not implemented/supported
          */
-        virtual Real maxDiff() const = 0;
+        virtual Real maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); };
 
         /// Returns number of iterations done (one iteration passes over the complete factorgraph).
         /** \throw NOT_IMPLEMENTED if not implemented/supported
          */
-        virtual size_t Iterations() const = 0;
+        virtual size_t Iterations() const { DAI_THROW(NOT_IMPLEMENTED); };
     //@}
 
     /// \name Changing the factor graph

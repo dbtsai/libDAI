@@ -77,7 +77,8 @@
  *  - Various variants of Loop Corrected Belief Propagation
  *    [\ref MoK07, \ref MoR05];
  *  - Gibbs sampler;
- *  - Conditioned Belief Propagation [\ref EaG09].
+ *  - Conditioned Belief Propagation [\ref EaG09];
+ *  - Decimation algorithm.
  *
  *  These inference methods can be used to calculate partition sums, marginals
  *  over subsets of variables, and MAP states (the joint state of variables that
@@ -479,9 +480,10 @@
  *  - Loop Corrected Belief Propagation: dai::MR [\ref MoR05] and dai::LC [\ref MoK07]
  *  - Gibbs sampling: dai::Gibbs
  *  - Conditioned Belief Propagation: dai::CBP [\ref EaG09]
+ *  - Decimation algorithm: dai::DECMAP
  *
  *  Not all inference tasks are implemented by each method: calculating MAP states
- *  is only possible with dai::JTree and dai::BP, calculating partition sums is
+ *  is only possible with dai::JTree, dai::BP and dai::DECMAP; calculating partition sums is
  *  not possible with dai::MR, dai::LC and dai::Gibbs.
  *
  *  \section terminology-learning Parameter learning

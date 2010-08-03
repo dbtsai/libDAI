@@ -1,5 +1,7 @@
 git HEAD
 --------
+* Added DECMAP algorithm.
+* Added createFactorDelta( const VarSet& vs, size_t state )
 * [Peter Rockett] Improved Makefiles for image segmentation example.
 * Removed deprecated interfaces.
 * Added FactorGraph::isMaximal(size_t) and FactorGraph::maximalFactor(size_t).

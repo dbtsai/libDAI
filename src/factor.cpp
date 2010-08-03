@@ -63,4 +63,12 @@ Factor createFactorDelta( const Var &v, size_t state ) {
 }
 
 
+Factor createFactorDelta( const VarSet& vs, size_t state ) {
+    Factor fac( vs, 0.0 );
+    DAI_ASSERT( state < vs.nrStates() );
+    fac.set( state, 1.0 );
+    return fac;
+}
+
+
 } // end of namespace dai

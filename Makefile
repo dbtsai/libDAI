@@ -89,6 +89,10 @@ ifdef WITH_CBP
   WITHFLAGS:=$(WITHFLAGS) -DDAI_WITH_CBP
   NAMES:=$(NAMES) bbp cbp bp_dual
 endif
+ifdef WITH_DECMAP
+  WITHFLAGS:=$(WITHFLAGS) -DDAI_WITH_DECMAP
+  NAMES:=$(NAMES) decmap
+endif
 
 # Define standard libDAI header dependencies, source file names and object file names
 HEADERS=$(foreach name,graph dag bipgraph index var factor varset smallset prob daialg properties alldai enum exceptions util,$(INC)/$(name).h)
@@ -173,6 +177,9 @@ treeep$(OE) : $(SRC)/treeep.cpp $(INC)/treeep.h $(HEADERS) $(INC)/weightedgraph.
 	$(CC) -c $<
 
 emalg$(OE) : $(SRC)/emalg.cpp $(INC)/emalg.h $(INC)/evidence.h $(HEADERS)
+	$(CC) -c $<
+
+decmap$(OE) : $(SRC)/decmap.cpp $(INC)/decmap.h $(HEADERS)
 	$(CC) -c $<
 
 

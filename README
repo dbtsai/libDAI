@@ -87,7 +87,8 @@ Currently, libDAI supports the following (approximate) inference methods:
   * Double-loop GBP [HAK03];
   * Various variants of Loop Corrected Belief Propagation [MoK07, MoR05];
   * Gibbs sampler;
-  * Conditioned Belief Propagation [EaG09].
+  * Conditioned Belief Propagation [EaG09];
+  * Decimation algorithm.
 
 These inference methods can be used to calculate partition sums, marginals over
 subsets of variables, and MAP states (the joint state of variables that has

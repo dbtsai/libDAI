@@ -82,7 +82,7 @@ int main( int argc, char *argv[] ) {
         // using the parameters specified by opts and two additional properties,
         // specifying the type of updates the BP algorithm should perform and
         // whether they should be done in the real or in the logdomain
-        BP bp(fg, opts("updates",string("SEQFIX"))("logdomain",false));
+        BP bp(fg, opts("updates",string("SEQRND"))("logdomain",false));
         // Initialize belief propagation algorithm
         bp.init();
         // Run belief propagation algorithm
@@ -95,7 +95,7 @@ int main( int argc, char *argv[] ) {
         //
         // Note that inference is set to MAXPROD, which means that the object
         // will perform the max-product algorithm instead of the sum-product algorithm
-        BP mp(fg, opts("updates",string("SEQFIX"))("logdomain",false)("inference",string("MAXPROD")));
+        BP mp(fg, opts("updates",string("SEQRND"))("logdomain",false)("inference",string("MAXPROD"))("damping",string("0.1")));
         // Initialize max-product algorithm
         mp.init();
         // Run max-product algorithm
@@ -103,6 +103,15 @@ int main( int argc, char *argv[] ) {
         // Calculate joint state of all variables that has maximum probability
         // based on the max-product result
         vector<size_t> mpstate = mp.findMaximum();
+
+        // Construct a decimation algorithm object from the FactorGraph fg
+        // using the parameters specified by opts and three additional properties,
+        // specifying that the decimation algorithm should use the max-product
+        // algorithm and should completely reinitalize its state at every step
+        DecMAP decmap(fg, opts("reinit",true)("ianame",string("BP"))("iaopts",string("[damping=0.1,inference=MAXPROD,logdomain=0,maxiter=1000,tol=1e-9,updates=SEQRND,verbose=1]")) );
+        decmap.init();
+        decmap.run();
+        vector<size_t> decmapstate = decmap.findMaximum();
 
         // Report variable marginals for fg, calculated by the junction tree algorithm
         cout << "Exact variable marginals:" << endl;
@@ -159,6 +168,11 @@ int main( int argc, char *argv[] ) {
         cout << "Approximate (max-product) MAP state (log probability = " << evalState( fg, mpstate ) << "):" << endl;
         for( size_t i = 0; i < mpstate.size(); i++ )
             cout << fg.var(i) << ": " << mpstate[i] << endl;
+
+        // Report DecMAP joint state
+        cout << "Approximate DecMAP state (log probability = " << evalState( fg, decmapstate ) << "):" << endl;
+        for( size_t i = 0; i < decmapstate.size(); i++ )
+            cout << fg.var(i) << ": " << decmapstate[i] << endl;
     }
 
     return 0;

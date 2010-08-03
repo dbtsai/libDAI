@@ -61,6 +61,9 @@
 #ifdef DAI_WITH_CBP
     #include <dai/cbp.h>
 #endif
+#ifdef DAI_WITH_DECMAP
+    #include <dai/decmap.h>
+#endif
 
 
 /// Namespace for libDAI
@@ -151,6 +154,9 @@ static const char* DAINames[] = {
 #endif
 #ifdef DAI_WITH_CBP
     CBP::Name,
+#endif
+#ifdef DAI_WITH_DECMAP
+    DecMAP::Name,
 #endif
     ""
 };

@@ -669,6 +669,13 @@ Factor createFactorPotts( const Var &x1, const Var &x2, Real J );
 Factor createFactorDelta( const Var &v, size_t state );
 
 
+/// Returns a Kronecker delta point mass
+/** \param vs Set of variables
+ *  \param state The state of \a vs that should get value 1
+ */
+Factor createFactorDelta( const VarSet& vs, size_t state );
+
+
 } // end of namespace dai
 
 

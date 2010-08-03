@@ -69,6 +69,10 @@ InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const Propert
     if( name == CBP::Name )
         return new CBP (fg, opts);
 #endif
+#ifdef DAI_WITH_DECMAP
+    if( name == DecMAP::Name )
+        return new DecMAP (fg, opts);
+#endif
     DAI_THROWE(UNKNOWN_DAI_ALGORITHM,"Unknown libDAI algorithm: " + name);
 }
 
