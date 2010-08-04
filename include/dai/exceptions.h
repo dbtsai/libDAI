@@ -98,6 +98,7 @@ class Exception : public std::runtime_error {
                    FACTORGRAPH_NOT_CONNECTED,
                    INTERNAL_ERROR,
                    RUNTIME_ERROR,
+                   OUT_OF_MEMORY,
                    NUM_ERRORS};  // NUM_ERRORS should be the last entry
 
         /// Constructor

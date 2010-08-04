@@ -39,6 +39,10 @@ void JTree::setProperties( const PropertySet &opts ) {
         props.heuristic = opts.getStringAs<Properties::HeuristicType>("heuristic");
     else
         props.heuristic = Properties::HeuristicType::MINFILL;
+    if( opts.hasKey("maxmem") )
+        props.maxmem = opts.getStringAs<size_t>("maxmem");
+    else
+        props.maxmem = 0;
 }
 
 
@@ -48,6 +52,7 @@ PropertySet JTree::getProperties() const {
     opts.set( "updates", props.updates );
     opts.set( "inference", props.inference );
     opts.set( "heuristic", props.heuristic );
+    opts.set( "maxmem", props.maxmem );
     return opts;
 }
 
@@ -58,7 +63,8 @@ string JTree::printProperties() const {
     s << "verbose=" << props.verbose << ",";
     s << "updates=" << props.updates << ",";
     s << "heuristic=" << props.heuristic << ",";
-    s << "inference=" << props.inference << "]";
+    s << "inference=" << props.inference << ",";
+    s << "maxmem=" << props.maxmem << "]";
     return s.str();
 }
 
@@ -67,20 +73,10 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
     setProperties( opts );
 
     if( automatic ) {
-        // Create ClusterGraph which contains factors as clusters
-        vector<VarSet> cl;
-        cl.reserve( fg.nrFactors() );
-        for( size_t I = 0; I < fg.nrFactors(); I++ )
-            cl.push_back( fg.factor(I).vars() );
-        ClusterGraph _cg( cl );
-
+        // Create ClusterGraph which contains maximal factors as clusters
+        ClusterGraph _cg( fg, true );
         if( props.verbose >= 3 )
             cerr << "Initial clusters: " << _cg << endl;
-
-        // Retain only maximal clusters
-        _cg.eraseNonMaximal();
-        if( props.verbose >= 3 )
-            cerr << "Maximal clusters: " << _cg << endl;
 
         // Use heuristic to guess optimal elimination sequence
         greedyVariableElimination::eliminationCostFunction ec(NULL);
@@ -100,9 +96,22 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
             default:
                 DAI_THROW(UNKNOWN_ENUM_VALUE);
         }
-        vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( ec ) ).eraseNonMaximal().clusters();
+        size_t fudge = 6; // this yields a rough estimate of the memory needed (for some reason not yet clearly understood)
+        vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( ec ), props.maxmem / (sizeof(Real) * fudge) ).eraseNonMaximal().clusters();
         if( props.verbose >= 3 )
             cerr << "VarElim result: " << ElimVec << endl;
+
+        // Estimate memory needed (rough upper bound)
+        long double memneeded = 0;
+        foreach( const VarSet& cl, ElimVec )
+            memneeded += cl.nrStates();
+        memneeded *= sizeof(Real) * fudge;
+        if( props.verbose >= 1 ) {
+            cerr << "Estimate of needed memory: " << memneeded / 1024 << "kB" << endl;
+            cerr << "Maximum memory: " << props.maxmem / 1024 << "kB" << endl;
+        }
+        if( props.maxmem && memneeded > props.maxmem )
+            DAI_THROW(OUT_OF_MEMORY);
 
         // Generate the junction tree corresponding to the elimination sequence
         GenerateJT( fg, ElimVec );
@@ -553,18 +562,12 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
 }
 
 
-std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn ) {
-    ClusterGraph _cg;
-
-    // Copy factors
-    for( size_t I = 0; I < fg.nrFactors(); I++ )
-        _cg.insert( fg.factor(I).vars() );
-
-    // Retain only maximal clusters
-    _cg.eraseNonMaximal();
+std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates ) {
+    // Create cluster graph from factor graph
+    ClusterGraph _cg( fg, true );
 
     // Obtain elimination sequence
-    vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( fn ) ).eraseNonMaximal().clusters();
+    vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( fn ), maxStates ).eraseNonMaximal().clusters();
 
     // Calculate treewidth
     size_t treewidth = 0;

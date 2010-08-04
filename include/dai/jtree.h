@@ -98,6 +98,9 @@ class JTree : public DAIAlgRG {
 
             /// Heuristic to use for constructing the junction tree
             HeuristicType heuristic;
+
+            /// Maximum memory to use in bytes (0 means unlimited)
+            size_t maxmem;
         } props;
 
         /// Name of this inference algorithm
@@ -200,9 +203,11 @@ class JTree : public DAIAlgRG {
 
 /// Calculates upper bound to the treewidth of a FactorGraph, using the specified heuristic
 /** \relates JTree
+ *  \param maxStates maximum total number of states in outer regions of junction tree (0 means no limit)
+ *  \throws OUT_OF_MEMORY if the total number of states becomes larger than maxStates
  *  \return a pair (number of variables in largest clique, number of states in largest clique)
  */
-std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn );
+std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates=0 );
 
 
 } // end of namespace dai

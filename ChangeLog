@@ -1,5 +1,13 @@
 git HEAD
 --------
+* Improved ClusterGraph
+  - added ClusterGraph(const FactorGraph& fg, bool onlyMaximal) constructor
+  - findVar( const Var& n ) no longer throws an exception if the variable is
+    not found
+  - added findCluster( const VarSet& cl )
+  - added elimVar( size_t i )
+  - added 'maxStates' argument to VarElim( EliminationChoice f, size_t maxStates=0 )
+* Improved JTree (added 'maxmem' property)
 * Improved HAK (added 'maxtime' property)
 * Improved TreeEP (added 'maxtime' property)
 * Added FactorGraph::logScore( const std::vector<size_t>& statevec )

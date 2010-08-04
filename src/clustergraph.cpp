@@ -45,6 +45,22 @@ ClusterGraph::ClusterGraph( const std::vector<VarSet> & cls ) : _G(), _vars(), _
 }
 
 
+ClusterGraph::ClusterGraph( const FactorGraph& fg, bool onlyMaximal ) : _G( fg.bipGraph() ), _vars(), _clusters() {
+    // copy variables
+    _vars.reserve( fg.nrVars() );
+    for( size_t i = 0; i < fg.nrVars(); i++ )
+        _vars.push_back( fg.var(i) );
+
+    // copy clusters
+    _clusters.reserve( fg.nrFactors() );
+    for( size_t I = 0; I < fg.nrFactors(); I++ )
+        _clusters.push_back( fg.factor(I).vars() );
+
+    if( onlyMaximal )
+        eraseNonMaximal();
+}
+
+
 size_t sequentialVariableElimination::operator()( const ClusterGraph &cl, const std::set<size_t> &/*remainingVars*/ ) {
     return cl.findVar( seq.at(i++) );
 }

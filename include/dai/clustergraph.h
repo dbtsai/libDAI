@@ -23,6 +23,7 @@
 #include <vector>
 #include <dai/varset.h>
 #include <dai/bipgraph.h>
+#include <dai/factorgraph.h>
 
 
 namespace dai {
@@ -31,6 +32,7 @@ namespace dai {
     /// A ClusterGraph is a hypergraph with variables as nodes, and "clusters" (sets of variables) as hyperedges.
     /** It is implemented as a bipartite graph with variable (Var) nodes and cluster (VarSet) nodes.
      *  One may think of a ClusterGraph as a FactorGraph without the actual factor values.
+     *  \todo Remove the _vars and _clusters variables and use only the graph and a contextual factor graph.
      */
     class ClusterGraph {
         public:
@@ -58,6 +60,12 @@ namespace dai {
 
             /// Construct from vector of VarSet 's
             ClusterGraph( const std::vector<VarSet>& cls );
+
+            /// Construct from a factor graph
+            /** Creates cluster graph which has factors in \a fg as clusters if \a onlyMaximal == \c false,
+             *  and only the maximal factors in \a fg if \a onlyMaximal == \c true.
+             */
+            ClusterGraph( const FactorGraph& fg, bool onlyMaximal );
         //@}
 
         /// \name Queries
@@ -90,19 +98,34 @@ namespace dai {
             }
 
             /// Returns the index of variable \a n
-            /** \throw OBJECT_NOT_FOUND if the variable does not occur in the cluster graph
-             */
             size_t findVar( const Var& n ) const {
-                size_t r = find( _vars.begin(), _vars.end(), n ) - _vars.begin();
-                if( r == _vars.size() )
-                    DAI_THROW(OBJECT_NOT_FOUND);
-                return r;
+                return find( _vars.begin(), _vars.end(), n ) - _vars.begin();
             }
+
+            /// Returns the index of a cluster \a cl
+            size_t findCluster( const VarSet& cl ) const {
+                return find( _clusters.begin(), _clusters.end(), cl ) - _clusters.begin();
+            }
+
+/*            /// Returns the index of a cluster \a _cl
+            size_t findCluster( const SmallSet<size_t>& _cl ) const {
+                if( _cl.size() == 0 ) {
+                    for( size_t I = 0; I < nrClusters(); I++ )
+                        if( cluster(I).size() == 0 )
+                            return I;
+                } else {
+                    size_t i = _cl.front();
+                    foreach( const Neighbor& I, _G.nb1(i) )
+                        if( _G.nb2Set(I) == _cl )
+                            return I;
+                }
+                return nrClusters();
+            }*/
 
             /// Returns union of clusters that contain the \a i 'th variable
             VarSet Delta( size_t i ) const {
                 VarSet result;
-                foreach( const Neighbor &I, _G.nb1(i) )
+                foreach( const Neighbor& I, _G.nb1(i) )
                     result |= _clusters[I];
                 return result;
             }
@@ -117,7 +140,7 @@ namespace dai {
                 if( i1 == i2 )
                     return false;
                 bool result = false;
-                foreach( const Neighbor &I, _G.nb1(i1) )
+                foreach( const Neighbor& I, _G.nb1(i1) )
                     if( find( _G.nb2(I).begin(), _G.nb2(I).end(), i2 ) != _G.nb2(I).end() ) {
                         result = true;
                         break;
@@ -131,8 +154,8 @@ namespace dai {
                 const VarSet & clI = _clusters[I];
                 bool maximal = true;
                 // The following may not be optimal, since it may repeatedly test the same cluster *J
-                foreach( const Neighbor &i, _G.nb2(I) ) {
-                    foreach( const Neighbor &J, _G.nb1(i) )
+                foreach( const Neighbor& i, _G.nb2(I) ) {
+                    foreach( const Neighbor& J, _G.nb1(i) )
                         if( (J != I) && (clI << _clusters[J]) ) {
                             maximal = false;
                             break;
@@ -146,14 +169,18 @@ namespace dai {
 
         /// \name Operations
         //@{
-            /// Inserts a cluster (if it does not already exist)
-            void insert( const VarSet& cl ) {
-                if( find( _clusters.begin(), _clusters.end(), cl ) == _clusters.end() ) {
+            /// Inserts a cluster (if it does not already exist) and creates new variables, if necessary
+            /** \note This function could be better optimized if the index of one variable in \a cl would be known.
+             *        If one could assume _vars to be ordered, a binary search could be used instead of a linear one.
+             */
+            size_t insert( const VarSet& cl ) {
+                size_t index = findCluster( cl );  // OPTIMIZE ME
+                if( index == _clusters.size() ) {
                     _clusters.push_back( cl );
                     // add variables (if necessary) and calculate neighborhood of new cluster
                     std::vector<size_t> nbs;
                     for( VarSet::const_iterator n = cl.begin(); n != cl.end(); n++ ) {
-                        size_t iter = find( _vars.begin(), _vars.end(), *n ) - _vars.begin();
+                        size_t iter = findVar( *n );  // OPTIMIZE ME
                         nbs.push_back( iter );
                         if( iter == _vars.size() ) {
                             _G.addNode1();
@@ -162,7 +189,21 @@ namespace dai {
                     }
                     _G.addNode2( nbs.begin(), nbs.end(), nbs.size() );
                 }
+                return index;
             }
+
+/*            /// Inserts a cluster (if it does not already exist), assuming no new variables have to be created
+            size_t insert( const SmallSet<size_t>& _cl ) {
+                size_t index = findCluster( _cl );
+                if( index == _clusters.size() ) {
+                    VarSet cl;
+                    foreach( size_t i, _cl )
+                        cl |= var(i);
+                    _clusters.push_back( cl );
+                    _G.addNode2( _cl.begin(), _cl.end(), _cl.size() );
+                }
+                return index;
+            }*/
 
             /// Erases all clusters that are not maximal
             ClusterGraph& eraseNonMaximal() {
@@ -178,11 +219,62 @@ namespace dai {
 
             /// Erases all clusters that contain the \a i 'th variable
             ClusterGraph& eraseSubsuming( size_t i ) {
+                DAI_ASSERT( i < nrVars() );
                 while( _G.nb1(i).size() ) {
                     _clusters.erase( _clusters.begin() + _G.nb1(i)[0] );
                     _G.eraseNode2( _G.nb1(i)[0] );
                 }
                 return *this;
+            }
+
+            /// Eliminates variable with index \a i, without deleting the variable itself
+            /** \note This function can be better optimized
+             */
+            VarSet elimVar( size_t i ) {
+                DAI_ASSERT( i < nrVars() );
+                VarSet Di = Delta( i );
+
+//                if( 1 ) { // unoptimized, transparent code
+                    VarSet di = delta( i );
+                    insert( di );
+                    eraseSubsuming( i );
+                    eraseNonMaximal();
+/*                } else { // partially optimized code
+                    SmallSet<size_t> nbI = _G.delta1( i, false );
+                    size_t I = insert( nbI );
+
+                    while( _G.nb1(i).size() ) {
+                        size_t J = _G.nb1(i,0);
+                        _clusters.erase( _clusters.begin() + J );
+                        _G.eraseNode2( J );
+                        if( I > J )
+                            I--;
+                    }
+
+                    bool di_maximal = true;
+                    foreach( size_t j, nbI ) {
+                        for( size_t _J = 0; _J < _G.nb1(j).size(); ) {
+                            size_t J = _G.nb1(j,_J);
+                            SmallSet<size_t> indJ = _G.nb2Set( J );
+                            if( indJ << nbI && indJ.size() != nbI.size() ) {
+                                _clusters.erase( _clusters.begin() + J );
+                                _G.eraseNode2( J );
+                                if( I > J )
+                                    I--;
+                            } else {
+                                if( di_maximal && indJ >> nbI && indJ.size() != nbI.size() )
+                                    di_maximal = false;
+                                _J++;
+                            }
+                        }
+                    }
+                    if( !di_maximal ) {
+                        _clusters.erase( _clusters.begin() + I );
+                        _G.eraseNode2( I );
+                    }
+                }*/
+
+                return Di;
             }
         //@}
 
@@ -200,10 +292,12 @@ namespace dai {
             /// Performs Variable Elimination, keeping track of the interactions that are created along the way.
             /** \tparam EliminationChoice should support "size_t operator()( const ClusterGraph &cl, const std::set<size_t> &remainingVars )"
              *  \param f function object which returns the next variable index to eliminate; for example, a dai::greedyVariableElimination object.
+             *  \param maxStates maximum total number of states of all clusters in the output cluster graph (0 means no limit).
+             *  \throws OUT_OF_MEMORY if total number of states becomes larger than maxStates
              *  \return A set of elimination "cliques".
              */
             template<class EliminationChoice>
-            ClusterGraph VarElim( EliminationChoice f ) const {
+            ClusterGraph VarElim( EliminationChoice f, size_t maxStates=0 ) const {
                 // Make a copy
                 ClusterGraph cl(*this);
                 cl.eraseNonMaximal();
@@ -216,13 +310,16 @@ namespace dai {
                     varindices.insert( i );
 
                 // Do variable elimination
+                size_t totalStates = 0;
                 while( !varindices.empty() ) {
                     size_t i = f( cl, varindices );
-                    DAI_ASSERT( i < _vars.size() );
-                    result.insert( cl.Delta( i ) );
-                    cl.insert( cl.delta( i ) );
-                    cl.eraseSubsuming( i );
-                    cl.eraseNonMaximal();
+                    VarSet Di = cl.elimVar( i );
+                    result.insert( Di );
+                    if( maxStates ) {
+                        totalStates += Di.nrStates();
+                        if( totalStates > maxStates )
+                            DAI_THROW(OUT_OF_MEMORY);
+                    }
                     varindices.erase( i );
                 }
 

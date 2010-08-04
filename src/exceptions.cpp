@@ -38,7 +38,8 @@ namespace dai {
         "Multiple undo levels unsupported",
         "FactorGraph is not connected",
         "Internal error",
-        "Runtime error"
+        "Runtime error",
+        "Out of memory"
     };
 
 

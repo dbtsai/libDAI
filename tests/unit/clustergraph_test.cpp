@@ -27,6 +27,11 @@ const double tol = 1e-8;
 
 
 BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
+    Var v0( 0, 2 );
+    Var v1( 1, 3 );
+    Var v2( 2, 2 );
+    Var v3( 3, 4 );
+
     ClusterGraph G;
     BOOST_CHECK_EQUAL( G.clusters(), std::vector<VarSet>() );
     BOOST_CHECK( G.bipGraph() == BipartiteGraph() );
@@ -36,12 +41,10 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_THROW( G.var( 0 ), Exception );
     BOOST_CHECK_THROW( G.cluster( 0 ), Exception );
 #endif
-    BOOST_CHECK_THROW( G.findVar( Var( 0, 2 ) ), Exception );
+    BOOST_CHECK_EQUAL( G.findVar( v0 ), 0 );
+    BOOST_CHECK_EQUAL( G.findCluster( v0 ), 0 );
+    BOOST_CHECK_EQUAL( G.findCluster( VarSet(v0,v1) ), 0 );
 
-    Var v0( 0, 2 );
-    Var v1( 1, 3 );
-    Var v2( 2, 2 );
-    Var v3( 3, 4 );
     std::vector<Var> vs;
     vs.push_back( v0 );
     vs.push_back( v1 );
@@ -67,6 +70,13 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( G2.findVar( v1 ), 1 );
     BOOST_CHECK_EQUAL( G2.findVar( v2 ), 2 );
     BOOST_CHECK_EQUAL( G2.findVar( v3 ), 3 );
+    BOOST_CHECK_EQUAL( G2.findVar( Var(4, 2) ), 4 );
+    BOOST_CHECK_EQUAL( G2.findCluster( v01 ), 0 );
+    BOOST_CHECK_EQUAL( G2.findCluster( v12 ), 1 );
+    BOOST_CHECK_EQUAL( G2.findCluster( v23 ), 2 );
+    BOOST_CHECK_EQUAL( G2.findCluster( v13 ), 3 );
+    BOOST_CHECK_EQUAL( G2.findCluster( v02 ), 4 );
+    BOOST_CHECK_EQUAL( G2.findCluster( v03 ), 4 );
 
     ClusterGraph Gb( G );
     BOOST_CHECK( G.bipGraph() == Gb.bipGraph() );
@@ -87,6 +97,48 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK( G2.bipGraph() == G2c.bipGraph() );
     BOOST_CHECK( G2.vars() == G2c.vars() );
     BOOST_CHECK( G2.clusters() == G2c.clusters() );
+
+    std::vector<Factor> facs;
+    facs.push_back( Factor( v01 ) );
+    facs.push_back( Factor( v12 ) );
+    facs.push_back( Factor( v1 ) );
+    facs.push_back( Factor( v2 ) );
+    facs.push_back( Factor( v23 ) );
+    facs.push_back( Factor( v13 ) );
+    FactorGraph F3( facs );
+    ClusterGraph G3( F3, false );
+    BOOST_CHECK_EQUAL( G3.bipGraph(), F3.bipGraph() );
+    BOOST_CHECK_EQUAL( G3.nrVars(), F3.nrVars() );
+    for( size_t i = 0; i < 4; i++ )
+        BOOST_CHECK_EQUAL( G3.var(i), F3.var(i) );
+    BOOST_CHECK_EQUAL( G3.vars(), F3.vars() );
+    BOOST_CHECK_EQUAL( G3.nrClusters(), F3.nrFactors() );
+    for( size_t I = 0; I < 6; I++ )
+        BOOST_CHECK_EQUAL( G3.cluster(I), F3.factor(I).vars() );
+
+    ClusterGraph G4( FactorGraph( facs ), true );
+    BOOST_CHECK_EQUAL( G4.nrVars(), 4 );
+    BOOST_CHECK_EQUAL( G4.var(0), v0 );
+    BOOST_CHECK_EQUAL( G4.var(1), v1 );
+    BOOST_CHECK_EQUAL( G4.var(2), v2 );
+    BOOST_CHECK_EQUAL( G4.var(3), v3 );
+    BOOST_CHECK_EQUAL( G4.nrClusters(), 4 );
+    BOOST_CHECK_EQUAL( G4.cluster(0), v01 );
+    BOOST_CHECK_EQUAL( G4.cluster(1), v12 );
+    BOOST_CHECK_EQUAL( G4.cluster(2), v23 );
+    BOOST_CHECK_EQUAL( G4.cluster(3), v13 );
+    typedef BipartiteGraph::Edge Edge;
+    std::vector<Edge> edges;
+    edges.push_back( Edge(0, 0) );
+    edges.push_back( Edge(1, 0) );
+    edges.push_back( Edge(1, 1) );
+    edges.push_back( Edge(1, 3) );
+    edges.push_back( Edge(2, 1) );
+    edges.push_back( Edge(2, 2) );
+    edges.push_back( Edge(3, 2) );
+    edges.push_back( Edge(3, 3) );
+    BipartiteGraph G4G( 4, 4, edges.begin(), edges.end() );
+    BOOST_CHECK_EQUAL( G4.bipGraph(), G4G );
 }
 
 
@@ -140,6 +192,17 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
     BOOST_CHECK_EQUAL( G.findVar( v2 ), 2 );
     BOOST_CHECK_EQUAL( G.findVar( v3 ), 3 );
     BOOST_CHECK_EQUAL( G.findVar( v4 ), 4 );
+    BOOST_CHECK_EQUAL( G.findCluster( v01 ), 0 );
+    BOOST_CHECK_EQUAL( G.findCluster( v12 ), 1 );
+    BOOST_CHECK_EQUAL( G.findCluster( v123 ), 2 );
+    BOOST_CHECK_EQUAL( G.findCluster( v34 ), 3 );
+    BOOST_CHECK_EQUAL( G.findCluster( v04 ), 4 );
+    BOOST_CHECK_EQUAL( G.findCluster( v02 ), 5 );
+    BOOST_CHECK_EQUAL( G.findCluster( v03 ), 5 );
+    BOOST_CHECK_EQUAL( G.findCluster( v13 ), 5 );
+    BOOST_CHECK_EQUAL( G.findCluster( v14 ), 5 );
+    BOOST_CHECK_EQUAL( G.findCluster( v23 ), 5 );
+    BOOST_CHECK_EQUAL( G.findCluster( v24 ), 5 );
     BipartiteGraph H( 5, 5 );
     H.addEdge( 0, 0 );
     H.addEdge( 1, 0 );
@@ -328,6 +391,63 @@ BOOST_AUTO_TEST_CASE( VarElimTest ) {
     H.addEdge( 4, 4 );
     BOOST_CHECK( G.bipGraph() == H );
 
+    G = Gorg;
+    BOOST_CHECK_EQUAL( G.elimVar( 0 ), v14 | v0 );
+    BOOST_CHECK_EQUAL( G.vars(), Gorg.vars() );
+    BOOST_CHECK_EQUAL( G.nrClusters(), 3 );
+    BOOST_CHECK_EQUAL( G.cluster(0), v123 );
+    BOOST_CHECK_EQUAL( G.cluster(1), v34 );
+    BOOST_CHECK_EQUAL( G.cluster(2), v14 );
+    BipartiteGraph H_0( 5, 3 );
+    H_0.addEdge( 1, 0 ); H_0.addEdge( 2, 0 ); H_0.addEdge( 3, 0 ); H_0.addEdge( 3, 1 ); H_0.addEdge( 4, 1 ); H_0.addEdge( 1, 2 ); H_0.addEdge( 4, 2 );
+    BOOST_CHECK( G.bipGraph() == H_0 );
+
+    G = Gorg;
+    BOOST_CHECK_EQUAL( G.elimVar( 1 ), v01 | v23 );
+    BOOST_CHECK_EQUAL( G.vars(), Gorg.vars() );
+    BOOST_CHECK_EQUAL( G.nrClusters(), 3 );
+    BOOST_CHECK_EQUAL( G.cluster(0), v34 );
+    BOOST_CHECK_EQUAL( G.cluster(1), v04 );
+    BOOST_CHECK_EQUAL( G.cluster(2), v02 | v3 );
+    BipartiteGraph H_1( 5, 3 );
+    H_1.addEdge( 3, 0 ); H_1.addEdge( 4, 0 ); H_1.addEdge( 0, 1 ); H_1.addEdge( 4, 1 ); H_1.addEdge( 0, 2 ); H_1.addEdge( 2, 2 ); H_1.addEdge( 3, 2 );
+    BOOST_CHECK( G.bipGraph() == H_1 );
+
+    G = Gorg;
+    BOOST_CHECK_EQUAL( G.elimVar( 2 ), v123 );
+    BOOST_CHECK_EQUAL( G.vars(), Gorg.vars() );
+    BOOST_CHECK_EQUAL( G.nrClusters(), 4 );
+    BOOST_CHECK_EQUAL( G.cluster(0), v01 );
+    BOOST_CHECK_EQUAL( G.cluster(1), v34 );
+    BOOST_CHECK_EQUAL( G.cluster(2), v04 );
+    BOOST_CHECK_EQUAL( G.cluster(3), v13 );
+    BipartiteGraph H_2( 5, 4 );
+    H_2.addEdge( 0, 0 ); H_2.addEdge( 1, 0 ); H_2.addEdge( 3, 1 ); H_2.addEdge( 4, 1 ); H_2.addEdge( 0, 2 ); H_2.addEdge( 4, 2 ); H_2.addEdge( 1, 3 ); H_2.addEdge( 3, 3 );
+    BOOST_CHECK( G.bipGraph() == H_2 );
+
+    G = Gorg;
+    BOOST_CHECK_EQUAL( G.elimVar( 3 ), v12 | v34 );
+    BOOST_CHECK_EQUAL( G.vars(), Gorg.vars() );
+    BOOST_CHECK_EQUAL( G.nrClusters(), 3 );
+    BOOST_CHECK_EQUAL( G.cluster(0), v01 );
+    BOOST_CHECK_EQUAL( G.cluster(1), v04 );
+    BOOST_CHECK_EQUAL( G.cluster(2), v12 | v4 );
+    BipartiteGraph H_3( 5, 3 );
+    H_3.addEdge( 0, 0 ); H_3.addEdge( 1, 0 ); H_3.addEdge( 0, 1 ); H_3.addEdge( 4, 1 ); H_3.addEdge( 1, 2 ); H_3.addEdge( 2, 2 ); H_3.addEdge( 4, 2 );
+    BOOST_CHECK( G.bipGraph() == H_3 );
+
+    G = Gorg;
+    BOOST_CHECK_EQUAL( G.elimVar( 4 ), v03 | v4 );
+    BOOST_CHECK_EQUAL( G.vars(), Gorg.vars() );
+    BOOST_CHECK_EQUAL( G.nrClusters(), 3 );
+    BOOST_CHECK_EQUAL( G.cluster(0), v01 );
+    BOOST_CHECK_EQUAL( G.cluster(1), v123 );
+    BOOST_CHECK_EQUAL( G.cluster(2), v03 );
+    BipartiteGraph H_4( 5, 3 );
+    H_4.addEdge( 0, 0 ); H_4.addEdge( 1, 0 ); H_4.addEdge( 1, 1 ); H_4.addEdge( 2, 1 ); H_4.addEdge( 3, 1 ); H_4.addEdge( 0, 2 ); H_4.addEdge( 3, 2 );
+    BOOST_CHECK( G.bipGraph() == H_4 );
+
+    G = Gorg;
     BOOST_CHECK_EQUAL( eliminationCost_MinFill( G, 0 ), 1 );
     BOOST_CHECK_EQUAL( eliminationCost_MinFill( G, 1 ), 2 );
     BOOST_CHECK_EQUAL( eliminationCost_MinFill( G, 2 ), 0 );

@@ -75,9 +75,10 @@ int main( int argc, char *argv[] ) {
     if( argc != 3 ) {
         // Display help message if number of command line arguments is incorrect
         cout << "This program is part of libDAI - http://www.libdai.org/" << endl << endl;
-        cout << "Usage: ./fginfo <in.fg> <tw>" << endl << endl;
+        cout << "Usage: ./fginfo <in.fg> <maxstates>" << endl << endl;
         cout << "Reports some detailed information about the factor graph <in.fg>." << endl;
-        cout << "Also calculates treewidth (which may take some time) unless <tw> == 0." << endl;
+        cout << "Also calculates treewidth, with maximum total number of states" << endl;
+        cout << "given by <maxstates>, where 0 means unlimited." << endl << endl;
         return 1;
     } else {
         // Read factorgraph
@@ -95,18 +96,53 @@ int main( int argc, char *argv[] ) {
         cout << "Has negatives:         " << hasNegatives(fg.factors()) << endl;
         cout << "Binary variables?      " << fg.isBinary() << endl;
         cout << "Pairwise interactions? " << fg.isPairwise() << endl;
-        // Calculate treewidth using various heuristics, if requested
-        if( calc_tw ) {
-            std::pair<size_t,double> tw;
-            tw = boundTreewidth(fg, &eliminationCost_MinNeighbors);
-            cout << "Treewidth (MinNeighbors):     " << tw.first << " (" << tw.second << " states)" << endl;
-            tw = boundTreewidth(fg, &eliminationCost_MinWeight);
-            cout << "Treewidth (MinWeight):        " << tw.first << " (" << tw.second << " states)" << endl;
-            tw = boundTreewidth(fg, &eliminationCost_MinFill);
-            cout << "Treewidth (MinFill):          " << tw.first << " (" << tw.second << " states)" << endl;
-            tw = boundTreewidth(fg, &eliminationCost_WeightedMinFill);
-            cout << "Treewidth (WeightedMinFill):  " << tw.first << " (" << tw.second << " states)" << endl;
+        
+        // Calculate treewidth using various heuristics
+        std::pair<size_t,double> tw;
+        cout << "Treewidth (MinNeighbors):     ";
+        try {
+            tw = boundTreewidth(fg, &eliminationCost_MinNeighbors, maxstates );
+            cout << tw.first << " (" << tw.second << " states)" << endl;
+        } catch( Exception &e ) {
+            if( e.code() == Exception::OUT_OF_MEMORY )
+                cout << "> " << maxstates << endl;
+            else
+                cout << "an exception occurred" << endl;
         }
+        
+        cout << "Treewidth (MinWeight):        ";
+        try {
+            tw = boundTreewidth(fg, &eliminationCost_MinWeight, maxstates );
+            cout << tw.first << " (" << tw.second << " states)" << endl;
+        } catch( Exception &e ) {
+            if( e.code() == Exception::OUT_OF_MEMORY )
+                cout << "> " << maxstates << endl;
+            else
+                cout << "an exception occurred" << endl;
+        }
+        
+        cout << "Treewidth (MinFill):          ";
+        try {
+            tw = boundTreewidth(fg, &eliminationCost_MinFill, maxstates );
+            cout << tw.first << " (" << tw.second << " states)" << endl;
+        } catch( Exception &e ) {
+            if( e.code() == Exception::OUT_OF_MEMORY )
+                cout << "> " << maxstates << endl;
+            else
+                cout << "an exception occurred" << endl;
+        }
+
+        cout << "Treewidth (WeightedMinFill):  ";
+        try {
+            tw = boundTreewidth(fg, &eliminationCost_WeightedMinFill, maxstates );
+            cout << tw.first << " (" << tw.second << " states)" << endl;
+        } catch( Exception &e ) {
+            if( e.code() == Exception::OUT_OF_MEMORY )
+                cout << "> " << maxstates << endl;
+            else
+                cout << "an exception occurred" << endl;
+        }
+        
         // Calculate total state space
         long double stsp = 1.0;
         for( size_t i = 0; i < fg.nrVars(); i++ )
