@@ -183,4 +183,11 @@ static const char* DAINames[] = {
  */
 
 
+/** \example uai2010-aie-solver.cpp
+ *  This example contains the full source code of the solver that was one of the
+ *  winners (the 'libDAI2' solver) in the UAI 2010 Approximate Inference Challenge
+ *  (see http://www.cs.huji.ac.il/project/UAI10/ for more information).
+ */
+
+
 #endif

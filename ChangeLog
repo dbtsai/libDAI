@@ -1,5 +1,7 @@
 git HEAD
 --------
+* Added source code for one of the winning solvers of the 
+  UAI 2010 Approximate Inference Challenge 
 * Improved VarSet
   - nrStates() now returns a double instead of a size_t
 * Improved ClusterGraph
