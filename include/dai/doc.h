@@ -37,7 +37,7 @@
 
 
 /** \mainpage Reference manual for libDAI - A free/open source C++ library for Discrete Approximate Inference methods
- *  \author Joris Mooij, Frederik Eaton
+ *  \author Joris Mooij (with contributions of Frederik Eaton)
  *  \version git HEAD
  *  \date May 12, 2010, or later
  *
@@ -62,6 +62,10 @@
  *  libDAI can be used to implement novel (approximate) inference algorithms
  *  and to easily compare the accuracy and performance with existing algorithms
  *  that have been implemented already.
+ *
+ *  A solver using libDAI was amongst the three winners of the UAI 2010 Approximate
+ *  Inference Challenge (see http://www.cs.huji.ac.il/project/UAI10/ for more 
+ *  information). The full source code is provided as part of the library.
  *
  *  \section features Features
  *  Currently, libDAI supports the following (approximate) inference methods:
@@ -480,7 +484,7 @@
  *  - Loop Corrected Belief Propagation: dai::MR [\ref MoR05] and dai::LC [\ref MoK07]
  *  - Gibbs sampling: dai::Gibbs
  *  - Conditioned Belief Propagation: dai::CBP [\ref EaG09]
- *  - Decimation algorithm: dai::DECMAP
+ *  - Decimation algorithm: dai::DecMAP
  *
  *  Not all inference tasks are implemented by each method: calculating MAP states
  *  is only possible with dai::JTree, dai::BP and dai::DECMAP; calculating partition sums is
