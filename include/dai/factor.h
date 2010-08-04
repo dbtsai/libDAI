@@ -93,7 +93,9 @@ class TFactor {
         /** \param vars contains the variables that the new factor should depend on.
          *  \param p Points to array of values to be added.
          */
-        TFactor( const VarSet& vars, const T* p ) : _vs(vars), _p(p, p + _vs.nrStates(), _vs.nrStates()) {}
+        TFactor( const VarSet& vars, const T* p ) : _vs(vars), _p(p, p + (size_t)_vs.nrStates(), (size_t)_vs.nrStates()) {
+            DAI_ASSERT( _vs.nrStates() <= std::numeric_limits<std::size_t>::max() );
+        }
 
         /// Constructs factor depending on variables in \a vars, copying the values from \a p
         TFactor( const VarSet& vars, const TProb<T> &p ) : _vs(vars), _p(p) {

@@ -131,13 +131,10 @@ class VarSet : public SmallSet<Var> {
          *  number of possible values ("states") of variable \f$x_l\f$, the number of
          *  joint configurations of the variables in \f$\{x_l\}_{l\in L}\f$ is given by \f$\prod_{l\in L} S_l\f$.
          */
-        size_t nrStates() const {
-            size_t states = 1;
-            for( VarSet::const_iterator n = begin(); n != end(); n++ ) {
-                size_t newStates = states * n->states();
-                DAI_ASSERT( newStates >= states );
-                states = newStates;
-            }
+        double nrStates() const {
+            double states = 1.0;
+            for( VarSet::const_iterator n = begin(); n != end(); n++ )
+                states *= n->states();
             return states;
         }
     //@}

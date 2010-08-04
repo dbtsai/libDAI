@@ -1,5 +1,7 @@
 git HEAD
 --------
+* Improved VarSet
+  - nrStates() now returns a double instead of a size_t
 * Improved ClusterGraph
   - added ClusterGraph(const FactorGraph& fg, bool onlyMaximal) constructor
   - findVar( const Var& n ) no longer throws an exception if the variable is

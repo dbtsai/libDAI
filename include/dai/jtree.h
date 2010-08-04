@@ -203,6 +203,8 @@ class JTree : public DAIAlgRG {
 
 /// Calculates upper bound to the treewidth of a FactorGraph, using the specified heuristic
 /** \relates JTree
+ *  \param fg the factor graph for which the treewidth should be bounded
+ *  \param fn the heuristic cost function used for greedy variable elimination
  *  \param maxStates maximum total number of states in outer regions of junction tree (0 means no limit)
  *  \throws OUT_OF_MEMORY if the total number of states becomes larger than maxStates
  *  \return a pair (number of variables in largest clique, number of states in largest clique)
