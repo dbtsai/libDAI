@@ -88,6 +88,12 @@ class BP : public DAIAlgFG {
         size_t _iters;
         /// The history of message updates (only recorded if \a recordSentMessages is \c true)
         std::vector<std::pair<std::size_t, std::size_t> > _sentMessages;
+        /// Stores variable beliefs of previous iteration
+        std::vector<Factor> _oldBeliefsV;
+        /// Stores factor beliefs of previous iteration
+        std::vector<Factor> _oldBeliefsF;
+        /// Stores the update schedule
+        std::vector<Edge> _updateSeq;
 
     public:
         /// Parameters for BP
@@ -139,35 +145,23 @@ class BP : public DAIAlgFG {
         /// Specifies whether the history of message updates should be recorded
         bool recordSentMessages;
 
-        /// Stores variable beliefs of previous iteration
-        std::vector<Factor> oldBeliefsV;
-
-        /// Stores factor beliefs of previous iteration
-        std::vector<Factor> oldBeliefsF;
-
-        /// Stores the update schedule
-        std::vector<Edge> updateSeq;
-
     public:
     /// \name Constructors/destructors
     //@{
         /// Default constructor
-        BP() : DAIAlgFG(), _edges(), _edge2lut(), _lut(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {}
+        BP() : DAIAlgFG(), _edges(), _edge2lut(), _lut(), _maxdiff(0.0), _iters(0U), _sentMessages(), _oldBeliefsV(), _oldBeliefsF(), _updateSeq(), props(), recordSentMessages(false) {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
         /** \param fg Factor graph.
          *  \param opts Parameters @see Properties
          */
-        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), _sentMessages(), props(), recordSentMessages(false) {
+        BP( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _edges(), _maxdiff(0.0), _iters(0U), _sentMessages(), _oldBeliefsV(), _oldBeliefsF(), _updateSeq(), props(), recordSentMessages(false) {
             setProperties( opts );
             construct();
         }
 
         /// Copy constructor
-        BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _edge2lut(x._edge2lut),
-            _lut(x._lut), _maxdiff(x._maxdiff), _iters(x._iters), _sentMessages(x._sentMessages),
-            props(x.props), recordSentMessages(x.recordSentMessages)
-        {
+        BP( const BP &x ) : DAIAlgFG(x), _edges(x._edges), _edge2lut(x._edge2lut), _lut(x._lut), _maxdiff(x._maxdiff), _iters(x._iters), _sentMessages(x._sentMessages), _oldBeliefsV(x._oldBeliefsV), _oldBeliefsF(x._oldBeliefsF), _updateSeq(x._updateSeq), props(x.props), recordSentMessages(x.recordSentMessages) {
             for( LutType::iterator l = _lut.begin(); l != _lut.end(); ++l )
                 _edge2lut[l->second.first][l->second.second] = l;
         }
@@ -183,6 +177,9 @@ class BP : public DAIAlgFG {
                 _maxdiff = x._maxdiff;
                 _iters = x._iters;
                 _sentMessages = x._sentMessages;
+                _oldBeliefsV = x._oldBeliefsV;
+                _oldBeliefsF = x._oldBeliefsF;
+                _updateSeq = x._updateSeq;
                 props = x.props;
                 recordSentMessages = x.recordSentMessages;
             }

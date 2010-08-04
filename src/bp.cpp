@@ -126,21 +126,21 @@ void BP::construct() {
     }
 
     // create old beliefs
-    oldBeliefsV.clear();
-    oldBeliefsV.reserve( nrVars() );
+    _oldBeliefsV.clear();
+    _oldBeliefsV.reserve( nrVars() );
     for( size_t i = 0; i < nrVars(); ++i )
-        oldBeliefsV.push_back( Factor( var(i) ) );
-    oldBeliefsF.clear();
-    oldBeliefsF.reserve( nrFactors() );
+        _oldBeliefsV.push_back( Factor( var(i) ) );
+    _oldBeliefsF.clear();
+    _oldBeliefsF.reserve( nrFactors() );
     for( size_t I = 0; I < nrFactors(); ++I )
-        oldBeliefsF.push_back( Factor( factor(I).vars() ) );
+        _oldBeliefsF.push_back( Factor( factor(I).vars() ) );
     
     // create update sequence
-    updateSeq.clear();
-    updateSeq.reserve( nrEdges() );
+    _updateSeq.clear();
+    _updateSeq.reserve( nrEdges() );
     for( size_t I = 0; I < nrFactors(); I++ )
         foreach( const Neighbor &i, nbF(I) )
-            updateSeq.push_back( Edge( i, i.dual ) );
+            _updateSeq.push_back( Edge( i, i.dual ) );
 }
 
 
@@ -284,7 +284,7 @@ Real BP::run() {
                       calcNewMessage( i, I.iter );
             }
             // Maximum-Residual BP [\ref EMK06]
-            for( size_t t = 0; t < updateSeq.size(); ++t ) {
+            for( size_t t = 0; t < _updateSeq.size(); ++t ) {
                 // update the message with the largest residual
                 size_t i, _I;
                 findMaxResidual( i, _I );
@@ -314,9 +314,9 @@ Real BP::run() {
         } else {
             // Sequential updates
             if( props.updates == Properties::UpdateType::SEQRND )
-                random_shuffle( updateSeq.begin(), updateSeq.end() );
+                random_shuffle( _updateSeq.begin(), _updateSeq.end() );
 
-            foreach( const Edge &e, updateSeq ) {
+            foreach( const Edge &e, _updateSeq ) {
                 calcNewMessage( e.first, e.second );
                 updateMessage( e.first, e.second );
             }
@@ -326,13 +326,13 @@ Real BP::run() {
         maxDiff = -INFINITY;
         for( size_t i = 0; i < nrVars(); ++i ) {
             Factor b( beliefV(i) );
-            maxDiff = std::max( maxDiff, dist( b, oldBeliefsV[i], DISTLINF ) );
-            oldBeliefsV[i] = b;
+            maxDiff = std::max( maxDiff, dist( b, _oldBeliefsV[i], DISTLINF ) );
+            _oldBeliefsV[i] = b;
         }
         for( size_t I = 0; I < nrFactors(); ++I ) {
             Factor b( beliefF(I) );
-            maxDiff = std::max( maxDiff, dist( b, oldBeliefsF[I], DISTLINF ) );
-            oldBeliefsF[I] = b;
+            maxDiff = std::max( maxDiff, dist( b, _oldBeliefsF[I], DISTLINF ) );
+            _oldBeliefsF[I] = b;
         }
 
         if( props.verbose >= 3 )

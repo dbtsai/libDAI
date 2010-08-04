@@ -108,7 +108,11 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
         memneeded *= sizeof(Real) * fudge;
         if( props.verbose >= 1 ) {
             cerr << "Estimate of needed memory: " << memneeded / 1024 << "kB" << endl;
-            cerr << "Maximum memory: " << props.maxmem / 1024 << "kB" << endl;
+            cerr << "Maximum memory: ";
+            if( props.maxmem )
+               cerr << props.maxmem / 1024 << "kB" << endl;
+            else
+               cerr << "unlimited" << endl;
         }
         if( props.maxmem && memneeded > props.maxmem )
             DAI_THROW(OUT_OF_MEMORY);
