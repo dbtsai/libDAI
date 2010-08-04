@@ -154,7 +154,7 @@ int main( int argc, char *argv[] ) {
         // Calculate complexity for LCBP
         long double cavsum_lcbp = 0.0;
         long double cavsum_lcbp2 = 0.0;
-        size_t max_Delta_size = 0;
+        long double max_Delta_size = 0.0;
         map<size_t,size_t> cavsizes;
         for( size_t i = 0; i < fg.nrVars(); i++ ) {
             VarSet di = fg.delta(i);
@@ -162,7 +162,7 @@ int main( int argc, char *argv[] ) {
                 cavsizes[di.size()]++;
             else
                 cavsizes[di.size()] = 1;
-            size_t Ds = fg.Delta(i).nrStates();
+            long double Ds = fg.Delta(i).nrStates();
             if( Ds > max_Delta_size )
                 max_Delta_size = Ds;
             cavsum_lcbp += di.nrStates();

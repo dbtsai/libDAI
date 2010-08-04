@@ -41,8 +41,10 @@ mxArray *Factors2mx(const vector<Factor> &Ps) {
             BiMember_data[i] = j->label();
             dims.push_back( j->states() );
         }
+        while( dims.size() <= 2 )
+            dims.push_back( 1 );
 
-        mxArray *BiP = mxCreateNumericArray(I->vars().size(), &(*(dims.begin())), mxDOUBLE_CLASS, mxREAL);
+        mxArray *BiP = mxCreateNumericArray(dims.size(), &(*(dims.begin())), mxDOUBLE_CLASS, mxREAL);
         double *BiP_data = mxGetPr(BiP);
         for( size_t j = 0; j < I->nrStates(); j++ )
             BiP_data[j] = (*I)[j];

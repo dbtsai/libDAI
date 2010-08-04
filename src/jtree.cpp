@@ -404,9 +404,10 @@ Real JTree::logZ() const {
 
 size_t JTree::findEfficientTree( const VarSet& vs, RootedTree &Tree, size_t PreviousRoot ) const {
     // find new root clique (the one with maximal statespace overlap with vs)
-    size_t maxval = 0, maxalpha = 0;
+    long double maxval = 0.0;
+    size_t maxalpha = 0;
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
-        size_t val = VarSet(vs & OR(alpha).vars()).nrStates();
+        long double val = VarSet(vs & OR(alpha).vars()).nrStates();
         if( val > maxval ) {
             maxval = val;
             maxalpha = alpha;
@@ -566,7 +567,7 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
 }
 
 
-std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates ) {
+std::pair<size_t,long double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates ) {
     // Create cluster graph from factor graph
     ClusterGraph _cg( fg, true );
 
@@ -579,7 +580,7 @@ std::pair<size_t,double> boundTreewidth( const FactorGraph &fg, greedyVariableEl
     for( size_t i = 0; i < ElimVec.size(); i++ ) {
         if( ElimVec[i].size() > treewidth )
             treewidth = ElimVec[i].size();
-        size_t s = ElimVec[i].nrStates();
+        long double s = ElimVec[i].nrStates();
         if( s > nrstates )
             nrstates = s;
     }

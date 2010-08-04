@@ -73,10 +73,14 @@ class TFactor {
         TFactor( const Var &v ) : _vs(v), _p(v.states()) {}
 
         /// Constructs factor depending on variables in \a vars with uniform distribution
-        TFactor( const VarSet& vars ) : _vs(vars), _p(_vs.nrStates()) {}
+        TFactor( const VarSet& vars ) : _vs(vars), _p((size_t)_vs.nrStates()) {
+            DAI_ASSERT( _vs.nrStates() <= std::numeric_limits<std::size_t>::max() );
+        }
 
         /// Constructs factor depending on variables in \a vars with all values set to \a p
-        TFactor( const VarSet& vars, T p ) : _vs(vars), _p(_vs.nrStates(),p) {}
+        TFactor( const VarSet& vars, T p ) : _vs(vars), _p((size_t)_vs.nrStates(),p) {
+            DAI_ASSERT( _vs.nrStates() <= std::numeric_limits<std::size_t>::max() );
+        }
 
         /// Constructs factor depending on variables in \a vars, copying the values from a std::vector<>
         /** \tparam S Type of values of \a x
@@ -86,7 +90,7 @@ class TFactor {
         template<typename S>
         TFactor( const VarSet& vars, const std::vector<S> &x ) : _vs(vars), _p() {
             DAI_ASSERT( x.size() == vars.nrStates() );
-	    _p = TProb<T>( x.begin(), x.begin() + _vs.nrStates(), _vs.nrStates() );
+            _p = TProb<T>( x.begin(), x.end(), x.size() );
         }
 
         /// Constructs factor depending on variables in \a vars, copying the values from an array
@@ -344,7 +348,8 @@ class TFactor {
             else {
                 TFactor<T> f(*this); // make a copy
                 _vs |= g._vs;
-                size_t N = _vs.nrStates();
+                DAI_ASSERT( _vs.nrStates() < std::numeric_limits<std::size_t>::max() );
+                size_t N = (size_t)_vs.nrStates();
 
                 IndexFor i_f( f._vs, _vs );
                 IndexFor i_g( g._vs, _vs );
@@ -402,7 +407,8 @@ class TFactor {
                 result._p = _p.pwBinaryTr( g._p, op );
             } else {
                 result._vs = _vs | g._vs;
-                size_t N = result._vs.nrStates();
+                DAI_ASSERT( result._vs.nrStates() < std::numeric_limits<std::size_t>::max() );
+                size_t N = (size_t)result._vs.nrStates();
 
                 IndexFor i_f( _vs, result.vars() );
                 IndexFor i_g( g._vs, result.vars() );
