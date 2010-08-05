@@ -1,5 +1,6 @@
 git HEAD
 --------
+* Image segmentation example now has a build flag for the version of CImg
 * Deprecated Graph::Neighbor, BipartiteGraph::Neighbor and DAG::Neighbor
   and replaced them by a globally defined Neighbor structure
 * Deprecated Graph::Neighbors, BipartiteGraph::Neighbors and DAG::Neighbors

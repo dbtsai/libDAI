@@ -122,7 +122,14 @@ MEX:=$(MEX) $(MEXINC) $(MEXFLAGS) $(WITHFLAGS) $(MEXLIB)
 all : $(TARGETS)
 	@echo libDAI built successfully!
 
-examples : examples/example$(EE) examples/example_bipgraph$(EE) examples/example_varset$(EE) examples/example_permute$(EE) examples/example_sprinkler$(EE) examples/example_sprinkler_gibbs$(EE) examples/example_sprinkler_em$(EE) examples/example_imagesegmentation$(EE)
+EXAMPLES=$(foreach name,example example_bipgraph example_varset example_permute example_sprinkler example_sprinkler_em,examples/$(name)$(EE))
+ifdef WITH_GIBBS
+  EXAMPLES:=$(EXAMPLES) examples/example_sprinkler_gibbs$(EE)
+endif
+ifdef WITH_CIMG
+  EXAMPLES:=$(EXAMPLES) examples/example_imagesegmentation$(EE)
+endif
+examples : $(EXAMPLES)
 
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
@@ -190,14 +197,14 @@ examples/%$(EE) : examples/%.cpp $(HEADERS) $(LIB)/libdai$(LE)
 	$(CC) $(CCO)$@ $< $(LIBS)
 
 examples/example_sprinkler_gibbs$(EE) : examples/example_sprinkler_gibbs.cpp $(HEADERS) $(LIB)/libdai$(LE)
-ifdef WITH_GIBBS
 	$(CC) $(CCO)$@ $< $(LIBS)
-else
-	@echo Skipping $@
-endif
 
 examples/example_imagesegmentation$(EE) : examples/example_imagesegmentation.cpp $(HEADERS) $(LIB)/libdai$(LE)
-	-$(CC) $(CIMGINC) $(CCO)$@ $< $(LIBS) $(CIMGLIBS)
+ifdef NEW_CIMG
+	$(CC) -DNEW_CIMG $(CIMGINC) $(CCO)$@ $< $(LIBS) $(CIMGLIBS)
+else
+	$(CC) $(CIMGINC) $(CCO)$@ $< $(LIBS) $(CIMGLIBS)
+endif
 
 
 # UNIT TESTS

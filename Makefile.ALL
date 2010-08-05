@@ -33,14 +33,14 @@ WITH_GIBBS=true
 WITH_CBP=true
 WITH_DECMAP=true
 
-# Build doxygen documentation?
-WITH_DOC=
-
-# Build with debug info?
+# Build with debug info? (slower but safer)
 DEBUG=true
 
-# Build MatLab interface?
+# Build doxygen documentation? (doxygen and TeX need to be installed)
+WITH_DOC=
+
+# Build MatLab interface? (MatLab needs to be installed)
 WITH_MATLAB=
 
-# MatLab version 7.3 (R2006b) or newer?
-NEW_MATLAB=true
+# Build image segmentation example? (CImg needs to be installed)
+WITH_CIMG=

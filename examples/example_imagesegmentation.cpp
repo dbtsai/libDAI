@@ -11,11 +11,7 @@
 
 #include <iostream>
 #include <dai/alldai.h>  // Include main libDAI header file
-#include <CImg.h>        // This example needs a recent version of CImg to be installed
-
-
-// For backwards compatibility with old CImg interface
-// #define CIMGOLD
+#include <CImg.h>        // This example needs CImg to be installed
 
 
 using namespace dai;
@@ -41,7 +37,7 @@ FactorGraph img2fg( const CImg<T> &img, double J, double th_min, double th_max, 
     vector<Var> vars;
     vector<Factor> factors;
 
-#ifdef CIMGOLD
+#ifndef NEW_CIMG
     size_t dimx = img.width;   // Width of the image in pixels
     size_t dimy = img.height;  // Height of the image in pixels
 #else
@@ -177,7 +173,7 @@ double doInference( FactorGraph& fg, string algOpts, size_t maxIter, double tol,
             }
 
         // Display the image with the current beliefs
-#ifdef CIMGOLD
+#ifndef NEW_CIMG
         disp << image;
 #else
         disp = image;
@@ -235,7 +231,7 @@ int main(int argc,char **argv) {
     CImg<unsigned char> image2 = CImg<>( file_i2 );
 
     // Check image sizes
-#ifdef CIMGOLD
+#ifndef NEW_CIMG
     if( (image1.width != image2.width) || (image1.height != image2.height) )
         cerr << "Error: input images should have same size." << endl;
     size_t dimx = image1.width;
@@ -265,7 +261,7 @@ int main(int argc,char **argv) {
     for( size_t i = 0; i < dimx; i++ ) {
         for( size_t j = 0; j < dimy; j++ ) {
             int avg = 0;
-#ifdef CIMGOLD
+#ifndef NEW_CIMG
             for( int c = 0; c < image1.dimv(); c++ )
                 avg += image1( i, j, c );
             avg /= image1.dimv();
@@ -314,7 +310,7 @@ int main(int argc,char **argv) {
                 image4(i,j,1) = image2(i,j,1);
                 image4(i,j,2) = image2(i,j,2);
             } else
-#ifdef CIMGOLD
+#ifndef NEW_CIMG
                 for( size_t c = 0; c < (size_t)image4.dimv(); c++ )
                     image4(i,j,c) = 255;
 #else
@@ -329,7 +325,7 @@ int main(int argc,char **argv) {
     image4.save_jpeg( file_o2, 100 );
 
     cout << "Close the last image display in order to finish." << endl;
-#ifdef CIMGOLD
+#ifndef NEW_CIMG
     while( !main_disp.is_closed )
         cimg::wait( 40 );
 #else
