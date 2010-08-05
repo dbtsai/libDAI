@@ -1,5 +1,12 @@
 git HEAD
 --------
+* Added io.h/io.cpp which currently provides functionality for reading
+  files in the UAI Approximate Inference Challenge fileformats
+  (supporting both the 2006/2008 evidence file format and the 2010
+  evidence file format)
+* Deprecated void tokenizeString( const string&, vector<string>&, const string& )
+  and replaced it with an improved version
+  vector<string> tokenizeString( const string&, bool, const string& )
 * [Matt Dunham] Fixed a bug in Factors2mx in src/matlab/matlab.cpp:
   segfault if factors depending on 0 variables were passed to MatLab
 * Added source code for one of the winning solvers of the 

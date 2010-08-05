@@ -44,7 +44,7 @@ ifdef WITH_DOC
 endif
 
 # Define conditional build targets
-NAMES:=graph dag bipgraph varset daialg alldai clustergraph factor factorgraph properties regiongraph util weightedgraph exceptions exactinf evidence emalg
+NAMES:=graph dag bipgraph varset daialg alldai clustergraph factor factorgraph properties regiongraph util weightedgraph exceptions exactinf evidence emalg io
 ifdef WITH_BP
   WITHFLAGS:=$(WITHFLAGS) -DDAI_WITH_BP
   NAMES:=$(NAMES) bp

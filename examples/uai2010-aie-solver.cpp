@@ -13,9 +13,7 @@
 #include <ostream>
 #include <cstdlib>
 #include <dai/alldai.h>
-#include <dai/util.h>
-#include <dai/index.h>
-#include <dai/jtree.h>
+#include <dai/io.h>
 
 
 using namespace std;
@@ -48,182 +46,6 @@ struct MPEbest {
 };
 
 
-/// Reads "evidence" (a mapping from observed variable labels to the observed values) from a UAI evidence file
-vector<map<size_t, size_t> > ReadUAIEvidenceFile( char* filename, size_t verbose ) {
-    vector<map<size_t, size_t> > evid;
-
-    // open file
-    ifstream is;
-    is.open( filename );
-    if( is.is_open() ) {
-        // read number of evidence cases
-        size_t nr_evid;
-        is >> nr_evid;
-        if( is.fail() )
-            DAI_THROWE(INVALID_EVIDENCE_FILE,"Cannot read number of evidence cases");
-        if( verbose >= 2 )
-            cout << "Reading " << nr_evid << " evidence cases..." << endl;
-        
-        evid.resize( nr_evid );
-        for( size_t i = 0; i < nr_evid; i++ ) {
-            // read number of variables
-            size_t nr_obs;
-            is >> nr_obs;
-            if( is.fail() )
-                DAI_THROWE(INVALID_EVIDENCE_FILE,"Evidence case " + toString(i) + ": Cannot read number of observations");
-            if( verbose >= 2 )
-                cout << "Evidence case " << i << ": reading " << nr_obs << " observations..." << endl;
-
-            // for each observation, read the variable label and the observed value
-            for( size_t j = 0; j < nr_obs; j++ ) {
-                size_t label, val;
-                is >> label;
-                if( is.fail() )
-                    DAI_THROWE(INVALID_EVIDENCE_FILE,"Evidence case " + toString(i) + ": Cannot read label for " + toString(j) + "'th observed variable");
-                is >> val;
-                if( is.fail() )
-                    DAI_THROWE(INVALID_EVIDENCE_FILE,"Evidence case " + toString(i) + ": Cannot read value of " + toString(j) + "'th observed variable");
-                if( verbose >= 3 )
-                    cout << "  variable: " << label << ", value: " << val << endl;
-                evid[i][label] = val;
-            }
-        }
-
-        // close file
-        is.close();
-    } else
-        DAI_THROWE(CANNOT_READ_FILE,"Cannot read from file " + std::string(filename));
-
-    if( evid.size() == 0 )
-        evid.resize( 1 );
-
-    return evid;
-}
-
-
-/// Reads factor graph (as a pair of a variable vector and factor vector) from a UAI factor graph file
-void ReadUAIFGFile( const char *filename, size_t verbose, vector<Var>& vars, vector<Factor>& factors, vector<Permute>& permutations ) {
-    vars.clear();
-    factors.clear();
-    permutations.clear();
-
-    // open file
-    ifstream is;
-    is.open( filename );
-    if( is.is_open() ) {
-        size_t nrFacs, nrVars;
-        string line;
-        
-        // read header line
-        getline(is,line);
-        if( is.fail() || (line != "BAYES" && line != "MARKOV" && line != "BAYES\r" && line != "MARKOV\r") )
-            DAI_THROWE(INVALID_FACTORGRAPH_FILE,"UAI factor graph file should start with \"BAYES\" or \"MARKOV\"");
-        if( verbose >= 2 )
-            cout << "Reading " << line << " network..." << endl;
-
-        // read number of variables
-        is >> nrVars;
-        if( is.fail() )
-            DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read number of variables");
-        if( verbose >= 2 )
-            cout << "Reading " << nrVars << " variables..." << endl;
-
-        // for each variable, read its number of states
-        vars.reserve( nrVars );
-        for( size_t i = 0; i < nrVars; i++ ) {
-            size_t dim;
-            is >> dim;
-            if( is.fail() )
-                DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read number of states of " + toString(i) + "'th variable");
-            vars.push_back( Var( i, dim ) );
-        }
-
-        // read number of factors
-        is >> nrFacs;
-        if( is.fail() )
-            DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read number of factors");
-        if( verbose >= 2 )
-            cout << "Reading " << nrFacs << " factors..." << endl;
-
-        // for each factor, read the variables on which it depends
-        vector<vector<Var> > factorVars;
-        factors.reserve( nrFacs );
-        factorVars.reserve( nrFacs );
-        for( size_t I = 0; I < nrFacs; I++ ) {
-            if( verbose >= 3 )
-                cout << "Reading factor " << I << "..." << endl;
-
-            // read number of variables for factor I
-            size_t I_nrVars;
-            is >> I_nrVars;
-            if( is.fail() )
-                DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read number of variables for " + toString(I) + "'th factor");
-            if( verbose >= 3 )
-                cout << "  which depends on " << I_nrVars << " variables" << endl;
-
-            // read the variable labels
-            vector<long> I_labels;
-            vector<size_t> I_dims;
-            I_labels.reserve( I_nrVars );
-            I_dims.reserve( I_nrVars );
-            factorVars[I].reserve( I_nrVars );
-            for( size_t _i = 0; _i < I_nrVars; _i++ ) {
-                long label;
-                is >> label;
-                if( is.fail() )
-                    DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read variable labels for " + toString(I) + "'th factor");
-                I_labels.push_back( label );
-                I_dims.push_back( vars[label].states() );
-                factorVars[I].push_back( vars[label] );
-            }
-            if( verbose >= 3 )
-                cout << "  labels: " << I_labels << ", dimensions " << I_dims << endl;
-
-            // add the factor and the labels
-            factors.push_back( Factor( VarSet( factorVars[I].begin(), factorVars[I].end(), factorVars[I].size() ), (Real)0 ) );
-        }
-
-        // for each factor, read its values
-        permutations.reserve( nrFacs );
-        for( size_t I = 0; I < nrFacs; I++ ) {
-            if( verbose >= 3 )
-                cout << "Reading factor " << I << "..." << endl;
-
-            // calculate permutation object, reversing the indexing in factorVars[I] first
-            Permute permindex( factorVars[I], true );
-            permutations.push_back( permindex );
-
-            // read factor values
-            size_t nrNonZeros;
-            is >> nrNonZeros;
-            if( is.fail() )
-                DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read number of nonzero factor values for " + toString(I) + "'th factor");
-            if( verbose >= 3 ) 
-                cout << "  number of nonzero values: " << nrNonZeros << endl;
-            DAI_ASSERT( nrNonZeros == factors[I].nrStates() );
-            for( size_t li = 0; li < nrNonZeros; li++ ) {
-                Real val;
-                is >> val;
-                if( is.fail() )
-                    DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Cannot read factor values of " + toString(I) + "'th factor");
-                // assign value after calculating its linear index corresponding to the permutation
-                if( verbose >= 4 )
-                    cout << "  " << li << "'th value " << val << " corresponds with index " << permindex.convertLinearIndex(li) << endl;
-                factors[I].set( permindex.convertLinearIndex( li ), val );
-            }
-        }
-        if( verbose >= 3 )
-            cout << "variables:" << vars << endl;
-        if( verbose >= 3 )
-            cout << "factors:" << factors << endl;
-
-        // close file
-        is.close();
-    } else
-        DAI_THROWE(CANNOT_READ_FILE,"Cannot read from file " + std::string(filename));
-}
-
-
 int main( int argc, char *argv[] ) {
     if ( argc != 5 ) {
         cout << "This program is part of libDAI - http://www.libdai.org/" << endl << endl;
@@ -235,9 +57,9 @@ int main( int argc, char *argv[] ) {
     } else {
         double starttic = toc();
 
-        size_t verbose = 1;
-        size_t ia_verbose = 0;
-        bool surgery = true;
+        size_t verbose = 1;    // verbosity
+        size_t ia_verbose = 0; // verbosity of inference algorithms
+        bool surgery = true;   // change factor graph structure based on evidence
         if( verbose )
             cout << "Solver:               " << argv[0] << endl;
 
@@ -295,7 +117,7 @@ int main( int argc, char *argv[] ) {
         vector<Permute> permutations;
         if( verbose )
             cout << "Reading factor graph..." << endl;
-        ReadUAIFGFile( argv[1], verbose, vars, facs0, permutations );
+        ReadUaiAieFactorGraphFile( argv[1], verbose, vars, facs0, permutations );
         if( verbose )
             cout << "Successfully read factor graph" << endl;
 
@@ -323,7 +145,7 @@ int main( int argc, char *argv[] ) {
         // read evidence
         if( verbose )
             cout << "Reading evidence..." << endl;
-        vector<map<size_t,size_t> > evid = ReadUAIEvidenceFile( argv[2], verbose );
+        vector<map<size_t,size_t> > evid = ReadUaiAieEvidenceFile( argv[2], verbose );
         if( verbose )
             cout << "Successfully read " << evid.size() << " evidence cases" << endl;
 
@@ -420,7 +242,7 @@ int main( int argc, char *argv[] ) {
                 // construct inference algorithm on clamped factor graph
                 if( verbose )
                     cout << "      Constructing inference algorithm..." << endl;
-                InfAlg *ia;
+                InfAlg *ia = NULL;
                 double tic = toc();
                 bool failed = false;
                 try {
