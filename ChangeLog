@@ -1,60 +1,71 @@
-git HEAD
---------
-* Added InfAlg::setMaxIter(size_t) in order to fix a regression in the
-  image segmentation example caused by the 'maxtime' properties
-* Image segmentation example now has a build flag for the version of CImg
+libDAI-0.2.6 (2010-08-05)
+-------------------------
+
+New features:
+* Added decimation algorithm DecMAP for MAP inference (decmap.h/cpp).
+* Added source code for one of the winning solvers of the 
+  UAI 2010 Approximate Inference Challenge (examples/uai2010-aie-solver.cpp).
+* Added support for reading files in the UAI Approximate Inference Challenge
+  format, supporting both the 2006/2008 evidence file format and the 2010
+  evidence file format (io.h/cpp).
+
+Miscellaneous improvements:
+* 'maxtime' property added to various algorithms (BP, Gibbs, HAK, TreeEP)
+  for setting an upper limit on execution time.
+* 'maxmem' property added to JTree for setting an upper limit on memory usage.
+* SmallSet:
+  - Added SmallSet::erase( const T& t ).
+* VarSet:
+  - nrStates() now returns a long double instead of a size_t.
+* Permute:
+  - Added ranges() accessor.
+  - Added inverse() method.
+  - Added optional reverse argument to Permute( const std::vector<Var>& ) constructor.
+* Factor:
+  - Added createFactorDelta( const VarSet& vs, size_t state ).
+* ClusterGraph:
+  - Added ClusterGraph(const FactorGraph& fg, bool onlyMaximal) constructor.
+  - Added findCluster( const VarSet& cl ).
+  - Added elimVar( size_t i ).
+  - Added 'maxStates' argument to VarElim( EliminationChoice f, size_t maxStates=0 ).
+* FactorGraph:
+  - Added isMaximal(size_t).
+  - Added maximalFactor(size_t).
+  - Added FactorGraph::logScore( const std::vector<size_t>& statevec ).
+* Gibbs:
+  - Added 'restart' property.
+  - Added Gibbs::findMaximum() for MAP inference.
+* HAK:
+  - Optimized region graph construction for HAK/GBP with clusters=BETHE.
+* examples/examples_imagesegmentation.cpp:
+  - [Peter Rockett] Improved Makefiles for image segmentation example.
+  - Added build flag to specify the CImg version.
+* util.h/cpp:
+  - Added fromString<>( const std::string& x ).
+
+Interface changes (the old interface is marked obsolete and will be removed in the next release):
+* Added InfAlg::setMaxIter(size_t) for setting the maximum number of iterations.
 * Deprecated Graph::Neighbor, BipartiteGraph::Neighbor and DAG::Neighbor
   and replaced them by a globally defined Neighbor structure
 * Deprecated Graph::Neighbors, BipartiteGraph::Neighbors and DAG::Neighbors
   and replaced them by a globally defined Neighbors type
 * Deprecated Graph::Edge, BipartiteGraph::Edge and DAG::Edge
   and replaced them by a globally defined Edge type
-* Added io.h/io.cpp which currently provides functionality for reading
-  files in the UAI Approximate Inference Challenge fileformats
-  (supporting both the 2006/2008 evidence file format and the 2010
-  evidence file format)
-* Deprecated void tokenizeString( const string&, vector<string>&, const string& )
+* Renamed 'iters' property of Gibbs algorithm into 'maxiter'.
+* ClusterGraph::findVar( const Var& n ) no longer throws an exception if the
+  variable is not found.
+* Deprecated 'void tokenizeString( const string&, vector<string>&, const string& )'
   and replaced it with an improved version
-  vector<string> tokenizeString( const string&, bool, const string& )
-* [Matt Dunham] Fixed a bug in Factors2mx in src/matlab/matlab.cpp:
-  segfault if factors depending on 0 variables were passed to MatLab
-* Added source code for one of the winning solvers of the 
-  UAI 2010 Approximate Inference Challenge 
-* Improved VarSet
-  - nrStates() now returns a long double instead of a size_t
-* Improved ClusterGraph
-  - added ClusterGraph(const FactorGraph& fg, bool onlyMaximal) constructor
-  - findVar( const Var& n ) no longer throws an exception if the variable is
-    not found
-  - added findCluster( const VarSet& cl )
-  - added elimVar( size_t i )
-  - added 'maxStates' argument to VarElim( EliminationChoice f, size_t maxStates=0 )
-* Improved JTree (added 'maxmem' property)
-* Improved HAK (added 'maxtime' property)
-* Improved TreeEP (added 'maxtime' property)
-* Added FactorGraph::logScore( const std::vector<size_t>& statevec )
-* Improved Gibbs
-  - renamed 'iters' property into 'maxiter'
-  - added 'maxtime' property
-  - added 'restart' property
-  - added Gibbs::findMaximum()
-* Improved BP (added 'maxtime' property)
-* Added fromString<>( const std::string& x )
-* Added SmallSet::erase( const T& t )
-* Added DECMAP algorithm.
-* Added createFactorDelta( const VarSet& vs, size_t state )
-* [Peter Rockett] Improved Makefiles for image segmentation example.
-* Removed deprecated interfaces.
-* Added FactorGraph::isMaximal(size_t) and FactorGraph::maximalFactor(size_t).
-* Added optional reverse argument to Permute::Permute( const std::vector<Var>& )
-  constructor.
-* Added Permute::ranges() accessor.
-* Added Permute::inverse() method.
-* Optimized region graph construction for HAK/GBP with clusters=BETHE.
+  'vector<string> tokenizeString( const string&, bool, const string& )'
+* Removed interfaces deprecated in 0.2.5.
+
+Bug fixes:
 * Fixed a problem with isnan() on FreeBSD; it is now in the dai namespace.
 * Workaround for older g++ compilers (e.g. version 4.0.0 on Darwin 9.8.0)
   which have problems when comparing const_reverse_iterator with
   reverse_iterator.
+* [Matt Dunham] Fixed a bug in Factors2mx in src/matlab/matlab.cpp
+  (segfault if factors depending on 0 variables were passed to MatLab)
 
 
 libDAI-0.2.5 (2010-05-09)

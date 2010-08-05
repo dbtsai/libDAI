@@ -29,8 +29,12 @@ const char *Gibbs::Name = "GIBBS";
 
 
 void Gibbs::setProperties( const PropertySet &opts ) {
-    DAI_ASSERT( opts.hasKey("maxiter") );
-    props.maxiter = opts.getStringAs<size_t>("maxiter");
+    /// \deprecated The 'iters' property has been renamed into 'maxiters'
+    DAI_ASSERT( opts.hasKey("maxiter") || opts.hasKey("iters") );
+    if( opts.hasKey("maxiter") )
+        props.maxiter = opts.getStringAs<size_t>("maxiter");
+    else
+        props.maxiter = opts.getStringAs<size_t>("iters");
 
     if( opts.hasKey("restart") )
         props.restart = opts.getStringAs<size_t>("restart");

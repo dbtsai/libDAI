@@ -2,8 +2,8 @@ libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
 -------------------------------------------------------------------------------
 
-Version:  git HEAD
-Date:     May 12, 2010, or later
+Version:  0.2.6
+Date:     August 5, 2010
 See also: http://www.libdai.org
 
 -------------------------------------------------------------------------------
@@ -32,14 +32,14 @@ fashion in which this software was used, including the version number.
 
 An appropriate citation would be:
 
-Joris M. Mooij et al. (2010) "libDAI 0.2.5: A free/open source C++ library for
+Joris M. Mooij et al. (2010) "libDAI 0.2.6: A free/open source C++ library for
 Discrete Approximate Inference", http://www.libdai.org
 
 or in BiBTeX format:
 
   @misc{mooij2010libdai,
     author = "Joris M. Mooij et al.",
-    title = "lib{DAI} 0.2.5: A free/open source {C}++ library for {D}iscrete {A}pproximate {I}nference",
+    title = "lib{DAI} 0.2.6: A free/open source {C}++ library for {D}iscrete {A}pproximate {I}nference",
     howpublished = "http://www.libdai.org/",
     year = 2010
   }
@@ -71,6 +71,10 @@ addition, part of the functionality is accessibly by using the
 libDAI can be used to implement novel (approximate) inference algorithms and to
 easily compare the accuracy and performance with existing algorithms that have
 been implemented already.
+
+A solver using libDAI was amongst the three winners of the UAI 2010 Approximate
+Inference Challenge (see http://www.cs.huji.ac.il/project/UAI10/ for more
+information). The full source code is provided as part of the library.
 
 Features
 
