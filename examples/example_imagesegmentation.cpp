@@ -179,8 +179,8 @@ double doInference( FactorGraph& fg, string algOpts, size_t maxIter, double tol,
         disp = image;
 #endif
 
-        // Perform the requested inference algorithm
-        // (which could be limited to perform only 1 iteration)
+        // Perform the requested inference algorithm for only one step
+        ia->setMaxIter( iter + 1 );
         maxDiff = ia->run();
 
         // Output progress

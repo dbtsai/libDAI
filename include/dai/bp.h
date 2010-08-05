@@ -197,11 +197,15 @@ class BP : public DAIAlgFG {
         virtual Factor beliefF( size_t I ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;
+        /** \pre Assumes that run() has been called and that \a props.inference == \c MAXPROD
+         */
+        std::vector<std::size_t> findMaximum() const;
         virtual void init();
         virtual void init( const VarSet &ns );
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
+        virtual void setMaxIter( size_t maxiter ) { props.maxiter = maxiter; }
         virtual void setProperties( const PropertySet &opts );
         virtual PropertySet getProperties() const;
         virtual std::string printProperties() const;
@@ -209,11 +213,6 @@ class BP : public DAIAlgFG {
 
     /// \name Additional interface specific for BP
     //@{
-        /// Calculates the joint state of all variables that has maximum probability
-        /** \pre Assumes that run() has been called and that \a props.inference == \c MAXPROD
-         */
-        std::vector<std::size_t> findMaximum() const;
-
         /// Returns history of which messages have been updated
         const std::vector<std::pair<std::size_t, std::size_t> >& getSentMessages() const {
             return _sentMessages;

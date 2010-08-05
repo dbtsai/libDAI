@@ -128,6 +128,9 @@ class JTree : public DAIAlgRG {
         virtual Factor belief( const VarSet &vs ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;
+        /** \pre Assumes that run() has been called and that \a props.inference == \c MAXPROD
+         */
+        std::vector<std::size_t> findMaximum() const;
         virtual void init() {}
         virtual void init( const VarSet &/*ns*/ ) {}
         virtual Real run();
@@ -192,11 +195,6 @@ class JTree : public DAIAlgRG {
         /** \pre assumes that run() has been called already
          */
         Factor calcMarginal( const VarSet& vs );
-
-        /// Calculates the joint state of all variables that has maximum probability
-        /** \pre Assumes that run() has been called and that \a props.inference == \c MAXPROD
-         */
-        std::vector<std::size_t> findMaximum() const;
     //@}
 };
 

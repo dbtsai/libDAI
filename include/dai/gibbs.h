@@ -94,12 +94,13 @@ class Gibbs : public DAIAlgFG {
         virtual Factor beliefF( size_t I ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
+        std::vector<std::size_t> findMaximum() const { return _max_state; }
         virtual void init();
         virtual void init( const VarSet &/*ns*/ ) { init(); }
         virtual Real run();
         virtual Real maxDiff() const { DAI_THROW(NOT_IMPLEMENTED); return 0.0; }
         virtual size_t Iterations() const { return _iters; }
-        std::vector<std::size_t> findMaximum() const { return _max_state; }
+        virtual void setMaxIter( size_t maxiter ) { props.maxiter = maxiter; }
         virtual void setProperties( const PropertySet &opts );
         virtual PropertySet getProperties() const;
         virtual std::string printProperties() const;

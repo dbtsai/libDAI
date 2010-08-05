@@ -77,6 +77,9 @@ class ExactInf : public DAIAlgFG {
         virtual Factor beliefF( size_t I ) const { return _beliefsF[I]; }
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const { return _logZ; }
+        /** \note The complexity of this calculation is exponential in the number of variables.
+         */
+        std::vector<std::size_t> findMaximum() const;
         virtual void init();
         virtual void init( const VarSet &/*ns*/ ) {}
         virtual Real run();
@@ -93,11 +96,6 @@ class ExactInf : public DAIAlgFG {
         /** \note The complexity of this calculation is exponential in the number of variables.
          */
         Factor calcMarginal( const VarSet &vs ) const;
-
-        /// Calculates the joint state of all variables that has maximum probability
-        /** \note The complexity of this calculation is exponential in the number of variables.
-         */
-        std::vector<std::size_t> findMaximum() const;
     //@}
 
     private:

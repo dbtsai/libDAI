@@ -78,10 +78,10 @@ class DecMAP : public DAIAlgFG {
         virtual Factor beliefF( size_t I ) const { return belief( factor(I).vars() ); }
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const { return _logp; }
+        virtual std::vector<size_t> findMaximum() const { return _state; }
         virtual void init() { _maxdiff = 0.0; _iters = 0; }
         virtual void init( const VarSet &/*ns*/ ) { init(); }
         virtual Real run();
-        virtual std::vector<size_t> findMaximum() const { return _state; }
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
         virtual void setProperties( const PropertySet &opts );

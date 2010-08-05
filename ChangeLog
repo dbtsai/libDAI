@@ -1,5 +1,7 @@
 git HEAD
 --------
+* Added InfAlg::setMaxIter(size_t) in order to fix a regression in the
+  image segmentation example caused by the 'maxtime' properties
 * Image segmentation example now has a build flag for the version of CImg
 * Deprecated Graph::Neighbor, BipartiteGraph::Neighbor and DAG::Neighbor
   and replaced them by a globally defined Neighbor structure

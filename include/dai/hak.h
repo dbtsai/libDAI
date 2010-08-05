@@ -122,6 +122,7 @@ class HAK : public DAIAlgRG {
         virtual Real run();
         virtual Real maxDiff() const { return _maxdiff; }
         virtual size_t Iterations() const { return _iters; }
+        virtual void setMaxIter( size_t maxiter ) { props.maxiter = maxiter; }
         virtual void setProperties( const PropertySet &opts );
         virtual PropertySet getProperties() const;
         virtual std::string printProperties() const;

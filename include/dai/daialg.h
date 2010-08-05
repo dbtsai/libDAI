@@ -126,6 +126,11 @@ class InfAlg {
         /** \throw NOT_IMPLEMENTED if not implemented/supported
          */
         virtual size_t Iterations() const { DAI_THROW(NOT_IMPLEMENTED); };
+
+        /// Sets maximum number of iterations (one iteration passes over the complete factorgraph).
+        /** \throw NOT_IMPLEMENTED if not implemented/supported
+         */
+        virtual void setMaxIter( size_t /*maxiter*/ ) { DAI_THROW(NOT_IMPLEMENTED); }
     //@}
 
     /// \name Changing the factor graph
