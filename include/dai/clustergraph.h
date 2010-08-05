@@ -107,21 +107,6 @@ namespace dai {
                 return find( _clusters.begin(), _clusters.end(), cl ) - _clusters.begin();
             }
 
-/*            /// Returns the index of a cluster \a _cl
-            size_t findCluster( const SmallSet<size_t>& _cl ) const {
-                if( _cl.size() == 0 ) {
-                    for( size_t I = 0; I < nrClusters(); I++ )
-                        if( cluster(I).size() == 0 )
-                            return I;
-                } else {
-                    size_t i = _cl.front();
-                    foreach( const Neighbor& I, _G.nb1(i) )
-                        if( _G.nb2Set(I) == _cl )
-                            return I;
-                }
-                return nrClusters();
-            }*/
-
             /// Returns union of clusters that contain the \a i 'th variable
             VarSet Delta( size_t i ) const {
                 VarSet result;
@@ -192,19 +177,6 @@ namespace dai {
                 return index;
             }
 
-/*            /// Inserts a cluster (if it does not already exist), assuming no new variables have to be created
-            size_t insert( const SmallSet<size_t>& _cl ) {
-                size_t index = findCluster( _cl );
-                if( index == _clusters.size() ) {
-                    VarSet cl;
-                    foreach( size_t i, _cl )
-                        cl |= var(i);
-                    _clusters.push_back( cl );
-                    _G.addNode2( _cl.begin(), _cl.end(), _cl.size() );
-                }
-                return index;
-            }*/
-
             /// Erases all clusters that are not maximal
             ClusterGraph& eraseNonMaximal() {
                 for( size_t I = 0; I < _G.nrNodes2(); ) {
@@ -233,47 +205,9 @@ namespace dai {
             VarSet elimVar( size_t i ) {
                 DAI_ASSERT( i < nrVars() );
                 VarSet Di = Delta( i );
-
-//                if( 1 ) { // unoptimized, transparent code
-                    VarSet di = delta( i );
-                    insert( di );
-                    eraseSubsuming( i );
-                    eraseNonMaximal();
-/*                } else { // partially optimized code
-                    SmallSet<size_t> nbI = _G.delta1( i, false );
-                    size_t I = insert( nbI );
-
-                    while( _G.nb1(i).size() ) {
-                        size_t J = _G.nb1(i,0);
-                        _clusters.erase( _clusters.begin() + J );
-                        _G.eraseNode2( J );
-                        if( I > J )
-                            I--;
-                    }
-
-                    bool di_maximal = true;
-                    foreach( size_t j, nbI ) {
-                        for( size_t _J = 0; _J < _G.nb1(j).size(); ) {
-                            size_t J = _G.nb1(j,_J);
-                            SmallSet<size_t> indJ = _G.nb2Set( J );
-                            if( indJ << nbI && indJ.size() != nbI.size() ) {
-                                _clusters.erase( _clusters.begin() + J );
-                                _G.eraseNode2( J );
-                                if( I > J )
-                                    I--;
-                            } else {
-                                if( di_maximal && indJ >> nbI && indJ.size() != nbI.size() )
-                                    di_maximal = false;
-                                _J++;
-                            }
-                        }
-                    }
-                    if( !di_maximal ) {
-                        _clusters.erase( _clusters.begin() + I );
-                        _G.eraseNode2( I );
-                    }
-                }*/
-
+                insert( Di / var(i) );
+                eraseSubsuming( i );
+                eraseNonMaximal();
                 return Di;
             }
         //@}
