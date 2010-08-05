@@ -127,7 +127,6 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     BOOST_CHECK_EQUAL( G4.cluster(1), v12 );
     BOOST_CHECK_EQUAL( G4.cluster(2), v23 );
     BOOST_CHECK_EQUAL( G4.cluster(3), v13 );
-    typedef BipartiteGraph::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge(0, 0) );
     edges.push_back( Edge(1, 0) );

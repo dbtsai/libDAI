@@ -24,8 +24,6 @@ using namespace dai;
 
 BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     // check constructors
-    typedef BipartiteGraph::Edge Edge;
-
     BipartiteGraph G;
     BOOST_CHECK_EQUAL( G.nrNodes1(), 0 );
     BOOST_CHECK_EQUAL( G.nrNodes2(), 0 );
@@ -105,7 +103,6 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
 
 BOOST_AUTO_TEST_CASE( NeighborTest ) {
     // check nb() accessor / mutator
-    typedef BipartiteGraph::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge(0, 0) );
     edges.push_back( Edge(0, 1) );
@@ -156,7 +153,6 @@ BOOST_AUTO_TEST_CASE( NeighborTest ) {
 
 BOOST_AUTO_TEST_CASE( AddEraseTest ) {
     // check addition and erasure of nodes and edges
-    typedef BipartiteGraph::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 0 ) );
     edges.push_back( Edge( 0, 1 ) );
@@ -347,7 +343,6 @@ BOOST_AUTO_TEST_CASE( RandomAddEraseTest ) {
 
 BOOST_AUTO_TEST_CASE( QueriesTest ) {
     // check queries which have not been tested in another test case
-    typedef BipartiteGraph::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 1 ) );
     edges.push_back( Edge( 1, 1 ) );
@@ -385,7 +380,6 @@ BOOST_AUTO_TEST_CASE( QueriesTest ) {
 
 BOOST_AUTO_TEST_CASE( StreamTest ) {
     // check printDot
-    typedef BipartiteGraph::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge(0, 0) );
     edges.push_back( Edge(0, 1) );

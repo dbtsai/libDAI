@@ -227,7 +227,7 @@ ostream & operator << (ostream & os, const RegionGraph & rg) {
     for( size_t beta = 0; beta < rg.nrIRs(); beta++ )
         os << "\tb" << beta << " [label=\"b" << beta << ": " << (VarSet)rg.IR(beta) << ", c=" << rg.IR(beta).c() << "\"];" << endl;
     for( size_t alpha = 0; alpha < rg.nrORs(); alpha++ )
-        foreach( const RegionGraph::Neighbor &beta, rg.nbOR(alpha) )
+        foreach( const Neighbor &beta, rg.nbOR(alpha) )
             os << "\ta" << alpha << " -> b" << beta << ";" << endl;
     os << "}" << endl;
     return os;

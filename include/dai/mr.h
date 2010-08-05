@@ -43,9 +43,6 @@ class MR : public DAIAlgFG {
         /// The interaction graph (Markov graph)
         GraphAL G;
 
-        /// Convenience shortcut
-        typedef GraphAL::Neighbor Neighbor;
-
         /// tJ[i][_j] is the hyperbolic tangent of the interaction between spin \a i and its neighbour G.nb(i,_j)
         std::vector<std::vector<Real> >                 tJ;
         /// theta[i] is the local field on spin \a i

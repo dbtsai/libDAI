@@ -35,13 +35,6 @@ namespace dai {
      *  \todo Remove the _vars and _clusters variables and use only the graph and a contextual factor graph.
      */
     class ClusterGraph {
-        public:
-            /// Shorthand for BipartiteGraph::Neighbor
-            typedef BipartiteGraph::Neighbor Neighbor;
-
-            /// Shorthand for BipartiteGraph::Edge
-            typedef BipartiteGraph::Edge     Edge;
-
         private:
             /// Stores the neighborhood structure
             BipartiteGraph       _G;

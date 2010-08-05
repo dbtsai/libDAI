@@ -23,9 +23,6 @@ namespace dai {
 using namespace std;
 
 
-typedef BipartiteGraph::Neighbor Neighbor;
-
-
 void BP_dual::init() {
     regenerateMessages();
     regenerateBeliefs();

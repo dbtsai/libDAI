@@ -1,5 +1,11 @@
 git HEAD
 --------
+* Deprecated Graph::Neighbor, BipartiteGraph::Neighbor and DAG::Neighbor
+  and replaced them by a globally defined Neighbor structure
+* Deprecated Graph::Neighbors, BipartiteGraph::Neighbors and DAG::Neighbors
+  and replaced them by a globally defined Neighbors type
+* Deprecated Graph::Edge, BipartiteGraph::Edge and DAG::Edge
+  and replaced them by a globally defined Edge type
 * Added io.h/io.cpp which currently provides functionality for reading
   files in the UAI Approximate Inference Challenge fileformats
   (supporting both the 2006/2008 evidence file format and the 2010

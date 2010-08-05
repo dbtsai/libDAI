@@ -82,7 +82,7 @@ FactorGraph createFG( const GraphAL &G, FactorType ft, size_t states, const Prop
     factors.reserve( G.nrEdges() + N );
     // Pairwise factors
     for( size_t i = 0; i < N; i++ )
-        foreach( const GraphAL::Neighbor &j, G.nb(i) )
+        foreach( const Neighbor &j, G.nb(i) )
             if( i < j ) {
                 if( ft == FactorType::POTTS )
                     factors.push_back( createFactorPotts( vars[i], vars[j], beta ) );
@@ -174,10 +174,10 @@ BipartiteGraph createRandomBipartiteGraph( size_t N1, size_t N2, size_t d1, size
     random_shuffle( stubs2.begin(), stubs2.end() );
 
     // add edges
-    vector<BipartiteGraph::Edge> edges;
+    vector<Edge> edges;
     edges.reserve( N1*d1 );
     for( size_t e = 0; e < N1*d1; e++ )
-        edges.push_back( BipartiteGraph::Edge(stubs1[e], stubs2[e]) );
+        edges.push_back( Edge(stubs1[e], stubs2[e]) );
 
     // finish construction
     G.construct( N1, N2, edges.begin(), edges.end() );
@@ -224,7 +224,6 @@ BipartiteGraph createSmallLDPCGraph() {
     BipartiteGraph G;
     size_t N=4, j=3, K=4; // k=3;
 
-    typedef BipartiteGraph::Edge Edge;
     vector<Edge> edges;
     edges.reserve( N*j );
     edges.push_back( Edge(0,0) ); edges.push_back( Edge(1,0) ); edges.push_back( Edge(2,0) );
@@ -272,7 +271,6 @@ BipartiteGraph createGroupStructuredLDPCGraph( size_t p, size_t j, size_t k ) {
 
     DAI_ASSERT( N * n == K * k );
 
-    typedef BipartiteGraph::Edge Edge;
     vector<Edge> edges;
     edges.reserve( N * n );
 

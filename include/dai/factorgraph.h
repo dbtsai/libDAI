@@ -62,18 +62,10 @@ namespace dai {
  *  (ones/delta/full) and act accordingly. Update: it seems that the proposed functionality 
  *  would not be enough for CBP, for which it would make more sense to add more levels of
  *  backup/restore.
+ *
+ *  \todo Write a method that applies evidence (should we represent evidence as a map<Var,size_t> or as a map<size_t,size_t>?)
  */ 
 class FactorGraph {
-    public:
-        /// Shorthand for BipartiteGraph::Neighbor
-        typedef BipartiteGraph::Neighbor  Neighbor;
-
-        /// Shorthand for BipartiteGraph::Neighbors
-        typedef BipartiteGraph::Neighbors Neighbors;
-
-        /// Shorthand for BipartiteGraph::Edge
-        typedef BipartiteGraph::Edge      Edge;
-
     private:
         /// Stores the neighborhood structure
         BipartiteGraph           _G;

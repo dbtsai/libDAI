@@ -38,7 +38,6 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     G2.checkConsistency();
     BOOST_CHECK( !(G2 == G0) );
     
-    typedef DAG::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 1 ) );
     edges.push_back( Edge( 1, 2 ) );
@@ -66,7 +65,6 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
 
 BOOST_AUTO_TEST_CASE( NeighborTest ) {
     // check pa(), ch() accessors / mutators
-    typedef DAG::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 2 ) );
     edges.push_back( Edge( 1, 2 ) );
@@ -115,7 +113,6 @@ BOOST_AUTO_TEST_CASE( NeighborTest ) {
 
 BOOST_AUTO_TEST_CASE( AddEraseTest ) {
     // check addition and erasure of nodes and edges
-    typedef DAG::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 1 ) );
     edges.push_back( Edge( 1, 2 ) );
@@ -248,7 +245,6 @@ BOOST_AUTO_TEST_CASE( RandomAddEraseTest ) {
 
 BOOST_AUTO_TEST_CASE( QueriesTest ) {
     // check queries which have not been tested in another test case
-    typedef DAG::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 1 ) );
     edges.push_back( Edge( 0, 3 ) );

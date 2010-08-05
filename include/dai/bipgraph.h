@@ -23,6 +23,7 @@
 #include <dai/util.h>
 #include <dai/smallset.h>
 #include <dai/exceptions.h>
+#include <dai/graph.h>
 
 
 namespace dai {
@@ -33,7 +34,7 @@ namespace dai {
  *  nodes of different type. Nodes are indexed by an unsigned integer. If there are nrNodes1()
  *  nodes of type 1 and nrNodes2() nodes of type 2, the nodes of type 1 are numbered
  *  0,1,2,...,nrNodes1()-1 and the nodes of type 2 are numbered 0,1,2,...,nrNodes2()-1. An edge
- *  between node \a n1 of type 1 and node \a n2 of type 2 is represented by a BipartiteGraph::Edge(\a n1,\a n2).
+ *  between node \a n1 of type 1 and node \a n2 of type 2 is represented by a Edge(\a n1,\a n2).
  *
  *  A BipartiteGraph is implemented as a sparse adjacency list, i.e., it stores for each node a list of
  *  its neighboring nodes. More precisely: it stores for each node of type 1 a vector of Neighbor structures
@@ -45,85 +46,20 @@ namespace dai {
  *  \idea Cache second-order neighborhoods in BipartiteGraph.
  */
 class BipartiteGraph {
-    public:
         /// Describes the neighbor relationship of two nodes in a BipartiteGraph.
-        /** Sometimes we want to do an action, such as sending a
-         *  message, for all edges in a graph. However, most graphs
-         *  will be sparse, so we need some way of storing a set of
-         *  the neighbors of a node, which is both fast and
-         *  memory-efficient. We also need to be able to go between
-         *  viewing node \a a as a neighbor of node \a b, and node \a b
-         *  as a neighbor of node \a a. The Neighbor struct solves
-         *  both of these problems. Each node has a list of neighbors,
-         *  stored as a std::vector<\link Neighbor \endlink>, and 
-         *  extra information is included in the Neighbor struct which 
-         *  allows us to access a node as a neighbor of its neighbor 
-         *  (the \c dual member).
-         *
-         *  By convention, variable identifiers naming indices into a
-         *  vector of neighbors are prefixed with an underscore ("_").
-         *  The neighbor list which they point into is then understood
-         *  from context. For example:
-         *
-         *  \code
-         *  void BP::calcNewMessage( size_t i, size_t _I )
-         *  \endcode
-         *
-         *  Here, \a i is the "absolute" index of node i, but \a _I is
-         *  understood as a "relative" index, giving node \a I 's entry in
-         *  <tt>nb1(i)</tt>. The corresponding Neighbor structure can be
-         *  accessed as <tt>nb1(i,_I)</tt> or <tt>nb1(i)[_I]</tt>. The 
-         *  absolute index of \a _I, which would be called \a I, can be 
-         *  recovered from the \c node member: <tt>nb1(i,_I).node</tt>. 
-         *  The \c iter member gives the relative index \a _I, and the 
-         *  \c dual member gives the "dual" relative index, i.e., the 
-         *  index of \a i in \a I 's neighbor list.
-         *
-         *  \code
-         *  Neighbor n = nb1(i,_I);
-         *  n.node == I &&
-         *  n.iter == _I &&
-         *  nb2(n.node,n.dual).node == i
-         *  \endcode
-         *
-         *  In a FactorGraph, the nodes of type 1 represent variables, and
-         *  the nodes of type 2 represent factors. For convenience, nb1() is 
-         *  called FactorGraph::nbV(), and nb2() is called FactorGraph::nbF().
-         *
-         *  There is no easy way to transform a pair of absolute node
-         *  indices \a i and \a I into a Neighbor structure relative
-         *  to one of the nodes. Such a feature has never yet been
-         *  found to be necessary. Iteration over edges can always be
-         *  accomplished using the Neighbor lists, and by writing
-         *  functions that accept relative indices:
-         *  \code
-         *  for( size_t i = 0; i < nrVars(); ++i )
-         *      foreach( const Neighbor &I, nbV(i) )
-         *          calcNewMessage( i, I.iter );
-         *  \endcode
+        /** \deprecated Please use dai::Neighbor instead
          */
-        struct Neighbor {
-            /// Corresponds to the index of this Neighbor entry in the vector of neighbors
-            size_t iter;
-            /// Contains the number of the neighboring node
-            size_t node;
-            /// Contains the "dual" iter
-            size_t dual;
-
-            /// Default constructor
-            Neighbor() {}
-            /// Constructor that sets the Neighbor members according to the parameters
-            Neighbor( size_t iter, size_t node, size_t dual ) : iter(iter), node(node), dual(dual) {}
-
-            /// Cast to \c size_t returns \c node member
-            operator size_t () const { return node; }
-        };
+        typedef dai::Neighbor Neighbor;
 
         /// Describes the neighbors of some node.
-        typedef std::vector<Neighbor> Neighbors;
+        /** \deprecated Please use dai::Neighbors instead
+         */
+        typedef dai::Neighbors Neighbors;
 
         /// Represents an edge: an Edge(\a n1,\a n2) corresponds to the edge between node \a n1 of type 1 and node \a n2 of type 2.
-        typedef std::pair<size_t,size_t> Edge;
+        /** \deprecated Please use dai::Edge instead
+         */
+        typedef dai::Edge Edge;
 
     private:
         /// Contains for each node of type 1 a vector of its neighbors
@@ -150,7 +86,7 @@ class BipartiteGraph {
         BipartiteGraph( size_t nr1, size_t nr2 ) : _nb1(nr1), _nb2(nr2) {}
 
         /// Constructs BipartiteGraph from a range of edges.
-        /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
+        /** \tparam EdgeInputIterator Iterator that iterates over instances of Edge.
          *  \param nrNodes1 The number of nodes of type 1.
          *  \param nrNodes2 The number of nodes of type 2.
          *  \param begin Points to the first edge.
@@ -217,7 +153,7 @@ class BipartiteGraph {
     /// \name Adding nodes and edges
     //@{
         /// (Re)constructs BipartiteGraph from a range of edges.
-        /** \tparam EdgeInputIterator Iterator that iterates over instances of BipartiteGraph::Edge.
+        /** \tparam EdgeInputIterator Iterator that iterates over instances of Edge.
          *  \param nrNodes1 The number of nodes of type 1.
          *  \param nrNodes2 The number of nodes of type 2.
          *  \param begin Points to the first edge.

@@ -28,10 +28,85 @@
 namespace dai {
 
 
+/// Describes the neighbor relationship of two nodes in a graph.
+/** Most graphs that libDAI deals with are sparse. Therefore,
+ *  a fast and memory-efficient way of representing the structure
+ *  of a sparse graph is needed. A frequently used operation that
+ *  also needs to be fast is switching between viewing node \a a as a 
+ *  neighbor of node \a b, and node \a b as a neighbor of node \a a.
+ *  The Neighbor struct solves both of these problems.
+ *
+ *  Most sparse graphs in libDAI are represented by storing for each
+ *  node in the graph the set of its neighbors. In practice, this set
+ *  of neighbors is stored using the Neighbors type, which is simply a
+ *  std::vector<\link Neighbor \endlink>. The Neighbor struct contains
+ *  the label of the neighboring node (the \c node member) and 
+ *  additional information which allows to access a node as a neighbor 
+ *  of its neighbor (the \c dual member). For convenience, each Neighbor 
+ *  structure also stores its index in the Neighbors vector that it is 
+ *  part of (the \c iter member).
+ *
+ *  By convention, variable identifiers naming indices into a vector
+ *  of neighbors are prefixed with an underscore ("_"). The neighbor list 
+ *  which they point into is then understood from the context.
+ *
+ *  Let us denote the \a _j 'th neighbor of node \a i by <tt>nb(i,_j)</tt>,
+ *  which is of the Neighbor type. Here, \a i is the "absolute" index of 
+ *  node \a i, but \a _j is understood as a "relative" index, giving node 
+ *  \a j 's entry in the Neighbors <tt>nb(i)</tt> of node \a i. The absolute
+ *  index of \a _j, which would be denoted \a j, can be recovered from the 
+ *  \c node member, <tt>nb(i,_j).node</tt>. The \c iter member 
+ *  <tt>nb(i,_j).iter</tt> gives the relative index \a _j, and the \c dual 
+ *  member <tt>nb(i,_j).dual</tt> gives the "dual" relative index, i.e., 
+ *  the index of \a i in \a j 's neighbor list.
+ *
+ *  Iteration over edges can be easily accomplished:
+ *  \code
+ *  for( size_t i = 0; i < nrNodes(); ++i ) {
+ *      size_t _j = 0;
+ *      foreach( const Neighbor &j, nb(i) ) {
+ *          assert( j == nb(i,j.iter) );
+ *          assert( nb(j.node,j.dual).node == i );
+ *          assert( _j = j.iter );
+ *          _j++;
+ *      }
+ *  }
+ *  \endcode
+ */
+struct Neighbor {
+    /// Corresponds to the index of this Neighbor entry in the vector of neighbors
+    size_t iter;
+    /// Contains the absolute index of the neighboring node
+    size_t node;
+    /// Contains the "dual" index (i.e., the index of this node in the Neighbors vector of the neighboring node)
+    size_t dual;
+
+    /// Default constructor
+    Neighbor() {}
+    /// Constructor that allows setting the values of the member variables
+    Neighbor( size_t iter, size_t node, size_t dual ) : iter(iter), node(node), dual(dual) {}
+
+    /// Cast to \c size_t returns \c node member
+    operator size_t () const { return node; }
+};
+
+
+/// Describes the set of neighbors of some node in a graph
+typedef std::vector<Neighbor> Neighbors;
+
+
+/// Represents an edge in a graph: an Edge(\a i,\a j) corresponds to the edge between node \a i and node \a j.
+/** \note If the edge is interpreted as a directed edge, then it points from \a i to \a j.
+ *  \note If the edge is part of a bipartite graph, \a i is understood to correspond to a node of type 1, and
+ *  \a j to a node of type 2.
+ */
+typedef std::pair<size_t,size_t> Edge;
+
+
 /// Represents the neighborhood structure of nodes in an undirected graph.
 /** A graph has nodes connected by edges. Nodes are indexed by an unsigned integer. 
  *  If there are nrNodes() nodes, they are numbered 0,1,2,...,nrNodes()-1. An edge
- *  between node \a n1 and node \a n2 is represented by a GraphAL::Edge(\a n1,\a n2).
+ *  between node \a n1 and node \a n2 is represented by a Edge(\a n1,\a n2).
  *
  *  GraphAL is implemented as a sparse adjacency list, i.e., it stores for each node a list of
  *  its neighboring nodes. The list of neighboring nodes is implemented as a vector of Neighbor
@@ -42,79 +117,19 @@ namespace dai {
 class GraphAL {
     public:
         /// Describes the neighbor relationship of two nodes in a GraphAL.
-        /** Sometimes we want to do an action, such as sending a
-         *  message, for all edges in a graph. However, most graphs
-         *  will be sparse, so we need some way of storing a set of
-         *  the neighbors of a node, which is both fast and
-         *  memory-efficient. We also need to be able to go between
-         *  viewing node \a a as a neighbor of node \a b, and node \a b
-         *  as a neighbor of node \a a. The Neighbor struct solves
-         *  both of these problems. Each node has a list of neighbors,
-         *  stored as a std::vector<\link Neighbor \endlink>, and 
-         *  extra information is included in the Neighbor struct which 
-         *  allows us to access a node as a neighbor of its neighbor 
-         *  (the \c dual member).
-         *
-         *  By convention, variable identifiers naming indices into a
-         *  vector of neighbors are prefixed with an underscore ("_").
-         *  The neighbor list which they point into is then understood
-         *  from context. For example:
-         *
-         *  \code
-         *  Real MR::T( size_t i, size_t _j );
-         *  \endcode
-         *
-         *  Here, \a i is the "absolute" index of node i, but \a _j is
-         *  understood as a "relative" index, giving node \a j 's entry in
-         *  <tt>nb(i)</tt>. The corresponding Neighbor structure can be
-         *  accessed as <tt>nb(i,_j)</tt> or <tt>nb(i)[_j]</tt>. The 
-         *  absolute index of \a _j, which would be called \a j, can be 
-         *  recovered from the \c node member: <tt>nb(i,_j).node</tt>. 
-         *  The \c iter member gives the relative index \a _j, and the 
-         *  \c dual member gives the "dual" relative index, i.e., the 
-         *  index of \a i in \a j 's neighbor list.
-         *
-         *  \code
-         *  Neighbor n = nb(i,_j);
-         *  n.node == j &&
-         *  n.iter == _j &&
-         *  nb(n.node,n.dual).node == i
-         *  \endcode
-         *
-         *  There is no easy way to transform a pair of absolute node
-         *  indices \a i and \a j into a Neighbor structure relative
-         *  to one of the nodes. Such a feature has never yet been
-         *  found to be necessary. Iteration over edges can always be
-         *  accomplished using the Neighbor lists, and by writing
-         *  functions that accept relative indices:
-         *  \code
-         *  for( size_t i = 0; i < nrNodes(); ++i )
-         *      foreach( const Neighbor &j, nb(i) )
-         *          T( i, j.iter );
-         *  \endcode
+        /** \deprecated Please use dai::Neighbor instead
          */
-        struct Neighbor {
-            /// Corresponds to the index of this Neighbor entry in the vector of neighbors
-            size_t iter;
-            /// Contains the number of the neighboring node
-            size_t node;
-            /// Contains the "dual" iter
-            size_t dual;
-
-            /// Default constructor
-            Neighbor() {}
-            /// Constructor that sets the Neighbor members according to the parameters
-            Neighbor( size_t iter, size_t node, size_t dual ) : iter(iter), node(node), dual(dual) {}
-
-            /// Cast to \c size_t returns \c node member
-            operator size_t () const { return node; }
-        };
+        typedef dai::Neighbor Neighbor;
 
         /// Describes the neighbors of some node.
-        typedef std::vector<Neighbor> Neighbors;
+        /** \deprecated Please use dai::Neighbors instead
+         */
+        typedef dai::Neighbors Neighbors;
 
         /// Represents an edge: an Edge(\a n1,\a n2) corresponds to the edge between node \a n1 and node \a n2.
-        typedef std::pair<size_t,size_t> Edge;
+        /** \deprecated Please use dai::Edge instead
+         */
+        typedef dai::Edge Edge;
 
     private:
         /// Contains for each node a vector of its neighbors
@@ -130,7 +145,7 @@ class GraphAL {
         GraphAL( size_t nr ) : _nb( nr ) {}
 
         /// Constructs GraphAL from a range of edges.
-        /** \tparam EdgeInputIterator Iterator that iterates over instances of GraphAL::Edge.
+        /** \tparam EdgeInputIterator Iterator that iterates over instances of Edge.
          *  \param nr The number of nodes.
          *  \param begin Points to the first edge.
          *  \param end Points just beyond the last edge.
@@ -172,7 +187,7 @@ class GraphAL {
     /// \name Adding nodes and edges
     //@{
         /// (Re)constructs GraphAL from a range of edges.
-        /** \tparam EdgeInputIterator Iterator that iterates over instances of GraphAL::Edge.
+        /** \tparam EdgeInputIterator Iterator that iterates over instances of Edge.
          *  \param nr The number of nodes.
          *  \param begin Points to the first edge.
          *  \param end Points just beyond the last edge.

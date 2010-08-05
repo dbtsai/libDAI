@@ -21,10 +21,6 @@ namespace dai {
 using namespace std;
 
 
-/// Convenience typedef
-typedef BipartiteGraph::Neighbor Neighbor;
-
-
 /// Returns the entry of the I'th factor corresponding to a global state
 size_t getFactorEntryForState( const FactorGraph &fg, size_t I, const vector<size_t> &state ) {
     size_t f_entry = 0;

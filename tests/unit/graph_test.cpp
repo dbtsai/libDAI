@@ -39,7 +39,6 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
     G2.checkConsistency();
     BOOST_CHECK( !(G2 == G0) );
     
-    typedef GraphAL::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 1 ) );
     edges.push_back( Edge( 1, 2 ) );
@@ -68,7 +67,6 @@ BOOST_AUTO_TEST_CASE( ConstructorsTest ) {
 
 BOOST_AUTO_TEST_CASE( NeighborTest ) {
     // check nb() accessor / mutator
-    typedef GraphAL::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 1 ) );
     edges.push_back( Edge( 1, 2 ) );
@@ -96,7 +94,6 @@ BOOST_AUTO_TEST_CASE( NeighborTest ) {
 
 BOOST_AUTO_TEST_CASE( AddEraseTest ) {
     // check addition and erasure of nodes and edges
-    typedef GraphAL::Edge Edge;
     std::vector<Edge> edges;
     edges.push_back( Edge( 0, 1 ) );
     edges.push_back( Edge( 1, 2 ) );
@@ -232,7 +229,7 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
         BOOST_CHECK( G.isConnected() );
         BOOST_CHECK_EQUAL( G.isTree(), N < 3 );
         for( size_t n1 = 0; n1 < G.nrNodes(); n1++ ) {
-            foreach( const GraphAL::Neighbor &n2, G.nb(n1) ) {
+            foreach( const Neighbor &n2, G.nb(n1) ) {
                 BOOST_CHECK( G.hasEdge( n1, n2 ) );
                 BOOST_CHECK( G.hasEdge( n2, n1 ) );
             }
@@ -256,7 +253,7 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
             BOOST_CHECK( G.isConnected() );
             BOOST_CHECK_EQUAL( G.isTree(), (N1 <= 1) || (N2 <= 1) );
             for( size_t n1 = 0; n1 < G.nrNodes(); n1++ ) {
-                foreach( const GraphAL::Neighbor &n2, G.nb(n1) ) {
+                foreach( const Neighbor &n2, G.nb(n1) ) {
                     BOOST_CHECK( G.hasEdge( n1, n2 ) );
                     BOOST_CHECK( G.hasEdge( n2, n1 ) );
                 }
@@ -279,7 +276,7 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
             BOOST_CHECK( G.isConnected() );
             BOOST_CHECK_EQUAL( G.isTree(), (G.nrNodes() <= 2) );
             for( size_t n1 = 0; n1 < G.nrNodes(); n1++ ) {
-                foreach( const GraphAL::Neighbor &n2, G.nb(n1) ) {
+                foreach( const Neighbor &n2, G.nb(n1) ) {
                     BOOST_CHECK( G.hasEdge( n1, n2 ) );
                     BOOST_CHECK( G.hasEdge( n2, n1 ) );
                 }
@@ -304,7 +301,7 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
                 BOOST_CHECK( G.isConnected() );
                 BOOST_CHECK_EQUAL( G.isTree(), (G.nrNodes() == 0) || (N1 <= 1 && N2 <= 1) || (N1 <= 1 && N3 <= 1) || (N2 <= 1 && N3 <= 1) );
                 for( size_t n1 = 0; n1 < G.nrNodes(); n1++ ) {
-                    foreach( const GraphAL::Neighbor &n2, G.nb(n1) ) {
+                    foreach( const Neighbor &n2, G.nb(n1) ) {
                         BOOST_CHECK( G.hasEdge( n1, n2 ) );
                         BOOST_CHECK( G.hasEdge( n2, n1 ) );
                     }
@@ -327,7 +324,7 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
                 BOOST_CHECK( G.isConnected() );
                 BOOST_CHECK_EQUAL( G.isTree(), (G.nrNodes() <= 2) );
                 for( size_t n1 = 0; n1 < G.nrNodes(); n1++ ) {
-                    foreach( const GraphAL::Neighbor &n2, G.nb(n1) ) {
+                    foreach( const Neighbor &n2, G.nb(n1) ) {
                         BOOST_CHECK( G.hasEdge( n1, n2 ) );
                         BOOST_CHECK( G.hasEdge( n2, n1 ) );
                     }
@@ -355,7 +352,7 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
         BOOST_CHECK( G.isConnected() );
         BOOST_CHECK_EQUAL( G.isTree(), N <= 2 );
         for( size_t n1 = 0; n1 < G.nrNodes(); n1++ ) {
-            foreach( const GraphAL::Neighbor &n2, G.nb(n1) ) {
+            foreach( const Neighbor &n2, G.nb(n1) ) {
                 BOOST_CHECK( G.hasEdge( n1, n2 ) );
                 BOOST_CHECK( G.hasEdge( n2, n1 ) );
             }
@@ -378,7 +375,7 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
         BOOST_CHECK( G.isConnected() );
         BOOST_CHECK( G.isTree() );
         for( size_t n1 = 0; n1 < G.nrNodes(); n1++ ) {
-            foreach( const GraphAL::Neighbor &n2, G.nb(n1) ) {
+            foreach( const Neighbor &n2, G.nb(n1) ) {
                 BOOST_CHECK( G.hasEdge( n1, n2 ) );
                 BOOST_CHECK( G.hasEdge( n2, n1 ) );
             }
@@ -402,7 +399,7 @@ BOOST_AUTO_TEST_CASE( QueriesAndCreationTest ) {
                 BOOST_CHECK_EQUAL( G.nrEdges(), d * N / 2 );
                 for( size_t n1 = 0; n1 < G.nrNodes(); n1++ ) {
                     BOOST_CHECK_EQUAL( G.nb(n1).size(), d );
-                    foreach( const GraphAL::Neighbor &n2, G.nb(n1) ) {
+                    foreach( const Neighbor &n2, G.nb(n1) ) {
                         BOOST_CHECK( G.hasEdge( n1, n2 ) );
                         BOOST_CHECK( G.hasEdge( n2, n1 ) );
                     }
