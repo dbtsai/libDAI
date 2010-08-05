@@ -150,17 +150,110 @@ BOOST_AUTO_TEST_CASE( stringTest ) {
 
 
 BOOST_AUTO_TEST_CASE( tokenizeStringTest ) {
-    std::string s("Hello\tworld.\nThis is it.");
-    std::vector<std::string> words;
-    tokenizeString( s, words );
-    BOOST_CHECK_EQUAL( words.size(), 3 );
-    BOOST_CHECK_EQUAL( words[0], "Hello" );
-    BOOST_CHECK_EQUAL( words[1], "world." );
-    BOOST_CHECK_EQUAL( words[2], "This is it." );
-    words.clear();
-    tokenizeString( s, words, " " );
-    BOOST_CHECK_EQUAL( words.size(), 3 );
-    BOOST_CHECK_EQUAL( words[0], "Hello\tworld.\nThis" );
-    BOOST_CHECK_EQUAL( words[1], "is" );
-    BOOST_CHECK_EQUAL( words[2], "it." );
+    std::string s;
+    std::vector<std::string> tokens;
+
+    s = "";
+    tokens = tokenizeString( s, true, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 0 );
+
+    s = " ";
+    tokens = tokenizeString( s, true, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 1 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    
+    s = " \t";
+    tokens = tokenizeString( s, true, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 2 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    BOOST_CHECK_EQUAL( tokens[1], "" );
+
+    s = " \tHello";
+    tokens = tokenizeString( s, true, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 3 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    BOOST_CHECK_EQUAL( tokens[1], "" );
+    BOOST_CHECK_EQUAL( tokens[2], "Hello" );
+
+    s = " \tHello\r\n there";
+    tokens = tokenizeString( s, true, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 4 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    BOOST_CHECK_EQUAL( tokens[1], "" );
+    BOOST_CHECK_EQUAL( tokens[2], "Hello\r\n" );
+    BOOST_CHECK_EQUAL( tokens[3], "there" );
+
+    s = " \tHello\r\n there !";
+    tokens = tokenizeString( s, true, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 5 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    BOOST_CHECK_EQUAL( tokens[1], "" );
+    BOOST_CHECK_EQUAL( tokens[2], "Hello\r\n" );
+    BOOST_CHECK_EQUAL( tokens[3], "there" );
+    BOOST_CHECK_EQUAL( tokens[4], "!" );
+
+    s = " \tHello\r\n there !\r";
+    tokens = tokenizeString( s, true, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 5 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    BOOST_CHECK_EQUAL( tokens[1], "" );
+    BOOST_CHECK_EQUAL( tokens[2], "Hello\r\n" );
+    BOOST_CHECK_EQUAL( tokens[3], "there" );
+    BOOST_CHECK_EQUAL( tokens[4], "!\r" );
+
+    s = " \tHello\r\n there !\r";
+    tokens = tokenizeString( s, true, " \t\r\n" );
+    BOOST_CHECK_EQUAL( tokens.size(), 7 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    BOOST_CHECK_EQUAL( tokens[1], "" );
+    BOOST_CHECK_EQUAL( tokens[2], "Hello" );
+    BOOST_CHECK_EQUAL( tokens[3], "" );
+    BOOST_CHECK_EQUAL( tokens[4], "" );
+    BOOST_CHECK_EQUAL( tokens[5], "there" );
+    BOOST_CHECK_EQUAL( tokens[6], "!" );
+
+
+    s = "";
+    tokens = tokenizeString( s, false, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 0 );
+
+    s = " ";
+    tokens = tokenizeString( s, false, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 0 );
+    
+    s = " \t";
+    tokens = tokenizeString( s, false, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 0 );
+
+    s = " \tHello";
+    tokens = tokenizeString( s, false, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 1 );
+    BOOST_CHECK_EQUAL( tokens[0], "Hello" );
+
+    s = " \tHello\r\n there";
+    tokens = tokenizeString( s, false, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 2 );
+    BOOST_CHECK_EQUAL( tokens[0], "Hello\r\n" );
+    BOOST_CHECK_EQUAL( tokens[1], "there" );
+
+    s = " \tHello\r\n there !";
+    tokens = tokenizeString( s, false, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 3 );
+    BOOST_CHECK_EQUAL( tokens[0], "Hello\r\n" );
+    BOOST_CHECK_EQUAL( tokens[1], "there" );
+    BOOST_CHECK_EQUAL( tokens[2], "!" );
+
+    s = " \tHello\r\n there !\r";
+    tokens = tokenizeString( s, false, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 3 );
+    BOOST_CHECK_EQUAL( tokens[0], "Hello\r\n" );
+    BOOST_CHECK_EQUAL( tokens[1], "there" );
+    BOOST_CHECK_EQUAL( tokens[2], "!\r" );
+
+    s = " \tHello\r\n there !\r";
+    tokens = tokenizeString( s, false, " \t\r\n" );
+    BOOST_CHECK_EQUAL( tokens.size(), 3 );
+    BOOST_CHECK_EQUAL( tokens[0], "Hello" );
+    BOOST_CHECK_EQUAL( tokens[1], "there" );
+    BOOST_CHECK_EQUAL( tokens[2], "!" );
 }

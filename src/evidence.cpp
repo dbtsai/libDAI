@@ -40,7 +40,7 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
 
     // Parse header
     std::vector<std::string> header_fields;
-    tokenizeString( line, header_fields );
+    header_fields = tokenizeString( line, true );
     std::vector<std::string>::const_iterator p_field = header_fields.begin();
     if( p_field == header_fields.end() )
         DAI_THROWE(INVALID_EVIDENCE_FILE,"Empty header line");
@@ -62,7 +62,7 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
         line_number++;
 
         std::vector<std::string> fields;
-        tokenizeString( line, fields );
+        fields = tokenizeString( line, true );
         if( fields.size() != vars.size() )
             DAI_THROWE(INVALID_EVIDENCE_FILE,"Invalid number of fields in line " + boost::lexical_cast<std::string>(line_number));
 

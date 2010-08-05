@@ -276,8 +276,7 @@ int main( int argc, char *argv[] ) {
         }
 
         // build output file name
-        vector<string> pathComponents;
-        tokenizeString( string(argv[1]), pathComponents, "/" );
+        vector<string> pathComponents = tokenizeString( string(argv[1]), true, "/" );
         string outfile = pathComponents.back() + "." + task;
         if( verbose )
             cout << "Output filename:      " << outfile << endl;

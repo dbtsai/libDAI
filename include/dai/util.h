@@ -209,6 +209,17 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
 }
 
 /// Split a string into tokens delimited by one of the characters in \a delim
+/** \param s the string to be split into tokens
+ *  \param singleDelim if \c true, any single delimiter forms a boundary between two tokens; 
+ *         if \c false, a maximal group of consecutive delimiters forms a boundary between two tokens
+ *  \param delim delimiter characters
+ */
+std::vector<std::string> tokenizeString( const std::string& s, bool singleDelim, const std::string& delim="\t\n" );
+
+
+/// Split a string into tokens delimited by one of the characters in \a delim
+/** \deprecated Please use dai::tokenizeString( const std::string&, bool, const std::string& ) instead
+ */
 void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
 
 

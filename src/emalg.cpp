@@ -129,8 +129,7 @@ SharedParameters::SharedParameters( std::istream &is, const FactorGraph &fg )
         while( line.size() == 0 && getline(is, line) )
             ;
 
-        std::vector<std::string> fields;
-        tokenizeString(line, fields, " \t");
+        std::vector<std::string> fields = tokenizeString( line, true, " \t" );
 
         // Lookup the factor in the factorgraph
         if( fields.size() < 1 )
