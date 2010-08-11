@@ -254,6 +254,7 @@ typedef DAIAlg<RegionGraph> DAIAlgRG;
  */
 Factor calcMarginal( const InfAlg& obj, const VarSet& vs, bool reInit );
 
+
 /// Calculates beliefs for all pairs of variables in \a vs using inference algorithm \a obj.
 /** calcPairBeliefs() works by 
  *  - clamping single variables in \a vs and calculating the partition sum and the single variable beliefs for each clamped state, if \a accurate == \c false;
@@ -267,6 +268,12 @@ Factor calcMarginal( const InfAlg& obj, const VarSet& vs, bool reInit );
  *  \param accurate if \c true, uses a slower but more accurate approximation algorithm
  */
 std::vector<Factor> calcPairBeliefs( const InfAlg& obj, const VarSet& vs, bool reInit, bool accurate=false );
+
+
+/// Calculates the joint state of all variables that has maximum probability, according to the inference algorithm \a obj
+/** \note Before this method is called, obj.run() should have been called.
+ */
+std::vector<size_t> findMaximum( const InfAlg& obj );
 
 
 } // end of namespace dai

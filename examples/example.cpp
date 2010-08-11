@@ -133,12 +133,12 @@ int main( int argc, char *argv[] ) {
         // Report exact MAP factor marginals
         cout << "Exact MAP factor marginals:" << endl;
         for( size_t I = 0; I < fg.nrFactors(); I++ )
-            cout << jtmap.belief(fg.factor(I).vars()) << "=" << jtmap.beliefF(I) << endl;
+            cout << jtmap.belief(fg.factor(I).vars()) << " == " << jtmap.beliefF(I) << endl;
 
         // Report max-product factor marginals
         cout << "Approximate (max-product) MAP factor marginals:" << endl;
         for( size_t I = 0; I < fg.nrFactors(); I++ )
-            cout << mp.belief(fg.factor(I).vars()) << "=" << mp.beliefF(I) << endl;
+            cout << mp.belief(fg.factor(I).vars()) << " == " << mp.beliefF(I) << endl;
 
         // Report exact MAP joint state
         cout << "Exact MAP state (log score = " << fg.logScore( jtmapstate ) << "):" << endl;

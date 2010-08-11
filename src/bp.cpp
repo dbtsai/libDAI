@@ -14,7 +14,6 @@
 #include <map>
 #include <set>
 #include <algorithm>
-#include <stack>
 #include <dai/bp.h>
 #include <dai/util.h>
 #include <dai/properties.h>
@@ -478,87 +477,6 @@ void BP::updateResidual( size_t i, size_t _I, Real r ) {
     // rearrange look-up table (delete and reinsert new key)
     _lut.erase( _edge2lut[i][_I] );
     _edge2lut[i][_I] = _lut.insert( make_pair( r, make_pair(i, _I) ) );
-}
-
-
-std::vector<size_t> BP::findMaximum() const {
-    vector<size_t> maximum( nrVars() );
-    vector<bool> visitedVars( nrVars(), false );
-    vector<bool> visitedFactors( nrFactors(), false );
-    stack<size_t> scheduledFactors;
-    for( size_t i = 0; i < nrVars(); ++i ) {
-        if( visitedVars[i] )
-            continue;
-        visitedVars[i] = true;
-
-        // Maximise with respect to variable i
-        Prob prod;
-        calcBeliefV( i, prod );
-        maximum[i] = prod.argmax().first;
-
-        foreach( const Neighbor &I, nbV(i) )
-            if( !visitedFactors[I] )
-                scheduledFactors.push(I);
-
-        while( !scheduledFactors.empty() ){
-            size_t I = scheduledFactors.top();
-            scheduledFactors.pop();
-            if( visitedFactors[I] )
-                continue;
-            visitedFactors[I] = true;
-
-            // Evaluate if some neighboring variables still need to be fixed; if not, we're done
-            bool allDetermined = true;
-            foreach( const Neighbor &j, nbF(I) )
-                if( !visitedVars[j.node] ) {
-                    allDetermined = false;
-                    break;
-                }
-            if( allDetermined )
-                continue;
-
-            // Calculate product of incoming messages on factor I
-            Prob prod2;
-            calcBeliefF( I, prod2 );
-
-            // The allowed configuration is restrained according to the variables assigned so far:
-            // pick the argmax amongst the allowed states
-            Real maxProb = -numeric_limits<Real>::max();
-            State maxState( factor(I).vars() );
-            for( State s( factor(I).vars() ); s.valid(); ++s ){
-                // First, calculate whether this state is consistent with variables that
-                // have been assigned already
-                bool allowedState = true;
-                foreach( const Neighbor &j, nbF(I) )
-                    if( visitedVars[j.node] && maximum[j.node] != s(var(j.node)) ) {
-                        allowedState = false;
-                        break;
-                    }
-                // If it is consistent, check if its probability is larger than what we have seen so far
-                if( allowedState && prod2[s] > maxProb ) {
-                    maxState = s;
-                    maxProb = prod2[s];
-                }
-            }
-
-            // Decode the argmax
-            foreach( const Neighbor &j, nbF(I) ) {
-                if( visitedVars[j.node] ) {
-                    // We have already visited j earlier - hopefully our state is consistent
-                    if( maximum[j.node] != maxState(var(j.node)) && props.verbose >= 1 )
-                        cerr << "BP::findMaximum - warning: maximum not consistent due to loops." << endl;
-                } else {
-                    // We found a consistent state for variable j
-                    visitedVars[j.node] = true;
-                    maximum[j.node] = maxState( var(j.node) );
-                    foreach( const Neighbor &J, nbV(j) )
-                        if( !visitedFactors[J] )
-                            scheduledFactors.push(J);
-                }
-            }
-        }
-    }
-    return maximum;
 }
 
 

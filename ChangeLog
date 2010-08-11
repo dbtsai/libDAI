@@ -1,3 +1,11 @@
+git master
+----------
+
+* Fixed a bug in JTree::findMaximum() (reported by zhengyun84 and Dhruv Batra):
+  if one or more variables had a MAP belief with more than one maximum, an 
+  incorrect MAP state could result.
+
+
 libDAI-0.2.6 (2010-08-05)
 -------------------------
 

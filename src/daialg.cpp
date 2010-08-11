@@ -10,6 +10,7 @@
 
 
 #include <vector>
+#include <stack>
 #include <dai/daialg.h>
 
 
@@ -207,6 +208,85 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& vs, bool reIni
     }
     delete clamped;
     return result;
+}
+
+
+std::vector<size_t> findMaximum( const InfAlg& obj ) {
+    vector<size_t> maximum( obj.fg().nrVars() );
+    vector<bool> visitedVars( obj.fg().nrVars(), false );
+    vector<bool> visitedFactors( obj.fg().nrFactors(), false );
+    stack<size_t> scheduledFactors;
+    for( size_t i = 0; i < obj.fg().nrVars(); ++i ) {
+        if( visitedVars[i] )
+            continue;
+        visitedVars[i] = true;
+
+        // Maximise with respect to variable i
+        Prob prod = obj.beliefV(i).p();
+        maximum[i] = prod.argmax().first;
+
+        foreach( const Neighbor &I, obj.fg().nbV(i) )
+            if( !visitedFactors[I] )
+                scheduledFactors.push(I);
+
+        while( !scheduledFactors.empty() ){
+            size_t I = scheduledFactors.top();
+            scheduledFactors.pop();
+            if( visitedFactors[I] )
+                continue;
+            visitedFactors[I] = true;
+
+            // Evaluate if some neighboring variables still need to be fixed; if not, we're done
+            bool allDetermined = true;
+            foreach( const Neighbor &j, obj.fg().nbF(I) )
+                if( !visitedVars[j.node] ) {
+                    allDetermined = false;
+                    break;
+                }
+            if( allDetermined )
+                continue;
+
+            // Get marginal of factor I
+            Prob probF = obj.beliefF(I).p();
+
+            // The allowed configuration is restrained according to the variables assigned so far:
+            // pick the argmax amongst the allowed states
+            Real maxProb = -numeric_limits<Real>::max();
+            State maxState( obj.fg().factor(I).vars() );
+            for( State s( obj.fg().factor(I).vars() ); s.valid(); ++s ) {
+                // First, calculate whether this state is consistent with variables that
+                // have been assigned already
+                bool allowedState = true;
+                foreach( const Neighbor &j, obj.fg().nbF(I) )
+                    if( visitedVars[j.node] && maximum[j.node] != s(obj.fg().var(j.node)) ) {
+                        allowedState = false;
+                        break;
+                    }
+                // If it is consistent, check if its probability is larger than what we have seen so far
+                if( allowedState && probF[s] > maxProb ) {
+                    maxState = s;
+                    maxProb = probF[s];
+                }
+            }
+
+            // Decode the argmax
+            foreach( const Neighbor &j, obj.fg().nbF(I) ) {
+                if( visitedVars[j.node] ) {
+                    // We have already visited j earlier - hopefully our state is consistent
+                    if( maximum[j.node] != maxState( obj.fg().var(j.node) ) )
+                        DAI_THROWE(RUNTIME_ERROR,"MAP state inconsistent due to loops");
+                } else {
+                    // We found a consistent state for variable j
+                    visitedVars[j.node] = true;
+                    maximum[j.node] = maxState( obj.fg().var(j.node) );
+                    foreach( const Neighbor &J, obj.fg().nbV(j) )
+                        if( !visitedFactors[J] )
+                            scheduledFactors.push(J);
+                }
+            }
+        }
+    }
+    return maximum;
 }
 
 

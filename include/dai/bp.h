@@ -199,7 +199,7 @@ class BP : public DAIAlgFG {
         virtual Real logZ() const;
         /** \pre Assumes that run() has been called and that \a props.inference == \c MAXPROD
          */
-        std::vector<std::size_t> findMaximum() const;
+        std::vector<std::size_t> findMaximum() const { return dai::findMaximum( *this ); }
         virtual void init();
         virtual void init( const VarSet &ns );
         virtual Real run();

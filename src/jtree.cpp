@@ -10,7 +10,6 @@
 
 
 #include <iostream>
-#include <stack>
 #include <dai/jtree.h>
 
 
@@ -586,43 +585,6 @@ std::pair<size_t,long double> boundTreewidth( const FactorGraph &fg, greedyVaria
     }
 
     return make_pair(treewidth, nrstates);
-}
-
-
-std::vector<size_t> JTree::findMaximum() const {
-#ifdef DAI_DEBUG
-    // check consistency of variables and factors
-    for( size_t I = 0; I < nrFactors(); I++ ) {
-        size_t linearState = beliefF(I).p().argmax().first;
-        map<Var,size_t> state = calcState( factor(I).vars(), linearState );
-        foreach( const Neighbor& i, nbF(I) ) {
-            if( state[var(i)] != beliefV(i).p().argmax().first ) {
-                cerr << "ERROR: inconsistency between MAP beliefs: factor belief " << beliefF(I) << ": " << state << " is inconsistent with " << beliefV(i) << endl;
-                DAI_THROW(RUNTIME_ERROR);
-            }
-        }
-    }
-    // check consistency of 
-    for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
-        size_t linearStateQa = Qa[alpha].p().argmax().first;
-        map<Var,size_t> stateQa = calcState( Qa[alpha].vars(), linearStateQa );
-        foreach( const Neighbor& beta, nbOR(alpha) ) {
-            size_t linearStateQb = Qb[beta].p().argmax().first;
-            map<Var,size_t> stateQb = calcState( Qb[beta].vars(), linearStateQb );
-            for( map<Var,size_t>::const_iterator it = stateQb.begin(); it != stateQb.end(); it++ )
-                if( stateQa[it->first] != it->second ) {
-                    cerr << "ERROR: inconsistency between MAP beliefs: OR belief " << Qa[alpha] << " (with MAP " << stateQa << ") is inconsistent with IR belief " << Qb[beta] << " (with MAP " << stateQb << ")" << endl;
-                    DAI_THROW(RUNTIME_ERROR);
-                }
-        }
-    }
-#endif
-
-    vector<size_t> maximum;
-    maximum.reserve( nrVars() );
-    for( size_t i = 0; i < nrVars(); i++ )
-        maximum.push_back( beliefV(i).p().argmax().first );
-    return maximum;
 }
 
 
