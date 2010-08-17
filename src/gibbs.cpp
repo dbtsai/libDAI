@@ -29,12 +29,8 @@ const char *Gibbs::Name = "GIBBS";
 
 
 void Gibbs::setProperties( const PropertySet &opts ) {
-    /// \deprecated The 'iters' property has been renamed into 'maxiters'
-    DAI_ASSERT( opts.hasKey("maxiter") || opts.hasKey("iters") );
-    if( opts.hasKey("maxiter") )
-        props.maxiter = opts.getStringAs<size_t>("maxiter");
-    else
-        props.maxiter = opts.getStringAs<size_t>("iters");
+    DAI_ASSERT( opts.hasKey("maxiter") );
+    props.maxiter = opts.getStringAs<size_t>("maxiter");
 
     if( opts.hasKey("restart") )
         props.restart = opts.getStringAs<size_t>("restart");
@@ -269,9 +265,9 @@ Factor Gibbs::belief( const VarSet &ns ) const {
 }
 
 
-std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t iters ) {
+std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t maxiter ) {
     PropertySet gibbsProps;
-    gibbsProps.set( "maxiter", iters );
+    gibbsProps.set( "maxiter", maxiter );
     gibbsProps.set( "burnin", size_t(0) );
     gibbsProps.set( "verbose", size_t(0) );
     Gibbs gibbs( fg, gibbsProps );

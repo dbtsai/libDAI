@@ -133,10 +133,10 @@ class Gibbs : public DAIAlgFG {
 };
 
 
-/// Runs Gibbs sampling for \a iters iterations (of which \a burnin for burn-in) on FactorGraph \a fg, and returns the resulting state
+/// Runs Gibbs sampling for \a maxiter iterations (of which \a burnin for burn-in) on FactorGraph \a fg, and returns the resulting state
 /** \relates Gibbs
  */
-std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t iters );
+std::vector<size_t> getGibbsState( const FactorGraph &fg, size_t maxiter );
 
 
 } // end of namespace dai

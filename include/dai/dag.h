@@ -41,21 +41,6 @@ namespace dai {
  *  parent and children nodes.
  */
 class DAG {
-        /// Describes the parent/child relationship of two nodes in a DAG.
-        /** \deprecated Please use dai::Neighbor instead
-         */
-        typedef dai::Neighbor Neighbor;
-
-        /// Type for storing the parents/children of some node.
-        /** \deprecated Please use dai::Neighbors instead
-         */
-        typedef dai::Neighbors Neighbors;
-
-        /// Represents a directed edge: an Edge(\a n1,\a n2) corresponds to the edge from node \a n1 to node \a n2.
-        /** \deprecated Please use dai::Edge instead
-         */
-        typedef dai::Edge Edge;
-
     private:
         /// Contains for each node a vector of its parent nodes
         std::vector<Neighbors> _pa;

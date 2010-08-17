@@ -217,12 +217,6 @@ std::vector<T> concat( const std::vector<T>& u, const std::vector<T>& v ) {
 std::vector<std::string> tokenizeString( const std::string& s, bool singleDelim, const std::string& delim="\t\n" );
 
 
-/// Split a string into tokens delimited by one of the characters in \a delim
-/** \deprecated Please use dai::tokenizeString( const std::string&, bool, const std::string& ) instead
- */
-void tokenizeString( const std::string& s, std::vector<std::string>& outTokens, const std::string& delim="\t\n" );
-
-
 /// Enumerates different ways of normalizing a probability measure.
 /**
  *  - NORMPROB means that the sum of all entries should be 1;

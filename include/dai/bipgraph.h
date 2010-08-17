@@ -46,21 +46,6 @@ namespace dai {
  *  \idea Cache second-order neighborhoods in BipartiteGraph.
  */
 class BipartiteGraph {
-        /// Describes the neighbor relationship of two nodes in a BipartiteGraph.
-        /** \deprecated Please use dai::Neighbor instead
-         */
-        typedef dai::Neighbor Neighbor;
-
-        /// Describes the neighbors of some node.
-        /** \deprecated Please use dai::Neighbors instead
-         */
-        typedef dai::Neighbors Neighbors;
-
-        /// Represents an edge: an Edge(\a n1,\a n2) corresponds to the edge between node \a n1 of type 1 and node \a n2 of type 2.
-        /** \deprecated Please use dai::Edge instead
-         */
-        typedef dai::Edge Edge;
-
     private:
         /// Contains for each node of type 1 a vector of its neighbors
         std::vector<Neighbors> _nb1;
