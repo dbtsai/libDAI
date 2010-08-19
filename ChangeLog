@@ -1,5 +1,5 @@
-git master
-----------
+libDAI-0.2.7 (2010-08-19)
+-------------------------
 
 * Removed interfaces deprecated in 0.2.6.
 * Fixed a bug in JTree::findMaximum() (reported by zhengyun84 and Dhruv Batra):

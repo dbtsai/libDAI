@@ -35,8 +35,8 @@
 
 /** \mainpage Reference manual for libDAI - A free/open source C++ library for Discrete Approximate Inference methods
  *  \author Joris Mooij (with contributions of Frederik Eaton)
- *  \version git master
- *  \date August 11, 2010 (or later)
+ *  \version 0.2.7
+ *  \date August 19, 2010
  *
  *  <hr size="1">
  *  \section about About libDAI
@@ -165,24 +165,22 @@
  *  \section citations-citations Citing libDAI
  *
  *  If you write a scientific paper describing research that made substantive use
- *  of this program, please cite the software appropriately, by mentioning the 
- *  fashion in which this software was used, including the version number.
+ *  of this library, please cite the following paper describing libDAI:\n
  *
- *  An appropriate citation would be:\n
+ *  Joris M. Mooij;\n
+ *  libDAI: A free & open source C++ library for Discrete Approximate Inference in graphical models;\n
+ *  Journal of Machine Learning Research, in press, 2010.\n
  *
- *  Joris M. Mooij et al. (2010) "libDAI 0.2.6: A free/open source C++ library for Discrete 
- *  Approximate Inference", http://www.libdai.org
- *
- *  or in BiBTeX format:
+ *  In BiBTeX format (for your convenience):\n
  *  
  *  <pre>
- *  \@misc{mooij2010libdai,
- *    author = "Joris M. Mooij et al.",
- *    title = "lib{DAI} 0.2.6: A free/open source {C}++ library for {D}iscrete {A}pproximate {I}nference",
- *    howpublished = "http://www.libdai.org/",
- *    year = 2010
- *  }
- *  </pre>
+ *  \@article{mooij2010libDAI,
+ *    author  = {Joris M. Mooij},
+ *    title   = {lib{DAI}: A free \& open source {C}++ Library for {D}iscrete {A}pproximate {I}nference in graphical models},
+ *    journal = {Journal of Machine Learning Research},
+ *    volume  = {in press},
+ *    year    = 2010
+ *  }</pre>
  *
  *  Moreover, as a personal note, I would appreciate it to be informed about any
  *  publications using libDAI at joris dot mooij at libdai dot org.
@@ -242,9 +240,12 @@
  *
  *  To build the libDAI source, first copy a template Makefile.* to Makefile.conf
  *  (for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). 
- *  Then, edit the Makefile.conf template to adapt it to your local setup.
- *  Especially directories may differ from system to system. Platform independent
- *  build options can be set in Makefile.ALL. Finally, run
+ *  Then, edit the Makefile.conf template to adapt it to your local setup. In case
+ *  you want to use Boost libraries which are installed in non-standard locations,
+ *  you have to tell the compiler and linker about their locations (using the
+ *  -I, -L flags for GCC; also you may need to set the LD_LIBRARY_PATH environment 
+ *  variable correctly before running libDAI binaries). Platform independent build
+ *  options can be set in Makefile.ALL. Finally, run
  *  <pre>  make</pre>
  *  The build includes a regression test, which may take a while to complete.
  *

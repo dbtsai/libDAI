@@ -15,8 +15,8 @@ include Makefile.ALL
 include Makefile.conf
 
 # Set version and date
-DAI_VERSION="git master"
-DAI_DATE="August 11, 2010 (or later)"
+DAI_VERSION="0.2.7"
+DAI_DATE="August 19, 2010"
 
 # Directories of libDAI sources
 # Location of libDAI headers
@@ -120,6 +120,7 @@ MEX:=$(MEX) $(MEXINC) $(MEXFLAGS) $(WITHFLAGS) $(MEXLIB)
 ###############
 
 all : $(TARGETS)
+	@echo
 	@echo libDAI built successfully!
 
 EXAMPLES=$(foreach name,example example_bipgraph example_varset example_permute example_sprinkler example_sprinkler_em,examples/$(name)$(EE))
@@ -134,7 +135,8 @@ examples : $(EXAMPLES)
 matlabs : matlab/dai$(ME) matlab/dai_readfg$(ME) matlab/dai_writefg$(ME) matlab/dai_potstrength$(ME)
 
 unittests : tests/unit/var_test$(EE) tests/unit/smallset_test$(EE) tests/unit/varset_test$(EE) tests/unit/graph_test$(EE) tests/unit/dag_test$(EE) tests/unit/bipgraph_test$(EE) tests/unit/weightedgraph_test$(EE) tests/unit/enum_test$(EE) tests/unit/enum_test$(EE) tests/unit/util_test$(EE) tests/unit/exceptions_test$(EE) tests/unit/properties_test$(EE) tests/unit/index_test$(EE) tests/unit/prob_test$(EE) tests/unit/factor_test$(EE) tests/unit/factorgraph_test$(EE) tests/unit/clustergraph_test$(EE) tests/unit/regiongraph_test$(EE) tests/unit/daialg_test$(EE) tests/unit/alldai_test$(EE)
-	echo Running unit tests...
+	@echo 'Running unit tests...(note: output containing "EXCEPTION" does not indicate an error)'
+	@echo
 	tests/unit/var_test$(EE)
 	tests/unit/smallset_test$(EE)
 	tests/unit/varset_test$(EE)
@@ -154,6 +156,9 @@ unittests : tests/unit/var_test$(EE) tests/unit/smallset_test$(EE) tests/unit/va
 	tests/unit/regiongraph_test$(EE)
 	tests/unit/daialg_test$(EE)
 	tests/unit/alldai_test$(EE)
+	@echo
+	@echo 'All unit tests completed successfully!'
+	@echo
 
 tests : tests/testdai$(EE) tests/testem/testem$(EE) tests/testbbp$(EE) $(unittests)
 

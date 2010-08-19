@@ -2,8 +2,8 @@ libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
 -------------------------------------------------------------------------------
 
-Version:  git master
-Date:     August 11, 2010 (or later)
+Version:  0.2.7
+Date:     August 19, 2010
 See also: http://www.libdai.org
 
 -------------------------------------------------------------------------------
@@ -27,23 +27,22 @@ along with libDAI in the file COPYING. If not, see http://www.gnu.org/licenses/
 Citing libDAI
 
 If you write a scientific paper describing research that made substantive use
-of this program, please cite the software appropriately, by mentioning the
-fashion in which this software was used, including the version number.
+of this library, please cite the following paper describing libDAI:
 
-An appropriate citation would be:
+Joris M. Mooij;
+libDAI: A free & open source C++ library for Discrete Approximate Inference in
+graphical models;
+Journal of Machine Learning Research, in press, 2010.
 
-Joris M. Mooij et al. (2010) "libDAI 0.2.6: A free/open source C++ library for
-Discrete Approximate Inference", http://www.libdai.org
+In BiBTeX format (for your convenience):
 
-or in BiBTeX format:
-
-  @misc{mooij2010libdai,
-    author = "Joris M. Mooij et al.",
-    title = "lib{DAI} 0.2.6: A free/open source {C}++ library for {D}iscrete {A}pproximate {I}nference",
-    howpublished = "http://www.libdai.org/",
-    year = 2010
+  @article{mooij2010libDAI,
+    author  = {Joris M. Mooij},
+    title   = {lib{DAI}: A free & open source {C}++ Library for {D}iscrete {A}pproximate {I}nference in graphical models},
+    journal = {Journal of Machine Learning Research},
+    volume  = {in press},
+    year    = 2010
   }
-
 
 Moreover, as a personal note, I would appreciate it to be informed about any
 publications using libDAI at joris dot mooij at libdai dot org.
@@ -202,12 +201,16 @@ Building boost under Cygwin
 
         export PATH=$PATH:/boost_root/stage/lib
 
+
 Building libDAI
 
 To build the libDAI source, first copy a template Makefile.* to Makefile.conf
 (for example, copy Makefile.LINUX to Makefile.conf if you use GNU/Linux). Then,
-edit the Makefile.conf template to adapt it to your local setup. Especially
-directories may differ from system to system. Platform independent build
+edit the Makefile.conf template to adapt it to your local setup. In case you
+want to use Boost libraries which are installed in non-standard locations, you
+have to tell the compiler and linker about their locations (using the -I, -L
+flags for GCC; also you may need to set the LD_LIBRARY_PATH environment
+variable correctly before running libDAI binaries). Platform independent build
 options can be set in Makefile.ALL. Finally, run
 
   make
@@ -259,6 +262,7 @@ Because building boost under Windows is tricky, I provide some guidance here.
     libDAI:
 
         bjam --with-graph --with-math --with-program_options --with-test link=static runtime-link=shared
+
 
 Building libDAI
 
