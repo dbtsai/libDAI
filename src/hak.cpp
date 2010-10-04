@@ -21,9 +21,6 @@ namespace dai {
 using namespace std;
 
 
-const char *HAK::Name = "HAK";
-
-
 /// Sets factor entries that lie between 0 and \a epsilon to \a epsilon
 template <class T>
 TFactor<T>& makePositive( TFactor<T> &f, T epsilon ) {
@@ -195,7 +192,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
         for( set<VarSet>::const_iterator c = scl.begin(); c != scl.end(); c++ )
             cl.push_back(*c);
         if( props.verbose >= 3 ) {
-            cerr << Name << " uses the following clusters: " << endl;
+            cerr << name() << " uses the following clusters: " << endl;
             for( vector<VarSet>::const_iterator cli = cl.begin(); cli != cl.end(); cli++ )
                 cerr << *cli << endl;
         }
@@ -265,12 +262,7 @@ HAK::HAK(const FactorGraph & fg, const PropertySet &opts) : DAIAlgRG(), _Qa(), _
     construct();
 
     if( props.verbose >= 3 )
-        cerr << Name << " regiongraph: " << *this << endl;
-}
-
-
-string HAK::identify() const {
-    return string(Name) + printProperties();
+        cerr << name() << " regiongraph: " << *this << endl;
 }
 
 
@@ -387,7 +379,7 @@ Real HAK::doGBP() {
             Qb_new.normalize();
             if( Qb_new.hasNaNs() ) {
                 // TODO: WHAT TO DO IN THIS CASE?
-                cerr << Name << "::doGBP:  Qb_new has NaNs!" << endl;
+                cerr << name() << "::doGBP:  Qb_new has NaNs!" << endl;
                 return 1.0;
             }
             /* TODO: WHAT IS THE PURPOSE OF THE FOLLOWING CODE?
@@ -416,7 +408,7 @@ Real HAK::doGBP() {
                 Qa_new ^= (1.0 / OR(alpha).c());
                 Qa_new.normalize();
                 if( Qa_new.hasNaNs() ) {
-                    cerr << Name << "::doGBP:  Qa_new has NaNs!" << endl;
+                    cerr << name() << "::doGBP:  Qa_new has NaNs!" << endl;
                     return 1.0;
                 }
                 /* TODO: WHAT IS THE PURPOSE OF THE FOLLOWING CODE?
@@ -446,7 +438,7 @@ Real HAK::doGBP() {
         }
 
         if( props.verbose >= 3 )
-            cerr << Name << "::doGBP:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
+            cerr << name() << "::doGBP:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
     if( maxDiff > _maxdiff )
@@ -456,10 +448,10 @@ Real HAK::doGBP() {
         if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-            cerr << Name << "::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
+            cerr << name() << "::doGBP:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 2 )
-                cerr << Name << "::doGBP:  ";
+                cerr << name() << "::doGBP:  ";
             cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
@@ -537,7 +529,7 @@ Real HAK::doDoubleLoop() {
         total_iter += Iterations();
 
         if( props.verbose >= 3 )
-            cerr << Name << "::doDoubleLoop:  maxdiff " << maxDiff << " after " << total_iter << " passes" << endl;
+            cerr << name() << "::doDoubleLoop:  maxdiff " << maxDiff << " after " << total_iter << " passes" << endl;
     }
 
     // restore _maxiter, _verbose and _maxdiff
@@ -560,10 +552,10 @@ Real HAK::doDoubleLoop() {
         if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-                cerr << Name << "::doDoubleLoop:  WARNING: not converged after " << total_iter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
+                cerr << name() << "::doDoubleLoop:  WARNING: not converged after " << total_iter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
             } else {
                 if( props.verbose >= 3 )
-                    cerr << Name << "::doDoubleLoop:  ";
+                    cerr << name() << "::doDoubleLoop:  ";
                 cerr << "converged in " << total_iter << " passes (" << toc() - tic << " seconds)." << endl;
             }
         }

@@ -139,9 +139,6 @@ class BP : public DAIAlgFG {
             InfType inference;
         } props;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
         /// Specifies whether the history of message updates should be recorded
         bool recordSentMessages;
 
@@ -190,7 +187,7 @@ class BP : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual BP* clone() const { return new BP(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "BP"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &vs ) const;
         virtual Factor beliefV( size_t i ) const;

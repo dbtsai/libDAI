@@ -65,9 +65,6 @@ class TRWBP : public BP {
          */
         size_t nrtrees;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     public:
     /// \name Constructors/destructors
     //@{
@@ -89,7 +86,7 @@ class TRWBP : public BP {
     /// \name General InfAlg interface
     //@{
         virtual TRWBP* clone() const { return new TRWBP(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "TRWBP"; }
         virtual Real logZ() const;
         virtual void setProperties( const PropertySet &opts );
         virtual PropertySet getProperties() const;

@@ -29,9 +29,6 @@ using namespace std;
 using boost::shared_ptr;
 
 
-const char *CBP::Name = "CBP";
-
-
 /// Given a sorted vector of states \a xis and total state count \a n_states, return a vector of states not in \a xis
 vector<size_t> complement( vector<size_t> &xis, size_t n_states ) {
     vector<size_t> cmp_xis( 0 );

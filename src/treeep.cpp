@@ -23,9 +23,6 @@ namespace dai {
 using namespace std;
 
 
-const char *TreeEP::Name = "TREEEP";
-
-
 void TreeEP::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("type") );
@@ -179,11 +176,6 @@ void TreeEP::construct( const FactorGraph& fg, const RootedTree& tree ) {
 }
 
 
-string TreeEP::identify() const {
-    return string(Name) + printProperties();
-}
-
-
 void TreeEP::init() {
     runHUGIN();
 
@@ -223,7 +215,7 @@ Real TreeEP::run() {
         swap( newBeliefs, oldBeliefs );
 
         if( props.verbose >= 3 )
-            cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
+            cerr << name() << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
     if( maxDiff > _maxdiff )
@@ -233,10 +225,10 @@ Real TreeEP::run() {
         if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-            cerr << Name << "::run:  WARNING: not converged after " << _iters << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
+            cerr << name() << "::run:  WARNING: not converged after " << _iters << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 3 )
-                cerr << Name << "::run:  ";
+                cerr << name() << "::run:  ";
             cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }

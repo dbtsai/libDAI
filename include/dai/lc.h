@@ -91,9 +91,6 @@ class LC : public DAIAlgFG {
             PropertySet cavaiopts;
         } props;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     public:
         /// Default constructor
         LC() : DAIAlgFG(), _pancakes(), _cavitydists(), _phis(), _beliefs(), _maxdiff(), _iters(), props() {}
@@ -108,7 +105,7 @@ class LC : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual LC* clone() const { return new LC(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "LC"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &/*vs*/ ) const;
         virtual Factor beliefV( size_t i ) const { return _beliefs[i]; }

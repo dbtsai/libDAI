@@ -74,9 +74,6 @@ class MF : public DAIAlgFG {
             UpdateType updates;
         } props;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     public:
     /// \name Constructors/destructors
     //@{
@@ -96,7 +93,7 @@ class MF : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual MF* clone() const { return new MF(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "MF"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &vs ) const;
         virtual Factor beliefV( size_t i ) const;

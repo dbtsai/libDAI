@@ -21,14 +21,6 @@ namespace dai {
 using namespace std;
 
 
-const char *FBP::Name = "FBP";
-
-
-string FBP::identify() const {
-    return string(Name) + printProperties();
-}
-
-
 // This code has been copied from bp.cpp, except where comments indicate FBP-specific behaviour
 Real FBP::logZ() const {
     Real sum = 0.0;

@@ -40,9 +40,6 @@ class ExactInf : public DAIAlgFG {
             size_t verbose;
         } props;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     private:
         /// All single variable marginals
         std::vector<Factor> _beliefsV;
@@ -70,7 +67,7 @@ class ExactInf : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual ExactInf* clone() const { return new ExactInf(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "EXACT"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &vs ) const;
         virtual Factor beliefV( size_t i ) const { return _beliefsV[i]; }

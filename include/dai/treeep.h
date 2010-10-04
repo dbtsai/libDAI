@@ -71,9 +71,6 @@ class TreeEP : public JTree {
             TypeType type;
         } props;
 
-        /// Name of this inference method
-        static const char *Name;
-
     private:
         /// Stores the data structures needed to efficiently update the approximation of an off-tree factor.
         /** The TreeEP object stores a TreeEPSubTree object for each off-tree factor.
@@ -185,7 +182,7 @@ class TreeEP : public JTree {
     /// \name General InfAlg interface
     //@{
         virtual TreeEP* clone() const { return new TreeEP(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "TREEEP"; }
         virtual Real logZ() const;
         virtual void init();
         virtual void init( const VarSet &/*ns*/ ) { init(); }

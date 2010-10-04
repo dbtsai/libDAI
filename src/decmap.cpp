@@ -17,9 +17,6 @@ namespace dai {
 using namespace std;
 
 
-const char *DecMAP::Name = "DECMAP";
-
-
 void DecMAP::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("ianame") );
     DAI_ASSERT( opts.hasKey("iaopts") );
@@ -63,11 +60,6 @@ DecMAP::DecMAP( const FactorGraph& fg, const PropertySet& opts ) : DAIAlgFG(fg),
 
     _state = vector<size_t>( nrVars(), 0 );
     _logp = -INFINITY;
-}
-
-
-string DecMAP::identify() const {
-    return string(Name) + printProperties();
 }
 
 
