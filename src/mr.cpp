@@ -27,9 +27,6 @@ namespace dai {
 using namespace std;
 
 
-const char *MR::Name = "MR";
-
-
 void MR::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("updates") );
@@ -346,11 +343,6 @@ Real MR::calcCavityCorrelations() {
 }
 
 
-string MR::identify() const {
-    return string(Name) + printProperties();
-}
-
-
 Real MR::run() {
     if( supported ) {
         if( props.verbose >= 1 )
@@ -370,7 +362,7 @@ Real MR::run() {
         calcMagnetizations();
 
         if( props.verbose >= 1 )
-            cerr << Name << " needed " << toc() - tic << " seconds." << endl;
+            cerr << name() << " needed " << toc() - tic << " seconds." << endl;
 
         return _maxdiff;
     } else

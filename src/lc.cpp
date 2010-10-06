@@ -24,9 +24,6 @@ namespace dai {
 using namespace std;
 
 
-const char *LC::Name = "LC";
-
-
 void LC::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("maxiter") );
@@ -111,11 +108,6 @@ LC::LC( const FactorGraph & fg, const PropertySet &opts ) : DAIAlgFG(fg), _panca
 }
 
 
-string LC::identify() const {
-    return string(Name) + printProperties();
-}
-
-
 void LC::CalcBelief (size_t i) {
     _beliefs[i] = _pancakes[i].marginal(var(i));
 }
@@ -171,7 +163,7 @@ Real LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
     double tic = toc();
 
     if( props.verbose >= 1 ) {
-        cerr << Name << "::InitCavityDists:  ";
+        cerr << this->name() << "::InitCavityDists:  ";
         if( props.cavity == Properties::CavityType::UNIFORM )
             cerr << "Using uniform initial cavity distributions" << endl;
         else if( props.cavity == Properties::CavityType::FULL )
@@ -190,7 +182,7 @@ Real LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
     }
 
     if( props.verbose >= 1 ) {
-        cerr << Name << "::InitCavityDists used " << toc() - tic << " seconds." << endl;
+        cerr << this->name() << "::InitCavityDists used " << toc() - tic << " seconds." << endl;
     }
 
     return maxdiff;
@@ -199,7 +191,7 @@ Real LC::InitCavityDists( const std::string &name, const PropertySet &opts ) {
 
 long LC::SetCavityDists( std::vector<Factor> &Q ) {
     if( props.verbose >= 1 )
-        cerr << Name << "::SetCavityDists:  Setting initial cavity distributions" << endl;
+        cerr << name() << "::SetCavityDists:  Setting initial cavity distributions" << endl;
     if( Q.size() != nrVars() )
         return -1;
     for( size_t i = 0; i < nrVars(); i++ ) {
@@ -245,7 +237,7 @@ Factor LC::NewPancake (size_t i, size_t _I, bool & hasNaNs) {
     piet.normalize();
 
     if( piet.hasNaNs() ) {
-        cerr << Name << "::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;
+        cerr << name() << "::NewPancake(" << i << ", " << _I << "):  has NaNs!" << endl;
         hasNaNs = true;
     }
 
@@ -290,7 +282,7 @@ Real LC::run() {
             break;
         }
     if( hasNaNs ) {
-        cerr << Name << "::run:  initial _pancakes has NaNs!" << endl;
+        cerr << name() << "::run:  initial _pancakes has NaNs!" << endl;
         return 1.0;
     }
 
@@ -326,7 +318,7 @@ Real LC::run() {
         }
 
         if( props.verbose >= 3 )
-            cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
+            cerr << name() << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
     if( maxDiff > _maxdiff )
@@ -336,10 +328,10 @@ Real LC::run() {
         if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-                cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
+                cerr << name() << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 2 )
-                cerr << Name << "::run:  ";
+                cerr << name() << "::run:  ";
                 cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }

@@ -103,9 +103,6 @@ class JTree : public DAIAlgRG {
             size_t maxmem;
         } props;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     public:
     /// \name Constructors/destructors
     //@{
@@ -124,7 +121,7 @@ class JTree : public DAIAlgRG {
     /// \name General InfAlg interface
     //@{
         virtual JTree* clone() const { return new JTree(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "JTREE"; }
         virtual Factor belief( const VarSet &vs ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;

@@ -19,9 +19,6 @@ namespace dai {
 using namespace std;
 
 
-const char *ExactInf::Name = "EXACT";
-
-
 void ExactInf::setProperties( const PropertySet &opts ) {
     if( opts.hasKey("verbose") )
         props.verbose = opts.getStringAs<size_t>("verbose");
@@ -138,11 +135,6 @@ Factor ExactInf::belief( const VarSet &ns ) const {
             DAI_THROW(BELIEF_NOT_AVAILABLE);
         return beliefF(I).marginal(ns);
     }
-}
-
-
-string ExactInf::identify() const {
-    return string(Name) + printProperties();
 }
 
 

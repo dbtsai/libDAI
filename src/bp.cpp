@@ -25,9 +25,6 @@ namespace dai {
 using namespace std;
 
 
-const char *BP::Name = "BP";
-
-
 #define DAI_BP_FAST 1
 
 
@@ -335,7 +332,7 @@ Real BP::run() {
         }
 
         if( props.verbose >= 3 )
-            cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
+            cerr << name() << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
     if( maxDiff > _maxdiff )
@@ -345,10 +342,10 @@ Real BP::run() {
         if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-                cerr << Name << "::run:  WARNING: not converged after " << _iters << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
+                cerr << name() << "::run:  WARNING: not converged after " << _iters << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 3 )
-                cerr << Name << "::run:  ";
+                cerr << name() << "::run:  ";
                 cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }
@@ -429,11 +426,6 @@ Real BP::logZ() const {
     for( size_t I = 0; I < nrFactors(); ++I )
         sum -= dist( beliefF(I), factor(I), DISTKL );
     return sum;
-}
-
-
-string BP::identify() const {
-    return string(Name) + printProperties();
 }
 
 

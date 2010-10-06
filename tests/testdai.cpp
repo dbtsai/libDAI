@@ -330,14 +330,6 @@ int main( int argc, char *argv[] ) {
             // Parse method
             pair<string, PropertySet> meth = parseNameProperties( methods[m], Aliases );
 
-            // Check whether name is valid
-            size_t n = 0;
-            for( ; strlen( DAINames[n] ) != 0; n++ )
-                if( meth.first == DAINames[n] )
-                    break;
-            if( strlen( DAINames[n] ) == 0 )
-                DAI_THROWE(UNKNOWN_DAI_ALGORITHM,string("Unknown DAI algorithm \"") + meth.first + string("\" in \"") + methods[m] + string("\""));
-
             // Construct object for running the method
             TestDAI testdai(fg, meth.first, meth.second );
 

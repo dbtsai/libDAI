@@ -54,9 +54,6 @@ class DecMAP : public DAIAlgFG {
             PropertySet iaopts;
         } props;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     public:
         /// Default constructor
         DecMAP() : DAIAlgFG(), _state(), _logp(), _maxdiff(), _iters(), props() {}
@@ -71,7 +68,7 @@ class DecMAP : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual DecMAP* clone() const { return new DecMAP(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "DECMAP"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &/*vs*/ ) const;
         virtual Factor beliefV( size_t i ) const;

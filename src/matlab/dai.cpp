@@ -126,11 +126,11 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
 
     if( nlhs >= 6 ) {
         std::vector<std::size_t> map_state;
-        if( obj->identify() == "BP" ) {
+        if( obj->name() == "BP" ) {
             BP* obj_bp = dynamic_cast<BP *>(obj);
             DAI_ASSERT( obj_bp != 0 );
             map_state = obj_bp->findMaximum();
-        } else if( obj->identify() == "JTREE" ) {
+        } else if( obj->name() == "JTree" ) {
             JTree* obj_jtree = dynamic_cast<JTree *>(obj);
             DAI_ASSERT( obj_jtree != 0 );
             map_state = obj_jtree->findMaximum();

@@ -60,6 +60,9 @@ class CBP : public DAIAlgFG {
 
 
     public:
+        /// Default constructor
+        CBP() : DAIAlgFG(), _beliefsV(), _beliefsF(), _logZ(0.0), _iters(0), _maxdiff(0.0), _sum_level(0.0), _num_leaves(0), _clamp_ofstream() {}
+
         /// Construct CBP object from FactorGraph \a fg and PropertySet \a opts
         /** \param fg Factor graph.
          *  \param opts Parameters @see Properties
@@ -69,13 +72,10 @@ class CBP : public DAIAlgFG {
             construct();
         }
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     /// \name General InfAlg interface
     //@{
         virtual CBP* clone() const { return new CBP(*this); }
-        virtual std::string identify() const { return std::string(Name) + props.toString(); }
+        virtual std::string name() const { return "CBP"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet & ) const { DAI_THROW(NOT_IMPLEMENTED); }
         virtual Factor beliefV( size_t i ) const { return _beliefsV[i]; }

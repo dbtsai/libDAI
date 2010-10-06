@@ -96,9 +96,6 @@ class MR : public DAIAlgFG {
             InitType inits;
         } props;
 
-        /// Name of this inference method
-        static const char *Name;
-
     public:
         /// Default constructor
         MR() : DAIAlgFG(), supported(), G(), tJ(), theta(), M(), cors(), Mag(), _maxdiff(), _iters(), props() {}
@@ -115,7 +112,7 @@ class MR : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual MR* clone() const { return new MR(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "MR"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &/*vs*/ ) const;
         virtual Factor beliefV( size_t i ) const;

@@ -90,9 +90,6 @@ class HAK : public DAIAlgRG {
             size_t loopdepth;
         } props;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     public:
     /// \name Constructors/destructors
     //@{
@@ -113,7 +110,7 @@ class HAK : public DAIAlgRG {
     /// \name General InfAlg interface
     //@{
         virtual HAK* clone() const { return new HAK(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "HAK"; }
         virtual Factor belief( const VarSet &vs ) const;
         virtual std::vector<Factor> beliefs() const;
         virtual Real logZ() const;

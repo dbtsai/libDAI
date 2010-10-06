@@ -25,9 +25,6 @@ namespace dai {
 using namespace std;
 
 
-const char *Gibbs::Name = "GIBBS";
-
-
 void Gibbs::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("maxiter") );
     props.maxiter = opts.getStringAs<size_t>("maxiter");
@@ -213,7 +210,7 @@ Real Gibbs::run() {
     }
 
     if( props.verbose >= 3 )
-        cerr << Name << "::run:  ran " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
+        cerr << name() << "::run:  ran " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
 
     if( _iters == 0 )
         return INFINITY;

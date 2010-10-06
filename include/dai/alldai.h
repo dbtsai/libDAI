@@ -71,7 +71,7 @@ namespace dai {
 
 
 /// Constructs a new inference algorithm.
-/** \param name The name of the inference algorithm (should be one of the names in DAINames).
+/** \param name The name of the inference algorithm.
  *  \param fg The FactorGraph that the algorithm should be applied to.
  *  \param opts A PropertySet specifying the options for the algorithm.
  *  \return Returns a pointer to the new InfAlg object; it is the responsibility of the caller to delete it later.
@@ -117,49 +117,6 @@ std::pair<std::string, PropertySet> parseNameProperties( const std::string &s, c
  *  \see \ref fileformats-aliases
  */
 std::map<std::string,std::string> readAliasesFile( const std::string &filename );
-
-
-/// Contains the names of all inference algorithms compiled into libDAI.
-static const char* DAINames[] = {
-    ExactInf::Name,
-#ifdef DAI_WITH_BP
-    BP::Name,
-#endif
-#ifdef DAI_WITH_FBP
-    FBP::Name,
-#endif
-#ifdef DAI_WITH_TRWBP
-    TRWBP::Name,
-#endif
-#ifdef DAI_WITH_MF
-    MF::Name,
-#endif
-#ifdef DAI_WITH_HAK
-    HAK::Name,
-#endif
-#ifdef DAI_WITH_LC
-    LC::Name,
-#endif
-#ifdef DAI_WITH_TREEEP
-    TreeEP::Name,
-#endif
-#ifdef DAI_WITH_JTREE
-    JTree::Name,
-#endif
-#ifdef DAI_WITH_MR
-    MR::Name,
-#endif
-#ifdef DAI_WITH_GIBBS
-    Gibbs::Name,
-#endif
-#ifdef DAI_WITH_CBP
-    CBP::Name,
-#endif
-#ifdef DAI_WITH_DECMAP
-    DecMAP::Name,
-#endif
-    ""
-};
 
 
 } // end of namespace dai

@@ -61,10 +61,6 @@ class FBP : public BP {
         std::vector<Real> _weight;
 
     public:
-        /// Name of this inference algorithm
-        static const char *Name;
-
-    public:
     /// \name Constructors/destructors
     //@{
         /// Default constructor
@@ -83,7 +79,7 @@ class FBP : public BP {
     /// \name General InfAlg interface
     //@{
         virtual FBP* clone() const { return new FBP(*this); }
-        virtual std::string identify() const;
+        virtual std::string name() const { return "FBP"; }
         virtual Real logZ() const;
     //@}
 

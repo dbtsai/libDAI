@@ -23,9 +23,6 @@ namespace dai {
 using namespace std;
 
 
-const char *MF::Name = "MF";
-
-
 void MF::setProperties( const PropertySet &opts ) {
     DAI_ASSERT( opts.hasKey("tol") );
     DAI_ASSERT( opts.hasKey("maxiter") );
@@ -85,11 +82,6 @@ void MF::construct() {
 }
 
 
-string MF::identify() const {
-    return string(Name) + printProperties();
-}
-
-
 void MF::init() {
     if( props.init == Properties::InitType::UNIFORM )
         for( size_t i = 0; i < nrVars(); i++ )
@@ -143,7 +135,7 @@ Real MF::run() {
             Factor nb = calcNewBelief( i );
 
             if( nb.hasNaNs() ) {
-                cerr << Name << "::run():  ERROR: new belief of variable " << var(i) << " has NaNs!" << endl;
+                cerr << name() << "::run():  ERROR: new belief of variable " << var(i) << " has NaNs!" << endl;
                 return 1.0;
             }
 
@@ -155,7 +147,7 @@ Real MF::run() {
         }
 
         if( props.verbose >= 3 )
-            cerr << Name << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
+            cerr << name() << "::run:  maxdiff " << maxDiff << " after " << _iters+1 << " passes" << endl;
     }
 
     if( maxDiff > _maxdiff )
@@ -165,10 +157,10 @@ Real MF::run() {
         if( maxDiff > props.tol ) {
             if( props.verbose == 1 )
                 cerr << endl;
-            cerr << Name << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
+            cerr << name() << "::run:  WARNING: not converged within " << props.maxiter << " passes (" << toc() - tic << " seconds)...final maxdiff:" << maxDiff << endl;
         } else {
             if( props.verbose >= 3 )
-                cerr << Name << "::run:  ";
+                cerr << name() << "::run:  ";
             cerr << "converged in " << _iters << " passes (" << toc() - tic << " seconds)." << endl;
         }
     }

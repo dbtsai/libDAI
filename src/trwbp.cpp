@@ -20,9 +20,6 @@ namespace dai {
 using namespace std;
 
 
-const char *TRWBP::Name = "TRWBP";
-
-
 void TRWBP::setProperties( const PropertySet &opts ) {
     BP::setProperties( opts );
 
@@ -47,11 +44,6 @@ string TRWBP::printProperties() const {
     s << ",";
     s << "nrtrees=" << nrtrees << "]";
     return s.str();
-}
-
-
-string TRWBP::identify() const {
-    return string(Name) + printProperties();
 }
 
 

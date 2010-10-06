@@ -47,8 +47,13 @@ class InfAlg {
 
     /// \name Queries
     //@{
+        /// Returns the name of the algorithm
+        virtual std::string name() const = 0;
+
         /// Identifies itself for logging purposes
-        virtual std::string identify() const = 0;
+        virtual std::string identify() const {
+            return name() + printProperties();
+        }
 
         /// Returns reference to underlying FactorGraph.
         virtual FactorGraph &fg() = 0;

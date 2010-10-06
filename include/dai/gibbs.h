@@ -67,9 +67,6 @@ class Gibbs : public DAIAlgFG {
             size_t verbose;
         } props;
 
-        /// Name of this inference algorithm
-        static const char *Name;
-
     public:
         /// Default constructor
         Gibbs() : DAIAlgFG(), _sample_count(0), _var_counts(), _factor_counts(), _iters(0), _state(), _max_state(), _max_score(-INFINITY) {}
@@ -87,7 +84,7 @@ class Gibbs : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual Gibbs* clone() const { return new Gibbs(*this); }
-        virtual std::string identify() const { return std::string(Name) + printProperties(); }
+        virtual std::string name() const { return "GIBBS"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &vs ) const;
         virtual Factor beliefV( size_t i ) const;
