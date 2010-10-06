@@ -169,17 +169,20 @@
  *
  *  Joris M. Mooij;\n
  *  libDAI: A free & open source C++ library for Discrete Approximate Inference in graphical models;\n
- *  Journal of Machine Learning Research, in press, 2010.\n
+ *  Journal of Machine Learning Research, 11(Aug):2169-2173, 2010.\n
  *
  *  In BiBTeX format (for your convenience):\n
  *  
  *  <pre>
- *  \@article{mooij2010libDAI,
- *    author  = {Joris M. Mooij},
- *    title   = {lib{DAI}: A free \& open source {C}++ Library for {D}iscrete {A}pproximate {I}nference in graphical models},
- *    journal = {Journal of Machine Learning Research},
- *    volume  = {in press},
- *    year    = 2010
+ *  \@article{Mooij_libDAI_10,
+ *    author    = {Joris M. Mooij},
+ *    title     = {lib{DAI}: A Free and Open Source {C++} Library for Discrete Approximate Inference in Graphical Models},
+ *    journal   = {Journal of Machine Learning Research},
+ *    year      = 2010,
+ *    month     = Aug,
+ *    volume    = 11,
+ *    pages     = {2169-2173},
+ *    url       = "http://www.jmlr.org/papers/volume11/mooij10a/mooij10a.pdf"
  *  }</pre>
  *
  *  Moreover, as a personal note, I would appreciate it to be informed about any
