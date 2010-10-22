@@ -1,6 +1,8 @@
 libDAI-0.2.7 (2010-08-19)
 -------------------------
 
+* Improved code in matlab/dai.cpp that tests whether findMaximum is supported
+  (this fixes a bug in matlab/dai.cpp reported by Deepak Roy)
 * Replaced all Name members by name() virtual functions and removed global variable DAINames
   (this fixes a bug in matlab/dai.cpp reported by Thomas Mensink)
 * Removed interfaces deprecated in 0.2.6.
