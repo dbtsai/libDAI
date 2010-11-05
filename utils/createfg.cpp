@@ -170,8 +170,8 @@ BipartiteGraph createRandomBipartiteGraph( size_t N1, size_t N2, size_t d1, size
             stubs2[n2*d2 + t] = n2;
 
     // shuffle lists
-    random_shuffle( stubs1.begin(), stubs1.end() );
-    random_shuffle( stubs2.begin(), stubs2.end() );
+    random_shuffle( stubs1.begin(), stubs1.end(), rnd );
+    random_shuffle( stubs2.begin(), stubs2.end(), rnd );
 
     // add edges
     vector<Edge> edges;

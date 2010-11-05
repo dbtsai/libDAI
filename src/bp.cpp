@@ -310,7 +310,7 @@ Real BP::run() {
         } else {
             // Sequential updates
             if( props.updates == Properties::UpdateType::SEQRND )
-                random_shuffle( _updateSeq.begin(), _updateSeq.end() );
+                random_shuffle( _updateSeq.begin(), _updateSeq.end(), rnd );
 
             foreach( const Edge &e, _updateSeq ) {
                 calcNewMessage( e.first, e.second );

@@ -299,7 +299,7 @@ Real LC::run() {
     for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
         // Sequential updates
         if( props.updates == Properties::UpdateType::SEQRND )
-            random_shuffle( update_seq.begin(), update_seq.end() );
+            random_shuffle( update_seq.begin(), update_seq.end(), rnd );
 
         for( size_t t=0; t < nredges; t++ ) {
             size_t i = update_seq[t].first;
