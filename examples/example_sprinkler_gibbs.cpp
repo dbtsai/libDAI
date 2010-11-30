@@ -37,7 +37,7 @@ int main() {
 
     // Prepare a Gibbs sampler
     PropertySet gibbsProps;
-    gibbsProps.set("iters", size_t(100));   // number of Gibbs sampler iterations
+    gibbsProps.set("maxiter", size_t(100));   // number of Gibbs sampler iterations
     gibbsProps.set("burnin", size_t(0));
     gibbsProps.set("verbose", size_t(0));
     Gibbs gibbsSampler( SprinklerNetwork, gibbsProps );
@@ -58,6 +58,7 @@ int main() {
     size_t nrSamples = 1000;
     std::vector<size_t> state;
     for( size_t t = 0; t < nrSamples; t++ ) {
+        gibbsSampler.init();
         gibbsSampler.run();
         state = gibbsSampler.state();
         for( size_t i = 0; i < state.size(); i++ )
