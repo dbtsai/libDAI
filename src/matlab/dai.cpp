@@ -91,13 +91,11 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
     obj->init();
     obj->run();
 
-
     // Save logZ
     double logZ = obj->logZ();
 
     // Save maxdiff
     double maxdiff = obj->maxDiff();
-
 
     // Hand over results to MATLAB
     LOGZ_OUT = mxCreateDoubleMatrix(1,1,mxREAL);
@@ -126,25 +124,26 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
 
     if( nlhs >= 6 ) {
         std::vector<std::size_t> map_state;
-        if( obj->name() == "BP" ) {
-            BP* obj_bp = dynamic_cast<BP *>(obj);
-            DAI_ASSERT( obj_bp != 0 );
-            map_state = obj_bp->findMaximum();
-        } else if( obj->name() == "JTree" ) {
-            JTree* obj_jtree = dynamic_cast<JTree *>(obj);
-            DAI_ASSERT( obj_jtree != 0 );
-            map_state = obj_jtree->findMaximum();
-        } else {
-            mexErrMsgTxt("MAP state assignment works only for BP, JTree.\n");
-            delete obj;
-            return;
+        bool supported = true;
+        try {
+            map_state = obj->findMaximum();
+        } catch( Exception &e ) {
+            if( e.code() == Exception::NOT_IMPLEMENTED )
+                supported = false;
+            else
+                throw;
         }
-        QMAP_OUT = mxCreateNumericMatrix(map_state.size(), 1, mxUINT32_CLASS, mxREAL);
-        uint32_T* qmap_p = reinterpret_cast<uint32_T *>(mxGetPr(QMAP_OUT));
-        for (size_t n = 0; n < map_state.size(); ++n)
-            qmap_p[n] = map_state[n];
+        if( supported ) {
+            QMAP_OUT = mxCreateNumericMatrix(map_state.size(), 1, mxUINT32_CLASS, mxREAL);
+            uint32_T* qmap_p = reinterpret_cast<uint32_T *>(mxGetPr(QMAP_OUT));
+            for (size_t n = 0; n < map_state.size(); ++n)
+                qmap_p[n] = map_state[n];
+        } else {
+            delete obj;
+            mexErrMsgTxt("Calculating a MAP state is not supported by this inference algorithm");
+        }
     }
-    delete obj;
 
+    delete obj;
     return;
 }

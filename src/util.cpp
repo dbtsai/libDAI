@@ -10,10 +10,7 @@
 
 
 #include <dai/util.h>
-#include <boost/random/linear_congruential.hpp>
-#include <boost/random/uniform_real.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
+#include <boost/random.hpp>
 
 #ifdef WINDOWS
     #include <windows.h>
@@ -67,7 +64,7 @@ double toc() {
 }
 
 /// Type of global random number generator
-typedef boost::minstd_rand _rnd_gen_type;  // Try boost::mt19937 or boost::ecuyer1988 instead of boost::minstd_rand
+typedef boost::mt19937 _rnd_gen_type;
 
 /// Global random number generator
 _rnd_gen_type _rnd_gen(42U);

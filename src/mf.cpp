@@ -128,7 +128,7 @@ Real MF::run() {
     // been reached or until the maximum belief difference is smaller than tolerance
     Real maxDiff = INFINITY;
     for( _iters = 0; _iters < props.maxiter && maxDiff > props.tol; _iters++ ) {
-        random_shuffle( update_seq.begin(), update_seq.end() );
+        random_shuffle( update_seq.begin(), update_seq.end(), rnd );
 
         maxDiff = -INFINITY;
         foreach( const size_t &i, update_seq ) {

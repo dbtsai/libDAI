@@ -315,7 +315,7 @@ GraphAL createGraphRegular( size_t N, size_t d ) {
             G = GraphAL( N );
             bool finished = false;
             while( !finished ) {
-                random_shuffle( U.begin(), U.end() );
+                random_shuffle( U.begin(), U.end(), rnd );
                 size_t i1, i2;
                 bool suit_pair_found = false;
                 for( i1 = 0; i1 < U.size()-1 && !suit_pair_found; i1++ )
