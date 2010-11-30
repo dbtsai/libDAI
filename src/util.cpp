@@ -107,7 +107,7 @@ std::vector<std::string> tokenizeString( const std::string& s, bool singleDelim,
     vector<string> tokens;
 
     string::size_type start = 0;
-    while( start < s.size() ) {
+    while( start <= s.size() ) {
         string::size_type end = s.find_first_of( delim, start );
         if( end == string::npos )
             end = s.size();
@@ -116,7 +116,7 @@ std::vector<std::string> tokenizeString( const std::string& s, bool singleDelim,
             // skip to next non-delimiter
             start = s.find_first_not_of( delim, start );
             if( start == string::npos )
-                start = s.size();
+                break;
         } else { // we found a token
             tokens.push_back( s.substr(start, end - start) );
             start = end + 1;

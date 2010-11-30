@@ -155,18 +155,21 @@ BOOST_AUTO_TEST_CASE( tokenizeStringTest ) {
 
     s = "";
     tokens = tokenizeString( s, true, " \t" );
-    BOOST_CHECK_EQUAL( tokens.size(), 0 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    BOOST_CHECK_EQUAL( tokens.size(), 1 );
 
     s = " ";
-    tokens = tokenizeString( s, true, " \t" );
-    BOOST_CHECK_EQUAL( tokens.size(), 1 );
-    BOOST_CHECK_EQUAL( tokens[0], "" );
-    
-    s = " \t";
     tokens = tokenizeString( s, true, " \t" );
     BOOST_CHECK_EQUAL( tokens.size(), 2 );
     BOOST_CHECK_EQUAL( tokens[0], "" );
     BOOST_CHECK_EQUAL( tokens[1], "" );
+    
+    s = " \t";
+    tokens = tokenizeString( s, true, " \t" );
+    BOOST_CHECK_EQUAL( tokens.size(), 3 );
+    BOOST_CHECK_EQUAL( tokens[0], "" );
+    BOOST_CHECK_EQUAL( tokens[1], "" );
+    BOOST_CHECK_EQUAL( tokens[2], "" );
 
     s = " \tHello";
     tokens = tokenizeString( s, true, " \t" );
@@ -203,7 +206,7 @@ BOOST_AUTO_TEST_CASE( tokenizeStringTest ) {
 
     s = " \tHello\r\n there !\r";
     tokens = tokenizeString( s, true, " \t\r\n" );
-    BOOST_CHECK_EQUAL( tokens.size(), 7 );
+    BOOST_CHECK_EQUAL( tokens.size(), 8 );
     BOOST_CHECK_EQUAL( tokens[0], "" );
     BOOST_CHECK_EQUAL( tokens[1], "" );
     BOOST_CHECK_EQUAL( tokens[2], "Hello" );
@@ -211,6 +214,7 @@ BOOST_AUTO_TEST_CASE( tokenizeStringTest ) {
     BOOST_CHECK_EQUAL( tokens[4], "" );
     BOOST_CHECK_EQUAL( tokens[5], "there" );
     BOOST_CHECK_EQUAL( tokens[6], "!" );
+    BOOST_CHECK_EQUAL( tokens[7], "" );
 
 
     s = "";

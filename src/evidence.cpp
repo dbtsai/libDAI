@@ -36,7 +36,7 @@ void Evidence::addEvidenceTabFile( std::istream &is, FactorGraph &fg ) {
 void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> &varMap ) {
     std::string line;
     getline( is, line );
-    size_t line_number = 0;
+    size_t line_number = 2;
 
     // Parse header
     std::vector<std::string> header_fields;
@@ -62,7 +62,7 @@ void Evidence::addEvidenceTabFile( std::istream &is, std::map<std::string, Var> 
         line_number++;
 
         std::vector<std::string> fields;
-        fields = tokenizeString( line, true );
+        fields = tokenizeString( line, true, "\t" );
         if( fields.size() != vars.size() )
             DAI_THROWE(INVALID_EVIDENCE_FILE,"Invalid number of fields in line " + boost::lexical_cast<std::string>(line_number));
 
