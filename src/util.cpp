@@ -83,7 +83,7 @@ boost::variate_generator<_rnd_gen_type&, boost::normal_distribution<Real> > _nor
 
 
 void rnd_seed( size_t seed ) {
-    _rnd_gen.seed(seed);
+    _rnd_gen.seed( static_cast<unsigned int>(seed) );
     _normal_rnd.distribution().reset(); // needed for clearing the cache used in boost::normal_distribution
 }
 

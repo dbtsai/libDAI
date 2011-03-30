@@ -1,3 +1,5 @@
+* Fixed a Boost-related bug in src/util.cpp (reported by Avneesh Saluja)
+  (the random seed needs to be an unsigned int on some platforms)
 * Fixed two bugs in examples/example_sprinkler_gibbs (reported by Priya)
 * Fixed bug in tokenizeString() and Evidence::addEvidenceTabFile()
   (a tab character at the end of a line was incorrectly discarded - bug reported by Priya)
