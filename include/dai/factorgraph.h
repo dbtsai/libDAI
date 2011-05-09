@@ -231,7 +231,7 @@ class FactorGraph {
         std::vector<VarSet> maximalFactorDomains() const;
 
         /// Evaluates the log score (i.e., minus the energy) of the joint configuration \a statevec
-        Real logScore( const std::vector<size_t>& statevec );
+        Real logScore( const std::vector<size_t>& statevec ) const;
     //@}
 
     /// \name Backup/restore mechanism for factors

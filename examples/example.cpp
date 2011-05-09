@@ -12,6 +12,9 @@
 #include <iostream>
 #include <map>
 #include <dai/alldai.h>  // Include main libDAI header file
+#include <dai/jtree.h>
+#include <dai/bp.h>
+#include <dai/decmap.h>
 
 
 using namespace dai;

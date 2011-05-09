@@ -6,6 +6,7 @@
  *
  *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
+ *  Copyright (C) 2008       Christian Wojek
  */
 
 
@@ -166,6 +167,8 @@ std::istream& operator>> ( std::istream& is, FactorGraph &fg ) {
             Ivars.push_back( Var(labels[mi], dims[mi]) );
         }
         facs.push_back( Factor( VarSet( Ivars.begin(), Ivars.end(), Ivars.size() ), (Real)0 ) );
+        if( verbose >= 3 )
+            cerr << "  vardims: " << vardims << endl;
 
         // calculate permutation object
         Permute permindex( Ivars );
@@ -337,7 +340,7 @@ vector<VarSet> FactorGraph::maximalFactorDomains() const {
 }
 
 
-Real FactorGraph::logScore( const std::vector<size_t>& statevec ) {
+Real FactorGraph::logScore( const std::vector<size_t>& statevec ) const {
     // Construct a State object that represents statevec
     // This decouples the representation of the joint state in statevec from the factor graph
     map<Var, size_t> statemap;

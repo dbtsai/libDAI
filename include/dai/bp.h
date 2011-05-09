@@ -6,6 +6,7 @@
  *
  *  Copyright (C) 2006-2010  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
+ *  Copyright (C) 2008-2009  Giuseppe Passino
  */
 
 

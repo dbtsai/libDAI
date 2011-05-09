@@ -1,3 +1,6 @@
+* Fixed bug in findMaximum(): inconsistent max-beliefs are now detected,
+  instead of returning a MAP state with zero joint probability
+  (reported by Hynek Urban)
 * Fixed a Boost-related bug in src/util.cpp (reported by Avneesh Saluja)
   (the random seed needs to be an unsigned int on some platforms)
 * Fixed two bugs in examples/example_sprinkler_gibbs (reported by Priya)

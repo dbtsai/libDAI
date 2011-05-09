@@ -10,6 +10,7 @@
 
 
 #include <iostream>
+#include <stack>
 #include <dai/jtree.h>
 
 
@@ -577,6 +578,73 @@ std::pair<size_t,long double> boundTreewidth( const FactorGraph &fg, greedyVaria
     }
 
     return make_pair(treewidth, nrstates);
+}
+
+
+std::vector<size_t> JTree::findMaximum() const {
+    vector<size_t> maximum( nrVars() );
+    vector<bool> visitedVars( nrVars(), false );
+    vector<bool> visitedORs( nrORs(), false );
+    stack<size_t> scheduledORs;
+    scheduledORs.push( 0 );
+    while( !scheduledORs.empty() ) {
+        size_t alpha = scheduledORs.top();
+        scheduledORs.pop();
+        if( visitedORs[alpha] )
+            continue;
+        visitedORs[alpha] = true;
+
+        // Get marginal of outer region alpha 
+        Prob probF = Qa[alpha].p();
+
+        // The allowed configuration is restrained according to the variables assigned so far:
+        // pick the argmax amongst the allowed states
+        Real maxProb = -numeric_limits<Real>::max();
+        State maxState( OR(alpha).vars() );
+        size_t maxcount = 0;
+        for( State s( OR(alpha).vars() ); s.valid(); ++s ) {
+            // First, calculate whether this state is consistent with variables that
+            // have been assigned already
+            bool allowedState = true;
+            foreach( const Var& j, OR(alpha).vars() ) {
+                size_t j_index = findVar(j);
+                if( visitedVars[j_index] && maximum[j_index] != s(j) ) {
+                    allowedState = false;
+                    break;
+                }
+            }
+            // If it is consistent, check if its probability is larger than what we have seen so far
+            if( allowedState ) {
+                if( probF[s] > maxProb ) {
+                    maxState = s;
+                    maxProb = probF[s];
+                    maxcount = 1;
+                } else
+                    maxcount++;
+            }
+        }
+        DAI_ASSERT( maxProb != 0.0 );
+        DAI_ASSERT( Qa[alpha][maxState] != 0.0 );
+
+        // Decode the argmax
+        foreach( const Var& j, OR(alpha).vars() ) {
+            size_t j_index = findVar(j);
+            if( visitedVars[j_index] ) {
+                // We have already visited j earlier - hopefully our state is consistent
+                if( maximum[j_index] != maxState( j ) )
+                    DAI_THROWE(RUNTIME_ERROR,"MAP state inconsistent due to loops");
+            } else {
+                // We found a consistent state for variable j
+                visitedVars[j_index] = true;
+                maximum[j_index] = maxState( j );
+                foreach( const Neighbor &beta, nbOR(alpha) )
+                    foreach( const Neighbor &alpha2, nbIR(beta) )
+                        if( !visitedORs[alpha2] )
+                            scheduledORs.push(alpha2);
+            }
+        }
+    }
+    return maximum;
 }
 
 
