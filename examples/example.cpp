@@ -4,7 +4,7 @@
  *  2, or (at your option) any later version. libDAI is distributed without any
  *  warranty. See the file COPYING for more details.
  *
- *  Copyright (C) 2006-2009  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Copyright (C) 2006-2011  Joris Mooij  [joris dot mooij at libdai dot org]
  *  Copyright (C) 2006-2007  Radboud University Nijmegen, The Netherlands
  */
 
@@ -114,12 +114,11 @@ int main( int argc, char *argv[] ) {
         // using the parameters specified by opts and three additional properties,
         // specifying that the decimation algorithm should use the max-product
         // algorithm and should completely reinitalize its state at every step
-/*        DecMAP decmap(fg, opts("reinit",true)("ianame",string("BP"))("iaopts",string("[damping=0.1,inference=MAXPROD,logdomain=0,maxiter=1000,tol=1e-9,updates=SEQRND,verbose=1]")) );
+        DecMAP decmap(fg, opts("reinit",true)("ianame",string("BP"))("iaopts",string("[damping=0.1,inference=MAXPROD,logdomain=0,maxiter=1000,tol=1e-9,updates=SEQRND,verbose=1]")) );
         decmap.init();
         decmap.run();
         vector<size_t> decmapstate = decmap.findMaximum();
-*/
-/*
+
         if( do_jt ) {
             // Report variable marginals for fg, calculated by the junction tree algorithm
             cout << "Exact variable marginals:" << endl;
@@ -143,7 +142,7 @@ int main( int argc, char *argv[] ) {
         cout << "Approximate (loopy belief propagation) factor marginals:" << endl;
         for( size_t I = 0; I < fg.nrFactors(); I++ ) // iterate over all factors in fg
             cout << bp.belief(fg.factor(I).vars()) << endl; // display the belief of bp for the variables in that factor
-*/
+
         if( do_jt ) {
             // Report log partition sum (normalizing constant) of fg, calculated by the junction tree algorithm
             cout << "Exact log partition sum: " << jt.logZ() << endl;
@@ -151,7 +150,7 @@ int main( int argc, char *argv[] ) {
 
         // Report log partition sum of fg, approximated by the belief propagation algorithm
         cout << "Approximate (loopy belief propagation) log partition sum: " << bp.logZ() << endl;
-/*
+
         if( do_jt ) {
             // Report exact MAP variable marginals
             cout << "Exact MAP variable marginals:" << endl;
@@ -175,7 +174,7 @@ int main( int argc, char *argv[] ) {
         cout << "Approximate (max-product) MAP factor marginals:" << endl;
         for( size_t I = 0; I < fg.nrFactors(); I++ )
             cout << mp.belief(fg.factor(I).vars()) << " == " << mp.beliefF(I) << endl;
-*/
+
         if( do_jt ) {
             // Report exact MAP joint state
             cout << "Exact MAP state (log score = " << fg.logScore( jtmapstate ) << "):" << endl;
@@ -187,12 +186,11 @@ int main( int argc, char *argv[] ) {
         cout << "Approximate (max-product) MAP state (log score = " << fg.logScore( mpstate ) << "):" << endl;
         for( size_t i = 0; i < mpstate.size(); i++ )
             cout << fg.var(i) << ": " << mpstate[i] << endl;
-/*
+
         // Report DecMAP joint state
         cout << "Approximate DecMAP state (log score = " << fg.logScore( decmapstate ) << "):" << endl;
         for( size_t i = 0; i < decmapstate.size(); i++ )
             cout << fg.var(i) << ": " << decmapstate[i] << endl;
-*/            
     }
 
     return 0;
