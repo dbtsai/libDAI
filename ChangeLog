@@ -1,3 +1,5 @@
+* Jerome Maye found a bug in the State() class in index.h; implemented
+  a workaround for the moment
 * Fixed bug in findMaximum(): inconsistent max-beliefs are now detected,
   instead of returning a MAP state with zero joint probability
   (reported by Hynek Urban)
