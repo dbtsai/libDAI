@@ -252,7 +252,8 @@ std::vector<size_t> findMaximum( const InfAlg& obj ) {
                     maxcount++;
             }
         }
-        DAI_ASSERT( maxProb != 0.0 );
+        if( maxProb == 0.0 )
+            DAI_THROWE(RUNTIME_ERROR,"Failed to decode the MAP state (should try harder using a SAT solver, but that's not implemented yet)");
         DAI_ASSERT( obj.fg().factor(I).p()[maxState] != 0.0 );
 
         // Decode the argmax
@@ -260,7 +261,7 @@ std::vector<size_t> findMaximum( const InfAlg& obj ) {
             if( visitedVars[j.node] ) {
                 // We have already visited j earlier - hopefully our state is consistent
                 if( maximum[j.node] != maxState( obj.fg().var(j.node) ) )
-                    DAI_THROWE(RUNTIME_ERROR,"MAP state inconsistent due to loops");
+                    DAI_THROWE(RUNTIME_ERROR,"Detected inconsistency while decoding MAP state (should try harder using a SAT solver, but that's not implemented yet)");
             } else {
                 // We found a consistent state for variable j
                 visitedVars[j.node] = true;
