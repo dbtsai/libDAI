@@ -354,6 +354,11 @@ class multifor {
  *  (and document it clearly, explaining the concept of state); 
  *  add more optimized variants of the State class like IndexFor 
  *  (e.g. for TFactor<>::slice()).
+ *
+ *  \todo The State class is dangerous because currently it represents a state both as
+ *  an integer and as a map<Var, size_t>; if the cardinality of the joint state space
+ *  becomes too large, the state no longer fits into an integer, and the two representations
+ *  are no longer consistent... this should be fixed!
  */
 class State {
     private:
@@ -423,7 +428,6 @@ class State {
 
         /// Return current state of variable \a v, or 0 if \a v is not in \c *this
         size_t operator() ( const Var &v ) const {
-            DAI_ASSERT( valid() );
             states_type::const_iterator entry = states.find( v );
             if( entry == states.end() )
                 return 0;
@@ -433,7 +437,6 @@ class State {
 
         /// Return linear state of variables in \a vs, assuming that variables that are not in \c *this are in state 0
         size_t operator() ( const VarSet &vs ) const {
-            DAI_ASSERT( valid() );
             size_t vs_state = 0;
             size_t prod = 1;
             for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ ) {
