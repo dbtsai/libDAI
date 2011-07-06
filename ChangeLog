@@ -1,3 +1,4 @@
+* Fixed numerical issues in MF, FBP and TRWBP (discovered in sparse branch)
 * Jerome Maye found a bug in the State() class in index.h; implemented
   a workaround for the moment
 * Fixed bug in findMaximum(): inconsistent max-beliefs are now detected,

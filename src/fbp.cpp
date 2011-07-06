@@ -32,7 +32,8 @@ Real FBP::logZ() const {
         Real c_i = 0.0;
         foreach( const Neighbor &I, nbV(i) )
             c_i += Weight(I);
-        sum += (1.0 - c_i) * beliefV(i).entropy();  // FBP
+        if( c_i != 1.0 )
+            sum += (1.0 - c_i) * beliefV(i).entropy();  // FBP
     }
     return sum;
 }
@@ -63,7 +64,7 @@ Prob FBP::calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) const
                         prod_j += message( j, J.iter );
                     else
                         prod_j *= message( j, J.iter );
-                } else {
+                } else if( c_I != 1.0 ) {
                     // FBP: multiply by m_Ij^(1-1/c_I)
                     if( props.logdomain )
                         prod_j += newMessage( j, J.iter) * (1.0 - 1.0 / c_I);

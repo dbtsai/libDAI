@@ -101,7 +101,7 @@ Factor MF::calcNewBelief( size_t i ) {
                 belief_I_minus_i *= _beliefs[j];
         Factor f_I = factor(I);
         if( props.updates == Properties::UpdateType::NAIVE )
-            f_I.takeLog();
+            f_I.takeLog(true);
         Factor msg_I_i = (belief_I_minus_i * f_I).marginal( var(i), false );
         if( props.updates == Properties::UpdateType::NAIVE )
             result *= msg_I_i.exp();
