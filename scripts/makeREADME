@@ -8,8 +8,6 @@ echo "Date:     $DAI_DATE" >> README
 echo "See also: http://www.libdai.org" >> README
 echo >> README
 w3m -dump doc/html/license.html | awk 'BEGIN {start=0}; $1 ~ /━/ {start=start+1; if (start<2) print $0}; $1 !~ /━/ {if (start>0 && start<2) print $0}' >> README
-echo "You should have received a copy of the GNU General Public License" >> README
-echo "along with libDAI in the file COPYING. If not, see http://www.gnu.org/licenses/" >> README
 echo >> README
 w3m -dump doc/html/citations.html | awk 'BEGIN {start=0}; $1 ~ /━/ {start=start+1; if (start<2) print $0}; $1 !~ /━/ {if (start>0 && start<2) print $0}' >> README
 w3m -dump doc/html/index.html | awk 'BEGIN {start=0}; $1 ~ /━/ {start=start+1; if (start<2) print $0}; $1 !~ /━/ {if (start>0 && start<2) print $0}' >> README

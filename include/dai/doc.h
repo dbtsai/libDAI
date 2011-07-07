@@ -1,10 +1,8 @@
 /*  This file is part of libDAI - http://www.libdai.org/
  *
- *  libDAI is licensed under the terms of the GNU General Public License version
- *  2, or (at your option) any later version. libDAI is distributed without any
- *  warranty. See the file COPYING for more details.
+ *  Copyright (c) 2006-2011, The libDAI authors. All rights reserved.
  *
- *  Copyright (C) 2008-2010  Joris Mooij  [joris dot mooij at libdai dot org]
+ *  Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
  */
 
 
@@ -33,16 +31,15 @@
 
 /** \mainpage Reference manual for libDAI - A free/open source C++ library for Discrete Approximate Inference methods
  *  \author Joris Mooij (with contributions of Frederik Eaton)
- *  \version 0.2.7
- *  \date August 19, 2010
+ *  \version git HEAD
+ *  \date July 7, 2011
  *
  *  <hr size="1">
  *  \section about About libDAI
- *  libDAI is a free/open source C++ library (licensed under GPL 2+) that provides
- *  implementations of various (approximate) inference methods for discrete
- *  graphical models. libDAI supports arbitrary factor graphs with discrete
- *  variables; this includes discrete Markov Random Fields and Bayesian
- *  Networks.
+ *  libDAI is a free/open source C++ library that provides implementations of
+ *  various (approximate) inference methods for discrete graphical models. libDAI
+ *  supports arbitrary factor graphs with discrete variables; this includes
+ *  discrete Markov Random Fields and Bayesian Networks.
  *
  *  The library is targeted at researchers. To be able to use the library, a
  *  good understanding of graphical models is needed.
@@ -141,20 +138,17 @@
  *  <hr size="1">
  *  \section license-license License
  *
- *  libDAI is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  libDAI is free software; you can redistribute it and/or modify it under the
+ *  terms of the BSD 2-clause license (also known as the FreeBSD license), which
+ *  can be found in the accompanying LICENSE file.
  *
- *  libDAI is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  [Note: up to and including version 0.2.7, libDAI was licensed under the GNU 
+ *  General Public License (GPL) version 2 or higher.]
  *
  *  <hr size="1">
- *  \section license-gpl GNU General Public License version 2
+ *  \section license-freebsd libDAI license (similar to FreeBSD license)
  * 
- *  \verbinclude COPYING
+ *  \verbinclude LICENSE
  */
 
 
