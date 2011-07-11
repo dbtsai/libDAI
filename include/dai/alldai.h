@@ -67,6 +67,20 @@
 namespace dai {
 
 
+/// Returns a map that contains for each built-in inference algorithm its name and a pointer to an object of that type
+std::map<std::string, InfAlg *>& builtinInfAlgs();
+
+
+/// Returns a set of names of all available inference algorithms
+/*  These are the names of the algorithms that were compiled in and can be 
+ *  given to \ref newInfAlg and \ref newInfAlgFromString.  
+ *  \return A set of strings, each one corresponding with the name of an available inference algorithm.
+ *  \note The set is returned by value because it will be reasonably small 
+ *  enough and this function is expected to be called infrequently.
+ */
+std::set<std::string> builtinInfAlgNames();
+
+
 /// Constructs a new inference algorithm.
 /** \param name The name of the inference algorithm.
  *  \param fg The FactorGraph that the algorithm should be applied to.

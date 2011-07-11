@@ -102,6 +102,7 @@ class LC : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual LC* clone() const { return new LC(*this); }
+        virtual LC* construct( const FactorGraph &fg, const PropertySet &opts ) const { return new LC( fg, opts ); }
         virtual std::string name() const { return "LC"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &/*vs*/ ) const;

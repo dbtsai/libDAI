@@ -73,6 +73,7 @@ class CBP : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual CBP* clone() const { return new CBP(*this); }
+        virtual CBP* construct( const FactorGraph &fg, const PropertySet &opts ) const { return new CBP( fg, opts ); }
         virtual std::string name() const { return "CBP"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet & ) const { DAI_THROW(NOT_IMPLEMENTED); }

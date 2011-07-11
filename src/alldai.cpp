@@ -19,58 +19,70 @@ namespace dai {
 using namespace std;
 
 
-InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts ) {
-    if( name == ExactInf().name() )
-        return new ExactInf (fg, opts);
+std::map<std::string, InfAlg *>& builtinInfAlgs() {
+    // use Construct On First Use idiom
+    // see also http://www.parashift.com/c++-faq-lite/ctors.html#faq-10.14
+
+    class _builtinInfAlgs : public std::map<std::string, InfAlg *> { public: _builtinInfAlgs() {
+        operator[]( ExactInf().name() ) = new ExactInf;
 #ifdef DAI_WITH_BP
-    if( name == BP().name() )
-        return new BP (fg, opts);
+        operator[]( BP().name() ) = new BP;
 #endif
 #ifdef DAI_WITH_FBP
-    if( name == FBP().name() )
-        return new FBP (fg, opts);
+        operator[]( FBP().name() ) = new FBP;
 #endif
 #ifdef DAI_WITH_TRWBP
-    if( name == TRWBP().name() )
-        return new TRWBP (fg, opts);
+        operator[]( TRWBP().name() ) = new TRWBP;
 #endif
 #ifdef DAI_WITH_MF
-    if( name == MF().name() )
-        return new MF (fg, opts);
+        operator[]( MF().name() ) = new MF;
 #endif
 #ifdef DAI_WITH_HAK
-    if( name == HAK().name() )
-        return new HAK (fg, opts);
+        operator[]( HAK().name() ) = new HAK;
 #endif
 #ifdef DAI_WITH_LC
-    if( name == LC().name() )
-        return new LC (fg, opts);
+        operator[]( LC().name() ) = new LC;
 #endif
 #ifdef DAI_WITH_TREEEP
-    if( name == TreeEP().name() )
-        return new TreeEP (fg, opts);
+        operator[]( TreeEP().name() ) = new TreeEP;
 #endif
 #ifdef DAI_WITH_JTREE
-    if( name == JTree().name() )
-        return new JTree (fg, opts);
+        operator[]( JTree().name() ) = new JTree;
 #endif
 #ifdef DAI_WITH_MR
-    if( name == MR().name() )
-        return new MR (fg, opts);
+        operator[]( MR().name() ) = new MR;
 #endif
 #ifdef DAI_WITH_GIBBS
-    if( name == Gibbs().name() )
-        return new Gibbs (fg, opts);
+        operator[]( Gibbs().name() ) = new Gibbs;
 #endif
 #ifdef DAI_WITH_CBP
-    if( name == CBP().name() )
-        return new CBP (fg, opts);
+        operator[]( CBP().name() ) = new CBP;
 #endif
 #ifdef DAI_WITH_DECMAP
-    if( name == DecMAP().name() )
-        return new DecMAP (fg, opts);
+        operator[]( DecMAP().name() ) = new DecMAP;
 #endif
-    DAI_THROWE(UNKNOWN_DAI_ALGORITHM,"Unknown libDAI algorithm: " + name);
+    } };
+
+    static std::map<std::string, InfAlg *>* bia = new _builtinInfAlgs;
+
+    return *bia;
+}
+
+
+std::set<std::string> builtinInfAlgNames() {
+    std::set<std::string> algNames;
+    for( typename std::map<std::string, InfAlg*>::const_iterator it = builtinInfAlgs().begin(); it != builtinInfAlgs().end(); it++ )
+        algNames.insert( it->first );
+    return algNames;
+}
+
+
+InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts ) {
+    std::map<std::string, InfAlg*>::const_iterator i = builtinInfAlgs().find( name );
+    if( i == builtinInfAlgs().end() )
+        DAI_THROWE(UNKNOWN_DAI_ALGORITHM, "Unknown inference algorithm: " + name);
+    InfAlg *ia = i->second;
+    return ia->construct( fg, opts );
 }
 
 

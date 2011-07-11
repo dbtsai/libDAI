@@ -1,3 +1,4 @@
+* Added builtinInfAlgs() and builtinInfAlgNames()
 * Now uses GMP big integer type to represent linear states and the number of
   states of VarSets (in some cases). This fixes a bug Jerome Maye found in the 
   State() class in index.h. Unfortunately, the supplied Makefile.WINDOWS now

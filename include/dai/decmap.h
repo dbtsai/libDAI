@@ -66,6 +66,7 @@ class DecMAP : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual DecMAP* clone() const { return new DecMAP(*this); }
+        virtual DecMAP* construct( const FactorGraph &fg, const PropertySet &opts ) const { return new DecMAP( fg, opts ); }
         virtual std::string name() const { return "DECMAP"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &/*vs*/ ) const;

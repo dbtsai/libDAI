@@ -179,6 +179,7 @@ class TreeEP : public JTree {
     /// \name General InfAlg interface
     //@{
         virtual TreeEP* clone() const { return new TreeEP(*this); }
+        virtual TreeEP* construct( const FactorGraph &fg, const PropertySet &opts ) const { return new TreeEP( fg, opts ); }
         virtual std::string name() const { return "TREEEP"; }
         virtual Real logZ() const;
         virtual void init();

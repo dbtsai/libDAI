@@ -84,6 +84,7 @@ class TRWBP : public BP {
     /// \name General InfAlg interface
     //@{
         virtual TRWBP* clone() const { return new TRWBP(*this); }
+        virtual TRWBP* construct( const FactorGraph &fg, const PropertySet &opts ) const { return new TRWBP( fg, opts ); }
         virtual std::string name() const { return "TRWBP"; }
         virtual Real logZ() const;
         virtual void setProperties( const PropertySet &opts );

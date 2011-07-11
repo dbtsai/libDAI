@@ -40,6 +40,12 @@ class InfAlg {
 
         /// Returns a pointer to a new, cloned copy of \c *this (i.e., virtual copy constructor)
         virtual InfAlg* clone() const = 0;
+
+        /// Returns a pointer to a newly constructed inference algorithm
+        /** \param fg Factor graph on which to perform the inference algorithm;
+         *  \param opts Parameters passed to constructor of inference algorithm;
+         */
+        virtual InfAlg* construct( const FactorGraph &fg, const PropertySet &opts ) const = 0;
     //@}
 
     /// \name Queries

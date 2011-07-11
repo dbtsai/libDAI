@@ -64,6 +64,7 @@ class ExactInf : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual ExactInf* clone() const { return new ExactInf(*this); }
+        virtual ExactInf* construct( const FactorGraph &fg, const PropertySet &opts ) const { return new ExactInf( fg, opts ); }
         virtual std::string name() const { return "EXACT"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &vs ) const;

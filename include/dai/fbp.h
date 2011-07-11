@@ -76,6 +76,7 @@ class FBP : public BP {
     /// \name General InfAlg interface
     //@{
         virtual FBP* clone() const { return new FBP(*this); }
+        virtual FBP* construct( const FactorGraph &fg, const PropertySet &opts ) const { return new FBP( fg, opts ); }
         virtual std::string name() const { return "FBP"; }
         virtual Real logZ() const;
     //@}

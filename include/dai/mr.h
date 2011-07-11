@@ -108,6 +108,7 @@ class MR : public DAIAlgFG {
     /// \name General InfAlg interface
     //@{
         virtual MR* clone() const { return new MR(*this); }
+        virtual MR* construct( const FactorGraph &fg, const PropertySet &opts ) const { return new MR( fg, opts ); }
         virtual std::string name() const { return "MR"; }
         virtual Factor belief( const Var &v ) const { return beliefV( findVar( v ) ); }
         virtual Factor belief( const VarSet &/*vs*/ ) const;
