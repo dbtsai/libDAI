@@ -96,7 +96,7 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
             cerr << "VarElim result: " << ElimVec << endl;
 
         // Estimate memory needed (rough upper bound)
-        long double memneeded = 0;
+        BigInt memneeded = 0;
         foreach( const VarSet& cl, ElimVec )
             memneeded += cl.nrStates();
         memneeded *= sizeof(Real) * fudge;
@@ -393,10 +393,10 @@ Real JTree::logZ() const {
 
 size_t JTree::findEfficientTree( const VarSet& vs, RootedTree &Tree, size_t PreviousRoot ) const {
     // find new root clique (the one with maximal statespace overlap with vs)
-    long double maxval = 0.0;
+    BigInt maxval = 0;
     size_t maxalpha = 0;
     for( size_t alpha = 0; alpha < nrORs(); alpha++ ) {
-        long double val = VarSet(vs & OR(alpha).vars()).nrStates();
+        BigInt val = VarSet(vs & OR(alpha).vars()).nrStates();
         if( val > maxval ) {
             maxval = val;
             maxalpha = alpha;
@@ -556,7 +556,7 @@ Factor JTree::calcMarginal( const VarSet& vs ) {
 }
 
 
-std::pair<size_t,long double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates ) {
+std::pair<size_t,BigInt> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates ) {
     // Create cluster graph from factor graph
     ClusterGraph _cg( fg, true );
 
@@ -565,11 +565,11 @@ std::pair<size_t,long double> boundTreewidth( const FactorGraph &fg, greedyVaria
 
     // Calculate treewidth
     size_t treewidth = 0;
-    double nrstates = 0.0;
+    BigInt nrstates = 0.0;
     for( size_t i = 0; i < ElimVec.size(); i++ ) {
         if( ElimVec[i].size() > treewidth )
             treewidth = ElimVec[i].size();
-        long double s = ElimVec[i].nrStates();
+        BigInt s = ElimVec[i].nrStates();
         if( s > nrstates )
             nrstates = s;
     }

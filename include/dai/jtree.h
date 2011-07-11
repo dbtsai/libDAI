@@ -201,7 +201,7 @@ class JTree : public DAIAlgRG {
  *  \throws OUT_OF_MEMORY if the total number of states becomes larger than maxStates
  *  \return a pair (number of variables in largest clique, number of states in largest clique)
  */
-std::pair<size_t,long double> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates=0 );
+std::pair<size_t,BigInt> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates=0 );
 
 
 } // end of namespace dai

@@ -31,7 +31,6 @@ int main( int argc, char *argv[] ) {
         Real   tol = 1.0e-9;
         size_t maxiter = 10000;
         Real   damping = 0.0;
-        BBP::Properties::UpdateType updates = BBP::Properties::UpdateType::PAR;
 
         // Store the constants in a PropertySet object
         PropertySet opts;

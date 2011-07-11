@@ -346,15 +346,8 @@ class multifor {
  *
  *  \see dai::calcLinearState(), dai::calcState()
  *
- *  \idea Make the State class a more prominent part of libDAI 
- *  (and document it clearly, explaining the concept of state); 
- *  add more optimized variants of the State class like IndexFor 
- *  (e.g. for TFactor<>::slice()).
- *
- *  \todo The State class is dangerous because currently it represents a state both as
- *  an integer and as a map<Var, size_t>; if the cardinality of the joint state space
- *  becomes too large, the state no longer fits into an integer, and the two representations
- *  are no longer consistent... this should be fixed!
+ *  \idea Make the State class a more prominent part of libDAI (and document it clearly, explaining the concept of state); 
+ *  add more optimized variants of the State class like IndexFor (e.g. for TFactor<>::slice()).
  */
 class State {
     private:
@@ -362,7 +355,7 @@ class State {
         typedef std::map<Var, size_t> states_type;
 
         /// Current state (represented linearly)
-        long                          state;
+        BigInt                        state;
 
         /// Current state (represented as a map)
         states_type                   states;
@@ -372,13 +365,13 @@ class State {
         State() : state(0), states() {}
 
         /// Construct from VarSet \a vs and corresponding linear state \a linearState
-        State( const VarSet &vs, size_t linearState=0 ) : state(linearState), states() {
+        State( const VarSet &vs, BigInt linearState=0 ) : state(linearState), states() {
             if( linearState == 0 )
                 for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ )
                     states[*v] = 0;
             else {
                 for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ ) {
-                    states[*v] = linearState % v->states();
+                    states[*v] = BigInt_size_t( linearState % v->states() );
                     linearState /= v->states();
                 }
                 DAI_ASSERT( linearState == 0 );
@@ -402,7 +395,7 @@ class State {
         /// Return current linear state
         operator size_t() const {
             DAI_ASSERT( valid() );
-            return( state );
+            return( BigInt_size_t( state ) );
         }
 
         /// Inserts a range of variable-state pairs, changing the current state
@@ -432,9 +425,9 @@ class State {
         }
 
         /// Return linear state of variables in \a vs, assuming that variables that are not in \c *this are in state 0
-        size_t operator() ( const VarSet &vs ) const {
-            size_t vs_state = 0;
-            size_t prod = 1;
+        BigInt operator() ( const VarSet &vs ) const {
+            BigInt vs_state = 0;
+            BigInt prod = 1;
             for( VarSet::const_iterator v = vs.begin(); v != vs.end(); v++ ) {
                 states_type::const_iterator entry = states.find( *v );
                 if( entry != states.end() )

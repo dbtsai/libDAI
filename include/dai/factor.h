@@ -69,13 +69,13 @@ class TFactor {
         TFactor( const Var &v ) : _vs(v), _p(v.states()) {}
 
         /// Constructs factor depending on variables in \a vars with uniform distribution
-        TFactor( const VarSet& vars ) : _vs(vars), _p((size_t)_vs.nrStates()) {
-            DAI_ASSERT( _vs.nrStates() <= std::numeric_limits<std::size_t>::max() );
+        TFactor( const VarSet& vars ) : _vs(vars), _p() {
+            _p = TProb<T>( BigInt_size_t( _vs.nrStates() ) );
         }
 
         /// Constructs factor depending on variables in \a vars with all values set to \a p
-        TFactor( const VarSet& vars, T p ) : _vs(vars), _p((size_t)_vs.nrStates(),p) {
-            DAI_ASSERT( _vs.nrStates() <= std::numeric_limits<std::size_t>::max() );
+        TFactor( const VarSet& vars, T p ) : _vs(vars), _p() {
+            _p = TProb<T>( BigInt_size_t( _vs.nrStates() ), p );
         }
 
         /// Constructs factor depending on variables in \a vars, copying the values from a std::vector<>
@@ -93,8 +93,9 @@ class TFactor {
         /** \param vars contains the variables that the new factor should depend on.
          *  \param p Points to array of values to be added.
          */
-        TFactor( const VarSet& vars, const T* p ) : _vs(vars), _p(p, p + (size_t)_vs.nrStates(), (size_t)_vs.nrStates()) {
-            DAI_ASSERT( _vs.nrStates() <= std::numeric_limits<std::size_t>::max() );
+        TFactor( const VarSet& vars, const T* p ) : _vs(vars), _p() {
+            size_t N = BigInt_size_t( _vs.nrStates() );
+            _p = TProb<T>( p, p + N, N );
         }
 
         /// Constructs factor depending on variables in \a vars, copying the values from \a p
@@ -104,7 +105,7 @@ class TFactor {
 
         /// Constructs factor depending on variables in \a vars, permuting the values given in \a p accordingly
         TFactor( const std::vector<Var> &vars, const std::vector<T> &p ) : _vs(vars.begin(), vars.end(), vars.size()), _p(p.size()) {
-            size_t nrStates = 1;
+            BigInt nrStates = 1;
             for( size_t i = 0; i < vars.size(); i++ )
                 nrStates *= vars[i].states();
             DAI_ASSERT( nrStates == p.size() );
@@ -344,8 +345,7 @@ class TFactor {
             else {
                 TFactor<T> f(*this); // make a copy
                 _vs |= g._vs;
-                DAI_ASSERT( _vs.nrStates() < std::numeric_limits<std::size_t>::max() );
-                size_t N = (size_t)_vs.nrStates();
+                size_t N = BigInt_size_t( _vs.nrStates() );
 
                 IndexFor i_f( f._vs, _vs );
                 IndexFor i_g( g._vs, _vs );
@@ -403,8 +403,7 @@ class TFactor {
                 result._p = _p.pwBinaryTr( g._p, op );
             } else {
                 result._vs = _vs | g._vs;
-                DAI_ASSERT( result._vs.nrStates() < std::numeric_limits<std::size_t>::max() );
-                size_t N = (size_t)result._vs.nrStates();
+                size_t N = BigInt_size_t( result._vs.nrStates() );
 
                 IndexFor i_f( _vs, result.vars() );
                 IndexFor i_g( g._vs, result.vars() );

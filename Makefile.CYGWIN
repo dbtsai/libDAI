@@ -43,7 +43,7 @@ CCINC=-Iinclude -I/cygdrive/e/cygwin/boost_1_42_0
 
 # LINKER
 # Standard libraries to include
-LIBS=-ldai
+LIBS=-ldai -lgmpxx -lgmp
 # For linking with BOOST libraries
 BOOSTLIBS_PO=-lboost_program_options
 BOOSTLIBS_UTF=-lboost_unit_test_framework

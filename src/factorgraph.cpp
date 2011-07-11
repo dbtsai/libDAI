@@ -348,7 +348,7 @@ Real FactorGraph::logScore( const std::vector<size_t>& statevec ) const {
     // by summing the log factor entries of the factors that correspond to this joint configuration
     Real lS = 0.0;
     for( size_t I = 0; I < nrFactors(); I++ )
-        lS += dai::log( factor(I)[S(factor(I).vars())] );
+        lS += dai::log( factor(I)[BigInt_size_t(S(factor(I).vars()))] );
     return lS;
 }
 

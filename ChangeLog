@@ -1,3 +1,7 @@
+* Now uses GMP big integer type to represent linear states and the number of
+  states of VarSets (in some cases). This fixes a bug Jerome Maye found in the 
+  State() class in index.h. Unfortunately, the supplied Makefile.WINDOWS now
+  no longer works out-of-the-box.
 * Changed license from GPL v2+ to FreeBSD (BSD 2-clause)
 * Fixed numerical issues in MF, FBP and TRWBP (discovered in sparse branch)
 * Jerome Maye found a bug in the State() class in index.h; implemented

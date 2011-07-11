@@ -234,7 +234,7 @@ namespace dai {
                     varindices.insert( i );
 
                 // Do variable elimination
-                long double totalStates = 0.0;
+                BigInt totalStates = 0;
                 while( !varindices.empty() ) {
                     size_t i = f( cl, varindices );
                     VarSet Di = cl.elimVar( i );

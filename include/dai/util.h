@@ -24,6 +24,7 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <cerrno>
+#include <gmpxx.h>
 
 #include <dai/exceptions.h>
 
@@ -78,6 +79,15 @@ namespace dai {
 
 /// Real number (alias for \c double, which could be changed to <tt>long double</tt> if necessary)
 typedef double Real;
+
+/// Arbitrary precision integer number
+typedef mpz_class BigInt;
+
+/// Safe down-cast of big integer to size_t
+inline size_t BigInt_size_t( const BigInt &N ) {
+    DAI_ASSERT( N <= std::numeric_limits<std::size_t>::max() );
+    return N.get_ui();
+}
 
 /// Returns true if argument is NAN (Not A Number)
 bool isnan( Real x );

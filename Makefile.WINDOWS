@@ -8,8 +8,8 @@
 # This template contains configurations for compiling libDAI with Visual C++
 # under Windows (and GNU Make)
 #
-# It has been tested with Windows XP, Visual Studio 2008, MatLab R2008b and
-# Boost 1.42.0
+# TODO: the latest libDAI version depends on GMP (Windows users can use MPIR)
+# This file has to be updated in order to link with the right GMP/MPIR libraries
 #
 # To use it, simply copy this file to 'Makefile.conf' and adapt 'Makefile.conf'
 # to your local setup

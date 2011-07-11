@@ -117,7 +117,7 @@
  *  \section compatibility Compatibility
  *  
  *  The code has been developed under Debian GNU/Linux with the GCC compiler suite.
- *  libDAI compiles successfully with g++ versions 3.4 up to 4.4.
+ *  libDAI compiles successfully with g++ versions 3.4 up to 4.6.
  *
  *  libDAI has also been successfully compiled with MS Visual Studio 2008 under Windows
  *  (but not all build targets are supported yet) and with Cygwin under Windows.
@@ -200,18 +200,19 @@
  *    - GNU make
  *    - recent boost C++ libraries (at least version 1.37; however,
  *      version 1.37 shipped with Ubuntu 9.04 is known not to work)
+ *    - GMP library (or the Windows port called MPIR)
  *    - doxygen (only for building the documentation)
  *    - graphviz (only for using some of the libDAI command line utilities)
  *    - CImg library (only for building the image segmentation example)
  * 
  *  On Debian/Ubuntu, you can easily install the required packages with a single command:
- *  <pre>  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev cimg-dev</pre>
+ *  <pre>  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev libgmp-dev cimg-dev</pre>
  *  (root permissions needed).
  *
  *  On Mac OS X (10.4 is known to work), these packages can be installed easily via MacPorts.
  *  If MacPorts is not already installed, install it according to the instructions at http://www.macports.org/.
  *  Then, a simple 
- *    <pre>  sudo port install gmake boost doxygen graphviz</pre>
+ *    <pre>  sudo port install gmake boost gmp doxygen graphviz</pre>
  *  should be enough to install everything that is needed.
  *  
  *  On Cygwin, the prebuilt Cygwin package boost-1.33.1-x is known not to work.
@@ -258,6 +259,7 @@
  *  You need:
  *  - A recent version of MicroSoft Visual Studio (2008 is known to work)
  *  - recent boost C++ libraries (version 1.37 or higher)
+ *  - GMP or MPIR library
  *  - GNU make (can be obtained from http://gnuwin32.sourceforge.net)
  *  - CImg library (only for building the image segmentation example)
  *
@@ -283,6 +285,11 @@
  *  - The following command builds the boost libraries that are relevant for libDAI:
  *    <pre>
  *    bjam --with-graph --with-math --with-program_options --with-test link=static runtime-link=shared</pre>
+ *
+ *  \subsection build-windows-gmp Building GMP or MPIR under Windows
+ *  
+ *  Information about how to build GPR or MPIR under Windows can be found on the internet.
+ *  The user has to update Makefile.WINDOWS in order to link with the GPR/MPIR libraries.
  *
  *  \subsection build-windows-libdai Building libDAI
  *

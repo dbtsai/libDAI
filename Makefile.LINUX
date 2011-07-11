@@ -44,7 +44,7 @@ CCINC=-Iinclude
 
 # LINKER
 # Standard libraries to include
-LIBS=-ldai
+LIBS=-ldai -lgmpxx -lgmp
 # For linking with BOOST libraries
 BOOSTLIBS_PO=-lboost_program_options-mt
 BOOSTLIBS_UTF=-lboost_unit_test_framework-mt

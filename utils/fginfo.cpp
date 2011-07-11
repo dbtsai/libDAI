@@ -95,7 +95,7 @@ int main( int argc, char *argv[] ) {
         cout << "Pairwise interactions? " << fg.isPairwise() << endl;
         
         // Calculate treewidth using various heuristics
-        std::pair<size_t,double> tw;
+        std::pair<size_t,BigInt> tw;
         cout << "Treewidth (MinNeighbors):     ";
         try {
             tw = boundTreewidth(fg, &eliminationCost_MinNeighbors, maxstates );
@@ -141,7 +141,7 @@ int main( int argc, char *argv[] ) {
         }
         
         // Calculate total state space
-        long double stsp = 1.0;
+        BigInt stsp = 1;
         for( size_t i = 0; i < fg.nrVars(); i++ )
             stsp *= fg.var(i).states();
         cout << "Total state space:   " << stsp << endl;
@@ -149,9 +149,9 @@ int main( int argc, char *argv[] ) {
         cout << "Type: " << (fg.isPairwise() ? "pairwise" : "higher order") << " interactions, " << (fg.isBinary() ? "binary" : "nonbinary") << " variables" << endl;
 
         // Calculate complexity for LCBP
-        long double cavsum_lcbp = 0.0;
-        long double cavsum_lcbp2 = 0.0;
-        long double max_Delta_size = 0.0;
+        BigInt cavsum_lcbp = 0;
+        BigInt cavsum_lcbp2 = 0;
+        BigInt max_Delta_size = 0;
         map<size_t,size_t> cavsizes;
         for( size_t i = 0; i < fg.nrVars(); i++ ) {
             VarSet di = fg.delta(i);
@@ -159,7 +159,7 @@ int main( int argc, char *argv[] ) {
                 cavsizes[di.size()]++;
             else
                 cavsizes[di.size()] = 1;
-            long double Ds = fg.Delta(i).nrStates();
+            BigInt Ds = fg.Delta(i).nrStates();
             if( Ds > max_Delta_size )
                 max_Delta_size = Ds;
             cavsum_lcbp += di.nrStates();
