@@ -1,14 +1,22 @@
-* [Laurens van der Maaten] src/matlab/dai.cpp now correctly handles missing logZ() and maxDiff() implementations
-* Improved dai::Exception object (it now stores more information and doesn't print to stderr by default)
-* Added builtinInfAlgs() and builtinInfAlgNames()
-* Now uses GMP big integer type to represent linear states and the number of
-  states of VarSets (in some cases). This fixes a bug Jerome Maye found in the 
-  State() class in index.h. Unfortunately, the supplied Makefile.WINDOWS now
-  no longer works out-of-the-box.
+libDAI-0.3.0 (2011-07-12)
+-------------------------
+
+New license:
 * Changed license from GPL v2+ to FreeBSD (BSD 2-clause)
+
+Miscellaneous improvements:
+* Improved Exception class 
+  (it now stores more information and doesn't print to stderr by default)
+* Added builtinInfAlgs() and builtinInfAlgNames()
+
+Bug fixes:
+* [Laurens van der Maaten] src/matlab/dai.cpp now correctly handles missing logZ() 
+  and maxDiff() implementations
+* Now uses GMP big integer type to represent linear states and the number of
+  states of VarSets (in some cases). This fixes a bug Jerome Maye and Prija 
+  found in the State class. Unfortunately, the supplied Makefile.WINDOWS now 
+  no longer works out-of-the-box.
 * Fixed numerical issues in MF, FBP and TRWBP (discovered in sparse branch)
-* Jerome Maye and Prija independently found a bug in the State() class in index.h; 
-  implemented a workaround for the moment
 * Fixed bug in findMaximum(): inconsistent max-beliefs are now detected,
   instead of returning a MAP state with zero joint probability
   (reported by Hynek Urban)

@@ -2,8 +2,8 @@ libDAI  -  A free/open source C++ library for Discrete Approximate Inference
 
 -------------------------------------------------------------------------------
 
-Version:  git HEAD
-Date:     July 7, 2011
+Version:  0.3.0
+Date:     July 12, 2011
 See also: http://www.libdai.org
 
 -------------------------------------------------------------------------------
@@ -26,8 +26,7 @@ If you write a scientific paper describing research that made substantive use
 of this library, please cite the following paper describing libDAI:
 
 Joris M. Mooij;
-libDAI: A free & open source C++ library for Discrete Approximate Inference in
-graphical models;
+libDAI: A free & open source C++ library for Discrete Approximate Inference in graphical models;
 Journal of Machine Learning Research, 11(Aug):2169-2173, 2010.
 
 In BiBTeX format (for your convenience):
@@ -134,7 +133,7 @@ provides a command line interface and experimental python and octave interfaces
 Compatibility
 
 The code has been developed under Debian GNU/Linux with the GCC compiler suite.
-libDAI compiles successfully with g++ versions 3.4 up to 4.4.
+libDAI compiles successfully with g++ versions 3.4 up to 4.6.
 
 libDAI has also been successfully compiled with MS Visual Studio 2008 under
 Windows (but not all build targets are supported yet) and with Cygwin under
@@ -164,6 +163,7 @@ You need:
   * GNU make
   * recent boost C++ libraries (at least version 1.37; however, version 1.37
     shipped with Ubuntu 9.04 is known not to work)
+  * GMP library (or the Windows port called MPIR)
   * doxygen (only for building the documentation)
   * graphviz (only for using some of the libDAI command line utilities)
   * CImg library (only for building the image segmentation example)
@@ -171,7 +171,7 @@ You need:
 On Debian/Ubuntu, you can easily install the required packages with a single
 command:
 
-  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev cimg-dev
+  apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev libgmp-dev cimg-dev
 
 (root permissions needed).
 
@@ -179,7 +179,7 @@ On Mac OS X (10.4 is known to work), these packages can be installed easily via
 MacPorts. If MacPorts is not already installed, install it according to the
 instructions at http://www.macports.org/. Then, a simple
 
-  sudo port install gmake boost doxygen graphviz
+  sudo port install gmake boost gmp doxygen graphviz
 
 should be enough to install everything that is needed.
 
@@ -233,6 +233,7 @@ You need:
 
   * A recent version of MicroSoft Visual Studio (2008 is known to work)
   * recent boost C++ libraries (version 1.37 or higher)
+  * GMP or MPIR library
   * GNU make (can be obtained from http://gnuwin32.sourceforge.net)
   * CImg library (only for building the image segmentation example)
 
@@ -260,6 +261,12 @@ Because building boost under Windows is tricky, I provide some guidance here.
     libDAI:
 
         bjam --with-graph --with-math --with-program_options --with-test link=static runtime-link=shared
+
+Building GMP or MPIR under Windows
+
+Information about how to build GPR or MPIR under Windows can be found on the
+internet. The user has to update Makefile.WINDOWS in order to link with the GPR
+/MPIR libraries.
 
 Building libDAI
 
