@@ -1,3 +1,4 @@
+* Improved dai::Exception object (it now stores more information and doesn't print to stderr by default)
 * Added builtinInfAlgs() and builtinInfAlgNames()
 * Now uses GMP big integer type to represent linear states and the number of
   states of VarSets (in some cases). This fixes a bug Jerome Maye found in the 
