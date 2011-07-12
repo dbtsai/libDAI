@@ -31,7 +31,7 @@ CC=g++
 # Output filename option of the compiler
 CCO=-o 
 # Flags for the C++ compiler
-CCFLAGS=-Wno-deprecated -Wall -W -Wextra -fPIC -DMACOSX
+CCFLAGS=-Wno-deprecated -Wall -W -Wextra -fPIC -DMACOSX -arch i386
 # Flags to add in debugging mode (if DEBUG=true)
 CCDEBUGFLAGS=-O3 -g -DDAI_DEBUG
 # Flags to add in non-debugging mode (if DEBUG=false)
@@ -41,7 +41,7 @@ CCINC=-Iinclude -I/opt/local/include
 
 # LINKER
 # Standard libraries to include
-LIBS=-ldai -lgmpxx -lgmp
+LIBS=-ldai -lgmpxx -lgmp -arch i386
 # For linking with BOOST libraries
 BOOSTLIBS_PO=-lboost_program_options
 BOOSTLIBS_UTF=-lboost_unit_test_framework

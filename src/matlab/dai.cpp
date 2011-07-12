@@ -89,10 +89,28 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
     obj->run();
 
     // Save logZ
-    double logZ = obj->logZ();
+	double logZ = NAN;
+    try {
+        logZ = obj->logZ();
+    }
+    catch( Exception &e ) {
+        if( e.getCode() == Exception::NOT_IMPLEMENTED )
+            mexWarnMsgTxt("Calculating the log-partition function is not supported by this inference algorithm.");
+        else
+            throw;
+    }
 
     // Save maxdiff
-    double maxdiff = obj->maxDiff();
+    double maxdiff = NAN; 
+    try {
+        maxdiff = obj->maxDiff();
+    }
+    catch( Exception &e ) {
+        if( e.getCode() == Exception::NOT_IMPLEMENTED )
+            mexWarnMsgTxt("Calculating the max-differences is not supported by this inference algorithm.");
+        else
+            throw;
+    }
 
     // Hand over results to MATLAB
     LOGZ_OUT = mxCreateDoubleMatrix(1,1,mxREAL);
@@ -137,10 +155,11 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
                 qmap_p[n] = map_state[n];
         } else {
             delete obj;
-            mexErrMsgTxt("Calculating a MAP state is not supported by this inference algorithm");
+            mexErrMsgTxt("Calculating a MAP state is not supported by this inference algorithm.");
         }
     }
 
     delete obj;
+
     return;
 }
