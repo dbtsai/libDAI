@@ -53,7 +53,7 @@ int main( int argc, char *argv[] ) {
         try {
             boundTreewidth(fg, &eliminationCost_MinFill, maxstates );
         } catch( Exception &e ) {
-            if( e.code() == Exception::OUT_OF_MEMORY ) {
+            if( e.getCode() == Exception::OUT_OF_MEMORY ) {
                 do_jt = false;
                 cout << "Skipping junction tree (need more than " << maxstates << " states)." << endl;
             }

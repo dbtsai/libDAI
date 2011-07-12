@@ -30,26 +30,34 @@ BOOST_AUTO_TEST_CASE( ExceptionsTest ) {
     try {
         DAI_THROW(NOT_IMPLEMENTED);
     } catch( Exception& e ) {
-        BOOST_CHECK_EQUAL( e.code(), Exception::NOT_IMPLEMENTED );
-        BOOST_CHECK_EQUAL( e.message(e.code()), std::string("Feature not implemented") );
+        BOOST_CHECK_EQUAL( e.getCode(), Exception::NOT_IMPLEMENTED );
+        BOOST_CHECK_EQUAL( e.getMsg(), std::string("Feature not implemented") );
+        BOOST_CHECK_EQUAL( e.getDetailedMsg(), std::string("") );
+        BOOST_CHECK_EQUAL( e.getFilename(), std::string("tests/unit/exceptions_test.cpp") );
+        BOOST_CHECK_EQUAL( e.getFunction(), std::string("void ExceptionsTest::test_method()") );
+        BOOST_CHECK_EQUAL( e.getLine(), std::string("31") );
     }
 
     try {
         DAI_THROWE(NOT_IMPLEMENTED,"Detailed error message");
     } catch( Exception& e ) {
-        BOOST_CHECK_EQUAL( e.code(), Exception::NOT_IMPLEMENTED );
-        BOOST_CHECK_EQUAL( e.message(e.code()), std::string("Feature not implemented") );
+        BOOST_CHECK_EQUAL( e.getCode(), Exception::NOT_IMPLEMENTED );
+        BOOST_CHECK_EQUAL( e.getMsg(), std::string("Feature not implemented") );
+        BOOST_CHECK_EQUAL( e.getDetailedMsg(), std::string("Detailed error message") );
+        BOOST_CHECK_EQUAL( e.getFilename(), std::string("tests/unit/exceptions_test.cpp") );
+        BOOST_CHECK_EQUAL( e.getFunction(), std::string("void ExceptionsTest::test_method()") );
+        BOOST_CHECK_EQUAL( e.getLine(), std::string("42") );
     }
 
     try {
         DAI_THROW(NOT_IMPLEMENTED);
     } catch( std::runtime_error& e ) {
-        BOOST_CHECK_EQUAL( e.what(), std::string("Feature not implemented [tests/unit/exceptions_test.cpp, line 45]") );
+        BOOST_CHECK_EQUAL( e.what(), std::string("Feature not implemented [File tests/unit/exceptions_test.cpp, line 53, function: void ExceptionsTest::test_method()]") );
     }
 
     try {
         DAI_THROWE(NOT_IMPLEMENTED,"Detailed error message");
     } catch( std::runtime_error& e ) {
-        BOOST_CHECK_EQUAL( e.what(), std::string("Feature not implemented [tests/unit/exceptions_test.cpp, line 51]") );
+        BOOST_CHECK_EQUAL( e.what(), std::string("Feature not implemented: Detailed error message [File tests/unit/exceptions_test.cpp, line 59, function: void ExceptionsTest::test_method()]") );
     }
 }

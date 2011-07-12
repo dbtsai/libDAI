@@ -48,7 +48,7 @@ Factor calcMarginal( const InfAlg &obj, const VarSet &vs, bool reInit ) {
             clamped->run();
             logZ = clamped->logZ();
         } catch( Exception &e ) {
-            if( e.code() == Exception::NOT_NORMALIZABLE )
+            if( e.getCode() == Exception::NOT_NORMALIZABLE )
                 logZ = -INFINITY;
             else
                 throw;
@@ -112,7 +112,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& vs, bool reIni
                             clamped->run();
                             logZ = clamped->logZ();
                         } catch( Exception &e ) {
-                            if( e.code() == Exception::NOT_NORMALIZABLE )
+                            if( e.getCode() == Exception::NOT_NORMALIZABLE )
                                 logZ = -INFINITY;
                             else
                                 throw;
@@ -167,7 +167,7 @@ vector<Factor> calcPairBeliefs( const InfAlg & obj, const VarSet& vs, bool reIni
                     clamped->run();
                     logZ = clamped->logZ();
                 } catch( Exception &e ) {
-                    if( e.code() == Exception::NOT_NORMALIZABLE )
+                    if( e.getCode() == Exception::NOT_NORMALIZABLE )
                         logZ = -INFINITY;
                     else
                         throw;

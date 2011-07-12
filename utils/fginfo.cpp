@@ -101,7 +101,7 @@ int main( int argc, char *argv[] ) {
             tw = boundTreewidth(fg, &eliminationCost_MinNeighbors, maxstates );
             cout << tw.first << " (" << tw.second << " states)" << endl;
         } catch( Exception &e ) {
-            if( e.code() == Exception::OUT_OF_MEMORY )
+            if( e.getCode() == Exception::OUT_OF_MEMORY )
                 cout << "> " << maxstates << endl;
             else
                 cout << "an exception occurred" << endl;
@@ -112,7 +112,7 @@ int main( int argc, char *argv[] ) {
             tw = boundTreewidth(fg, &eliminationCost_MinWeight, maxstates );
             cout << tw.first << " (" << tw.second << " states)" << endl;
         } catch( Exception &e ) {
-            if( e.code() == Exception::OUT_OF_MEMORY )
+            if( e.getCode() == Exception::OUT_OF_MEMORY )
                 cout << "> " << maxstates << endl;
             else
                 cout << "an exception occurred" << endl;
@@ -123,7 +123,7 @@ int main( int argc, char *argv[] ) {
             tw = boundTreewidth(fg, &eliminationCost_MinFill, maxstates );
             cout << tw.first << " (" << tw.second << " states)" << endl;
         } catch( Exception &e ) {
-            if( e.code() == Exception::OUT_OF_MEMORY )
+            if( e.getCode() == Exception::OUT_OF_MEMORY )
                 cout << "> " << maxstates << endl;
             else
                 cout << "an exception occurred" << endl;
@@ -134,7 +134,7 @@ int main( int argc, char *argv[] ) {
             tw = boundTreewidth(fg, &eliminationCost_WeightedMinFill, maxstates );
             cout << tw.first << " (" << tw.second << " states)" << endl;
         } catch( Exception &e ) {
-            if( e.code() == Exception::OUT_OF_MEMORY )
+            if( e.getCode() == Exception::OUT_OF_MEMORY )
                 cout << "> " << maxstates << endl;
             else
                 cout << "an exception occurred" << endl;

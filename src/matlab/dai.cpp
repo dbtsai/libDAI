@@ -125,7 +125,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray*prhs[] ) {
         try {
             map_state = obj->findMaximum();
         } catch( Exception &e ) {
-            if( e.code() == Exception::NOT_IMPLEMENTED )
+            if( e.getCode() == Exception::NOT_IMPLEMENTED )
                 supported = false;
             else
                 throw;

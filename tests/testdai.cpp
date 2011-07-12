@@ -121,7 +121,7 @@ class TestDAI {
                     logZ = obj->logZ();
                     has_logZ = true;
                 } catch( Exception &e ) {
-                    if( e.code() == Exception::NOT_IMPLEMENTED )
+                    if( e.getCode() == Exception::NOT_IMPLEMENTED )
                         has_logZ = false;
                     else
                         throw;
@@ -132,7 +132,7 @@ class TestDAI {
                     maxdiff = obj->maxDiff();
                     has_maxdiff = true;
                 } catch( Exception &e ) {
-                    if( e.code() == Exception::NOT_IMPLEMENTED )
+                    if( e.getCode() == Exception::NOT_IMPLEMENTED )
                         has_maxdiff = false;
                     else
                         throw;
@@ -143,7 +143,7 @@ class TestDAI {
                     iters = obj->Iterations();
                     has_iters = true;
                 } catch( Exception &e ) {
-                    if( e.code() == Exception::NOT_IMPLEMENTED )
+                    if( e.getCode() == Exception::NOT_IMPLEMENTED )
                         has_iters = false;
                     else
                         throw;
@@ -160,7 +160,7 @@ class TestDAI {
                     try {
                         facMarginals.push_back( obj->beliefF( I ) );
                     } catch( Exception &e ) {
-                        if( e.code() == Exception::BELIEF_NOT_AVAILABLE )
+                        if( e.getCode() == Exception::BELIEF_NOT_AVAILABLE )
                             facMarginals.push_back( Factor( obj->fg().factor(I).vars(), INFINITY ) );
                         else
                             throw;
