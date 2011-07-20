@@ -68,6 +68,8 @@ namespace dai {
 
 
 /// Returns a map that contains for each built-in inference algorithm its name and a pointer to an object of that type
+/** \obsolete This functionality is obsolete and will be removed in future versions of libDAI
+ */
 std::map<std::string, InfAlg *>& builtinInfAlgs();
 
 

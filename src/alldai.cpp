@@ -19,67 +19,74 @@ namespace dai {
 using namespace std;
 
 
-std::map<std::string, InfAlg *>& builtinInfAlgs() {
-    // use Construct On First Use idiom
-    // see also http://www.parashift.com/c++-faq-lite/ctors.html#faq-10.14
-
-    class _builtinInfAlgs : public std::map<std::string, InfAlg *> { public: _builtinInfAlgs() {
-        operator[]( ExactInf().name() ) = new ExactInf;
+class _builtinInfAlgs : public std::map<std::string, InfAlg *> { 
+    public: 
+        _builtinInfAlgs() {
+            operator[]( ExactInf().name() ) = new ExactInf;
 #ifdef DAI_WITH_BP
-        operator[]( BP().name() ) = new BP;
+            operator[]( BP().name() ) = new BP;
 #endif
 #ifdef DAI_WITH_FBP
-        operator[]( FBP().name() ) = new FBP;
+            operator[]( FBP().name() ) = new FBP;
 #endif
 #ifdef DAI_WITH_TRWBP
-        operator[]( TRWBP().name() ) = new TRWBP;
+            operator[]( TRWBP().name() ) = new TRWBP;
 #endif
 #ifdef DAI_WITH_MF
-        operator[]( MF().name() ) = new MF;
+            operator[]( MF().name() ) = new MF;
 #endif
 #ifdef DAI_WITH_HAK
-        operator[]( HAK().name() ) = new HAK;
+            operator[]( HAK().name() ) = new HAK;
 #endif
 #ifdef DAI_WITH_LC
-        operator[]( LC().name() ) = new LC;
+            operator[]( LC().name() ) = new LC;
 #endif
 #ifdef DAI_WITH_TREEEP
-        operator[]( TreeEP().name() ) = new TreeEP;
+            operator[]( TreeEP().name() ) = new TreeEP;
 #endif
 #ifdef DAI_WITH_JTREE
-        operator[]( JTree().name() ) = new JTree;
+            operator[]( JTree().name() ) = new JTree;
 #endif
 #ifdef DAI_WITH_MR
-        operator[]( MR().name() ) = new MR;
+            operator[]( MR().name() ) = new MR;
 #endif
 #ifdef DAI_WITH_GIBBS
-        operator[]( Gibbs().name() ) = new Gibbs;
+            operator[]( Gibbs().name() ) = new Gibbs;
 #endif
 #ifdef DAI_WITH_CBP
-        operator[]( CBP().name() ) = new CBP;
+            operator[]( CBP().name() ) = new CBP;
 #endif
 #ifdef DAI_WITH_DECMAP
-        operator[]( DecMAP().name() ) = new DecMAP;
+            operator[]( DecMAP().name() ) = new DecMAP;
 #endif
-    } };
+        }
 
-    static std::map<std::string, InfAlg *>* bia = new _builtinInfAlgs;
+        ~_builtinInfAlgs() {
+            for( iterator it = begin(); it != end(); it++ )
+                delete it->second;
+        }
+};
 
-    return *bia;
+
+static _builtinInfAlgs allBuiltinInfAlgs;
+
+
+std::map<std::string, InfAlg *>& builtinInfAlgs() {
+    return allBuiltinInfAlgs;
 }
 
 
 std::set<std::string> builtinInfAlgNames() {
     std::set<std::string> algNames;
-    for( typename std::map<std::string, InfAlg*>::const_iterator it = builtinInfAlgs().begin(); it != builtinInfAlgs().end(); it++ )
+    for( _builtinInfAlgs::const_iterator it = allBuiltinInfAlgs.begin(); it != allBuiltinInfAlgs.end(); it++ )
         algNames.insert( it->first );
     return algNames;
 }
 
 
 InfAlg *newInfAlg( const std::string &name, const FactorGraph &fg, const PropertySet &opts ) {
-    std::map<std::string, InfAlg*>::const_iterator i = builtinInfAlgs().find( name );
-    if( i == builtinInfAlgs().end() )
+    _builtinInfAlgs::const_iterator i = allBuiltinInfAlgs.find( name );
+    if( i == allBuiltinInfAlgs.end() )
         DAI_THROWE(UNKNOWN_DAI_ALGORITHM, "Unknown inference algorithm: " + name);
     InfAlg *ia = i->second;
     return ia->construct( fg, opts );
