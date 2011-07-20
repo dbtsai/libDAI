@@ -141,6 +141,7 @@ Real CBP::run() {
     if( props.verbose >= 1 )
         cerr << "CBP average levels = " << (_sum_level / _num_leaves) << ", leaves = " << _num_leaves << endl;
     setBeliefs( beliefs_out, lz_out );
+    delete bp;
     return 0.0;
 }
 

@@ -1,5 +1,6 @@
 git master
 ----------
+* Fixed memory leak in CBP::run()
 * Fixed typo in Priya's name
 
 
