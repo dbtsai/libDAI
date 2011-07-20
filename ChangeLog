@@ -1,3 +1,8 @@
+git master
+----------
+* Fixed typo in Priya's name
+
+
 libDAI-0.3.0 (2011-07-12)
 -------------------------
 
@@ -13,7 +18,7 @@ Bug fixes:
 * [Laurens van der Maaten] src/matlab/dai.cpp now correctly handles missing logZ() 
   and maxDiff() implementations
 * Now uses GMP big integer type to represent linear states and the number of
-  states of VarSets (in some cases). This fixes a bug Jerome Maye and Prija 
+  states of VarSets (in some cases). This fixes a bug Jerome Maye and Priya 
   found in the State class. Unfortunately, the supplied Makefile.WINDOWS now 
   no longer works out-of-the-box.
 * Fixed numerical issues in MF, FBP and TRWBP (discovered in sparse branch)

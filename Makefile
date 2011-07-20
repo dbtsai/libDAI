@@ -12,8 +12,8 @@ include Makefile.ALL
 include Makefile.conf
 
 # Set version and date
-DAI_VERSION="0.3.0"
-DAI_DATE="July 12, 2011"
+DAI_VERSION="git HEAD"
+DAI_DATE="July 12, 2011 - or later"
 
 # Directories of libDAI sources
 # Location of libDAI headers
