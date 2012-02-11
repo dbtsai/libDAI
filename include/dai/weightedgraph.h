@@ -22,13 +22,14 @@
 #include <set>
 #include <limits>
 #include <climits>   // Work-around for bug in boost graph library
-#include <dai/util.h>
-#include <dai/exceptions.h>
-#include <dai/graph.h>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
+
+#include <dai/util.h>
+#include <dai/exceptions.h>
+#include <dai/graph.h>
 
 
 namespace dai {
@@ -123,7 +124,7 @@ class GraphEL : public std::set<UEdge> {
         /// Construct from GraphAL
         GraphEL( const GraphAL& G ) {
             for( size_t n1 = 0; n1 < G.nrNodes(); n1++ )
-                foreach( const Neighbor n2, G.nb(n1) )
+                bforeach( const Neighbor n2, G.nb(n1) )
                     if( n1 < n2 )
                         insert( UEdge( n1, n2 ) );
         }

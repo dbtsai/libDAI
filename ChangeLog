@@ -1,5 +1,6 @@
 git master
 ----------
+* [Benjamin Piwowarski] Renamed "foreach" macro into "bforeach" to avoid conflicts with newer Boost library versions
 * Optimized ClusterGraph( const FactorGraph&, bool) constructor
 * Fixed "typename" bug in src/alldai.cpp which resulted in FTBFS for older g++ compilers
 * Fixed memory leak in alldai.cpp and removed the function builtinInfAlgs()

@@ -79,7 +79,7 @@ FactorGraph createFG( const GraphAL &G, FactorType ft, size_t states, const Prop
     factors.reserve( G.nrEdges() + N );
     // Pairwise factors
     for( size_t i = 0; i < N; i++ )
-        foreach( const Neighbor &j, G.nb(i) )
+        bforeach( const Neighbor &j, G.nb(i) )
             if( i < j ) {
                 if( ft == FactorType::POTTS )
                     factors.push_back( createFactorPotts( vars[i], vars[j], beta ) );

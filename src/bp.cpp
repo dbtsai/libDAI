@@ -101,7 +101,7 @@ void BP::construct() {
             _edge2lut.push_back( vector<LutType::iterator>() );
             _edge2lut[i].reserve( nbV(i).size() );
         }
-        foreach( const Neighbor &I, nbV(i) ) {
+        bforeach( const Neighbor &I, nbV(i) ) {
             EdgeProp newEP;
             newEP.message = Prob( var(i).states() );
             newEP.newMessage = Prob( var(i).states() );
@@ -133,7 +133,7 @@ void BP::construct() {
     _updateSeq.clear();
     _updateSeq.reserve( nrEdges() );
     for( size_t I = 0; I < nrFactors(); I++ )
-        foreach( const Neighbor &i, nbF(I) )
+        bforeach( const Neighbor &i, nbF(I) )
             _updateSeq.push_back( Edge( i, i.dual ) );
 }
 
@@ -141,7 +141,7 @@ void BP::construct() {
 void BP::init() {
     Real c = props.logdomain ? 0.0 : 1.0;
     for( size_t i = 0; i < nrVars(); ++i ) {
-        foreach( const Neighbor &I, nbV(i) ) {
+        bforeach( const Neighbor &I, nbV(i) ) {
             message( i, I.iter ).fill( c );
             newMessage( i, I.iter ).fill( c );
             if( props.updates == Properties::UpdateType::SEQMAX )
@@ -168,11 +168,11 @@ Prob BP::calcIncomingMessageProduct( size_t I, bool without_i, size_t i ) const 
         prod.takeLog();
 
     // Calculate product of incoming messages and factor I
-    foreach( const Neighbor &j, nbF(I) )
+    bforeach( const Neighbor &j, nbF(I) )
         if( !(without_i && (j == i)) ) {
             // prod_j will be the product of messages coming into j
             Prob prod_j( var(j).states(), props.logdomain ? 0.0 : 1.0 );
-            foreach( const Neighbor &J, nbV(j) )
+            bforeach( const Neighbor &J, nbV(j) )
                 if( J != I ) { // for all J in nb(j) \ I
                     if( props.logdomain )
                         prod_j += message( j, J.iter );
@@ -274,7 +274,7 @@ Real BP::run() {
             if( _iters == 0 ) {
                 // do the first pass
                 for( size_t i = 0; i < nrVars(); ++i )
-                  foreach( const Neighbor &I, nbV(i) )
+                  bforeach( const Neighbor &I, nbV(i) )
                       calcNewMessage( i, I.iter );
             }
             // Maximum-Residual BP [\ref EMK06]
@@ -286,9 +286,9 @@ Real BP::run() {
 
                 // I->i has been updated, which means that residuals for all
                 // J->j with J in nb[i]\I and j in nb[J]\i have to be updated
-                foreach( const Neighbor &J, nbV(i) ) {
+                bforeach( const Neighbor &J, nbV(i) ) {
                     if( J.iter != _I ) {
-                        foreach( const Neighbor &j, nbF(J) ) {
+                        bforeach( const Neighbor &j, nbF(J) ) {
                             size_t _J = j.dual;
                             if( j != i )
                                 calcNewMessage( j, _J );
@@ -299,18 +299,18 @@ Real BP::run() {
         } else if( props.updates == Properties::UpdateType::PARALL ) {
             // Parallel updates
             for( size_t i = 0; i < nrVars(); ++i )
-                foreach( const Neighbor &I, nbV(i) )
+                bforeach( const Neighbor &I, nbV(i) )
                     calcNewMessage( i, I.iter );
 
             for( size_t i = 0; i < nrVars(); ++i )
-                foreach( const Neighbor &I, nbV(i) )
+                bforeach( const Neighbor &I, nbV(i) )
                     updateMessage( i, I.iter );
         } else {
             // Sequential updates
             if( props.updates == Properties::UpdateType::SEQRND )
                 random_shuffle( _updateSeq.begin(), _updateSeq.end(), rnd );
 
-            foreach( const Edge &e, _updateSeq ) {
+            bforeach( const Edge &e, _updateSeq ) {
                 calcNewMessage( e.first, e.second );
                 updateMessage( e.first, e.second );
             }
@@ -354,7 +354,7 @@ Real BP::run() {
 
 void BP::calcBeliefV( size_t i, Prob &p ) const {
     p = Prob( var(i).states(), props.logdomain ? 0.0 : 1.0 );
-    foreach( const Neighbor &I, nbV(i) )
+    bforeach( const Neighbor &I, nbV(i) )
         if( props.logdomain )
             p += newMessage( i, I.iter );
         else
@@ -430,7 +430,7 @@ Real BP::logZ() const {
 void BP::init( const VarSet &ns ) {
     for( VarSet::const_iterator n = ns.begin(); n != ns.end(); ++n ) {
         size_t ni = findVar( *n );
-        foreach( const Neighbor &I, nbV( ni ) ) {
+        bforeach( const Neighbor &I, nbV( ni ) ) {
             Real val = props.logdomain ? 0.0 : 1.0;
             message( ni, I.iter ).fill( val );
             newMessage( ni, I.iter ).fill( val );

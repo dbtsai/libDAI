@@ -40,8 +40,8 @@
 #endif
 
 
-/// An alias to the BOOST_FOREACH macro from the boost::foreach library
-#define foreach BOOST_FOREACH
+/// An alias to the BOOST_FOREACH macro from the boost::bforeach library
+#define bforeach BOOST_FOREACH
 
 #ifdef DAI_DEBUG
 /// \brief "Print variable". Prints the text of an expression, followed by its value (only if DAI_DEBUG is defined)

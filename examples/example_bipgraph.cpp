@@ -32,7 +32,7 @@ int main() {
     for( size_t n1 = 0; n1 < G.nrNodes1(); n1++ ) {
         cout << "Node " << n1 << " of type 1 has " << G.nb1(n1).size() << " neighbors:" << endl;
         // Iterate over all neighbors n2 of n1
-        foreach( const Neighbor &n2, G.nb1(n1) ) {
+        bforeach( const Neighbor &n2, G.nb1(n1) ) {
             // The n2.iter'th neighbor of n1 is n2:
             DAI_ASSERT( G.nb1(n1)[n2.iter] == n2 );
 
