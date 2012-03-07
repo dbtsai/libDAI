@@ -1,5 +1,6 @@
 git master
 ----------
+* [Arman Aksoy] Added Makefile.MACOSX64
 * Fixed bug in findMaximum (it only considered a single connected component of the factor graph)
 * [Benjamin Piwowarski] Renamed "foreach" macro into "bforeach" to avoid conflicts with newer Boost library versions
 * Optimized ClusterGraph( const FactorGraph&, bool) constructor
