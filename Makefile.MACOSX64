@@ -52,13 +52,15 @@ CCLIB=-Llib -L/opt/local/lib
 # MatLab version 7.3 (R2006b) or newer?
 NEW_MATLAB=true
 # Replace the following by the directory where MatLab has been installed
-MATLABDIR=/agbs/share/sw/matlab
+MATLABDIR=/opt/Matlab-R2010b
 # The following should resolve to the MatLab mex compile command
 MEX=$(MATLABDIR)/bin/mex
-# Specify the same C++ compiler and flags to mex
+# Specify the C++ compiler and flags for MEX
 MEXFLAGS:=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'
 # Standard include directories for MEX
 MEXINC:=$(CCINC)
+# Standard libraries to include
+MEXLIBS=-lgmpxx -lgmp
 # Additional library search paths for MEX
 MEXLIB=
 

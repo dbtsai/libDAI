@@ -61,6 +61,8 @@ MEX=$(MATLABDIR)/bin/mex
 MEXFLAGS:=CXX\#$(CC) CXXFLAGS\#'$(CCFLAGS)'
 # Standard include directories for MEX
 MEXINC:=$(CCINC)
+# Standard libraries to include
+MEXLIBS=-lgmpxx -lgmp
 # Additional library search paths for MEX
 MEXLIB=
 

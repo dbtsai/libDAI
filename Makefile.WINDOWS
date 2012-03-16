@@ -67,6 +67,8 @@ MEX=$(MATLABDIR)\bin\mex
 MEXFLAGS:=-DWINDOWS -DNOMINMAX
 # Standard include directories for MEX
 MEXINC:=$(CCINC)
+# Standard libraries to include
+MEXLIBS=
 # Additional library search paths for MEX
 MEXLIB=
 
