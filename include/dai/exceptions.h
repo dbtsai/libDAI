@@ -36,7 +36,14 @@
  *  DAI_THROW(NOT_IMPLEMENTED);
  *  \endcode
  */
-#define DAI_THROW(cod) throw dai::Exception(dai::Exception::cod, __FILE__, __PRETTY_FUNCTION__, DAI_TOSTRING(__LINE__), "")
+#if defined __GNUG__ // GNU C++
+  #define FUNCTION_NAME __PRETTY_FUNCTION__
+#elif defined _MSC_VER // Visual Studio
+  #define FUNCTION_NAME __FUNCTION__
+#else // other compilers
+  #define FUNCTION_NAME __func__
+#endif
+#define DAI_THROW(cod) throw dai::Exception(dai::Exception::cod, __FILE__, FUNCTION_NAME, DAI_TOSTRING(__LINE__), "")
 
 /// Macro that simplifies throwing an exception with a user-defined error message.
 /** \param cod Corresponds to one of the enum values of dai::Exception::Code
