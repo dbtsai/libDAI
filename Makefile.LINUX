@@ -71,7 +71,7 @@ MEXLIB=
 # The following should resolve to the SWIG command
 SWIG=swig
 # Location of Python header files
-INCLUDE_PYTHON=/usr/include/python2.5
+INCLUDE_PYTHON=/usr/include/python2.7
 # Location of Boost C++ library header files
 INCLUDE_BOOST=/usr/include/boost
 

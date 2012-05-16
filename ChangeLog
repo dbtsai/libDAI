@@ -1,5 +1,6 @@
 git master
 ----------
+* Fixed bug (found by Andy Mueller): added GMP library invocations to swig Makefile
 * Fixed bug (found by Yan): replaced GNU extension __PRETTY_FUNCTION__ by __FUNCTION (Visual Studio) or __func__ (other compilers)
 * Fixed bug (found by cax): when building MatLab MEX files, GMP libraries were not linked
 * [Arman Aksoy] Added Makefile.MACOSX64
